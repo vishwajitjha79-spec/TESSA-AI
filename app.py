@@ -96,16 +96,57 @@ col1, col2 = st.columns([1, 1.4])
 
 with col1:
     components.html(
-        """
-        <div style="text-align:center;">
-            <img src="https://i.imgur.com/REPLACE_THIS.png"
-                 style="width:280px;
-                        filter: drop-shadow(0 0 25px #ff00ff);">
-            <p style="opacity:0.7;">Holographic Projection</p>
-        </div>
-        """,
-        height=420
-    )
+    """
+    <div class="tessa-holo">
+        <img src="assets/tessa.png" class="tessa-avatar">
+        <div class="scanlines"></div>
+        <p class="holo-text">Holographic Projection</p>
+    </div>
+
+    <style>
+    .tessa-holo {
+        text-align: center;
+        position: relative;
+    }
+
+    .tessa-avatar {
+        width: 280px;
+        animation: float 4s ease-in-out infinite;
+        filter: drop-shadow(0 0 30px rgba(255,0,255,0.7));
+    }
+
+    .scanlines {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 280px;
+        height: 100%;
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,0.05),
+            rgba(255,255,255,0.05) 1px,
+            transparent 1px,
+            transparent 3px
+        );
+        pointer-events: none;
+    }
+
+    .holo-text {
+        opacity: 0.6;
+        font-size: 0.85rem;
+        margin-top: 8px;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0); }
+    }
+    </style>
+    """,
+    height=460
+)
 
 with col2:
     for m in st.session_state.messages:
@@ -179,4 +220,5 @@ if (
     and st.session_state.messages
     and st.session_state.messages[-1]["role"] == "assistant"
 ):
+
     speak(st.session_state.messages[-1]["content"])

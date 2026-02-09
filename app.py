@@ -101,10 +101,23 @@ with st.sidebar:
     st.subheader("Interface")
 
     # Hidden creator unlock (no labels, no buttons)
-    secret = st.text_input("", type="password", label_visibility="collapsed")
+    secret = st.text_input(
+    " ",
+    type="password",
+    placeholder="••••••••",
+    label_visibility="collapsed"
+)
+
+if secret:
     if secret == "BihariBabu07":
-        st.session_state.is_ankit = True
-        st.toast("Creator recognized.")
+        if not st.session_state.is_ankit:
+            st.session_state.is_ankit = True
+            st.success("❤️ Heart unlocked.")
+            time.sleep(0.6)
+            st.rerun()
+    elif len(secret) > 4:
+        st.warning("…that’s not it.")
+
 
     if st.button("Clear Memory"):
         st.session_state.messages = []
@@ -203,5 +216,6 @@ st.markdown(
     "<script>window.scrollTo(0, document.body.scrollHeight);</script>",
     unsafe_allow_html=True
 )
+
 
 

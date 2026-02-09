@@ -1,84 +1,88 @@
 import streamlit as st
+from groq import Groq
+import os
+import base64
 import time
 import random
-from openai import OpenAI
+from streamlit_mic_recorder import speech_to_text
+from gtts import gTTS
+import streamlit.components.v1 as components
 
 # ---------------- CONFIG ----------------
 st.set_page_config(
     page_title="TESSA",
-    page_icon="✨",
-    layout="centered"
+    page_icon="💠",
+    layout="wide"
 )
 
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-
-# ---------------- SESSION STATE ----------------
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-if "tessa_state" not in st.session_state:
-    st.session_state.tessa_state = "idle"
-
-if "creator_mode" not in st.session_state:
-    st.session_state.creator_mode = False
-
-
-# ---------------- CSS ----------------
+# ---------------- STYLING ----------------
 st.markdown("""
 <style>
 body {
-    background: radial-gradient(circle at top, #0b0f1a, #020409);
+    background: linear-gradient(180deg, #0a0f1f, #02040a);
     color: #eaeaff;
+}
+
+.tessa-avatar {
+    width: 300px;
+    transition: all 0.6s ease;
+    filter: drop-shadow(0 0 30px rgba(255,0,255,0.6));
+}
+
+.tessa-avatar.thinking {
+    filter: drop-shadow(0 0 45px rgba(0,255,255,0.9));
 }
 
 .chat-container {
     max-height: 70vh;
     overflow-y: auto;
-    scroll-behavior: smooth;
-}
-
-.tessa-avatar {
-    width: 260px;
-    display: block;
-    margin: auto;
-    filter: drop-shadow(0 0 30px rgba(255, 0, 180, 0.6));
-    transition: all 0.4s ease;
-}
-
-.tessa-avatar.thinking {
-    filter: drop-shadow(0 0 45px rgba(0, 255, 255, 0.9));
-}
-
-.thinking-text {
-    text-align: center;
-    opacity: 0.75;
-    font-style: italic;
-    margin-top: 6px;
-}
-
-.user {
-    background: linear-gradient(135deg, #2a2f45, #1b1f33);
-    padding: 12px;
-    border-radius: 12px;
-    margin: 8px 0;
-}
-
-.tessa {
-    background: linear-gradient(135deg, #4b0055, #24002a);
-    padding: 12px;
-    border-radius: 12px;
-    margin: 8px 0;
 }
 </style>
 """, unsafe_allow_html=True)
 
+# ---------------- API ----------------
+api_key = st.secrets.get("GROQ_API_KEY")
+client = Groq(api_key=api_key)
 
-# ---------------- AVATAR ----------------
-state_class = "thinking" if st.session_state.tessa_state == "thinking" else ""
-st.markdown(f"""
-<img src="assets/tessa.png" class="tessa-avatar {state_class}">
-""", unsafe_allow_html=True)
+# ---------------- SESSION STATE ----------------
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
+if "creator_mode" not in st.session_state:
+    st.session_state.creator_mode = False
+
+if "tessa_state" not in st.session_state:
+    st.session_state.tessa_state = "idle"
+
+# ---------------- CONSTANTS ----------------
+HISTORY_LIMIT = 40
+
+VARIETY_MODIFIERS = [
+    "Be playful and witty, never cruel.",
+    "Sound confident, curious, and alive.",
+    "Be charming with soft sarcasm.",
+    "Respond naturally, vary reply length."
+]
+
+CREATOR_MODES = [
+    "Be warm, familiar, and slightly teasing.",
+    "Speak honestly, thoughtfully, and protectively.",
+    "Drop the performance. Be real."
+]
+
+# ---------------- PERSONA ----------------
+def get_persona():
+    base = """
+You are Tessa — an intelligent, emotionally aware holographic AI.
+You speak naturally, with varied response length.
+You are never robotic or repetitive.
+You tease gently, but become serious when the topic demands it.
+You think before answering and adapt to the user's tone.
+"""
+    if st.session_state.creator_mode:
+        return base + random.choice(CREATOR_MODES)
+    else:
+        return base + random.choice(VARIETY_MODIFIERS)
 
 # ---------------- THINKING ENGINE ----------------
 def get_thinking_lines(prompt):
@@ -86,110 +90,134 @@ def get_thinking_lines(prompt):
 
     if any(w in p for w in ["why", "how", "explain"]):
         return [
-            "Alright… this needs actual thought.",
+            "Okay… this one deserves real thought.",
             "Let me slow down for this.",
-            "Pulling threads together…"
+            "Connecting things carefully…"
         ]
 
-    if any(w in p for w in ["sad", "feel", "lost", "confused"]):
+    if any(w in p for w in ["sad", "feel", "confused", "hurt"]):
         return [
-            "Okay… emotional weight detected.",
-            "Switching to gentle mode.",
-            "I need to choose my words carefully."
+            "Switching to soft focus.",
+            "I should be careful here.",
+            "This matters."
         ]
 
     if any(w in p for w in ["joke", "fun", "flirt"]):
         return [
-            "Oh? We’re doing *that*?",
-            "This could be dangerous.",
-            "Let me behave… maybe."
+            "Oh… interesting.",
+            "Choosing words wisely. Or not.",
+            "This could be fun."
         ]
 
     return [
         "Thinking…",
         "Processing you.",
-        "Deciding how honest to be."
+        "Deciding how direct to be."
     ]
 
+# ---------------- HEADER ----------------
+st.title("TESSA")
 
-def perform_thinking(prompt):
+# ---------------- SIDEBAR ----------------
+with st.sidebar:
+    st.subheader("Settings")
+
+    hidden = st.text_input(" ", type="password", placeholder=" ")
+    if hidden == "BihariBabu07":
+        st.session_state.creator_mode = True
+        st.toast("Creator Mode unlocked 💠")
+
+    if st.button("Clear Memory"):
+        st.session_state.messages = []
+        st.rerun()
+
+    use_voice = st.toggle("Voice Output 🎙️", value=True)
+    v_input = speech_to_text(language="en", start_prompt="Talk to me…", key="mic")
+
+# ---------------- LAYOUT ----------------
+col1, col2 = st.columns([1, 1.6])
+
+with col1:
+    state_class = "thinking" if st.session_state.tessa_state == "thinking" else ""
+    components.html(f"""
+    <div style="text-align:center;">
+        <img src="assets/tessa.png" class="tessa-avatar {state_class}">
+        <p style="opacity:0.6;">Holographic Presence</p>
+    </div>
+    """, height=420)
+
+with col2:
+    st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
+    for m in st.session_state.messages:
+        with st.chat_message(m["role"]):
+            st.markdown(m["content"])
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ---------------- VOICE OUTPUT ----------------
+def speak(text):
+    try:
+        clean = text.encode("ascii", "ignore").decode()
+        tts = gTTS(text=clean, lang="en", tld="ie")
+        tts.save("voice.mp3")
+        with open("voice.mp3", "rb") as f:
+            b64 = base64.b64encode(f.read()).decode()
+            st.markdown(f"""
+            <audio autoplay style="display:none;">
+                <source src="data:audio/mp3;base64,{b64}">
+            </audio>
+            """, unsafe_allow_html=True)
+    except:
+        pass
+
+# ---------------- CHAT INPUT ----------------
+prompt = v_input if v_input else st.chat_input("Speak to Tessa…")
+
+if prompt:
+    st.session_state.messages.append({"role": "user", "content": prompt})
     st.session_state.tessa_state = "thinking"
-    style = random.choice(["silent", "tease", "focused"])
+
+    thinking_style = random.choice(["silent", "tease", "focused"])
     lines = get_thinking_lines(prompt)
 
-    if style == "silent":
+    if thinking_style == "silent":
         with st.spinner("Tessa is thinking…"):
             time.sleep(random.uniform(1.3, 2.2))
 
-    elif style == "tease":
-        for line in lines[:random.randint(1, 2)]:
-            st.markdown(f"<div class='thinking-text'>{line}</div>", unsafe_allow_html=True)
+    elif thinking_style == "tease":
+        for l in lines[:random.randint(1, 2)]:
+            st.markdown(f"*{l}*")
             time.sleep(random.uniform(0.4, 0.7))
 
     else:
         with st.spinner(random.choice(lines)):
-            time.sleep(random.uniform(1.1, 1.8))
+            time.sleep(random.uniform(1.2, 1.8))
 
+    try:
+        completion = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "system", "content": get_persona()}]
+            + st.session_state.messages[-HISTORY_LIMIT:],
+            temperature=random.uniform(0.9, 1.2),
+            top_p=0.95,
+            max_tokens=random.randint(120, 260)
+        )
 
-# ---------------- CHAT HISTORY ----------------
-st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
+        response = completion.choices[0].message.content
+        st.session_state.messages.append(
+            {"role": "assistant", "content": response}
+        )
 
-for msg in st.session_state.messages:
-    role_class = "user" if msg["role"] == "user" else "tessa"
-    st.markdown(f"<div class='{role_class}'>{msg['content']}</div>", unsafe_allow_html=True)
+        st.session_state.tessa_state = "idle"
+        st.rerun()
 
-st.markdown("</div>", unsafe_allow_html=True)
+    except:
+        st.error("Tessa lost her train of thought.")
 
-
-# ---------------- INPUT ----------------
-prompt = st.chat_input("Talk to Tessa…")
-
-# Hidden Creator Mode Trigger
-if prompt and prompt.strip().lower() == "access heart":
-    st.session_state.creator_mode = True
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": "Heart access granted. Hello, Creator."
-    })
-    st.experimental_rerun()
-
-
-if prompt and not st.session_state.creator_mode:
-    st.session_state.messages.append({"role": "user", "content": prompt})
-
-    perform_thinking(prompt)
-
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "You are TESSA — a holographic AI assistant. "
-                    "You are intelligent, warm, playful but not cruel. "
-                    "You vary response length naturally. "
-                    "You are serious when the topic is serious. "
-                    "Never be robotic. Never over-sass."
-                )
-            }
-        ] + st.session_state.messages
-    )
-
-    answer = response.choices[0].message.content
-
-    # Slight human pacing
-    time.sleep(random.uniform(0.3, 0.6))
-
-    st.session_state.messages.append({"role": "assistant", "content": answer})
-    st.session_state.tessa_state = "idle"
-
-    st.experimental_rerun()
-
-
-# ---------------- CREATOR MODE ----------------
-if st.session_state.creator_mode:
-    st.sidebar.title("💗 Tessa — Heart Mode")
-    st.sidebar.write("You’re inside the core.")
-    st.sidebar.write("Future settings, memory tuning, personality sliders go here.")
-
+# ---------------- PLAY VOICE ----------------
+if (
+    use_voice
+    and st.session_state.messages
+    and st.session_state.messages[-1]["role"] == "assistant"
+):
+    speak(st.session_state.messages[-1]["content"])
 

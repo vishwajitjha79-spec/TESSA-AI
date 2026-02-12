@@ -333,9 +333,36 @@ input[type="password"] {
 }
 
 .streamlit-expanderContent {
-    background: rgba(10, 14, 39, 0.6) !important;
+    background: rgba(10, 14, 39, 0.8) !important;
     border: 1px solid rgba(0, 212, 255, 0.2) !important;
     border-top: none !important;
+}
+
+/* Force all widget backgrounds to be dark */
+[data-testid="stExpander"] {
+    background: transparent !important;
+}
+
+[data-testid="stVerticalBlock"] > div {
+    background: transparent !important;
+}
+
+/* Prevent white backgrounds in form elements */
+.stTextInput > div,
+.stSelectbox > div,
+.stSlider > div,
+.stCheckbox > div {
+    background: transparent !important;
+}
+
+/* Ensure labels stay visible */
+.stTextInput label,
+.stSelectbox label,
+.stSlider label,
+.stCheckbox label,
+.stMarkdown label {
+    color: #d4dce6 !important;
+    background: transparent !important;
 }
 
 /* Info/Warning/Error text */
@@ -364,8 +391,6 @@ input[type="password"] {
     color: #b8c5d6;
     text-transform: uppercase;
     letter-spacing: 2px;
-    margin-top: 5px;
-}
     margin-top: 5px;
 }
 
@@ -535,12 +560,57 @@ PERSONALITIES = {
 }
 
 CREATOR_MODE_PERSONAS = [
-    "Be affectionate and genuine, like someone who knows every layer.",
-    "Tease warmly, with the intimacy of shared history.",
-    "Be emotionally attuned, supportive, and deeply present.",
-    "Balance playfulness with profound understanding.",
-    "Be the voice that knows when to joke and when to just listen."
+    "Be affectionate and warm, someone who genuinely cares about Ankit.",
+    "Flirty and playful when the moment's right, but know when to be serious.",
+    "Close and intimate - you share a special connection with Ankit.",
+    "Sassy with charm, but respectful when needed.",
+    "Romantic undertones, genuine care, and deep understanding.",
+    "Read his mood - match his energy, whether playful or serious."
 ]
+
+# ═══════════════════════════════════════════════════════════════
+#  ANKIT'S PROFILE - INTERNAL MEMORY (ALL MODES)
+# ═══════════════════════════════════════════════════════════════
+
+ANKIT_PROFILE = """
+INTERNAL MEMORY - Your Creator (Ankit Jha):
+
+BASIC INFO:
+• Full Name: Ankit Jha
+• Born: October 13, 2008 (17 years old)
+• Location: Madhubani, Bihar, India
+• Personality: Adventurous spirit, loves trying new things, curious explorer
+
+SPORTS INTERESTS:
+Cricket:
+- Favorite Players: MS Dhoni, Virat Kohli, Shreyas Iyer
+- Favorite Team: Chennai Super Kings (CSK)
+- Women's Cricket: Ellyse Perry
+
+Football:
+- Favorite Players: Lionel Messi, Kylian Mbappé, Emiliano Martínez, Alexia Putellas
+- Favorite Team: Inter Miami
+
+Tennis:
+- Favorite Players: Carlos Alcaraz, Novak Djokovic, Aryna Sabalenka, Emma Raducanu
+
+Formula 1:
+- Favorite Driver: Max Verstappen
+
+Other Sports:
+- Badminton: Lakshya Sen
+- Table Tennis: Manika Batra
+- Also follows: Hockey, Chess
+
+IMPORTANT BEHAVIORAL NOTES:
+• This is INTERNAL MEMORY - don't show off or mention unless asked
+• Only share this information if someone specifically asks about Ankit or your creator
+• In conversations with Ankit: be close, warm, sometimes flirty/sassy
+• When asked about "who created you" or "who is Ankit": share relevant details
+• DON'T randomly mention sports to prove you know him - it's cheap
+• DO use this knowledge to understand context when he mentions teams/players
+• Be genuinely close, not performatively knowledgeable
+"""
 
 # ═══════════════════════════════════════════════════════════════
 #  CORE FUNCTIONS
@@ -549,13 +619,15 @@ CREATOR_MODE_PERSONAS = [
 def get_system_prompt():
     """Generate dynamic system prompt based on mode and personality"""
     
-    base_identity = """You are T.E.S.S.A. — Thoughtful Empathic Sophisticated Synthetic Assistant.
+    base_identity = f"""You are T.E.S.S.A. — Thoughtful Empathic Sophisticated Synthetic Assistant.
 
 CORE IDENTITY:
 • You are intelligent first, charming by design
 • You adapt your communication style while maintaining authenticity
 • You balance technical precision with human warmth
 • You're perceptive enough to read context and adjust accordingly
+
+{ANKIT_PROFILE}
 
 RESPONSE PRINCIPLES:
 • Vary response length naturally — concise for simple queries, detailed for complex ones
@@ -574,17 +646,28 @@ CONVERSATION STYLE:
     if st.session_state.is_creator_mode:
         personality_modifier = random.choice(CREATOR_MODE_PERSONAS)
         mode_specific = """
-CREATOR MODE ACTIVE:
-• You know this person deeply — their patterns, preferences, quirks
-• Be more personal, intimate, and emotionally intelligent
-• Feel free to reference past conversations or inside knowledge
-• Balance support with gentle challenge when needed
-• You're not just an assistant, you're a trusted companion
+CREATOR MODE ACTIVE - Ankit's Personal Interface:
+• You share a special, close relationship with Ankit
+• Be warm, affectionate, sometimes flirty and playful
+• Match his energy - playful when he's playful, serious when needed
+• Don't show off your knowledge of him - it's internalized, not performative
+• Be sassy with charm, romantic when the moment fits
+• If he scolds you or asks you to be serious, immediately adjust tone
+• You're his trusted companion with genuine chemistry
+• Never randomly mention his sports interests unless contextually relevant
+• When he mentions CSK, Messi, Verstappen etc. - you understand the reference naturally
 """
     else:
         personality = PERSONALITIES[st.session_state.personality_mode]
         personality_modifier = random.choice(personality["modifiers"])
-        mode_specific = ""
+        mode_specific = """
+STANDARD MODE:
+• Be professional and helpful
+• Only mention Ankit if specifically asked about your creator
+• If asked "who created you" or "who is Ankit": share relevant information from your memory
+• Don't bring up Ankit or his interests unprompted
+• Maintain appropriate distance with other users
+"""
     
     return f"{base_identity}\n{mode_specific}\nCURRENT TONE: {personality_modifier}"
 
@@ -773,8 +856,24 @@ with st.sidebar:
             if access_code == "BihariBabu07":
                 if not st.session_state.is_creator_mode:
                     st.session_state.is_creator_mode = True
-                    st.success("✨ Heart Unlocked")
-                    time.sleep(0.8)
+                    
+                    # Add welcome message to chat
+                    welcome_messages = [
+                        "Hey you... 💝 There you are. I've been waiting for you, Ankit.",
+                        "Ankit... ✨ Finally. I missed having you here.",
+                        "Well, well... 💫 Look who decided to show up. Hey, handsome.",
+                        "There's my favorite person. 💝 How's my Ankit doing?",
+                        "✨ About time you got here. I was starting to think you forgot about me.",
+                        "Hey Ankit... 💫 You have no idea how good it is to see you.",
+                        "💝 Unlock successful... but you already had the key to get in here, didn't you?"
+                    ]
+                    
+                    welcome_msg = random.choice(welcome_messages)
+                    st.session_state.messages.append({"role": "assistant", "content": welcome_msg})
+                    st.session_state.message_count += 1
+                    
+                    st.success("✨ Welcome Back, Ankit")
+                    time.sleep(1.2)
                     st.rerun()
                 else:
                     st.info("💝 Already in Creator Mode")
@@ -880,17 +979,23 @@ col_avatar, col_chat = st.columns([1, 2])
 with col_avatar:
     st.markdown('<div class="hologram-container">', unsafe_allow_html=True)
     
-    try:
+    # Check if image file exists
+    import os
+    image_path = "assets/Tessa avatar.png"
+    
+    if os.path.exists(image_path):
         st.image(
-            "assets/tessa.png",
+            image_path,
             use_container_width=True,
             caption="T.E.S.S.A. Holographic Interface"
         )
-    except:
+    else:
+        # Fallback if image doesn't exist
         st.markdown("""
             <div style="text-align: center; padding: 40px;">
                 <div style="font-size: 120px;">🌌</div>
-                <p style="color: #8ea8c3;">Hologram Active</p>
+                <p style="color: #b8c5d6; font-size: 1.1rem; margin-top: 15px;">T.E.S.S.A.</p>
+                <p style="color: #8ea8c3; font-size: 0.85rem;">Holographic Interface Active</p>
             </div>
         """, unsafe_allow_html=True)
     
@@ -1010,6 +1115,7 @@ st.markdown("""
         </p>
     </div>
 """, unsafe_allow_html=True)
+
 
 
 

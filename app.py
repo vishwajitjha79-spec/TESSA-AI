@@ -37,6 +37,16 @@ st.markdown("""
 .stApp {
     background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0d1117 100%);
     font-family: 'Rajdhani', sans-serif;
+    color: #e8eef5;
+}
+
+/* Global text improvements */
+p, span, div, label {
+    color: #d4dce6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff;
 }
 
 /* Header Styling */
@@ -72,12 +82,16 @@ st.markdown("""
 
 /* Status Panel */
 .status-panel {
-    background: rgba(0, 212, 255, 0.05);
-    border: 1px solid rgba(0, 212, 255, 0.3);
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid rgba(0, 212, 255, 0.4);
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+}
+
+.status-panel > * {
+    color: #e8eef5 !important;
 }
 
 .status-grid {
@@ -88,7 +102,7 @@ st.markdown("""
 }
 
 .status-item {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 212, 255, 0.05);
     padding: 12px;
     border-radius: 8px;
     border-left: 3px solid var(--primary-glow);
@@ -96,41 +110,64 @@ st.markdown("""
 
 .status-label {
     font-size: 0.75rem;
-    color: #6b7a8f;
+    color: #99b3cc;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
 .status-value {
     font-size: 1.1rem;
-    color: var(--primary-glow);
+    color: #00d4ff;
     font-weight: 600;
     margin-top: 4px;
 }
 
 /* Chat Messages */
 [data-testid="stChatMessage"] {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.9), rgba(26, 31, 58, 0.85));
+    border: 1px solid rgba(0, 212, 255, 0.25);
     border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 12px;
+    padding: 18px;
+    margin-bottom: 14px;
     backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     transition: all 0.3s ease;
 }
 
 [data-testid="stChatMessage"]:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(0, 212, 255, 0.3);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.95), rgba(26, 31, 58, 0.9));
+    border-color: rgba(0, 212, 255, 0.5);
+    box-shadow: 0 0 25px rgba(0, 212, 255, 0.2);
+    transform: translateY(-2px);
 }
 
 [data-testid="stChatMessage"][data-testid*="user"] {
-    border-left: 3px solid var(--primary-glow);
+    border-left: 4px solid var(--primary-glow);
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.08), rgba(10, 14, 39, 0.9));
 }
 
 [data-testid="stChatMessage"][data-testid*="assistant"] {
-    border-left: 3px solid var(--secondary-glow);
+    border-left: 4px solid var(--secondary-glow);
+    background: linear-gradient(135deg, rgba(127, 92, 255, 0.08), rgba(10, 14, 39, 0.9));
+}
+
+/* Chat Message Text */
+[data-testid="stChatMessage"] p,
+[data-testid="stChatMessage"] span,
+[data-testid="stChatMessage"] div {
+    color: #e8eef5 !important;
+    line-height: 1.6;
+}
+
+[data-testid="stChatMessage"] strong {
+    color: #ffffff !important;
+}
+
+[data-testid="stChatMessage"] code {
+    background: rgba(0, 212, 255, 0.15);
+    color: #00d4ff !important;
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 /* Thinking Animation */
@@ -139,10 +176,15 @@ st.markdown("""
     align-items: center;
     gap: 10px;
     padding: 20px;
-    background: rgba(127, 92, 255, 0.1);
+    background: rgba(127, 92, 255, 0.12);
     border-radius: 12px;
-    border: 1px solid rgba(127, 92, 255, 0.3);
+    border: 1px solid rgba(127, 92, 255, 0.4);
     margin: 10px 0;
+}
+
+.thinking-container span {
+    color: #b8c5d6 !important;
+    font-style: italic;
 }
 
 .thinking-dots {
@@ -176,6 +218,18 @@ st.markdown("""
     margin-bottom: 1rem;
 }
 
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] label {
+    color: #d4dce6 !important;
+}
+
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {
+    color: #ffffff !important;
+}
+
 /* Buttons */
 .stButton > button {
     width: 100%;
@@ -198,10 +252,14 @@ st.markdown("""
 
 /* Toggle Switches */
 .stCheckbox {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 212, 255, 0.05);
     padding: 10px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.stCheckbox label {
+    color: #d4dce6 !important;
 }
 
 /* Input Fields */
@@ -220,27 +278,45 @@ st.markdown("""
     box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
 }
 
+/* Select/Dropdown */
+.stSelectbox label,
+.stSlider label {
+    color: #d4dce6 !important;
+}
+
+.stSelectbox > div > div {
+    background: rgba(0, 212, 255, 0.05);
+    border-color: rgba(0, 212, 255, 0.3);
+}
+
+/* Info/Warning/Error text */
+.stInfo, .stWarning, .stError, .stSuccess {
+    color: #e8eef5 !important;
+}
+
 /* Metrics */
 .metric-card {
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(127, 92, 255, 0.1));
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.12), rgba(127, 92, 255, 0.12));
     padding: 15px;
     border-radius: 10px;
-    border: 1px solid rgba(0, 212, 255, 0.3);
+    border: 1px solid rgba(0, 212, 255, 0.4);
     text-align: center;
 }
 
 .metric-value {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--primary-glow);
+    color: #00d4ff;
     font-family: 'Orbitron', monospace;
 }
 
 .metric-label {
     font-size: 0.85rem;
-    color: #8ea8c3;
+    color: #b8c5d6;
     text-transform: uppercase;
     letter-spacing: 2px;
+    margin-top: 5px;
+}
     margin-top: 5px;
 }
 
@@ -837,9 +913,9 @@ if (st.session_state.auto_speak and
 
 st.markdown("---")
 st.markdown("""
-    <div style="text-align: center; color: #6b7a8f; font-size: 0.85rem; padding: 20px;">
+    <div style="text-align: center; color: #99b3cc; font-size: 0.85rem; padding: 20px;">
         <p>T.E.S.S.A. v2.0 | Powered by Groq & Llama 3.3 | Designed for Ankit</p>
-        <p style="font-size: 0.75rem; margin-top: 10px;">
+        <p style="font-size: 0.75rem; margin-top: 10px; color: #7f8fa6;">
             "Intelligence with empathy, sophistication with warmth"
         </p>
     </div>

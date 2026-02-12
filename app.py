@@ -250,6 +250,19 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateY(-2px);
 }
 
+/* Unlock button specific */
+button[kind="secondary"] {
+    background: linear-gradient(135deg, rgba(255, 51, 102, 0.2), rgba(0, 212, 255, 0.2)) !important;
+    border: 2px solid rgba(0, 212, 255, 0.6) !important;
+    font-size: 1.2rem !important;
+    padding: 8px !important;
+}
+
+button[kind="secondary"]:hover {
+    background: linear-gradient(135deg, rgba(255, 51, 102, 0.4), rgba(0, 212, 255, 0.4)) !important;
+    box-shadow: 0 0 25px rgba(0, 212, 255, 0.6) !important;
+}
+
 /* Toggle Switches */
 .stCheckbox {
     background: rgba(0, 212, 255, 0.05);
@@ -265,17 +278,33 @@ h1, h2, h3, h4, h5, h6 {
 /* Input Fields */
 .stTextInput > div > div > input,
 .stChatInput > div > input {
-    background: rgba(0, 212, 255, 0.05);
-    border: 1px solid rgba(0, 212, 255, 0.3);
-    border-radius: 8px;
-    color: white;
-    font-family: 'Rajdhani', sans-serif;
+    background: rgba(10, 14, 39, 0.95) !important;
+    border: 2px solid rgba(0, 212, 255, 0.5) !important;
+    border-radius: 12px !important;
+    color: #e8eef5 !important;
+    font-family: 'Rajdhani', sans-serif !important;
+    padding: 14px !important;
+    font-size: 1rem !important;
+}
+
+.stTextInput > div > div > input::placeholder,
+.stChatInput > div > input::placeholder {
+    color: #7f8fa6 !important;
+    opacity: 0.8 !important;
 }
 
 .stTextInput > div > div > input:focus,
 .stChatInput > div > input:focus {
-    border-color: var(--primary-glow);
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+    border-color: var(--primary-glow) !important;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.4) !important;
+    background: rgba(10, 14, 39, 1) !important;
+}
+
+/* Password Input Specific */
+input[type="password"] {
+    background: rgba(10, 14, 39, 0.95) !important;
+    color: #00d4ff !important;
+    border: 2px solid rgba(0, 212, 255, 0.4) !important;
 }
 
 /* Select/Dropdown */
@@ -287,6 +316,26 @@ h1, h2, h3, h4, h5, h6 {
 .stSelectbox > div > div {
     background: rgba(0, 212, 255, 0.05);
     border-color: rgba(0, 212, 255, 0.3);
+}
+
+/* Expander styling */
+.streamlit-expanderHeader {
+    background: rgba(0, 212, 255, 0.1) !important;
+    border: 1px solid rgba(0, 212, 255, 0.3) !important;
+    border-radius: 8px !important;
+    color: #e8eef5 !important;
+    font-weight: 600 !important;
+}
+
+.streamlit-expanderHeader:hover {
+    background: rgba(0, 212, 255, 0.15) !important;
+    border-color: rgba(0, 212, 255, 0.5) !important;
+}
+
+.streamlit-expanderContent {
+    background: rgba(10, 14, 39, 0.6) !important;
+    border: 1px solid rgba(0, 212, 255, 0.2) !important;
+    border-top: none !important;
 }
 
 /* Info/Warning/Error text */
@@ -645,83 +694,117 @@ render_header()
 with st.sidebar:
     st.markdown("### ⚙️ SYSTEM CONTROLS")
     
-    # Creator Mode Access
-    with st.expander("🔐 Access Control", expanded=False):
-        access_code = st.text_input(
-            "Authorization Code",
-            type="password",
-            placeholder="Enter access code...",
-            key="access_input"
-        )
+    # Settings Menu
+    with st.expander("🔧 Settings", expanded=True):
+        # Personality Settings
+        st.markdown("**🎭 Personality**")
         
-        if access_code:
+        if not st.session_state.is_creator_mode:
+            personality_mode = st.selectbox(
+                "Conversation Style",
+                options=list(PERSONALITIES.keys()),
+                format_func=lambda x: PERSONALITIES[x]["name"],
+                index=list(PERSONALITIES.keys()).index(st.session_state.personality_mode),
+                key="personality_selector",
+                label_visibility="collapsed"
+            )
+            st.session_state.personality_mode = personality_mode
+        else:
+            st.info("🎯 Creator Mode Active - Adaptive Personality")
+        
+        st.markdown("---")
+        
+        # Response Creativity
+        st.markdown("**🎨 Response Creativity**")
+        temperature = st.slider(
+            "Creativity Level",
+            min_value=0.5,
+            max_value=1.3,
+            value=st.session_state.temperature,
+            step=0.1,
+            help="Higher values = more creative and varied responses",
+            label_visibility="collapsed"
+        )
+        st.session_state.temperature = temperature
+        
+        st.markdown("---")
+        
+        # Voice Settings
+        st.markdown("**🎙️ Voice**")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            voice_enabled = st.checkbox(
+                "Voice Input",
+                value=st.session_state.voice_enabled,
+                key="voice_toggle"
+            )
+            st.session_state.voice_enabled = voice_enabled
+        
+        with col2:
+            auto_speak = st.checkbox(
+                "Auto Speak",
+                value=st.session_state.auto_speak,
+                key="auto_speak_toggle"
+            )
+            st.session_state.auto_speak = auto_speak
+    
+    # Hidden Access Control - Only visible as icon
+    with st.expander("❤️ Heart Access", expanded=False):
+        st.markdown("**Unlock Creator Mode**")
+        
+        # Create columns for input and button
+        col_input, col_button = st.columns([3, 1])
+        
+        with col_input:
+            access_code = st.text_input(
+                "Code",
+                type="password",
+                placeholder="Enter code...",
+                key="access_input",
+                label_visibility="collapsed"
+            )
+        
+        with col_button:
+            unlock_pressed = st.button("🔓", key="unlock_btn", help="Unlock")
+        
+        # Check access code on button press or enter
+        if access_code and (unlock_pressed or access_code):
             if access_code == "BihariBabu07":
                 if not st.session_state.is_creator_mode:
                     st.session_state.is_creator_mode = True
-                    st.success("✨ Creator Mode Activated")
-                    time.sleep(0.5)
+                    st.success("✨ Heart Unlocked")
+                    time.sleep(0.8)
                     st.rerun()
+                else:
+                    st.info("💝 Already in Creator Mode")
             elif len(access_code) > 4:
-                st.error("❌ Access Denied")
+                st.error("❌ Invalid Code")
+    
+    st.markdown("---")
     
     # Mode Indicator
     if st.session_state.is_creator_mode:
-        st.markdown('<div class="mode-badge mode-creator">👤 CREATOR MODE</div>', unsafe_allow_html=True)
+        st.markdown("""
+            <div style="text-align: center; padding: 10px; background: linear-gradient(135deg, rgba(255, 51, 102, 0.2), rgba(127, 92, 255, 0.2)); border-radius: 10px; border: 2px solid #ff3366;">
+                <div style="font-size: 1.2rem; font-weight: 700; color: #ff3366;">👤 CREATOR MODE</div>
+                <div style="font-size: 0.75rem; color: #d4dce6; margin-top: 5px;">Heart Access Active</div>
+            </div>
+        """, unsafe_allow_html=True)
     else:
-        st.markdown('<div class="mode-badge mode-standard">👥 STANDARD MODE</div>', unsafe_allow_html=True)
+        st.markdown("""
+            <div style="text-align: center; padding: 10px; background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(127, 92, 255, 0.15)); border-radius: 10px; border: 2px solid #00d4ff;">
+                <div style="font-size: 1.2rem; font-weight: 700; color: #00d4ff;">👥 STANDARD MODE</div>
+                <div style="font-size: 0.75rem; color: #d4dce6; margin-top: 5px;">Public Access</div>
+            </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("---")
     
-    # Personality Settings
-    st.markdown("### 🎭 Personality")
-    
-    if not st.session_state.is_creator_mode:
-        personality_mode = st.selectbox(
-            "Conversation Style",
-            options=list(PERSONALITIES.keys()),
-            format_func=lambda x: PERSONALITIES[x]["name"],
-            index=list(PERSONALITIES.keys()).index(st.session_state.personality_mode),
-            key="personality_selector"
-        )
-        st.session_state.personality_mode = personality_mode
-    else:
-        st.info("Creator Mode uses adaptive personality")
-    
-    temperature = st.slider(
-        "Response Creativity",
-        min_value=0.5,
-        max_value=1.3,
-        value=st.session_state.temperature,
-        step=0.1,
-        help="Higher values = more creative and varied responses"
-    )
-    st.session_state.temperature = temperature
-    
-    st.markdown("---")
-    
-    # Voice Controls
-    st.markdown("### 🎙️ Voice Settings")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        voice_enabled = st.checkbox(
-            "Voice Input",
-            value=st.session_state.voice_enabled,
-            key="voice_toggle"
-        )
-        st.session_state.voice_enabled = voice_enabled
-    
-    with col2:
-        auto_speak = st.checkbox(
-            "Auto Speak",
-            value=st.session_state.auto_speak,
-            key="auto_speak_toggle"
-        )
-        st.session_state.auto_speak = auto_speak
-    
-    # Voice input
+    # Voice input (when enabled)
     voice_input = None
     if st.session_state.voice_enabled:
+        st.markdown("**🎤 Voice Input**")
         voice_input = speech_to_text(
             language="en",
             start_prompt="🎤 Speak now...",
@@ -729,8 +812,7 @@ with st.sidebar:
             just_once=True,
             key="voice_recorder"
         )
-    
-    st.markdown("---")
+        st.markdown("---")
     
     # Session Stats
     st.markdown("### 📊 Session Stats")
@@ -756,23 +838,31 @@ with st.sidebar:
             </div>
         """, unsafe_allow_html=True)
     
-    st.markdown(f"**Tokens Used:** {st.session_state.total_tokens_used:,}")
+    st.markdown(f"""
+        <div style="text-align: center; margin-top: 10px; color: #99b3cc;">
+            <strong>Tokens:</strong> {st.session_state.total_tokens_used:,}
+        </div>
+    """, unsafe_allow_html=True)
     
     st.markdown("---")
     
     # System Actions
     st.markdown("### 🔧 Actions")
     
-    if st.button("🗑️ Clear Conversation", use_container_width=True):
-        st.session_state.messages = []
-        st.session_state.message_count = 0
-        st.session_state.conversation_start = datetime.now()
-        st.rerun()
+    col1, col2 = st.columns(2)
     
-    if st.button("🔄 Reset System", use_container_width=True):
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
-        st.rerun()
+    with col1:
+        if st.button("🗑️ Clear", use_container_width=True, help="Clear conversation"):
+            st.session_state.messages = []
+            st.session_state.message_count = 0
+            st.session_state.conversation_start = datetime.now()
+            st.rerun()
+    
+    with col2:
+        if st.button("🔄 Reset", use_container_width=True, help="Reset all settings"):
+            for key in list(st.session_state.keys()):
+                del st.session_state[key]
+            st.rerun()
     
     if st.session_state.is_creator_mode:
         if st.button("🚪 Exit Creator Mode", use_container_width=True):
@@ -792,7 +882,7 @@ with col_avatar:
     
     try:
         st.image(
-            "assets/Tessa avatar.png",
+            "assets/tessa.png",
             use_container_width=True,
             caption="T.E.S.S.A. Holographic Interface"
         )
@@ -920,6 +1010,7 @@ st.markdown("""
         </p>
     </div>
 """, unsafe_allow_html=True)
+
 
 
 

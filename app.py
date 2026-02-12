@@ -792,7 +792,7 @@ with col_avatar:
     
     try:
         st.image(
-            "assets/tessa.png",
+            "assets/Tessa avatar.png",
             use_container_width=True,
             caption="T.E.S.S.A. Holographic Interface"
         )
@@ -920,6 +920,7 @@ st.markdown("""
         </p>
     </div>
 """, unsafe_allow_html=True)
+
 
 
 

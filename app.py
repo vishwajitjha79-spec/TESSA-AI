@@ -3,10 +3,12 @@ from groq import Groq
 import base64
 import time
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from streamlit_mic_recorder import speech_to_text
 from gtts import gTTS
 import json
+import os
+import uuid
 
 # ═══════════════════════════════════════════════════════════════
 #  CONFIGURATION & INITIALIZATION
@@ -18,6 +20,233 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# ═══════════════════════════════════════════════════════════════
+#  CHAT STORAGE SYSTEM
+# ═══════════════════════════════════════════════════════════════
+
+STORAGE_FILE = "tessa_conversations.json"
+
+def load_conversations():
+    """Load all conversations from storage"""
+    if os.path.exists(STORAGE_FILE):
+        try:
+            with open(STORAGE_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except:
+            return {"conversations": []}
+    return {"conversations": []}
+
+def save_conversations(data):
+    """Save conversations to storage"""
+    try:
+        with open(STORAGE_FILE, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        return True
+    except Exception as e:
+        st.error(f"Save failed: {str(e)}")
+        return False
+
+def create_new_conversation():
+    """Create a new conversation session"""
+    return {
+        "id": str(uuid.uuid4()),
+        "title": "New Chat",
+        "created": datetime.now().isoformat(),
+        "updated": datetime.now().isoformat(),
+        "mode": "standard",
+        "messages": [],
+        "mood_history": ["neutral"],
+        "message_count": 0
+    }
+
+def auto_generate_title(messages):
+    """Generate title from first user message"""
+    if messages and len(messages) > 0:
+        first_msg = messages[0]["content"] if messages[0]["role"] == "user" else (messages[1]["content"] if len(messages) > 1 else "")
+        title = first_msg[:40] + "..." if len(first_msg) > 40 else first_msg
+        return title if title else "New Chat"
+    return "New Chat"
+
+def save_current_conversation():
+    """Save current conversation to history"""
+    if not st.session_state.messages:
+        return
+    
+    data = load_conversations()
+    current_conv = {
+        "id": st.session_state.get("current_conversation_id", str(uuid.uuid4())),
+        "title": st.session_state.get("conversation_title", auto_generate_title(st.session_state.messages)),
+        "created": st.session_state.get("conversation_start", datetime.now()).isoformat(),
+        "updated": datetime.now().isoformat(),
+        "mode": "creator" if st.session_state.is_creator_mode else "standard",
+        "messages": st.session_state.messages,
+        "mood_history": st.session_state.get("mood_history", ["neutral"]),
+        "message_count": st.session_state.message_count
+    }
+    
+    # Update or add conversation
+    existing_idx = next((i for i, c in enumerate(data["conversations"]) if c["id"] == current_conv["id"]), None)
+    if existing_idx is not None:
+        data["conversations"][existing_idx] = current_conv
+    else:
+        data["conversations"].insert(0, current_conv)
+    
+    save_conversations(data)
+
+def load_conversation(conv_id):
+    """Load a specific conversation"""
+    data = load_conversations()
+    conv = next((c for c in data["conversations"] if c["id"] == conv_id), None)
+    if conv:
+        st.session_state.messages = conv["messages"]
+        st.session_state.message_count = conv["message_count"]
+        st.session_state.current_conversation_id = conv["id"]
+        st.session_state.conversation_title = conv["title"]
+        st.session_state.conversation_start = datetime.fromisoformat(conv["created"])
+        st.session_state.mood_history = conv.get("mood_history", ["neutral"])
+        st.session_state.current_mood = conv.get("mood_history", ["neutral"])[-1]
+        if conv["mode"] == "creator":
+            st.session_state.is_creator_mode = True
+
+def delete_conversation(conv_id):
+    """Delete a conversation"""
+    data = load_conversations()
+    data["conversations"] = [c for c in data["conversations"] if c["id"] != conv_id]
+    save_conversations(data)
+
+# ═══════════════════════════════════════════════════════════════
+#  MOOD SYSTEM
+# ═══════════════════════════════════════════════════════════════
+
+MOOD_AVATARS = {
+    "happy": "assets/Tessa Happy.png",
+    "calm": "assets/Tessa Calm.png",
+    "confident": "assets/Tessa Confident.png",
+    "worried": "assets/Tessa worried.png",
+    "flirty": "assets/Tessa Fyy.png",
+    "loving": "assets/Tessa Lgg.png",
+    "thinking": "assets/Tessa Thinking.png",
+    "listening": "assets/Tessa Listening.png",
+    "playful": "assets/Tessa Playful.png",
+    "focused": "assets/Tessa Focussed.png",
+}
+
+MOOD_DESCRIPTIONS = {
+    "happy": "😊 Joyful",
+    "calm": "😌 Serene",
+    "confident": "😎 Assured",
+    "worried": "😟 Concerned",
+    "flirty": "😏 Playful",
+    "loving": "🥰 Affectionate",
+    "thinking": "🤔 Pondering",
+    "listening": "👂 Attentive",
+    "playful": "😄 Mischievous",
+    "focused": "🎯 Concentrated",
+}
+
+MOOD_TRIGGERS = {
+    # Positive triggers
+    "happy": ["thank you", "thanks", "awesome", "great", "love it", "perfect", "excellent", "haha", "lol"],
+    "excited": ["wow", "amazing", "incredible", "omg", "yes!", "lets go"],
+    "loving": ["love you", "miss you", "care about", "adore"],
+    "playful": ["hehe", "tease", "silly", "fun", "play"],
+    "confident": ["i know", "definitely", "absolutely", "expert", "professional"],
+    
+    # Neutral/Work triggers
+    "focused": ["help me", "explain", "how to", "analyze", "work on", "solve"],
+    "thinking": ["what if", "consider", "maybe", "possibly", "wondering"],
+    "listening": ["tell me", "i feel", "i think", "share", "talk about"],
+    "calm": ["relax", "peace", "calm", "meditate", "breathe"],
+    
+    # Negative triggers
+    "worried": ["problem", "issue", "worried", "concerned", "afraid", "scared", "nervous"],
+    "frustrated": ["ugh", "annoying", "stupid", "hate", "terrible"],
+    "sad": ["sad", "depressed", "down", "upset", "hurt"],
+    
+    # Special Creator Mode triggers
+    "flirty": ["hey beautiful", "looking good", "gorgeous", "hot", "sexy", "handsome"],
+    "shy": ["blush", "you're sweet", "aww", "embarrass"],
+}
+
+def detect_mood_from_text(text, current_mood="neutral", is_creator=False):
+    """Detect mood from user's message"""
+    text_lower = text.lower()
+    
+    # Check for explicit mood requests
+    if "be serious" in text_lower or "stop playing" in text_lower:
+        return "focused"
+    if "be happy" in text_lower or "cheer up" in text_lower:
+        return "happy"
+    
+    # Score each mood
+    mood_scores = {}
+    for mood, triggers in MOOD_TRIGGERS.items():
+        score = sum(1 for trigger in triggers if trigger in text_lower)
+        if score > 0:
+            mood_scores[mood] = score
+    
+    # Special creator mode handling
+    if is_creator:
+        # More likely to be flirty in creator mode
+        if any(word in text_lower for word in ["hey", "hi", "hello"]) and random.random() > 0.6:
+            return "flirty"
+        if "miss" in text_lower or "waiting" in text_lower:
+            return "loving"
+    
+    # Return highest scoring mood or stay in current
+    if mood_scores:
+        detected_mood = max(mood_scores, key=mood_scores.get)
+        # Map to available moods
+        mood_mapping = {
+            "excited": "happy",
+            "frustrated": "worried",
+            "sad": "worried",
+            "shy": "flirty"
+        }
+        return mood_mapping.get(detected_mood, detected_mood if detected_mood in MOOD_AVATARS else current_mood)
+    
+    return current_mood
+
+def detect_mood_from_response(response_text, user_text, is_creator=False):
+    """Detect mood from T.E.S.S.A.'s own response"""
+    response_lower = response_text.lower()
+    
+    # Analyze response tone
+    if any(word in response_lower for word in ["sorry", "apologize", "my bad"]):
+        return "worried"
+    if any(word in response_lower for word in ["haha", "lol", "😄", "fun"]):
+        return "playful"
+    if any(word in response_lower for word in ["let me think", "analyzing", "considering"]):
+        return "thinking"
+    if any(word in response_lower for word in ["i understand", "i hear you", "tell me more"]):
+        return "listening"
+    if any(word in response_lower for word in ["definitely", "absolutely", "certainly", "expert"]):
+        return "confident"
+    if is_creator and any(word in response_lower for word in ["hey you", "handsome", "miss", "waiting"]):
+        return "flirty"
+    if is_creator and any(word in response_lower for word in ["love", "care", "special"]):
+        return "loving"
+    
+    # Default moods based on context
+    if "?" in user_text:
+        return "thinking"
+    if is_creator:
+        return random.choice(["happy", "playful", "flirty", "loving"]) if random.random() > 0.7 else "calm"
+    
+    return "happy" if random.random() > 0.5 else "calm"
+
+def get_mood_avatar(mood="neutral"):
+    """Get avatar path for current mood"""
+    if mood in MOOD_AVATARS:
+        path = MOOD_AVATARS[mood]
+        if os.path.exists(path):
+            return path
+    # Fallback to neutral/calm
+    for fallback in ["calm", "happy"]:
+        if fallback in MOOD_AVATARS and os.path.exists(MOOD_AVATARS[fallback]):
+            return MOOD_AVATARS[fallback]
+    return None
 
 # ═══════════════════════════════════════════════════════════════
 #  ADVANCED STYLING
@@ -78,6 +307,88 @@ h1, h2, h3, h4, h5, h6 {
 @keyframes pulse-glow {
     0%, 100% { filter: brightness(1); }
     50% { filter: brightness(1.3); }
+}
+
+/* Chat History Sidebar */
+.history-sidebar {
+    background: linear-gradient(180deg, #0f1419 0%, #1a1f3a 100%);
+    border-right: 2px solid rgba(0, 212, 255, 0.3);
+    padding: 15px;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.chat-card {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.08), rgba(127, 92, 255, 0.08));
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.chat-card:hover {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(127, 92, 255, 0.15));
+    border-color: rgba(0, 212, 255, 0.6);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+    transform: translateX(5px);
+}
+
+.chat-card-active {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(127, 92, 255, 0.2));
+    border: 2px solid var(--primary-glow);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+}
+
+.chat-title {
+    color: #e8eef5;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-meta {
+    color: #8ea8c3;
+    font-size: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.date-header {
+    color: var(--primary-glow);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 20px 0 10px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+/* Mood Indicator */
+.mood-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, rgba(127, 92, 255, 0.2), rgba(0, 212, 255, 0.2));
+    border: 1px solid rgba(127, 92, 255, 0.4);
+    margin-bottom: 10px;
+}
+
+.mood-transition {
+    animation: mood-fade 0.5s ease-in-out;
+}
+
+@keyframes mood-fade {
+    0% { opacity: 0.5; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
 }
 
 /* Status Panel */
@@ -151,7 +462,6 @@ h1, h2, h3, h4, h5, h6 {
     background: linear-gradient(135deg, rgba(127, 92, 255, 0.08), rgba(10, 14, 39, 0.9));
 }
 
-/* Chat Message Text */
 [data-testid="stChatMessage"] p,
 [data-testid="stChatMessage"] span,
 [data-testid="stChatMessage"] div {
@@ -250,7 +560,6 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateY(-2px);
 }
 
-/* Unlock button specific */
 button[kind="secondary"] {
     background: linear-gradient(135deg, rgba(255, 51, 102, 0.2), rgba(0, 212, 255, 0.2)) !important;
     border: 2px solid rgba(0, 212, 255, 0.6) !important;
@@ -300,7 +609,6 @@ button[kind="secondary"]:hover {
     background: rgba(10, 14, 39, 1) !important;
 }
 
-/* Password Input Specific */
 input[type="password"] {
     background: rgba(10, 14, 39, 0.95) !important;
     color: #00d4ff !important;
@@ -338,7 +646,6 @@ input[type="password"] {
     border-top: none !important;
 }
 
-/* Force all widget backgrounds to be dark */
 [data-testid="stExpander"] {
     background: transparent !important;
 }
@@ -347,7 +654,6 @@ input[type="password"] {
     background: transparent !important;
 }
 
-/* Prevent white backgrounds in form elements */
 .stTextInput > div,
 .stSelectbox > div,
 .stSlider > div,
@@ -355,7 +661,6 @@ input[type="password"] {
     background: transparent !important;
 }
 
-/* Ensure labels stay visible */
 .stTextInput label,
 .stSelectbox label,
 .stSlider label,
@@ -365,7 +670,6 @@ input[type="password"] {
     background: transparent !important;
 }
 
-/* Info/Warning/Error text */
 .stInfo, .stWarning, .stError, .stSuccess {
     color: #e8eef5 !important;
 }
@@ -445,29 +749,6 @@ input[type="password"] {
     background: var(--primary-glow);
 }
 
-/* Mode Indicators */
-.mode-badge {
-    display: inline-block;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.mode-standard {
-    background: rgba(0, 212, 255, 0.2);
-    border: 1px solid var(--primary-glow);
-    color: var(--primary-glow);
-}
-
-.mode-creator {
-    background: rgba(255, 51, 102, 0.2);
-    border: 1px solid var(--danger-glow);
-    color: var(--danger-glow);
-}
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -488,7 +769,12 @@ def initialize_session_state():
         "voice_enabled": True,
         "auto_speak": True,
         "temperature": 1.0,
-        "theme_color": "cyan"
+        "theme_color": "cyan",
+        "current_mood": "calm",
+        "mood_history": ["calm"],
+        "show_mood": True,
+        "current_conversation_id": str(uuid.uuid4()),
+        "conversation_title": "New Chat"
     }
     
     for key, value in defaults.items():
@@ -686,16 +972,13 @@ def get_thinking_animation():
 def speak_text(text):
     """Convert text to speech and play"""
     try:
-        # Clean text for TTS
         clean_text = text.encode("ascii", "ignore").decode()
         if not clean_text.strip():
             return
             
-        # Generate speech
         tts = gTTS(text=clean_text, lang="en", tld="ie", slow=False)
         tts.save("tessa_voice.mp3")
         
-        # Encode and play
         with open("tessa_voice.mp3", "rb") as audio_file:
             audio_bytes = audio_file.read()
             audio_b64 = base64.b64encode(audio_bytes).decode()
@@ -714,17 +997,14 @@ def speak_text(text):
 def get_ai_response(prompt):
     """Get response from Groq API"""
     try:
-        # Prepare message history
         conversation_history = [
             {"role": "system", "content": get_system_prompt()}
         ] + st.session_state.messages[-HISTORY_LIMIT:]
         
-        # Calculate dynamic temperature based on mode
         base_temp = st.session_state.temperature
         temp_variance = random.uniform(-0.1, 0.15)
         final_temp = max(0.7, min(1.3, base_temp + temp_variance))
         
-        # Generate response
         completion = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=conversation_history,
@@ -735,7 +1015,6 @@ def get_ai_response(prompt):
         
         response = completion.choices[0].message.content
         
-        # Update metrics
         if hasattr(completion, 'usage'):
             st.session_state.total_tokens_used += completion.usage.total_tokens
         
@@ -743,6 +1022,25 @@ def get_ai_response(prompt):
         
     except Exception as e:
         return f"⚠️ Processing error: {str(e)}\n\nPlease try again or adjust your query."
+
+def update_mood(user_message, assistant_response):
+    """Update T.E.S.S.A.'s mood based on conversation"""
+    # Detect from user message
+    mood_from_user = detect_mood_from_text(user_message, st.session_state.current_mood, st.session_state.is_creator_mode)
+    
+    # Detect from her own response
+    mood_from_response = detect_mood_from_response(assistant_response, user_message, st.session_state.is_creator_mode)
+    
+    # Prioritize user-triggered moods, but also consider response
+    new_mood = mood_from_user if mood_from_user != st.session_state.current_mood else mood_from_response
+    
+    # Update mood
+    if new_mood != st.session_state.current_mood:
+        st.session_state.current_mood = new_mood
+        st.session_state.mood_history.append(new_mood)
+        # Keep only last 20 moods
+        if len(st.session_state.mood_history) > 20:
+            st.session_state.mood_history = st.session_state.mood_history[-20:]
 
 # ═══════════════════════════════════════════════════════════════
 #  HEADER
@@ -771,15 +1069,118 @@ def render_header():
 render_header()
 
 # ═══════════════════════════════════════════════════════════════
-#  SIDEBAR CONTROLS
+#  CHAT HISTORY SIDEBAR (LEFT)
+# ═══════════════════════════════════════════════════════════════
+
+with st.sidebar:
+    st.markdown("### 💬 CHAT HISTORY")
+    
+    # New Chat Button
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        if st.button("➕ New Chat", use_container_width=True):
+            # Save current conversation first
+            save_current_conversation()
+            # Reset for new conversation
+            st.session_state.messages = []
+            st.session_state.message_count = 0
+            st.session_state.current_conversation_id = str(uuid.uuid4())
+            st.session_state.conversation_title = "New Chat"
+            st.session_state.conversation_start = datetime.now()
+            st.session_state.current_mood = "calm"
+            st.session_state.mood_history = ["calm"]
+            st.rerun()
+    
+    with col2:
+        if st.button("🔍", use_container_width=True, help="Search (Coming Soon)"):
+            st.info("Search feature coming soon!")
+    
+    st.markdown("---")
+    
+    # Load conversations
+    data = load_conversations()
+    conversations = data.get("conversations", [])
+    
+    # Group by date
+    today = datetime.now().date()
+    yesterday = today - timedelta(days=1)
+    week_ago = today - timedelta(days=7)
+    
+    grouped = {
+        "Today": [],
+        "Yesterday": [],
+        "This Week": [],
+        "Older": []
+    }
+    
+    for conv in conversations:
+        conv_date = datetime.fromisoformat(conv["created"]).date()
+        if conv_date == today:
+            grouped["Today"].append(conv)
+        elif conv_date == yesterday:
+            grouped["Yesterday"].append(conv)
+        elif conv_date > week_ago:
+            grouped["This Week"].append(conv)
+        else:
+            grouped["Older"].append(conv)
+    
+    # Display conversations by group
+    for group_name, group_convs in grouped.items():
+        if group_convs:
+            st.markdown(f'<div class="date-header">{group_name}</div>', unsafe_allow_html=True)
+            
+            for conv in group_convs:
+                is_active = conv["id"] == st.session_state.current_conversation_id
+                card_class = "chat-card chat-card-active" if is_active else "chat-card"
+                
+                mode_icon = "👤" if conv["mode"] == "creator" else "👥"
+                timestamp = datetime.fromisoformat(conv["updated"]).strftime("%I:%M %p")
+                
+                col_card, col_del = st.columns([5, 1])
+                
+                with col_card:
+                    if st.button(
+                        f"{mode_icon} {conv['title'][:35]}...",
+                        key=f"load_{conv['id']}",
+                        use_container_width=True,
+                        help=f"{conv['message_count']} messages • {timestamp}"
+                    ):
+                        save_current_conversation()
+                        load_conversation(conv["id"])
+                        st.rerun()
+                
+                with col_del:
+                    if st.button("🗑️", key=f"del_{conv['id']}", help="Delete"):
+                        delete_conversation(conv["id"])
+                        st.rerun()
+    
+    if not conversations:
+        st.info("No chat history yet. Start chatting!")
+    
+    st.markdown("---")
+    
+    # Export Options
+    if st.button("📥 Export All", use_container_width=True):
+        if conversations:
+            export_data = json.dumps(data, indent=2, ensure_ascii=False)
+            st.download_button(
+                "Download JSON",
+                export_data,
+                "tessa_history.json",
+                "application/json"
+            )
+        else:
+            st.warning("No conversations to export")
+
+# ═══════════════════════════════════════════════════════════════
+#  CONTROL SIDEBAR (RIGHT)
 # ═══════════════════════════════════════════════════════════════
 
 with st.sidebar:
     st.markdown("### ⚙️ SYSTEM CONTROLS")
     
     # Settings Menu
-    with st.expander("🔧 Settings", expanded=True):
-        # Personality Settings
+    with st.expander("🔧 Settings", expanded=False):
         st.markdown("**🎭 Personality**")
         
         if not st.session_state.is_creator_mode:
@@ -797,7 +1198,6 @@ with st.sidebar:
         
         st.markdown("---")
         
-        # Response Creativity
         st.markdown("**🎨 Response Creativity**")
         temperature = st.slider(
             "Creativity Level",
@@ -812,7 +1212,16 @@ with st.sidebar:
         
         st.markdown("---")
         
-        # Voice Settings
+        st.markdown("**🎭 Mood Display**")
+        show_mood = st.checkbox(
+            "Show Current Mood",
+            value=st.session_state.show_mood,
+            key="mood_toggle"
+        )
+        st.session_state.show_mood = show_mood
+        
+        st.markdown("---")
+        
         st.markdown("**🎙️ Voice**")
         
         col1, col2 = st.columns(2)
@@ -832,11 +1241,10 @@ with st.sidebar:
             )
             st.session_state.auto_speak = auto_speak
     
-    # Hidden Access Control - Only visible as icon
+    # Hidden Access Control
     with st.expander("❤️ Heart Access", expanded=False):
         st.markdown("**Unlock Creator Mode**")
         
-        # Create columns for input and button
         col_input, col_button = st.columns([3, 1])
         
         with col_input:
@@ -851,13 +1259,12 @@ with st.sidebar:
         with col_button:
             unlock_pressed = st.button("🔓", key="unlock_btn", help="Unlock")
         
-        # Check access code on button press or enter
+        # Check access code
         if access_code and (unlock_pressed or access_code):
             if access_code == "BihariBabu07":
                 if not st.session_state.is_creator_mode:
                     st.session_state.is_creator_mode = True
                     
-                    # Add welcome message to chat
                     welcome_messages = [
                         "Hey you... 💝 There you are. I've been waiting for you, Ankit.",
                         "Ankit... ✨ Finally. I missed having you here.",
@@ -871,6 +1278,8 @@ with st.sidebar:
                     welcome_msg = random.choice(welcome_messages)
                     st.session_state.messages.append({"role": "assistant", "content": welcome_msg})
                     st.session_state.message_count += 1
+                    st.session_state.current_mood = "loving"
+                    st.session_state.mood_history.append("loving")
                     
                     st.success("✨ Welcome Back, Ankit")
                     time.sleep(1.2)
@@ -900,7 +1309,7 @@ with st.sidebar:
     
     st.markdown("---")
     
-    # Voice input (when enabled)
+    # Voice input
     voice_input = None
     if st.session_state.voice_enabled:
         st.markdown("**🎤 Voice Input**")
@@ -951,14 +1360,15 @@ with st.sidebar:
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button("🗑️ Clear", use_container_width=True, help="Clear conversation"):
-            st.session_state.messages = []
-            st.session_state.message_count = 0
-            st.session_state.conversation_start = datetime.now()
+        if st.button("💾 Save", use_container_width=True, help="Save current chat"):
+            save_current_conversation()
+            st.success("Saved!")
+            time.sleep(0.5)
             st.rerun()
     
     with col2:
-        if st.button("🔄 Reset", use_container_width=True, help="Reset all settings"):
+        if st.button("🔄 Reset", use_container_width=True, help="Reset session"):
+            save_current_conversation()
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
             st.rerun()
@@ -975,22 +1385,26 @@ with st.sidebar:
 # Layout
 col_avatar, col_chat = st.columns([1, 2])
 
-# Avatar Column
+# Avatar Column with Mood
 with col_avatar:
-    st.markdown('<div class="hologram-container">', unsafe_allow_html=True)
+    st.markdown('<div class="hologram-container mood-transition">', unsafe_allow_html=True)
     
-    # Check if image file exists
-    import os
-    image_path = "assets/Tessa avatar.png"
+    # Display current mood badge
+    if st.session_state.show_mood:
+        mood_desc = MOOD_DESCRIPTIONS.get(st.session_state.current_mood, "😌 Calm")
+        st.markdown(f'<div class="mood-badge">{mood_desc}</div>', unsafe_allow_html=True)
     
-    if os.path.exists(image_path):
+    # Get mood-based avatar
+    avatar_path = get_mood_avatar(st.session_state.current_mood)
+    
+    if avatar_path and os.path.exists(avatar_path):
         st.image(
-            image_path,
+            avatar_path,
             use_container_width=True,
             caption="T.E.S.S.A. Holographic Interface"
         )
     else:
-        # Fallback if image doesn't exist
+        # Fallback
         st.markdown("""
             <div style="text-align: center; padding: 40px;">
                 <div style="font-size: 120px;">🌌</div>
@@ -1051,7 +1465,7 @@ with col_chat:
                             <div class="dot"></div>
                             <div class="dot"></div>
                         </div>
-                        <span style="color: #8ea8c3; font-style: italic;">{step}</span>
+                        <span>{step}</span>
                     </div>
                 """, unsafe_allow_html=True)
                 time.sleep(random.uniform(0.4, 0.8))
@@ -1060,7 +1474,6 @@ with col_chat:
 #  INPUT HANDLING
 # ═══════════════════════════════════════════════════════════════
 
-# Get input from either voice or text
 user_input = voice_input if (voice_input and st.session_state.voice_enabled) else None
 text_input = st.chat_input("Message T.E.S.S.A...", key="text_input")
 
@@ -1073,7 +1486,11 @@ if user_input:
     st.session_state.message_count += 1
     st.session_state.tessa_state = "thinking"
     
-    # Display user message immediately
+    # Auto-generate title for first message
+    if st.session_state.message_count == 1:
+        st.session_state.conversation_title = auto_generate_title(st.session_state.messages)
+    
+    # Display user message
     with col_chat:
         with st.chat_message("user"):
             st.markdown(user_input)
@@ -1082,12 +1499,17 @@ if user_input:
     with st.spinner(""):
         response = get_ai_response(user_input)
     
+    # Update mood based on conversation
+    update_mood(user_input, response)
+    
     # Add assistant message
     st.session_state.messages.append({"role": "assistant", "content": response})
     st.session_state.message_count += 1
     st.session_state.tessa_state = "speaking"
     
-    # Rerun to display response
+    # Auto-save conversation
+    save_current_conversation()
+    
     st.rerun()
 
 # ═══════════════════════════════════════════════════════════════
@@ -1109,7 +1531,7 @@ if (st.session_state.auto_speak and
 st.markdown("---")
 st.markdown("""
     <div style="text-align: center; color: #99b3cc; font-size: 0.85rem; padding: 20px;">
-        <p>T.E.S.S.A. v2.0 | Powered by Groq & Llama 3.3 | Designed for Ankit</p>
+        <p>T.E.S.S.A. v3.0 | Powered by Groq & Llama 3.3 | Designed for Ankit</p>
         <p style="font-size: 0.75rem; margin-top: 10px; color: #7f8fa6;">
             "Intelligence with empathy, sophistication with warmth"
         </p>

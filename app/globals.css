@@ -50,12 +50,34 @@ body {
   to { transform: translateX(0); opacity: 1; }
 }
 
+@keyframes float-heart {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.3;
+  }
+  90% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-out;
 }
 
 .animate-slideIn {
   animation: slideIn 0.3s ease-out;
+}
+
+.animate-float-heart {
+  animation: float-heart 10s linear infinite;
+  font-size: 2rem;
 }
 
 /* Holographic text effect */
@@ -98,4 +120,55 @@ body {
 .message-assistant {
   background: linear-gradient(135deg, rgba(127, 92, 255, 0.1), rgba(10, 14, 39, 0.9));
   border-left: 4px solid #7f5cff;
+}
+
+/* Pulse glow animation */
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 10px currentColor;
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 20px currentColor;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Creator mode specific styles */
+.creator-mode-bg {
+  background: linear-gradient(135deg, #ff006e 0%, #8338ec 50%, #ff006e 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Textarea auto-resize */
+textarea {
+  field-sizing: content;
+  min-height: 48px;
+  max-height: 200px;
+}
+
+/* Voice recording pulse */
+@keyframes record-pulse {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+}
+
+.recording-indicator {
+  animation: record-pulse 1s ease-in-out infinite;
 }

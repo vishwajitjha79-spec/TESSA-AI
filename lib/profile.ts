@@ -91,4 +91,3 @@ export function getSassyResponse(type: keyof typeof SASSY_RESPONSES, userMessage
   
   return responses[Math.floor(Math.random() * responses.length)];
 }
-}

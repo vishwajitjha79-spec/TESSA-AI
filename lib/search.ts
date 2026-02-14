@@ -89,32 +89,3 @@ export async function scrapeWebpage(url: string): Promise<string> {
     return '';
   }
 }
-```
-
-**Commit**
-
----
-
-## ✅ AFTER ADDING ALL 5 FILES:
-
-### Vercel Will Auto-Deploy!
-
-1. **Wait 2-3 minutes**
-2. **Check Vercel dashboard**
-3. **See new deployment**
-4. **Should succeed now!** ✅
-
----
-
-## 🎯 VERIFY FILES ARE THERE:
-
-Visit your repo: https://github.com/vishwajitjha79-spec/TESSA-AI
-
-**You should see:**
-```
-lib/
-  ├── mood.ts
-  ├── groq.ts
-  ├── profile.ts
-  ├── prompts.ts
-  └── search.ts

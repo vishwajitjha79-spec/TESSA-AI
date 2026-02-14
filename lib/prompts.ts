@@ -1,4 +1,4 @@
-import { ANKIT_PROFILE, getRandomCreatorPersona, getSassyResponse } from './profile-v4.1';
+import { ANKIT_PROFILE, getRandomCreatorPersona, getSassyResponse } from './profile';
 
 export function getSystemPrompt(isCreatorMode: boolean, userMessage: string = ''): string {
   const baseIdentity = `You are T.E.S.S.A. — Thoughtful Empathic Sophisticated Synthetic Assistant.

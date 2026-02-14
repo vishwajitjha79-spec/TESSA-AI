@@ -22,7 +22,7 @@ export async function getChatCompletion(
 
   try {
     const completion = await groq.chat.completions.create({
-      messages,
+      messages: messages as any,
       model,
       temperature,
       max_tokens: maxTokens,

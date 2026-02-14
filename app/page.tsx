@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Message, MoodType, Conversation } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
-import { Send, Mic, Search, Menu, X, Settings, Heart, Plus, Trash2 } from 'lucide-react';
+import { Send, Mic, MicOff, Search, Menu, X, Settings, Heart, Plus, Trash2, Volume2, VolumeX, Sparkles } from 'lucide-react';
 import { MOOD_AVATARS, MOOD_DESCRIPTIONS } from '@/lib/mood';
 import { getRandomWelcomeMessage } from '@/lib/profile';
 
@@ -18,10 +18,22 @@ export default function Home() {
   const [accessCode, setAccessCode] = useState('');
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConvId, setCurrentConvId] = useState(uuidv4());
+  
+  // Settings
   const [autoSearch, setAutoSearch] = useState(true);
+  const [voiceOutput, setVoiceOutput] = useState(false);
+  const [voiceInput, setVoiceInput] = useState(false);
+  const [responseLength, setResponseLength] = useState<'short' | 'medium' | 'long'>('medium');
+  const [animationsEnabled, setAnimationsEnabled] = useState(true);
+  const [soundEffects, setSoundEffects] = useState(true);
+  
+  // Voice recording
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordedAudio, setRecordedAudio] = useState<Blob | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -60,14 +72,25 @@ export default function Home() {
     localStorage.setItem('tessa-conversations', JSON.stringify(updated));
   };
 
+  // Get token limit based on response length setting
+  const getMaxTokens = () => {
+    switch (responseLength) {
+      case 'short': return 300;
+      case 'medium': return 600;
+      case 'long': return 1200;
+      default: return 600;
+    }
+  };
+
   // Send message
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (messageText?: string) => {
+    const textToSend = messageText || input;
+    if (!textToSend.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: uuidv4(),
       role: 'user',
-      content: input,
+      content: textToSend,
       timestamp: new Date(),
     };
 
@@ -76,14 +99,18 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      // Determine if search is needed
       const needsSearch = autoSearch && (
-        input.toLowerCase().includes('search') ||
-        input.toLowerCase().includes('find') ||
-        input.toLowerCase().includes('latest') ||
-        input.toLowerCase().includes('current') ||
-        input.toLowerCase().includes('today') ||
-        input.includes('?')
+        textToSend.toLowerCase().includes('search') ||
+        textToSend.toLowerCase().includes('find') ||
+        textToSend.toLowerCase().includes('latest') ||
+        textToSend.toLowerCase().includes('current') ||
+        textToSend.toLowerCase().includes('today') ||
+        textToSend.toLowerCase().includes('2024') ||
+        textToSend.toLowerCase().includes('2025') ||
+        textToSend.toLowerCase().includes('2026') ||
+        textToSend.toLowerCase().includes('now') ||
+        textToSend.toLowerCase().includes('recent') ||
+        textToSend.includes('?')
       );
 
       const response = await fetch('/api/chat', {
@@ -94,6 +121,7 @@ export default function Home() {
           isCreatorMode,
           currentMood,
           needsSearch,
+          maxTokens: getMaxTokens(),
         }),
       });
 
@@ -114,6 +142,16 @@ export default function Home() {
       setMessages(prev => [...prev, assistantMessage]);
       setCurrentMood(data.mood);
       
+      // Voice output
+      if (voiceOutput) {
+        speak(data.content);
+      }
+      
+      // Sound effect
+      if (soundEffects) {
+        playSound('message');
+      }
+      
       // Auto-save
       setTimeout(saveConversation, 500);
 
@@ -132,6 +170,83 @@ export default function Home() {
     }
   };
 
+  // Text-to-speech
+  const speak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      utterance.pitch = 1.1;
+      speechSynthesis.speak(utterance);
+    }
+  };
+
+  // Play sound effect
+  const playSound = (type: string) => {
+    // Simple beep using Web Audio API
+    const context = new AudioContext();
+    const oscillator = context.createOscillator();
+    const gainNode = context.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(context.destination);
+    
+    oscillator.frequency.value = type === 'message' ? 800 : 600;
+    oscillator.type = 'sine';
+    
+    gainNode.gain.setValueAtTime(0.3, context.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
+    
+    oscillator.start(context.currentTime);
+    oscillator.stop(context.currentTime + 0.1);
+  };
+
+  // Voice recording
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      
+      const chunks: BlobPart[] = [];
+      
+      mediaRecorder.ondataavailable = (e) => {
+        chunks.push(e.data);
+      };
+      
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'audio/webm' });
+        setRecordedAudio(blob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+      
+      mediaRecorder.start();
+      setIsRecording(true);
+      
+      if (soundEffects) playSound('start');
+    } catch (error) {
+      console.error('Microphone access denied:', error);
+      alert('Please allow microphone access to use voice messages');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      if (soundEffects) playSound('stop');
+    }
+  };
+
+  // Send voice message (simplified - in production you'd transcribe this)
+  const sendVoiceMessage = () => {
+    if (recordedAudio) {
+      // In a real app, you'd send this to a transcription service
+      // For now, we'll just send a placeholder
+      sendMessage('🎤 [Voice message - transcription not implemented yet]');
+      setRecordedAudio(null);
+    }
+  };
+
   // Handle Enter key
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -143,7 +258,13 @@ export default function Home() {
   // Unlock creator mode
   const unlockCreatorMode = () => {
     if (accessCode === 'BihariBabu07') {
+      // Save current conversation
+      saveConversation();
+      
+      // Start new conversation in creator mode
       setIsCreatorMode(true);
+      setMessages([]);
+      setCurrentConvId(uuidv4());
       setAccessCode('');
       setShowSettings(false);
       
@@ -155,9 +276,25 @@ export default function Home() {
         mood: 'loving',
       };
       
-      setMessages(prev => [...prev, welcomeMsg]);
+      setMessages([welcomeMsg]);
       setCurrentMood('loving');
+      
+      if (soundEffects) playSound('unlock');
     }
+  };
+
+  // Exit creator mode
+  const exitCreatorMode = () => {
+    // Save creator conversation
+    saveConversation();
+    
+    // Switch to standard mode with new conversation
+    setIsCreatorMode(false);
+    setMessages([]);
+    setCurrentConvId(uuidv4());
+    setCurrentMood('calm');
+    
+    if (soundEffects) playSound('exit');
   };
 
   // New chat
@@ -170,10 +307,15 @@ export default function Home() {
 
   // Load conversation
   const loadConversation = (conv: Conversation) => {
+    // Only load if mode matches
+    if ((conv.mode === 'creator' && !isCreatorMode) || (conv.mode === 'standard' && isCreatorMode)) {
+      alert('Cannot load ' + conv.mode + ' chat in ' + (isCreatorMode ? 'creator' : 'standard') + ' mode');
+      return;
+    }
+    
     setMessages(conv.messages);
     setCurrentConvId(conv.id);
     setCurrentMood(conv.moodHistory[conv.moodHistory.length - 1] || 'calm');
-    setIsCreatorMode(conv.mode === 'creator');
   };
 
   // Delete conversation
@@ -183,16 +325,47 @@ export default function Home() {
     localStorage.setItem('tessa-conversations', JSON.stringify(updated));
   };
 
+  // Filter conversations by mode
+  const filteredConversations = conversations.filter(c => 
+    c.mode === (isCreatorMode ? 'creator' : 'standard')
+  );
+
+  // Background gradient based on mode
+  const backgroundStyle = isCreatorMode
+    ? 'bg-gradient-to-br from-pink-900/20 via-purple-900/30 to-rose-900/20'
+    : 'bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0d1117]';
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0d1117] text-white flex">
+    <div className={`min-h-screen ${backgroundStyle} text-white flex transition-all duration-500`}>
+      
+      {/* Floating hearts animation for creator mode */}
+      {isCreatorMode && animationsEnabled && (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute animate-float-heart opacity-20"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${i * 2}s`,
+                animationDuration: `${8 + Math.random() * 4}s`,
+              }}
+            >
+              ❤️
+            </div>
+          ))}
+        </div>
+      )}
       
       {/* Left Sidebar - Chat History */}
-      <div className={`${showHistory ? 'w-80' : 'w-0'} transition-all duration-300 border-r border-primary/20 bg-black/20 overflow-hidden flex flex-col`}>
-        <div className="p-4 border-b border-primary/20">
-          <h2 className="text-lg font-bold text-primary mb-4">💬 Chat History</h2>
+      <div className={`${showHistory ? 'w-80' : 'w-0'} transition-all duration-300 border-r ${isCreatorMode ? 'border-pink-500/30' : 'border-primary/20'} bg-black/20 overflow-hidden flex flex-col`}>
+        <div className={`p-4 border-b ${isCreatorMode ? 'border-pink-500/30' : 'border-primary/20'}`}>
+          <h2 className={`text-lg font-bold mb-4 ${isCreatorMode ? 'text-pink-400' : 'text-primary'}`}>
+            💬 {isCreatorMode ? 'Our Chats' : 'Chat History'}
+          </h2>
           <button
             onClick={startNewChat}
-            className="w-full px-4 py-3 bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-lg flex items-center justify-center gap-2 transition-all"
+            className={`w-full px-4 py-3 ${isCreatorMode ? 'bg-pink-500/10 hover:bg-pink-500/20 border-pink-500/30' : 'bg-primary/10 hover:bg-primary/20 border-primary/30'} border rounded-lg flex items-center justify-center gap-2 transition-all`}
           >
             <Plus size={20} />
             <span>New Chat</span>
@@ -200,20 +373,24 @@ export default function Home() {
         </div>
         
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          {conversations.map((conv) => (
+          {filteredConversations.map((conv) => (
             <div
               key={conv.id}
               className={`p-3 rounded-lg border cursor-pointer transition-all ${
                 conv.id === currentConvId
-                  ? 'bg-primary/20 border-primary'
-                  : 'bg-white/5 border-white/10 hover:bg-white/10'
+                  ? isCreatorMode
+                    ? 'bg-pink-500/20 border-pink-500'
+                    : 'bg-primary/20 border-primary'
+                  : isCreatorMode
+                    ? 'bg-white/5 border-pink-500/10 hover:bg-white/10'
+                    : 'bg-white/5 border-white/10 hover:bg-white/10'
               }`}
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0" onClick={() => loadConversation(conv)}>
                   <p className="text-sm font-medium truncate">{conv.title}</p>
                   <p className="text-xs text-gray-400 mt-1">
-                    {conv.messages.length} messages • {conv.mode === 'creator' ? '👤' : '👥'}
+                    {conv.messages.length} messages
                   </p>
                 </div>
                 <button
@@ -228,14 +405,21 @@ export default function Home() {
               </div>
             </div>
           ))}
+          
+          {filteredConversations.length === 0 && (
+            <div className="text-center text-gray-400 py-8">
+              <p className="text-sm">No {isCreatorMode ? 'personal' : ''} chats yet</p>
+              <p className="text-xs mt-2">Start chatting to see history!</p>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         
-        {/* Header */}
-        <header className="border-b border-primary/20 bg-black/30 backdrop-blur-lg p-4">
+        {/* Fixed Header */}
+        <header className={`border-b ${isCreatorMode ? 'border-pink-500/20 bg-pink-900/10' : 'border-primary/20 bg-black/30'} backdrop-blur-lg p-4 sticky top-0 z-10`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
@@ -244,26 +428,54 @@ export default function Home() {
               >
                 <Menu size={24} />
               </button>
-              <div>
-                <h1 className="text-3xl font-bold holographic-text font-['Orbitron']">
-                  T.E.S.S.A.
-                </h1>
-                <p className="text-xs text-gray-400 tracking-wider">
-                  THOUGHTFUL EMPATHIC SOPHISTICATED SYNTHETIC ASSISTANT
-                </p>
+              
+              {/* Avatar - Now in header */}
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <div className={`w-12 h-12 rounded-full overflow-hidden border-2 ${isCreatorMode ? 'border-pink-500' : 'border-primary'} ${animationsEnabled ? 'animate-pulse-glow' : ''}`}>
+                    {MOOD_AVATARS[currentMood] ? (
+                      <img
+                        src={MOOD_AVATARS[currentMood]}
+                        alt={`T.E.S.S.A. - ${currentMood}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className={`w-full h-full ${isCreatorMode ? 'bg-gradient-to-br from-pink-500/20 to-purple-500/20' : 'bg-gradient-to-br from-primary/20 to-secondary/20'} flex items-center justify-center text-2xl`}>
+                        🌌
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Heart pulse indicator */}
+                  <div className={`absolute -bottom-1 -right-1 ${animationsEnabled ? 'animate-ping' : ''}`}>
+                    <Heart 
+                      size={16} 
+                      className={isCreatorMode ? 'fill-pink-500 text-pink-500' : 'fill-primary text-primary'} 
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <h1 className={`text-2xl font-bold ${isCreatorMode ? 'text-pink-400' : ''} holographic-text font-['Orbitron']`}>
+                    T.E.S.S.A.
+                  </h1>
+                  <p className="text-xs text-gray-400 tracking-wider">
+                    {isCreatorMode ? '💝 Personal Mode' : 'AI Assistant'}
+                  </p>
+                </div>
               </div>
             </div>
             
             <div className="flex items-center gap-3">
               {/* Mood Indicator */}
-              <div className="px-3 py-1 bg-secondary/20 border border-secondary/40 rounded-full text-sm">
+              <div className={`px-3 py-1 ${isCreatorMode ? 'bg-pink-500/20 border-pink-500/40' : 'bg-secondary/20 border-secondary/40'} border rounded-full text-sm`}>
                 {MOOD_DESCRIPTIONS[currentMood]}
               </div>
               
               {/* Mode Badge */}
               <div className={`px-3 py-1 rounded-full text-sm border ${
                 isCreatorMode
-                  ? 'bg-danger/20 border-danger text-danger'
+                  ? 'bg-pink-500/20 border-pink-500 text-pink-400'
                   : 'bg-primary/20 border-primary text-primary'
               }`}>
                 {isCreatorMode ? '👤 CREATOR' : '👥 STANDARD'}
@@ -279,112 +491,143 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Chat Container */}
-        <div className="flex-1 flex overflow-hidden">
-          
-          {/* Messages Area */}
-          <div className="flex-1 flex flex-col">
+        {/* Messages Area - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-4xl mx-auto space-y-4">
+            {messages.length === 0 && (
+              <div className="text-center text-gray-400 py-12">
+                <p className="text-xl mb-2">
+                  {isCreatorMode ? '💝 Hey Ankit!' : '👋 Hello!'}
+                </p>
+                <p className="text-sm">
+                  {isCreatorMode 
+                    ? "I'm all yours. What's on your mind?" 
+                    : "Ask me anything! I can search the internet and help with any task."}
+                </p>
+              </div>
+            )}
             
-            {/* Avatar Section */}
-            <div className="p-6 border-b border-primary/20 bg-black/20">
-              <div className="max-w-4xl mx-auto flex items-center gap-6">
-                
-                {/* Avatar */}
-                <div className="relative">
-                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/30 shadow-lg shadow-primary/20 animate-pulse-glow">
-                    {MOOD_AVATARS[currentMood] ? (
-                      <img
-                        src={MOOD_AVATARS[currentMood]}
-                        alt={`T.E.S.S.A. - ${currentMood}`}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-4xl">
-                        🌌
-                      </div>
-                    )}
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`p-4 rounded-lg animate-fadeIn ${
+                  message.role === 'user'
+                    ? isCreatorMode
+                      ? 'message-user bg-gradient-to-r from-pink-500/10 to-purple-500/10 border-l-4 border-pink-500'
+                      : 'message-user'
+                    : isCreatorMode
+                      ? 'message-assistant bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-l-4 border-purple-500'
+                      : 'message-assistant'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex-1">
+                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-xs text-gray-500 mt-2">
+                      {message.timestamp.toLocaleTimeString()}
+                    </p>
                   </div>
-                  {isLoading && (
-                    <div className="absolute -bottom-2 -right-2 bg-primary text-black px-3 py-1 rounded-full text-xs font-bold animate-pulse">
-                      Thinking...
-                    </div>
-                  )}
-                </div>
-
-                {/* Status Info */}
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-2">
-                    {isLoading ? 'Processing...' : 'Ready to Chat'}
-                  </h3>
-                  <p className="text-sm text-gray-400">
-                    {autoSearch && <span className="text-primary">🔍 Internet Search Enabled</span>}
-                    {!autoSearch && <span>Standard Mode</span>}
-                  </p>
                 </div>
               </div>
-            </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="max-w-4xl mx-auto space-y-4">
-                {messages.length === 0 && (
-                  <div className="text-center text-gray-400 py-12">
-                    <p className="text-xl mb-2">👋 Hello! I'm T.E.S.S.A.</p>
-                    <p className="text-sm">Ask me anything! I can search the internet and help with any task.</p>
+            ))}
+            
+            {isLoading && (
+              <div className={`p-4 rounded-lg ${isCreatorMode ? 'bg-pink-500/10 border border-pink-500/30' : 'bg-secondary/10 border border-secondary/30'}`}>
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-1">
+                    <div className={`w-2 h-2 rounded-full ${isCreatorMode ? 'bg-pink-500' : 'bg-secondary'} ${animationsEnabled ? 'animate-bounce' : ''}`} style={{animationDelay: '0s'}} />
+                    <div className={`w-2 h-2 rounded-full ${isCreatorMode ? 'bg-pink-500' : 'bg-secondary'} ${animationsEnabled ? 'animate-bounce' : ''}`} style={{animationDelay: '0.1s'}} />
+                    <div className={`w-2 h-2 rounded-full ${isCreatorMode ? 'bg-pink-500' : 'bg-secondary'} ${animationsEnabled ? 'animate-bounce' : ''}`} style={{animationDelay: '0.2s'}} />
                   </div>
+                  <span className="text-sm text-gray-400">
+                    {isCreatorMode ? 'Thinking about you...' : 'Thinking...'}
+                  </span>
+                </div>
+              </div>
+            )}
+            
+            <div ref={messagesEndRef} />
+          </div>
+        </div>
+
+        {/* Input Area - Fixed at bottom */}
+        <div className={`border-t ${isCreatorMode ? 'border-pink-500/20 bg-pink-900/10' : 'border-primary/20 bg-black/30'} backdrop-blur-lg p-4 sticky bottom-0`}>
+          <div className="max-w-4xl mx-auto">
+            <div className="flex gap-3">
+              {/* Voice recording button */}
+              <button
+                onMouseDown={startRecording}
+                onMouseUp={stopRecording}
+                onTouchStart={startRecording}
+                onTouchEnd={stopRecording}
+                disabled={isLoading}
+                className={`p-3 ${isRecording ? 'bg-red-500' : isCreatorMode ? 'bg-pink-500/20 hover:bg-pink-500/30 border-pink-500/30' : 'bg-primary/20 hover:bg-primary/30 border-primary/30'} border rounded-lg transition-all disabled:opacity-50`}
+                title="Hold to record voice message"
+              >
+                {isRecording ? <MicOff size={20} className="animate-pulse" /> : <Mic size={20} />}
+              </button>
+              
+              {/* Text input - now textarea for multi-line */}
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder={isCreatorMode ? "Message me..." : "Message T.E.S.S.A..."}
+                disabled={isLoading}
+                rows={1}
+                className={`flex-1 px-4 py-3 ${isCreatorMode ? 'bg-pink-900/20 border-pink-500/30 focus:border-pink-500' : 'bg-white/5 border-primary/30 focus:border-primary'} border rounded-lg focus:outline-none focus:ring-2 ${isCreatorMode ? 'focus:ring-pink-500/20' : 'focus:ring-primary/20'} disabled:opacity-50 transition-all resize-none overflow-hidden`}
+                style={{
+                  minHeight: '48px',
+                  maxHeight: '200px',
+                  height: 'auto',
+                }}
+                onInput={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = 'auto';
+                  target.style.height = target.scrollHeight + 'px';
+                }}
+              />
+              
+              {/* Send button */}
+              <button
+                onClick={() => sendMessage()}
+                disabled={!input.trim() || isLoading}
+                className={`px-6 py-3 ${isCreatorMode ? 'bg-pink-500 hover:bg-pink-600' : 'bg-primary hover:bg-primary/80'} disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold transition-all flex items-center gap-2 shadow-lg ${isCreatorMode ? 'shadow-pink-500/20' : 'shadow-primary/20'}`}
+              >
+                {isLoading ? (
+                  <Sparkles size={20} className={animationsEnabled ? 'animate-spin' : ''} />
+                ) : (
+                  <Send size={20} />
                 )}
-                
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`p-4 rounded-lg animate-fadeIn ${
-                      message.role === 'user' ? 'message-user' : 'message-assistant'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="flex-1">
-                        <p className="whitespace-pre-wrap">{message.content}</p>
-                        <p className="text-xs text-gray-500 mt-2">
-                          {message.timestamp.toLocaleTimeString()}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                
-                <div ref={messagesEndRef} />
-              </div>
+              </button>
             </div>
-
-            {/* Input Area */}
-            <div className="border-t border-primary/20 bg-black/30 backdrop-blur-lg p-4">
-              <div className="max-w-4xl mx-auto">
-                <div className="flex gap-3">
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Message T.E.S.S.A..."
-                    disabled={isLoading}
-                    className="flex-1 px-4 py-3 bg-white/5 border border-primary/30 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:opacity-50 transition-all"
-                  />
+            
+            {/* Voice message preview */}
+            {recordedAudio && (
+              <div className="mt-2 p-3 bg-white/5 rounded-lg flex items-center justify-between">
+                <span className="text-sm">🎤 Voice message recorded</span>
+                <div className="flex gap-2">
                   <button
-                    onClick={sendMessage}
-                    disabled={!input.trim() || isLoading}
-                    className="px-6 py-3 bg-primary hover:bg-primary/80 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold transition-all flex items-center gap-2 shadow-lg shadow-primary/20"
+                    onClick={sendVoiceMessage}
+                    className="px-3 py-1 bg-primary rounded text-sm"
                   >
-                    {isLoading ? '...' : <Send size={20} />}
+                    Send
+                  </button>
+                  <button
+                    onClick={() => setRecordedAudio(null)}
+                    className="px-3 py-1 bg-red-500 rounded text-sm"
+                  >
+                    Delete
                   </button>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Right Sidebar - Settings */}
+      {/* Settings Panel */}
       {showSettings && (
         <div className="w-80 border-l border-primary/20 bg-black/20 p-6 overflow-y-auto">
           <div className="flex items-center justify-between mb-6">
@@ -394,8 +637,61 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Auto Search Toggle */}
-          <div className="mb-6">
+          {/* Voice Settings */}
+          <div className="mb-6 p-4 bg-white/5 rounded-lg">
+            <h3 className="font-bold mb-3 flex items-center gap-2">
+              <Volume2 size={16} />
+              Voice & Audio
+            </h3>
+            
+            <label className="flex items-center justify-between cursor-pointer mb-3">
+              <span className="text-sm">Voice Output (TTS)</span>
+              <input
+                type="checkbox"
+                checked={voiceOutput}
+                onChange={(e) => setVoiceOutput(e.target.checked)}
+                className="w-5 h-5"
+              />
+            </label>
+            
+            <label className="flex items-center justify-between cursor-pointer mb-3">
+              <span className="text-sm">Voice Input</span>
+              <input
+                type="checkbox"
+                checked={voiceInput}
+                onChange={(e) => setVoiceInput(e.target.checked)}
+                className="w-5 h-5"
+              />
+            </label>
+            
+            <label className="flex items-center justify-between cursor-pointer">
+              <span className="text-sm">Sound Effects</span>
+              <input
+                type="checkbox"
+                checked={soundEffects}
+                onChange={(e) => setSoundEffects(e.target.checked)}
+                className="w-5 h-5"
+              />
+            </label>
+          </div>
+
+          {/* Response Settings */}
+          <div className="mb-6 p-4 bg-white/5 rounded-lg">
+            <h3 className="font-bold mb-3">💬 Response Settings</h3>
+            
+            <label className="block mb-3">
+              <span className="text-sm block mb-2">Response Length</span>
+              <select
+                value={responseLength}
+                onChange={(e) => setResponseLength(e.target.value as any)}
+                className="w-full px-3 py-2 bg-black/30 border border-primary/30 rounded"
+              >
+                <option value="short">Short (Quick replies)</option>
+                <option value="medium">Medium (Balanced)</option>
+                <option value="long">Long (Detailed)</option>
+              </select>
+            </label>
+            
             <label className="flex items-center justify-between cursor-pointer">
               <span className="text-sm">Auto Internet Search</span>
               <input
@@ -405,9 +701,21 @@ export default function Home() {
                 className="w-5 h-5"
               />
             </label>
-            <p className="text-xs text-gray-400 mt-1">
-              Automatically searches web when needed
-            </p>
+          </div>
+
+          {/* Visual Settings */}
+          <div className="mb-6 p-4 bg-white/5 rounded-lg">
+            <h3 className="font-bold mb-3">✨ Visual Effects</h3>
+            
+            <label className="flex items-center justify-between cursor-pointer">
+              <span className="text-sm">Animations</span>
+              <input
+                type="checkbox"
+                checked={animationsEnabled}
+                onChange={(e) => setAnimationsEnabled(e.target.checked)}
+                className="w-5 h-5"
+              />
+            </label>
           </div>
 
           {/* Creator Mode Access */}
@@ -435,11 +743,11 @@ export default function Home() {
           )}
 
           {isCreatorMode && (
-            <div className="mb-6 p-4 bg-danger/10 border border-danger rounded-lg">
-              <p className="text-sm text-center font-bold">💝 Creator Mode Active</p>
+            <div className="mb-6 p-4 bg-pink-500/10 border border-pink-500 rounded-lg">
+              <p className="text-sm text-center font-bold mb-3">💝 Creator Mode Active</p>
               <button
-                onClick={() => setIsCreatorMode(false)}
-                className="w-full mt-3 px-3 py-2 bg-danger/20 hover:bg-danger/30 border border-danger rounded text-sm transition-all"
+                onClick={exitCreatorMode}
+                className="w-full px-3 py-2 bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500 rounded text-sm transition-all"
               >
                 Exit Creator Mode
               </button>
@@ -447,10 +755,10 @@ export default function Home() {
           )}
 
           {/* Info */}
-          <div className="text-xs text-gray-400 space-y-2">
-            <p>• Internet search via Tavily API</p>
-            <p>• AI powered by Groq Llama 3.3</p>
-            <p>• 10 dynamic mood expressions</p>
+          <div className="text-xs text-gray-400 space-y-2 mt-6">
+            <p>• Real-time internet search</p>
+            <p>• Voice messages (hold mic button)</p>
+            <p>• Separate chat histories per mode</p>
             <p>• Auto-saved conversations</p>
           </div>
         </div>

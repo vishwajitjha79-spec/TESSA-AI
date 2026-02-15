@@ -77,7 +77,6 @@ body {
 
 .animate-float-heart {
   animation: float-heart 10s linear infinite;
-  font-size: 2rem;
 }
 
 /* Holographic text effect */
@@ -102,15 +101,6 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Glow effects */
-.glow-primary {
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-}
-
-.glow-secondary {
-  box-shadow: 0 0 20px rgba(127, 92, 255, 0.3);
-}
-
 /* Message bubbles */
 .message-user {
   background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(10, 14, 39, 0.9));
@@ -120,6 +110,89 @@ body {
 .message-assistant {
   background: linear-gradient(135deg, rgba(127, 92, 255, 0.1), rgba(10, 14, 39, 0.9));
   border-left: 4px solid #7f5cff;
+}
+
+/* Ultra Edge Pulse Effect - Standard Mode */
+@keyframes edge-pulse-standard {
+  0%, 100% {
+    box-shadow: 
+      0 0 10px rgba(0, 212, 255, 0.3),
+      0 0 20px rgba(0, 212, 255, 0.2),
+      0 0 30px rgba(0, 212, 255, 0.1),
+      inset 0 0 10px rgba(0, 212, 255, 0.1);
+    border-color: rgba(0, 212, 255, 0.5);
+  }
+  50% {
+    box-shadow: 
+      0 0 20px rgba(0, 212, 255, 0.6),
+      0 0 40px rgba(0, 212, 255, 0.4),
+      0 0 60px rgba(0, 212, 255, 0.2),
+      inset 0 0 20px rgba(0, 212, 255, 0.2);
+    border-color: rgba(0, 212, 255, 1);
+  }
+}
+
+/* Ultra Edge Pulse Effect - Creator Mode */
+@keyframes edge-pulse-creator {
+  0%, 100% {
+    box-shadow: 
+      0 0 15px rgba(236, 72, 153, 0.4),
+      0 0 30px rgba(236, 72, 153, 0.3),
+      0 0 45px rgba(236, 72, 153, 0.2),
+      inset 0 0 15px rgba(236, 72, 153, 0.15);
+    border-color: rgba(236, 72, 153, 0.6);
+  }
+  50% {
+    box-shadow: 
+      0 0 25px rgba(236, 72, 153, 0.7),
+      0 0 50px rgba(236, 72, 153, 0.5),
+      0 0 75px rgba(236, 72, 153, 0.3),
+      inset 0 0 25px rgba(236, 72, 153, 0.3);
+    border-color: rgba(236, 72, 153, 1);
+  }
+}
+
+.animate-edge-pulse-standard {
+  animation: edge-pulse-standard 2s ease-in-out infinite;
+}
+
+.animate-edge-pulse-creator {
+  animation: edge-pulse-creator 2s ease-in-out infinite;
+}
+
+/* Neon Glow for Avatar */
+@keyframes neon-glow-standard {
+  0%, 100% {
+    filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.5))
+            drop-shadow(0 0 10px rgba(0, 212, 255, 0.3))
+            drop-shadow(0 0 15px rgba(0, 212, 255, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.8))
+            drop-shadow(0 0 20px rgba(0, 212, 255, 0.6))
+            drop-shadow(0 0 30px rgba(0, 212, 255, 0.4));
+  }
+}
+
+@keyframes neon-glow-creator {
+  0%, 100% {
+    filter: drop-shadow(0 0 5px rgba(236, 72, 153, 0.5))
+            drop-shadow(0 0 10px rgba(236, 72, 153, 0.3))
+            drop-shadow(0 0 15px rgba(236, 72, 153, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.8))
+            drop-shadow(0 0 20px rgba(236, 72, 153, 0.6))
+            drop-shadow(0 0 30px rgba(236, 72, 153, 0.4));
+  }
+}
+
+.neon-avatar-standard {
+  animation: neon-glow-standard 2s ease-in-out infinite;
+}
+
+.neon-avatar-creator {
+  animation: neon-glow-creator 2s ease-in-out infinite;
 }
 
 /* Pulse glow animation */
@@ -136,18 +209,6 @@ body {
 
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
-}
-
-/* Creator mode specific styles */
-.creator-mode-bg {
-  background: linear-gradient(135deg, #ff006e 0%, #8338ec 50%, #ff006e 100%);
-  background-size: 200% 200%;
-  animation: gradient-shift 15s ease infinite;
-}
-
-@keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
 }
 
 /* Textarea auto-resize */
@@ -171,4 +232,47 @@ textarea {
 
 .recording-indicator {
   animation: record-pulse 1s ease-in-out infinite;
+}
+
+/* Sidebar Independent Scroll */
+.sidebar-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100vh - 200px);
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(236, 72, 153, 0.5);
+  border-radius: 3px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(236, 72, 153, 0.8);
+}
+
+/* Settings Panel Scroll */
+.settings-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100vh - 100px);
+}
+
+.settings-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.settings-scroll::-webkit-scrollbar-thumb {
+  background: rgba(127, 92, 255, 0.5);
+  border-radius: 3px;
+}
+
+/* Static Input Box */
+.input-static {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
 }

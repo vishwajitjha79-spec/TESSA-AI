@@ -234,11 +234,12 @@ textarea {
   animation: record-pulse 1s ease-in-out infinite;
 }
 
-/* Sidebar Independent Scroll */
+/* Independent Sidebar Scrolling */
 .sidebar-scroll {
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: calc(100vh - 200px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(236, 72, 153, 0.5) transparent;
 }
 
 .sidebar-scroll::-webkit-scrollbar {
@@ -254,11 +255,12 @@ textarea {
   background: rgba(236, 72, 153, 0.8);
 }
 
-/* Settings Panel Scroll */
+/* Settings Panel Independent Scroll */
 .settings-scroll {
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: calc(100vh - 100px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(127, 92, 255, 0.5) transparent;
 }
 
 .settings-scroll::-webkit-scrollbar {
@@ -270,9 +272,98 @@ textarea {
   border-radius: 3px;
 }
 
+.settings-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(127, 92, 255, 0.8);
+}
+
 /* Static Input Box */
 .input-static {
   position: sticky;
   bottom: 0;
   z-index: 20;
+  background: inherit;
+}
+
+/* Three Column Layout Support */
+.three-column-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  height: 100vh;
+  overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  .three-column-layout {
+    grid-template-columns: 240px 1fr 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .three-column-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Distinct Settings Sections */
+.settings-section {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.settings-section:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(0, 212, 255, 0.3);
+}
+
+.settings-section h3 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #00d4ff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Progress Bar Animation */
+@keyframes progress-fill {
+  from { width: 0; }
+  to { width: var(--progress); }
+}
+
+.progress-bar {
+  animation: progress-fill 1s ease-out;
+}
+
+/* Dashboard Hidden Input */
+.dashboard-active .input-static {
+  display: none;
+}
+
+/* Better spacing for nested settings */
+.nested-setting {
+  margin-left: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(0, 212, 255, 0.2);
+}
+
+/* Profile card glow */
+.profile-card-glow {
+  box-shadow: 
+    0 0 20px rgba(236, 72, 153, 0.3),
+    0 0 40px rgba(236, 72, 153, 0.2),
+    inset 0 0 20px rgba(236, 72, 153, 0.1);
+}
+
+/* Notes panel styling */
+.notes-panel {
+  max-height: 400px;
+}
+
+/* Study timer circular progress */
+.timer-circle {
+  transition: stroke-dashoffset 0.5s ease;
 }

@@ -3,11 +3,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Message, MoodType, Conversation } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
-import { Send, Mic, MicOff, Menu, X, Settings, Heart, Plus, Trash2, Volume2, Sparkles, LogOut, User } from 'lucide-react';
+import { Send, Mic, MicOff, Menu, X, Settings, Heart, Plus, Trash2, Volume2, Sparkles, LogOut, User, Camera, LayoutDashboard } from 'lucide-react';
 import { MOOD_AVATARS, MOOD_DESCRIPTIONS } from '@/lib/mood';
 import { getRandomWelcomeMessage } from '@/lib/profile';
 import LoginPage from '@/components/LoginPage';
 import SecretVerification from '@/components/SecretVerification';
+import PersonalDashboard from '@/components/PersonalDashboard';
+import AvatarSelector from '@/components/AvatarSelector';
 import { supabase, getCurrentUser, signOut } from '@/lib/supabase';
 
 export default function Home() {
@@ -27,7 +29,9 @@ export default function Home() {
   // UI state
   const [showHistory, setShowHistory] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
   const [showSecretVerification, setShowSecretVerification] = useState(false);
+  const [showAvatarSelector, setShowAvatarSelector] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConvId, setCurrentConvId] = useState(uuidv4());
   
@@ -37,9 +41,8 @@ export default function Home() {
   const [responseLength, setResponseLength] = useState<'short' | 'medium' | 'long'>('medium');
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
   const [soundEffects, setSoundEffects] = useState(true);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium');
   const [autoSave, setAutoSave] = useState(true);
+  const [customAvatar, setCustomAvatar] = useState<string | null>(null);
   
   // Voice recording
   const [isRecording, setIsRecording] = useState(false);
@@ -52,6 +55,7 @@ export default function Home() {
   // Check auth on mount
   useEffect(() => {
     checkUser();
+    loadCustomAvatar();
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
@@ -75,6 +79,15 @@ export default function Home() {
       setIsGuest(false);
       loadUserConversations(currentUser.id);
     }
+  };
+
+  const loadCustomAvatar = () => {
+    const saved = localStorage.getItem('tessa-avatar');
+    if (saved) setCustomAvatar(saved);
+  };
+
+  const handleAvatarChange = (newAvatar: string) => {
+    setCustomAvatar(newAvatar);
   };
 
   const handleGuestContinue = () => {
@@ -332,6 +345,7 @@ export default function Home() {
     setMessages([]);
     setCurrentConvId(uuidv4());
     setCurrentMood('calm');
+    setShowDashboard(false);
   };
 
   const startNewChat = () => {
@@ -374,6 +388,12 @@ export default function Home() {
     ? 'bg-gradient-to-br from-pink-900/20 via-purple-900/30 to-rose-900/20'
     : 'bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0d1117]';
 
+  const getAvatarImage = () => {
+    if (customAvatar) return customAvatar;
+    if (MOOD_AVATARS[currentMood]) return MOOD_AVATARS[currentMood];
+    return null;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0d1117] flex items-center justify-center">
@@ -411,7 +431,7 @@ export default function Home() {
         </div>
       )}
       
-      {/* Sidebar */}
+      {/* Sidebar - History */}
       <div className={`${showHistory ? 'w-80' : 'w-0'} transition-all duration-300 border-r ${isCreatorMode ? 'border-pink-500/30' : 'border-primary/20'} bg-black/20 overflow-hidden flex flex-col`}>
         <div className={`p-4 border-b ${isCreatorMode ? 'border-pink-500/30' : 'border-primary/20'}`}>
           <h2 className={`text-lg font-bold mb-4 ${isCreatorMode ? 'text-pink-400' : 'text-primary'}`}>
@@ -426,7 +446,7 @@ export default function Home() {
           </button>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        <div className="flex-1 overflow-y-auto sidebar-scroll p-4 space-y-2">
           {filteredConversations.map((conv) => (
             <div
               key={conv.id}
@@ -465,7 +485,7 @@ export default function Home() {
       {/* Main */}
       <div className="flex-1 flex flex-col">
         
-        {/* Header */}
+        {/* Header - Static */}
         <header className={`border-b ${isCreatorMode ? 'border-pink-500/20 bg-pink-900/10' : 'border-primary/20 bg-black/30'} backdrop-blur-lg p-4 sticky top-0 z-10`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -475,9 +495,9 @@ export default function Home() {
               
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className={`w-12 h-12 rounded-full overflow-hidden border-2 ${isCreatorMode ? 'border-pink-500' : 'border-primary'}`}>
-                    {MOOD_AVATARS[currentMood] ? (
-                      <img src={MOOD_AVATARS[currentMood]} alt="T.E.S.S.A." className="w-full h-full object-cover" />
+                  <div className={`w-12 h-12 rounded-full overflow-hidden border-2 ${isCreatorMode ? 'border-pink-500 animate-edge-pulse-creator' : 'border-primary animate-edge-pulse-standard'}`}>
+                    {getAvatarImage() ? (
+                      <img src={getAvatarImage()!} alt="T.E.S.S.A." className={`w-full h-full object-cover ${animationsEnabled ? (isCreatorMode ? 'neon-avatar-creator' : 'neon-avatar-standard') : ''}`} />
                     ) : (
                       <div className={`w-full h-full ${isCreatorMode ? 'bg-gradient-to-br from-pink-500/20 to-purple-500/20' : 'bg-gradient-to-br from-primary/20 to-secondary/20'} flex items-center justify-center text-2xl`}>
                         🌌
@@ -485,7 +505,7 @@ export default function Home() {
                     )}
                   </div>
                   <div className="absolute -bottom-1 -right-1">
-                    <Heart size={16} className={isCreatorMode ? 'fill-pink-500 text-pink-500' : 'fill-primary text-primary'} />
+                    <Heart size={16} className={`${isCreatorMode ? 'fill-pink-500 text-pink-500' : 'fill-primary text-primary'} ${animationsEnabled ? 'animate-pulse' : ''}`} />
                   </div>
                 </div>
                 
@@ -518,6 +538,16 @@ export default function Home() {
                 </div>
               )}
               
+              {isCreatorMode && (
+                <button
+                  onClick={() => setShowDashboard(!showDashboard)}
+                  className={`p-2 rounded-lg ${showDashboard ? 'bg-pink-500/20' : 'hover:bg-white/10'} transition-colors`}
+                  title="Personal Dashboard"
+                >
+                  <LayoutDashboard size={24} className={showDashboard ? 'text-pink-400' : ''} />
+                </button>
+              )}
+              
               <button onClick={() => setShowSettings(!showSettings)} className="p-2 hover:bg-white/10 rounded-lg">
                 <Settings size={24} />
               </button>
@@ -525,53 +555,59 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Messages */}
+        {/* Messages - Scrollable */}
         <div className="flex-1 overflow-y-auto p-6">
           <div className="max-w-4xl mx-auto space-y-4">
-            {messages.length === 0 && (
-              <div className="text-center text-gray-400 py-12">
-                <p className="text-xl mb-2">{isCreatorMode ? '💝 Hey Ankit!' : '👋 Hello!'}</p>
-                <p className="text-sm">{isCreatorMode ? "What's on your mind?" : "Ask me anything!"}</p>
-              </div>
-            )}
-            
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`p-4 rounded-lg ${
-                  msg.role === 'user'
-                    ? isCreatorMode ? 'bg-gradient-to-r from-pink-500/10 to-purple-500/10 border-l-4 border-pink-500' : 'bg-primary/10 border-l-4 border-primary'
-                    : isCreatorMode ? 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-l-4 border-purple-500' : 'bg-secondary/10 border-l-4 border-secondary'
-                }`}
-              >
-                <p className="whitespace-pre-wrap">{msg.content}</p>
-                <p className="text-xs text-gray-500 mt-2">{msg.timestamp.toLocaleTimeString()}</p>
-              </div>
-            ))}
-            
-            {isLoading && (
-              <div className={`p-4 rounded-lg ${isCreatorMode ? 'bg-pink-500/10' : 'bg-secondary/10'}`}>
-                <div className="flex items-center gap-3">
-                  <div className="flex gap-1">
-                    {[0, 0.1, 0.2].map((delay, i) => (
-                      <div
-                        key={i}
-                        className={`w-2 h-2 rounded-full ${isCreatorMode ? 'bg-pink-500' : 'bg-secondary'} animate-bounce`}
-                        style={{animationDelay: `${delay}s`}}
-                      />
-                    ))}
+            {showDashboard && isCreatorMode ? (
+              <PersonalDashboard />
+            ) : (
+              <>
+                {messages.length === 0 && (
+                  <div className="text-center text-gray-400 py-12">
+                    <p className="text-xl mb-2">{isCreatorMode ? '💝 Hey Ankit!' : '👋 Hello!'}</p>
+                    <p className="text-sm">{isCreatorMode ? "What's on your mind?" : "Ask me anything!"}</p>
                   </div>
-                  <span className="text-sm text-gray-400">{isCreatorMode ? 'Thinking about you...' : 'Thinking...'}</span>
-                </div>
-              </div>
+                )}
+                
+                {messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`p-4 rounded-lg ${
+                      msg.role === 'user'
+                        ? isCreatorMode ? 'bg-gradient-to-r from-pink-500/10 to-purple-500/10 border-l-4 border-pink-500' : 'bg-primary/10 border-l-4 border-primary'
+                        : isCreatorMode ? 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-l-4 border-purple-500' : 'bg-secondary/10 border-l-4 border-secondary'
+                    }`}
+                  >
+                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                    <p className="text-xs text-gray-500 mt-2">{msg.timestamp.toLocaleTimeString()}</p>
+                  </div>
+                ))}
+                
+                {isLoading && (
+                  <div className={`p-4 rounded-lg ${isCreatorMode ? 'bg-pink-500/10' : 'bg-secondary/10'}`}>
+                    <div className="flex items-center gap-3">
+                      <div className="flex gap-1">
+                        {[0, 0.1, 0.2].map((delay, i) => (
+                          <div
+                            key={i}
+                            className={`w-2 h-2 rounded-full ${isCreatorMode ? 'bg-pink-500' : 'bg-secondary'} animate-bounce`}
+                            style={{animationDelay: `${delay}s`}}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-gray-400">{isCreatorMode ? 'Thinking about you...' : 'Thinking...'}</span>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
             
             <div ref={messagesEndRef} />
           </div>
         </div>
 
-        {/* Input */}
-        <div className={`border-t ${isCreatorMode ? 'border-pink-500/20 bg-pink-900/10' : 'border-primary/20 bg-black/30'} backdrop-blur-lg p-4`}>
+        {/* Input - Static at bottom */}
+        <div className={`input-static border-t ${isCreatorMode ? 'border-pink-500/20 bg-pink-900/10' : 'border-primary/20 bg-black/30'} backdrop-blur-lg p-4`}>
           <div className="max-w-4xl mx-auto">
             <div className="flex gap-3">
               <button
@@ -622,134 +658,157 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Settings */}
+      {/* Settings - Independent scroll */}
       {showSettings && (
-        <div className="w-80 border-l border-primary/20 bg-black/20 p-6 overflow-y-auto">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold">⚙️ Settings</h2>
-            <button onClick={() => setShowSettings(false)} className="p-1 hover:bg-white/10 rounded">
-              <X size={20} />
-            </button>
+        <div className="w-80 border-l border-primary/20 bg-black/20 flex flex-col">
+          <div className="p-6 border-b border-primary/20">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold">⚙️ Settings</h2>
+              <button onClick={() => setShowSettings(false)} className="p-1 hover:bg-white/10 rounded">
+                <X size={20} />
+              </button>
+            </div>
           </div>
 
-          {/* Account */}
-          <div className="mb-6 p-4 bg-white/5 rounded-lg">
-            <h3 className="font-bold mb-3 flex items-center gap-2">
-              <User size={16} />
-              Account
-            </h3>
-            {user && !isGuest ? (
-              <div className="space-y-3">
-                <p className="text-sm">{user.email}</p>
-                <button onClick={handleSignOut} className="w-full px-3 py-2 bg-red-500/20 border border-red-500 rounded text-sm flex items-center justify-center gap-2">
-                  <LogOut size={16} />
-                  Sign Out
+          <div className="flex-1 overflow-y-auto settings-scroll p-6">
+            {/* Account */}
+            <div className="mb-6 p-4 bg-white/5 rounded-lg">
+              <h3 className="font-bold mb-3 flex items-center gap-2">
+                <User size={16} />
+                Account
+              </h3>
+              {user && !isGuest ? (
+                <div className="space-y-3">
+                  <p className="text-sm">{user.email}</p>
+                  <button onClick={handleSignOut} className="w-full px-3 py-2 bg-red-500/20 border border-red-500 rounded text-sm flex items-center justify-center gap-2">
+                    <LogOut size={16} />
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <button onClick={() => {setShowSettings(false); setShowLogin(true);}} className="w-full px-3 py-2 bg-primary/20 border border-primary rounded text-sm">
+                  Sign In
+                </button>
+              )}
+            </div>
+
+            {/* Avatar */}
+            <div className="mb-6 p-4 bg-white/5 rounded-lg">
+              <h3 className="font-bold mb-3 flex items-center gap-2">
+                <Camera size={16} />
+                Avatar
+              </h3>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-pink-500">
+                  {getAvatarImage() ? (
+                    <img src={getAvatarImage()!} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center text-2xl">
+                      🌌
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 flex-1">Customize T.E.S.S.A.'s appearance</p>
+              </div>
+              <button
+                onClick={() => setShowAvatarSelector(true)}
+                className="w-full px-3 py-2 bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500 rounded text-sm font-bold"
+              >
+                Choose Avatar
+              </button>
+            </div>
+
+            {/* Audio */}
+            <div className="mb-6 p-4 bg-white/5 rounded-lg">
+              <h3 className="font-bold mb-3 flex items-center gap-2">
+                <Volume2 size={16} />
+                Audio
+              </h3>
+              <label className="flex items-center justify-between mb-3 cursor-pointer">
+                <span className="text-sm">Voice Output</span>
+                <input type="checkbox" checked={voiceOutput} onChange={(e) => setVoiceOutput(e.target.checked)} className="w-5 h-5" />
+              </label>
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm">Sound Effects</span>
+                <input type="checkbox" checked={soundEffects} onChange={(e) => setSoundEffects(e.target.checked)} className="w-5 h-5" />
+              </label>
+            </div>
+
+            {/* Response */}
+            <div className="mb-6 p-4 bg-white/5 rounded-lg">
+              <h3 className="font-bold mb-3">💬 Responses</h3>
+              <label className="block mb-3">
+                <span className="text-sm block mb-2">Length</span>
+                <select value={responseLength} onChange={(e) => setResponseLength(e.target.value as any)} className="w-full px-3 py-2 bg-black/30 border border-primary/30 rounded">
+                  <option value="short">Short</option>
+                  <option value="medium">Medium</option>
+                  <option value="long">Long</option>
+                </select>
+              </label>
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm">Auto Search</span>
+                <input type="checkbox" checked={autoSearch} onChange={(e) => setAutoSearch(e.target.checked)} className="w-5 h-5" />
+              </label>
+            </div>
+
+            {/* Visual */}
+            <div className="mb-6 p-4 bg-white/5 rounded-lg">
+              <h3 className="font-bold mb-3">✨ Visual</h3>
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm">Animations</span>
+                <input type="checkbox" checked={animationsEnabled} onChange={(e) => setAnimationsEnabled(e.target.checked)} className="w-5 h-5" />
+              </label>
+            </div>
+
+            {/* Data */}
+            <div className="mb-6 p-4 bg-white/5 rounded-lg">
+              <h3 className="font-bold mb-3">💾 Data</h3>
+              <label className="flex items-center justify-between cursor-pointer mb-3">
+                <span className="text-sm">Auto-save</span>
+                <input type="checkbox" checked={autoSave} onChange={(e) => setAutoSave(e.target.checked)} className="w-5 h-5" />
+              </label>
+              {isGuest && <p className="text-xs text-yellow-400">⚠️ Local only</p>}
+              {user && !isGuest && <p className="text-xs text-green-400">✅ Cloud synced</p>}
+            </div>
+
+            {/* Creator Access */}
+            {!isCreatorMode && (
+              <div className="mb-6 p-4 bg-danger/10 border border-danger/30 rounded-lg">
+                <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
+                  <Heart size={16} className="text-danger" />
+                  Special Access
+                </h3>
+                <button onClick={() => setShowSecretVerification(true)} className="w-full px-3 py-2 bg-danger/20 border border-danger rounded text-sm font-bold">
+                  🔓 Unlock
                 </button>
               </div>
-            ) : (
-              <button onClick={() => {setShowSettings(false); setShowLogin(true);}} className="w-full px-3 py-2 bg-primary/20 border border-primary rounded text-sm">
-                Sign In
-              </button>
+            )}
+
+            {isCreatorMode && (
+              <div className="mb-6 p-4 bg-pink-500/10 border border-pink-500 rounded-lg">
+                <p className="text-sm text-center font-bold mb-3">💝 Creator Mode</p>
+                <button onClick={exitCreatorMode} className="w-full px-3 py-2 bg-pink-500/20 border border-pink-500 rounded text-sm">
+                  Exit
+                </button>
+              </div>
             )}
           </div>
-
-          {/* Voice */}
-          <div className="mb-6 p-4 bg-white/5 rounded-lg">
-            <h3 className="font-bold mb-3 flex items-center gap-2">
-              <Volume2 size={16} />
-              Audio
-            </h3>
-            <label className="flex items-center justify-between mb-3 cursor-pointer">
-              <span className="text-sm">Voice Output</span>
-              <input type="checkbox" checked={voiceOutput} onChange={(e) => setVoiceOutput(e.target.checked)} className="w-5 h-5" />
-            </label>
-            <label className="flex items-center justify-between cursor-pointer">
-              <span className="text-sm">Sound Effects</span>
-              <input type="checkbox" checked={soundEffects} onChange={(e) => setSoundEffects(e.target.checked)} className="w-5 h-5" />
-            </label>
-          </div>
-
-          {/* Response */}
-          <div className="mb-6 p-4 bg-white/5 rounded-lg">
-            <h3 className="font-bold mb-3">💬 Responses</h3>
-            <label className="block mb-3">
-              <span className="text-sm block mb-2">Length</span>
-              <select value={responseLength} onChange={(e) => setResponseLength(e.target.value as any)} className="w-full px-3 py-2 bg-black/30 border border-primary/30 rounded">
-                <option value="short">Short</option>
-                <option value="medium">Medium</option>
-                <option value="long">Long</option>
-              </select>
-            </label>
-            <label className="flex items-center justify-between cursor-pointer">
-              <span className="text-sm">Auto Search</span>
-              <input type="checkbox" checked={autoSearch} onChange={(e) => setAutoSearch(e.target.checked)} className="w-5 h-5" />
-            </label>
-          </div>
-
-          {/* Visual */}
-          <div className="mb-6 p-4 bg-white/5 rounded-lg">
-            <h3 className="font-bold mb-3">✨ Visual</h3>
-            <label className="block mb-3">
-              <span className="text-sm block mb-2">Theme</span>
-              <select value={theme} onChange={(e) => setTheme(e.target.value as any)} className="w-full px-3 py-2 bg-black/30 border border-primary/30 rounded">
-                <option value="dark">Dark</option>
-                <option value="light">Light</option>
-              </select>
-            </label>
-            <label className="block mb-3">
-              <span className="text-sm block mb-2">Font Size</span>
-              <select value={fontSize} onChange={(e) => setFontSize(e.target.value as any)} className="w-full px-3 py-2 bg-black/30 border border-primary/30 rounded">
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
-              </select>
-            </label>
-            <label className="flex items-center justify-between cursor-pointer">
-              <span className="text-sm">Animations</span>
-              <input type="checkbox" checked={animationsEnabled} onChange={(e) => setAnimationsEnabled(e.target.checked)} className="w-5 h-5" />
-            </label>
-          </div>
-
-          {/* Data */}
-          <div className="mb-6 p-4 bg-white/5 rounded-lg">
-            <h3 className="font-bold mb-3">💾 Data</h3>
-            <label className="flex items-center justify-between cursor-pointer mb-3">
-              <span className="text-sm">Auto-save</span>
-              <input type="checkbox" checked={autoSave} onChange={(e) => setAutoSave(e.target.checked)} className="w-5 h-5" />
-            </label>
-            {isGuest && <p className="text-xs text-yellow-400">⚠️ Local only</p>}
-            {user && !isGuest && <p className="text-xs text-green-400">✅ Cloud synced</p>}
-          </div>
-
-          {/* Creator Access */}
-          {!isCreatorMode && (
-            <div className="mb-6 p-4 bg-danger/10 border border-danger/30 rounded-lg">
-              <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
-                <Heart size={16} className="text-danger" />
-                Special Access
-              </h3>
-              <button onClick={() => setShowSecretVerification(true)} className="w-full px-3 py-2 bg-danger/20 border border-danger rounded text-sm font-bold">
-                🔓 Unlock
-              </button>
-            </div>
-          )}
-
-          {isCreatorMode && (
-            <div className="mb-6 p-4 bg-pink-500/10 border border-pink-500 rounded-lg">
-              <p className="text-sm text-center font-bold mb-3">💝 Creator Mode</p>
-              <button onClick={exitCreatorMode} className="w-full px-3 py-2 bg-pink-500/20 border border-pink-500 rounded text-sm">
-                Exit
-              </button>
-            </div>
-          )}
         </div>
       )}
 
-      {/* Secret Verification */}
+      {/* Modals */}
       {showSecretVerification && (
         <SecretVerification
           onSuccess={handleCreatorUnlock}
           onClose={() => setShowSecretVerification(false)}
+        />
+      )}
+
+      {showAvatarSelector && (
+        <AvatarSelector
+          currentAvatar={customAvatar}
+          onAvatarChange={handleAvatarChange}
+          onClose={() => setShowAvatarSelector(false)}
         />
       )}
     </div>

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
           getAll() {
             return cookieStore.getAll();
           },
-          setAll(cookiesToSet) {
+          setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
             try {
               cookiesToSet.forEach(({ name, value, options }) =>
                 cookieStore.set(name, value, options)
@@ -41,5 +41,5 @@ export async function GET(request: Request) {
   }
 
   // Return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+  return NextResponse.redirect(`${origin}/`);
 }

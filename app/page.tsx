@@ -3,20 +3,21 @@
 import { useState, useEffect, useRef } from 'react';
 import { Message, MoodType, Conversation } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
-import { Send, Mic, MicOff, Menu, X, Settings, Heart, Plus, Trash2, Volume2, Sparkles, LogOut, User, Camera, LayoutDashboard } from 'lucide-react';
+import { Send, Mic, MicOff, Menu, X, Settings, Heart, Plus, Trash2, LogOut, User, LayoutDashboard } from 'lucide-react';
 import { MOOD_AVATARS, MOOD_DESCRIPTIONS } from '@/lib/mood';
 import { getRandomWelcomeMessage } from '@/lib/profile';
-import LoginPage from '@/components/LoginPage';
 import SecretVerification from '@/components/SecretVerification';
 import PersonalDashboard from '@/components/PersonalDashboard';
-import AvatarSelector from '@/components/AvatarSelector';
+import AvatarPresets from '@/components/AvatarPresets';
+import NotesPanel from '@/components/NotesPanel';
+import ProfileCard from '@/components/ProfileCard';
+import StudyTimer from '@/components/StudyTimer';
 import { supabase, getCurrentUser, signOut } from '@/lib/supabase';
 
 export default function Home() {
   // Auth state
   const [user, setUser] = useState<any>(null);
-  const [isGuest, setIsGuest] = useState(false);
-  const [showLogin, setShowLogin] = useState(true);
+  const [isGuest, setIsGuest] = useState(true); // Start as guest (no login screen)
   const [loading, setLoading] = useState(true);
 
   // Chat state
@@ -42,7 +43,7 @@ export default function Home() {
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
   const [soundEffects, setSoundEffects] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
-  const [customAvatar, setCustomAvatar] = useState<string | null>(null);
+  const [customAvatar, setCustomAvatar] = useState<string>('/avatars/cosmic.png');
   
   // Voice recording
   const [isRecording, setIsRecording] = useState(false);
@@ -56,11 +57,11 @@ export default function Home() {
   useEffect(() => {
     checkUser();
     loadCustomAvatar();
+    loadLocalConversations();
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        setShowLogin(false);
         setIsGuest(false);
         loadUserConversations(session.user.id);
       }
@@ -75,36 +76,35 @@ export default function Home() {
     setLoading(false);
     
     if (currentUser) {
-      setShowLogin(false);
       setIsGuest(false);
       loadUserConversations(currentUser.id);
     }
   };
 
   const loadCustomAvatar = () => {
-    const saved = localStorage.getItem('tessa-avatar');
-    if (saved) setCustomAvatar(saved);
+    const saved = localStorage.getItem('tessa-avatar-preset');
+    if (saved) {
+      setCustomAvatar(saved);
+    }
   };
 
   const handleAvatarChange = (newAvatar: string) => {
     setCustomAvatar(newAvatar);
   };
 
-  const handleGuestContinue = () => {
-    setIsGuest(true);
-    setShowLogin(false);
-    setLoading(false);
-    loadLocalConversations();
-  };
-
   const handleSignOut = async () => {
     await signOut();
     setUser(null);
-    setIsGuest(false);
+    setIsGuest(true);
     setMessages([]);
     setConversations([]);
     setIsCreatorMode(false);
-    setShowLogin(true);
+    loadLocalConversations();
+  };
+
+  const handleSignIn = () => {
+    // For now, just show an alert - you can add LoginPage component if needed
+    alert('Sign in feature: Visit your deployment URL and use Supabase auth. For now, continue as guest!');
   };
 
   // Auto-scroll
@@ -391,7 +391,7 @@ export default function Home() {
   const getAvatarImage = () => {
     if (customAvatar) return customAvatar;
     if (MOOD_AVATARS[currentMood]) return MOOD_AVATARS[currentMood];
-    return null;
+    return '/avatars/cosmic.png';
   };
 
   if (loading) {
@@ -399,18 +399,14 @@ export default function Home() {
       <div className="min-h-screen bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0d1117] flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4 animate-pulse">🌌</div>
-          <p className="text-gray-400">Loading...</p>
+          <p className="text-gray-400">Loading T.E.S.S.A...</p>
         </div>
       </div>
     );
   }
 
-  if (showLogin) {
-    return <LoginPage onGuestContinue={handleGuestContinue} />;
-  }
-
   return (
-    <div className={`min-h-screen ${bgStyle} text-white flex transition-all duration-500`}>
+    <div className={`min-h-screen ${bgStyle} text-white flex transition-all duration-500 ${showDashboard ? 'dashboard-active' : ''}`}>
       
       {/* Floating hearts */}
       {isCreatorMode && animationsEnabled && (
@@ -431,86 +427,124 @@ export default function Home() {
         </div>
       )}
       
-      {/* Sidebar - History */}
+      {/* LEFT SIDEBAR */}
       <div className={`${showHistory ? 'w-80' : 'w-0'} transition-all duration-300 border-r ${isCreatorMode ? 'border-pink-500/30' : 'border-primary/20'} bg-black/20 overflow-hidden flex flex-col`}>
-        <div className={`p-4 border-b ${isCreatorMode ? 'border-pink-500/30' : 'border-primary/20'}`}>
-          <h2 className={`text-lg font-bold mb-4 ${isCreatorMode ? 'text-pink-400' : 'text-primary'}`}>
-            💬 {isCreatorMode ? 'Our Chats' : 'History'}
-          </h2>
-          <button
-            onClick={startNewChat}
-            className={`w-full px-4 py-3 ${isCreatorMode ? 'bg-pink-500/10 hover:bg-pink-500/20 border-pink-500/30' : 'bg-primary/10 hover:bg-primary/20 border-primary/30'} border rounded-lg flex items-center justify-center gap-2 transition-all`}
-          >
-            <Plus size={20} />
-            <span>New Chat</span>
-          </button>
-        </div>
         
-        <div className="flex-1 overflow-y-auto sidebar-scroll p-4 space-y-2">
-          {filteredConversations.map((conv) => (
-            <div
-              key={conv.id}
-              className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                conv.id === currentConvId
-                  ? isCreatorMode ? 'bg-pink-500/20 border-pink-500' : 'bg-primary/20 border-primary'
-                  : isCreatorMode ? 'bg-white/5 border-pink-500/10 hover:bg-white/10' : 'bg-white/5 border-white/10 hover:bg-white/10'
-              }`}
+        {/* Notes Panel */}
+        <NotesPanel />
+        
+        {/* Chat History */}
+        <div className="flex-1 overflow-hidden flex flex-col border-t border-primary/20">
+          <div className="p-4 border-b border-primary/20">
+            <h3 className={`text-sm font-bold mb-3 ${isCreatorMode ? 'text-pink-400' : 'text-primary'}`}>
+              💬 {isCreatorMode ? 'Our Chats' : 'History'}
+            </h3>
+            <button
+              onClick={startNewChat}
+              className={`w-full px-4 py-2 ${isCreatorMode ? 'bg-pink-500/10 hover:bg-pink-500/20 border-pink-500/30' : 'bg-primary/10 hover:bg-primary/20 border-primary/30'} border rounded-lg flex items-center justify-center gap-2 transition-all text-sm`}
             >
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0" onClick={() => loadConversation(conv)}>
-                  <p className="text-sm font-medium truncate">{conv.title}</p>
-                  <p className="text-xs text-gray-400 mt-1">{conv.messages.length} messages</p>
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteConversation(conv.id);
-                  }}
-                  className="text-gray-400 hover:text-red-400 transition-colors"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </div>
-          ))}
+              <Plus size={16} />
+              <span>New Chat</span>
+            </button>
+          </div>
           
-          {filteredConversations.length === 0 && (
-            <div className="text-center text-gray-400 py-8">
-              <p className="text-sm">No chats yet</p>
+          <div className="flex-1 overflow-y-auto sidebar-scroll p-4 space-y-2">
+            {filteredConversations.map((conv) => (
+              <div
+                key={conv.id}
+                className={`p-2 rounded-lg border cursor-pointer transition-all ${
+                  conv.id === currentConvId
+                    ? isCreatorMode ? 'bg-pink-500/20 border-pink-500' : 'bg-primary/20 border-primary'
+                    : isCreatorMode ? 'bg-white/5 border-pink-500/10 hover:bg-white/10' : 'bg-white/5 border-white/10 hover:bg-white/10'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0" onClick={() => loadConversation(conv)}>
+                    <p className="text-xs font-medium truncate">{conv.title}</p>
+                    <p className="text-xs text-gray-400 mt-1">{conv.messages.length} msgs</p>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteConversation(conv.id);
+                    }}
+                    className="text-gray-400 hover:text-red-400 transition-colors"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+            
+            {filteredConversations.length === 0 && (
+              <div className="text-center text-gray-400 py-6">
+                <p className="text-xs">No chats yet</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Account Section */}
+        <div className="p-4 border-t border-primary/20">
+          <h3 className="text-sm font-bold text-primary mb-3 flex items-center gap-2">
+            <User size={16} />
+            Account
+          </h3>
+          {user && !isGuest ? (
+            <div className="space-y-2">
+              <p className="text-xs text-gray-400 truncate">{user.email}</p>
+              <button
+                onClick={handleSignOut}
+                className="w-full px-3 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500 rounded text-xs flex items-center justify-center gap-2"
+              >
+                <LogOut size={14} />
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <p className="text-xs text-gray-400">👤 Guest Mode</p>
+              <button
+                onClick={handleSignIn}
+                className="w-full px-3 py-2 bg-primary/20 hover:bg-primary/30 border border-primary rounded text-xs"
+              >
+                Sign In
+              </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col">
+      {/* MAIN AREA */}
+      <div className="flex-1 flex flex-col min-w-0">
         
-        {/* Header - Static */}
+        {/* Header */}
         <header className={`border-b ${isCreatorMode ? 'border-pink-500/20 bg-pink-900/10' : 'border-primary/20 bg-black/30'} backdrop-blur-lg p-4 sticky top-0 z-10`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button onClick={() => setShowHistory(!showHistory)} className="p-2 hover:bg-white/10 rounded-lg">
+            <div className="flex items-center gap-3">
+              <button onClick={() => setShowHistory(!showHistory)} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
                 <Menu size={24} />
               </button>
               
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className={`w-12 h-12 rounded-full overflow-hidden border-2 ${isCreatorMode ? 'border-pink-500 animate-edge-pulse-creator' : 'border-primary animate-edge-pulse-standard'}`}>
-                    {getAvatarImage() ? (
-                      <img src={getAvatarImage()!} alt="T.E.S.S.A." className={`w-full h-full object-cover ${animationsEnabled ? (isCreatorMode ? 'neon-avatar-creator' : 'neon-avatar-standard') : ''}`} />
-                    ) : (
-                      <div className={`w-full h-full ${isCreatorMode ? 'bg-gradient-to-br from-pink-500/20 to-purple-500/20' : 'bg-gradient-to-br from-primary/20 to-secondary/20'} flex items-center justify-center text-2xl`}>
-                        🌌
-                      </div>
-                    )}
+                    <img 
+                      src={getAvatarImage()} 
+                      alt="T.E.S.S.A."
+                      className={`w-full h-full object-cover ${animationsEnabled ? (isCreatorMode ? 'neon-avatar-creator' : 'neon-avatar-standard') : ''}`}
+                      onError={(e) => {
+                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg"%3E%3C/svg%3E';
+                      }}
+                    />
                   </div>
                   <div className="absolute -bottom-1 -right-1">
-                    <Heart size={16} className={`${isCreatorMode ? 'fill-pink-500 text-pink-500' : 'fill-primary text-primary'} ${animationsEnabled ? 'animate-pulse' : ''}`} />
+                    <Heart size={14} className={`${isCreatorMode ? 'fill-pink-500 text-pink-500' : 'fill-primary text-primary'} ${animationsEnabled ? 'animate-pulse' : ''}`} />
                   </div>
                 </div>
                 
                 <div>
-                  <h1 className={`text-2xl font-bold ${isCreatorMode ? 'text-pink-400' : ''} holographic-text`}>
+                  <h1 className={`text-xl font-bold ${isCreatorMode ? 'text-pink-400' : ''} holographic-text`}>
                     T.E.S.S.A.
                   </h1>
                   <p className="text-xs text-gray-400">
@@ -521,47 +555,34 @@ export default function Home() {
             </div>
             
             <div className="flex items-center gap-3">
-              <div className={`px-3 py-1 ${isCreatorMode ? 'bg-pink-500/20 border-pink-500/40' : 'bg-secondary/20 border-secondary/40'} border rounded-full text-sm`}>
+              <div className={`px-3 py-1 ${isCreatorMode ? 'bg-pink-500/20 border-pink-500/40' : 'bg-secondary/20 border-secondary/40'} border rounded-full text-xs`}>
                 {MOOD_DESCRIPTIONS[currentMood]}
               </div>
-              
-              {user && !isGuest && (
-                <div className="px-3 py-1 bg-primary/20 border border-primary/40 rounded-full text-sm flex items-center gap-2">
-                  <User size={14} />
-                  <span>{user.email?.split('@')[0] || 'User'}</span>
-                </div>
-              )}
-              
-              {isGuest && (
-                <div className="px-3 py-1 bg-yellow-500/20 border border-yellow-500/40 rounded-full text-sm">
-                  👤 Guest
-                </div>
-              )}
               
               {isCreatorMode && (
                 <button
                   onClick={() => setShowDashboard(!showDashboard)}
                   className={`p-2 rounded-lg ${showDashboard ? 'bg-pink-500/20' : 'hover:bg-white/10'} transition-colors`}
-                  title="Personal Dashboard"
+                  title="Dashboard"
                 >
-                  <LayoutDashboard size={24} className={showDashboard ? 'text-pink-400' : ''} />
+                  <LayoutDashboard size={20} className={showDashboard ? 'text-pink-400' : ''} />
                 </button>
               )}
               
-              <button onClick={() => setShowSettings(!showSettings)} className="p-2 hover:bg-white/10 rounded-lg">
-                <Settings size={24} />
+              <button onClick={() => setShowSettings(!showSettings)} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                <Settings size={20} />
               </button>
             </div>
           </div>
         </header>
 
-        {/* Messages - Scrollable */}
+        {/* Messages / Dashboard */}
         <div className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-4xl mx-auto space-y-4">
+          <div className="max-w-4xl mx-auto">
             {showDashboard && isCreatorMode ? (
               <PersonalDashboard />
             ) : (
-              <>
+              <div className="space-y-4">
                 {messages.length === 0 && (
                   <div className="text-center text-gray-400 py-12">
                     <p className="text-xl mb-2">{isCreatorMode ? '💝 Hey Ankit!' : '👋 Hello!'}</p>
@@ -572,13 +593,13 @@ export default function Home() {
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`p-4 rounded-lg ${
+                    className={`p-4 rounded-lg animate-fadeIn ${
                       msg.role === 'user'
                         ? isCreatorMode ? 'bg-gradient-to-r from-pink-500/10 to-purple-500/10 border-l-4 border-pink-500' : 'bg-primary/10 border-l-4 border-primary'
                         : isCreatorMode ? 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-l-4 border-purple-500' : 'bg-secondary/10 border-l-4 border-secondary'
                     }`}
                   >
-                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                    <p className="whitespace-pre-wrap text-sm">{msg.content}</p>
                     <p className="text-xs text-gray-500 mt-2">{msg.timestamp.toLocaleTimeString()}</p>
                   </div>
                 ))}
@@ -599,194 +620,166 @@ export default function Home() {
                     </div>
                   </div>
                 )}
-              </>
-            )}
-            
-            <div ref={messagesEndRef} />
-          </div>
-        </div>
-
-        {/* Input - Static at bottom */}
-        <div className={`input-static border-t ${isCreatorMode ? 'border-pink-500/20 bg-pink-900/10' : 'border-primary/20 bg-black/30'} backdrop-blur-lg p-4`}>
-          <div className="max-w-4xl mx-auto">
-            <div className="flex gap-3">
-              <button
-                onMouseDown={startRecording}
-                onMouseUp={stopRecording}
-                disabled={isLoading}
-                className={`p-3 ${isRecording ? 'bg-red-500' : isCreatorMode ? 'bg-pink-500/20 border-pink-500/30' : 'bg-primary/20 border-primary/30'} border rounded-lg disabled:opacity-50`}
-              >
-                {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
-              </button>
-              
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyPress}
-                placeholder={isCreatorMode ? "Message me..." : "Message T.E.S.S.A..."}
-                disabled={isLoading}
-                rows={1}
-                className={`flex-1 px-4 py-3 ${isCreatorMode ? 'bg-pink-900/20 border-pink-500/30' : 'bg-white/5 border-primary/30'} border rounded-lg focus:outline-none resize-none`}
-                style={{ minHeight: '48px', maxHeight: '200px' }}
-                onInput={(e) => {
-                  const t = e.target as HTMLTextAreaElement;
-                  t.style.height = 'auto';
-                  t.style.height = t.scrollHeight + 'px';
-                }}
-              />
-              
-              <button
-                onClick={() => sendMessage()}
-                disabled={!input.trim() || isLoading}
-                className={`px-6 py-3 ${isCreatorMode ? 'bg-pink-500' : 'bg-primary'} disabled:bg-gray-600 rounded-lg font-bold`}
-              >
-                {isLoading ? <Sparkles size={20} /> : <Send size={20} />}
-              </button>
-            </div>
-            
-            {recordedAudio && (
-              <div className="mt-2 p-3 bg-white/5 rounded-lg flex justify-between">
-                <span className="text-sm">🎤 Recorded</span>
-                <div className="flex gap-2">
-                  <button onClick={() => {sendMessage('🎤 Voice message'); setRecordedAudio(null);}} className="px-3 py-1 bg-primary rounded text-sm">Send</button>
-                  <button onClick={() => setRecordedAudio(null)} className="px-3 py-1 bg-red-500 rounded text-sm">Delete</button>
-                </div>
+                
+                <div ref={messagesEndRef} />
               </div>
             )}
           </div>
         </div>
+
+        {/* Input - Hidden when dashboard open */}
+        {!showDashboard && (
+          <div className={`input-static border-t ${isCreatorMode ? 'border-pink-500/20 bg-pink-900/10' : 'border-primary/20 bg-black/30'} backdrop-blur-lg p-4`}>
+            <div className="max-w-4xl mx-auto">
+              <div className="flex gap-3">
+                <button
+                  onMouseDown={startRecording}
+                  onMouseUp={stopRecording}
+                  disabled={isLoading}
+                  className={`p-3 ${isRecording ? 'bg-red-500' : isCreatorMode ? 'bg-pink-500/20 border-pink-500/30' : 'bg-primary/20 border-primary/30'} border rounded-lg disabled:opacity-50`}
+                >
+                  {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
+                </button>
+                
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder={isCreatorMode ? "Message me..." : "Message T.E.S.S.A..."}
+                  disabled={isLoading}
+                  rows={1}
+                  className={`flex-1 px-4 py-3 ${isCreatorMode ? 'bg-pink-900/20 border-pink-500/30' : 'bg-white/5 border-primary/30'} border rounded-lg focus:outline-none resize-none text-sm`}
+                  style={{ minHeight: '48px', maxHeight: '200px' }}
+                  onInput={(e) => {
+                    const t = e.target as HTMLTextAreaElement;
+                    t.style.height = 'auto';
+                    t.style.height = t.scrollHeight + 'px';
+                  }}
+                />
+                
+                <button
+                  onClick={() => sendMessage()}
+                  disabled={!input.trim() || isLoading}
+                  className={`px-6 py-3 ${isCreatorMode ? 'bg-pink-500' : 'bg-primary'} disabled:bg-gray-600 rounded-lg font-bold`}
+                >
+                  <Send size={20} />
+                </button>
+              </div>
+              
+              {recordedAudio && (
+                <div className="mt-2 p-3 bg-white/5 rounded-lg flex justify-between text-sm">
+                  <span>🎤 Recorded</span>
+                  <div className="flex gap-2">
+                    <button onClick={() => {sendMessage('🎤 Voice'); setRecordedAudio(null);}} className="px-3 py-1 bg-primary rounded text-xs">Send</button>
+                    <button onClick={() => setRecordedAudio(null)} className="px-3 py-1 bg-red-500 rounded text-xs">Delete</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Settings - Independent scroll */}
+      {/* RIGHT SIDEBAR */}
       {showSettings && (
         <div className="w-80 border-l border-primary/20 bg-black/20 flex flex-col">
-          <div className="p-6 border-b border-primary/20">
+          
+          {/* Profile Card */}
+          <ProfileCard
+            avatarPath={getAvatarImage()}
+            mood={currentMood}
+            isCreatorMode={isCreatorMode}
+            animationsEnabled={animationsEnabled}
+          />
+
+          {/* Settings Header */}
+          <div className="p-4 border-b border-primary/20">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">⚙️ Settings</h2>
+              <h2 className="text-lg font-bold">⚙️ Settings</h2>
               <button onClick={() => setShowSettings(false)} className="p-1 hover:bg-white/10 rounded">
                 <X size={20} />
               </button>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto settings-scroll p-6">
-            {/* Account */}
-            <div className="mb-6 p-4 bg-white/5 rounded-lg">
-              <h3 className="font-bold mb-3 flex items-center gap-2">
-                <User size={16} />
-                Account
-              </h3>
-              {user && !isGuest ? (
-                <div className="space-y-3">
-                  <p className="text-sm">{user.email}</p>
-                  <button onClick={handleSignOut} className="w-full px-3 py-2 bg-red-500/20 border border-red-500 rounded text-sm flex items-center justify-center gap-2">
-                    <LogOut size={16} />
-                    Sign Out
-                  </button>
-                </div>
-              ) : (
-                <button onClick={() => {setShowSettings(false); setShowLogin(true);}} className="w-full px-3 py-2 bg-primary/20 border border-primary rounded text-sm">
-                  Sign In
-                </button>
-              )}
-            </div>
-
+          {/* Settings Content */}
+          <div className="flex-1 overflow-y-auto settings-scroll p-4 space-y-4">
+            
             {/* Avatar */}
-            <div className="mb-6 p-4 bg-white/5 rounded-lg">
-              <h3 className="font-bold mb-3 flex items-center gap-2">
-                <Camera size={16} />
-                Avatar
-              </h3>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-pink-500">
-                  {getAvatarImage() ? (
-                    <img src={getAvatarImage()!} alt="Avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center text-2xl">
-                      🌌
-                    </div>
-                  )}
-                </div>
-                <p className="text-xs text-gray-400 flex-1">Customize T.E.S.S.A.'s appearance</p>
-              </div>
+            <div className="settings-section">
+              <h3>🎨 Appearance</h3>
               <button
                 onClick={() => setShowAvatarSelector(true)}
-                className="w-full px-3 py-2 bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500 rounded text-sm font-bold"
+                className="w-full px-3 py-2 bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500 rounded text-sm font-bold mt-2"
               >
                 Choose Avatar
               </button>
+              <label className="flex items-center justify-between mt-3 cursor-pointer text-sm">
+                <span>Animations</span>
+                <input type="checkbox" checked={animationsEnabled} onChange={(e) => setAnimationsEnabled(e.target.checked)} className="w-5 h-5" />
+              </label>
             </div>
 
             {/* Audio */}
-            <div className="mb-6 p-4 bg-white/5 rounded-lg">
-              <h3 className="font-bold mb-3 flex items-center gap-2">
-                <Volume2 size={16} />
-                Audio
-              </h3>
-              <label className="flex items-center justify-between mb-3 cursor-pointer">
-                <span className="text-sm">Voice Output</span>
+            <div className="settings-section">
+              <h3>🔊 Audio</h3>
+              <label className="flex items-center justify-between mb-2 cursor-pointer text-sm">
+                <span>Voice Output</span>
                 <input type="checkbox" checked={voiceOutput} onChange={(e) => setVoiceOutput(e.target.checked)} className="w-5 h-5" />
               </label>
-              <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-sm">Sound Effects</span>
+              <label className="flex items-center justify-between cursor-pointer text-sm">
+                <span>Sound Effects</span>
                 <input type="checkbox" checked={soundEffects} onChange={(e) => setSoundEffects(e.target.checked)} className="w-5 h-5" />
               </label>
             </div>
 
-            {/* Response */}
-            <div className="mb-6 p-4 bg-white/5 rounded-lg">
-              <h3 className="font-bold mb-3">💬 Responses</h3>
+            {/* Chat */}
+            <div className="settings-section">
+              <h3>💬 Chat</h3>
               <label className="block mb-3">
-                <span className="text-sm block mb-2">Length</span>
-                <select value={responseLength} onChange={(e) => setResponseLength(e.target.value as any)} className="w-full px-3 py-2 bg-black/30 border border-primary/30 rounded">
+                <span className="text-sm block mb-2">Response Length</span>
+                <select value={responseLength} onChange={(e) => setResponseLength(e.target.value as any)} className="w-full px-3 py-2 bg-black/30 border border-primary/30 rounded text-sm">
                   <option value="short">Short</option>
                   <option value="medium">Medium</option>
                   <option value="long">Long</option>
                 </select>
               </label>
-              <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-sm">Auto Search</span>
+              <label className="flex items-center justify-between cursor-pointer text-sm">
+                <span>Auto Search</span>
                 <input type="checkbox" checked={autoSearch} onChange={(e) => setAutoSearch(e.target.checked)} className="w-5 h-5" />
               </label>
             </div>
 
-            {/* Visual */}
-            <div className="mb-6 p-4 bg-white/5 rounded-lg">
-              <h3 className="font-bold mb-3">✨ Visual</h3>
-              <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-sm">Animations</span>
-                <input type="checkbox" checked={animationsEnabled} onChange={(e) => setAnimationsEnabled(e.target.checked)} className="w-5 h-5" />
-              </label>
-            </div>
-
             {/* Data */}
-            <div className="mb-6 p-4 bg-white/5 rounded-lg">
-              <h3 className="font-bold mb-3">💾 Data</h3>
-              <label className="flex items-center justify-between cursor-pointer mb-3">
-                <span className="text-sm">Auto-save</span>
+            <div className="settings-section">
+              <h3>💾 Data</h3>
+              <label className="flex items-center justify-between mb-2 cursor-pointer text-sm">
+                <span>Auto-save</span>
                 <input type="checkbox" checked={autoSave} onChange={(e) => setAutoSave(e.target.checked)} className="w-5 h-5" />
               </label>
-              {isGuest && <p className="text-xs text-yellow-400">⚠️ Local only</p>}
+              {isGuest && <p className="text-xs text-yellow-400">⚠️ Guest: Local storage</p>}
               {user && !isGuest && <p className="text-xs text-green-400">✅ Cloud synced</p>}
             </div>
 
+            {/* Study Timer */}
+            {isCreatorMode && (
+              <StudyTimer />
+            )}
+
             {/* Creator Access */}
             {!isCreatorMode && (
-              <div className="mb-6 p-4 bg-danger/10 border border-danger/30 rounded-lg">
-                <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
-                  <Heart size={16} className="text-danger" />
-                  Special Access
-                </h3>
-                <button onClick={() => setShowSecretVerification(true)} className="w-full px-3 py-2 bg-danger/20 border border-danger rounded text-sm font-bold">
+              <div className="settings-section bg-danger/10 border-danger/30">
+                <h3 className="text-danger">💝 Special</h3>
+                <button onClick={() => setShowSecretVerification(true)} className="w-full px-3 py-2 bg-danger/20 border border-danger rounded text-sm font-bold mt-2">
                   🔓 Unlock
                 </button>
               </div>
             )}
 
             {isCreatorMode && (
-              <div className="mb-6 p-4 bg-pink-500/10 border border-pink-500 rounded-lg">
-                <p className="text-sm text-center font-bold mb-3">💝 Creator Mode</p>
+              <div className="settings-section bg-pink-500/10 border-pink-500/30">
+                <p className="text-sm text-center font-bold mb-2">💝 Creator Mode</p>
                 <button onClick={exitCreatorMode} className="w-full px-3 py-2 bg-pink-500/20 border border-pink-500 rounded text-sm">
                   Exit
                 </button>
@@ -805,7 +798,7 @@ export default function Home() {
       )}
 
       {showAvatarSelector && (
-        <AvatarSelector
+        <AvatarPresets
           currentAvatar={customAvatar}
           onAvatarChange={handleAvatarChange}
           onClose={() => setShowAvatarSelector(false)}

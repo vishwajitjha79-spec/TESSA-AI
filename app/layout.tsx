@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "T.E.S.S.A. - Thoughtful Empathic Sophisticated Synthetic Assistant",
-  description: "Your intelligent AI companion with internet search and mood-aware responses",
-  manifest: "/manifest.json",
-  themeColor: "#00d4ff",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+export const metadata = {
+  title: 'T.E.S.S.A. - AI Assistant',
+  description: 'Your Personal AI Assistant',
+  icons: {
+    icon: '/app-icon.jpg', // or .png
+    apple: '/app-icon.jpg',
+  },
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({

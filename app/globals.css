@@ -17,7 +17,10 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  overflow-x: hidden;
+  overflow: hidden; /* Prevent body scroll */
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
 /* Custom Scrollbar */
@@ -211,11 +214,9 @@ body {
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
-/* Textarea auto-resize */
+/* Textarea */
 textarea {
   field-sizing: content;
-  min-height: 48px;
-  max-height: 200px;
 }
 
 /* Voice recording pulse */
@@ -225,21 +226,24 @@ textarea {
     transform: scale(1);
   }
   50% { 
-    opacity: 0.5;
-    transform: scale(1.1);
+    opacity: 0.7;
+    transform: scale(1.05);
   }
 }
 
 .recording-indicator {
-  animation: record-pulse 1s ease-in-out infinite;
+  animation: record-pulse 0.8s ease-in-out infinite;
 }
 
-/* Independent Sidebar Scrolling */
+/* FIXED: Independent Sidebar Scrolling - NO OVERFLOW */
 .sidebar-scroll {
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: rgba(236, 72, 153, 0.5) transparent;
+  /* Important: Remove any max-height that could cause issues */
+  flex: 1;
+  min-height: 0;
 }
 
 .sidebar-scroll::-webkit-scrollbar {
@@ -255,12 +259,14 @@ textarea {
   background: rgba(236, 72, 153, 0.8);
 }
 
-/* Settings Panel Independent Scroll */
+/* FIXED: Settings Panel Independent Scroll - NO OVERFLOW */
 .settings-scroll {
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: rgba(127, 92, 255, 0.5) transparent;
+  flex: 1;
+  min-height: 0;
 }
 
 .settings-scroll::-webkit-scrollbar {
@@ -276,37 +282,9 @@ textarea {
   background: rgba(127, 92, 255, 0.8);
 }
 
-/* Static Input Box */
-.input-static {
-  position: sticky;
-  bottom: 0;
-  z-index: 20;
-  background: inherit;
-}
-
-/* Three Column Layout Support */
-.three-column-layout {
-  display: grid;
-  grid-template-columns: 280px 1fr 320px;
-  height: 100vh;
-  overflow: hidden;
-}
-
-@media (max-width: 1024px) {
-  .three-column-layout {
-    grid-template-columns: 240px 1fr 280px;
-  }
-}
-
-@media (max-width: 768px) {
-  .three-column-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* Distinct Settings Sections */
 .settings-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   padding: 1rem;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 0.75rem;
@@ -338,18 +316,6 @@ textarea {
   animation: progress-fill 1s ease-out;
 }
 
-/* Dashboard Hidden Input */
-.dashboard-active .input-static {
-  display: none;
-}
-
-/* Better spacing for nested settings */
-.nested-setting {
-  margin-left: 1rem;
-  padding-left: 1rem;
-  border-left: 2px solid rgba(0, 212, 255, 0.2);
-}
-
 /* Profile card glow */
 .profile-card-glow {
   box-shadow: 
@@ -358,12 +324,71 @@ textarea {
     inset 0 0 20px rgba(236, 72, 153, 0.1);
 }
 
-/* Notes panel styling */
+/* Notes panel */
 .notes-panel {
-  max-height: 400px;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 /* Study timer circular progress */
 .timer-circle {
   transition: stroke-dashoffset 0.5s ease;
+}
+
+/* MOBILE RESPONSIVENESS */
+@media (max-width: 768px) {
+  /* Hide sidebars by default on mobile */
+  .sidebar-left,
+  .sidebar-right {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 50;
+    background: rgba(10, 14, 39, 0.98);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Overlay when sidebar open */
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 40;
+  }
+
+  /* Adjust text sizes for mobile */
+  .holographic-text {
+    font-size: 1.25rem;
+  }
+
+  /* Make buttons more touch-friendly */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Adjust input area */
+  textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+/* Ensure no layout shift */
+html, body, #__next {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Prevent rubber band scrolling on iOS */
+html {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overscroll-behavior: none;
 }

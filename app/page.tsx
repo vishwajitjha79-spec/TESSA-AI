@@ -15,20 +15,17 @@ import StudyTimer from '@/components/StudyTimer';
 import { supabase, getCurrentUser, signOut } from '@/lib/supabase';
 
 export default function Home() {
-  // Auth state
   const [user, setUser] = useState<any>(null);
-  const [isGuest, setIsGuest] = useState(true); // Start as guest (no login screen)
+  const [isGuest, setIsGuest] = useState(true);
   const [loading, setLoading] = useState(true);
 
-  // Chat state
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [currentMood, setCurrentMood] = useState<MoodType>('calm');
   const [isCreatorMode, setIsCreatorMode] = useState(false);
   
-  // UI state
-  const [showHistory, setShowHistory] = useState(true);
+  const [showHistory, setShowHistory] = useState(false); // Start hidden on mobile
   const [showSettings, setShowSettings] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const [showSecretVerification, setShowSecretVerification] = useState(false);
@@ -36,7 +33,6 @@ export default function Home() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConvId, setCurrentConvId] = useState(uuidv4());
   
-  // Settings
   const [autoSearch, setAutoSearch] = useState(true);
   const [voiceOutput, setVoiceOutput] = useState(false);
   const [responseLength, setResponseLength] = useState<'short' | 'medium' | 'long'>('medium');
@@ -45,15 +41,14 @@ export default function Home() {
   const [autoSave, setAutoSave] = useState(true);
   const [customAvatar, setCustomAvatar] = useState<string>('/avatars/cosmic.png');
   
-  // Voice recording
   const [isRecording, setIsRecording] = useState(false);
   const [recordedAudio, setRecordedAudio] = useState<Blob | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Check auth on mount
   useEffect(() => {
     checkUser();
     loadCustomAvatar();
@@ -70,6 +65,13 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Auto-scroll ONLY messages, not sidebars
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [messages]);
+
   const checkUser = async () => {
     const currentUser = await getCurrentUser();
     setUser(currentUser);
@@ -83,9 +85,7 @@ export default function Home() {
 
   const loadCustomAvatar = () => {
     const saved = localStorage.getItem('tessa-avatar-preset');
-    if (saved) {
-      setCustomAvatar(saved);
-    }
+    if (saved) setCustomAvatar(saved);
   };
 
   const handleAvatarChange = (newAvatar: string) => {
@@ -103,16 +103,9 @@ export default function Home() {
   };
 
   const handleSignIn = () => {
-    // For now, just show an alert - you can add LoginPage component if needed
-    alert('Sign in feature: Visit your deployment URL and use Supabase auth. For now, continue as guest!');
+    alert('Sign in: Visit your deployment URL. For now, continue as guest!');
   };
 
-  // Auto-scroll
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  // Load conversations
   const loadUserConversations = async (userId: string) => {
     try {
       const { data } = await supabase
@@ -149,7 +142,6 @@ export default function Home() {
     }
   };
 
-  // Save conversation
   const saveConversation = async () => {
     if (messages.length === 0) return;
 
@@ -258,10 +250,32 @@ export default function Home() {
 
   const speak = (text: string) => {
     if ('speechSynthesis' in window) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      utterance.pitch = 1.1;
-      speechSynthesis.speak(utterance);
+      
+      // Set female voice parameters
+      utterance.pitch = 1.3; // Higher pitch for female voice
+      utterance.rate = 1.1; // Slightly faster, more energetic
+      
+      // Try to find a female voice
+      const voices = window.speechSynthesis.getVoices();
+      const femaleVoice = voices.find(voice => 
+        voice.name.toLowerCase().includes('female') ||
+        voice.name.toLowerCase().includes('woman') ||
+        voice.name.toLowerCase().includes('samantha') ||
+        voice.name.toLowerCase().includes('victoria') ||
+        voice.name.toLowerCase().includes('karen') ||
+        voice.name.toLowerCase().includes('zira') ||
+        voice.name.toLowerCase().includes('google us english')
+      );
+      
+      if (femaleVoice) {
+        utterance.voice = femaleVoice;
+      }
+      
+      window.speechSynthesis.speak(utterance);
     }
   };
 
@@ -289,21 +303,34 @@ export default function Home() {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm'
+      });
       
-      const chunks: BlobPart[] = [];
-      mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+      
       mediaRecorder.onstop = () => {
-        setRecordedAudio(new Blob(chunks, { type: 'audio/webm' }));
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        setRecordedAudio(audioBlob);
         stream.getTracks().forEach(track => track.stop());
+        
+        // Transcribe audio
+        transcribeAudio(audioBlob);
       };
       
       mediaRecorder.start();
       setIsRecording(true);
       if (soundEffects) playSound('start');
     } catch (error) {
-      alert('Microphone access denied');
+      console.error('Microphone error:', error);
+      alert('Please allow microphone access');
     }
   };
 
@@ -312,6 +339,31 @@ export default function Home() {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       if (soundEffects) playSound('stop');
+    }
+  };
+
+  const transcribeAudio = async (audioBlob: Blob) => {
+    try {
+      // Use Web Speech API for transcription
+      const recognition = new (window as any).webkitSpeechRecognition() || new (window as any).SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(transcript);
+      };
+
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setInput('🎤 [Voice message - please type your message]');
+      };
+
+      recognition.start();
+    } catch (error) {
+      console.error('Transcription error:', error);
+      setInput('🎤 [Voice recorded - transcription unavailable]');
     }
   };
 
@@ -406,11 +458,11 @@ export default function Home() {
   }
 
   return (
-    <div className={`min-h-screen ${bgStyle} text-white flex transition-all duration-500 ${showDashboard ? 'dashboard-active' : ''}`}>
+    <div className={`h-screen ${bgStyle} text-white flex overflow-hidden transition-all duration-500`}>
       
       {/* Floating hearts */}
       {isCreatorMode && animationsEnabled && (
-        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
@@ -427,15 +479,17 @@ export default function Home() {
         </div>
       )}
       
-      {/* LEFT SIDEBAR */}
-      <div className={`${showHistory ? 'w-80' : 'w-0'} transition-all duration-300 border-r ${isCreatorMode ? 'border-pink-500/30' : 'border-primary/20'} bg-black/20 overflow-hidden flex flex-col`}>
+      {/* LEFT SIDEBAR - Fixed height, independent scroll */}
+      <div className={`${showHistory ? 'w-80' : 'w-0'} transition-all duration-300 border-r ${isCreatorMode ? 'border-pink-500/30' : 'border-primary/20'} bg-black/20 flex flex-col h-screen overflow-hidden z-10`}>
         
-        {/* Notes Panel */}
-        <NotesPanel />
+        {/* Notes Panel - Fixed section */}
+        <div className="flex-shrink-0">
+          <NotesPanel />
+        </div>
         
-        {/* Chat History */}
-        <div className="flex-1 overflow-hidden flex flex-col border-t border-primary/20">
-          <div className="p-4 border-b border-primary/20">
+        {/* Chat History - Scrollable section */}
+        <div className="flex-1 flex flex-col border-t border-primary/20 min-h-0">
+          <div className="flex-shrink-0 p-4 border-b border-primary/20">
             <h3 className={`text-sm font-bold mb-3 ${isCreatorMode ? 'text-pink-400' : 'text-primary'}`}>
               💬 {isCreatorMode ? 'Our Chats' : 'History'}
             </h3>
@@ -484,8 +538,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Account Section */}
-        <div className="p-4 border-t border-primary/20">
+        {/* Account Section - Fixed at bottom */}
+        <div className="flex-shrink-0 p-4 border-t border-primary/20">
           <h3 className="text-sm font-bold text-primary mb-3 flex items-center gap-2">
             <User size={16} />
             Account
@@ -515,15 +569,15 @@ export default function Home() {
         </div>
       </div>
 
-      {/* MAIN AREA */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* MAIN AREA - Fixed height */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden min-w-0 z-10">
         
-        {/* Header */}
-        <header className={`border-b ${isCreatorMode ? 'border-pink-500/20 bg-pink-900/10' : 'border-primary/20 bg-black/30'} backdrop-blur-lg p-4 sticky top-0 z-10`}>
+        {/* Header - Fixed */}
+        <header className={`flex-shrink-0 border-b ${isCreatorMode ? 'border-pink-500/20 bg-pink-900/10' : 'border-primary/20 bg-black/30'} backdrop-blur-lg p-4`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button onClick={() => setShowHistory(!showHistory)} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                <Menu size={24} />
+                {showHistory ? <X size={24} /> : <Menu size={24} />}
               </button>
               
               <div className="flex items-center gap-3">
@@ -555,7 +609,7 @@ export default function Home() {
             </div>
             
             <div className="flex items-center gap-3">
-              <div className={`px-3 py-1 ${isCreatorMode ? 'bg-pink-500/20 border-pink-500/40' : 'bg-secondary/20 border-secondary/40'} border rounded-full text-xs`}>
+              <div className={`hidden md:block px-3 py-1 ${isCreatorMode ? 'bg-pink-500/20 border-pink-500/40' : 'bg-secondary/20 border-secondary/40'} border rounded-full text-xs`}>
                 {MOOD_DESCRIPTIONS[currentMood]}
               </div>
               
@@ -569,15 +623,18 @@ export default function Home() {
                 </button>
               )}
               
-              <button onClick={() => setShowSettings(!showSettings)} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                <Settings size={20} />
+              <button 
+                onClick={() => setShowSettings(!showSettings)} 
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              >
+                {showSettings ? <X size={20} /> : <Settings size={20} />}
               </button>
             </div>
           </div>
         </header>
 
-        {/* Messages / Dashboard */}
-        <div className="flex-1 overflow-y-auto p-6">
+        {/* Messages - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-6">
           <div className="max-w-4xl mx-auto">
             {showDashboard && isCreatorMode ? (
               <PersonalDashboard />
@@ -627,16 +684,18 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Input - Hidden when dashboard open */}
+        {/* Input - Fixed at bottom, hidden when dashboard open */}
         {!showDashboard && (
-          <div className={`input-static border-t ${isCreatorMode ? 'border-pink-500/20 bg-pink-900/10' : 'border-primary/20 bg-black/30'} backdrop-blur-lg p-4`}>
+          <div className={`flex-shrink-0 border-t ${isCreatorMode ? 'border-pink-500/20 bg-pink-900/10' : 'border-primary/20 bg-black/30'} backdrop-blur-lg p-4`}>
             <div className="max-w-4xl mx-auto">
               <div className="flex gap-3">
                 <button
                   onMouseDown={startRecording}
                   onMouseUp={stopRecording}
+                  onTouchStart={startRecording}
+                  onTouchEnd={stopRecording}
                   disabled={isLoading}
-                  className={`p-3 ${isRecording ? 'bg-red-500' : isCreatorMode ? 'bg-pink-500/20 border-pink-500/30' : 'bg-primary/20 border-primary/30'} border rounded-lg disabled:opacity-50`}
+                  className={`flex-shrink-0 p-3 ${isRecording ? 'bg-red-500 recording-indicator' : isCreatorMode ? 'bg-pink-500/20 border-pink-500/30' : 'bg-primary/20 border-primary/30'} border rounded-lg disabled:opacity-50`}
                 >
                   {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
                 </button>
@@ -650,18 +709,18 @@ export default function Home() {
                   disabled={isLoading}
                   rows={1}
                   className={`flex-1 px-4 py-3 ${isCreatorMode ? 'bg-pink-900/20 border-pink-500/30' : 'bg-white/5 border-primary/30'} border rounded-lg focus:outline-none resize-none text-sm`}
-                  style={{ minHeight: '48px', maxHeight: '200px' }}
+                  style={{ minHeight: '48px', maxHeight: '120px' }}
                   onInput={(e) => {
                     const t = e.target as HTMLTextAreaElement;
                     t.style.height = 'auto';
-                    t.style.height = t.scrollHeight + 'px';
+                    t.style.height = Math.min(t.scrollHeight, 120) + 'px';
                   }}
                 />
                 
                 <button
                   onClick={() => sendMessage()}
                   disabled={!input.trim() || isLoading}
-                  className={`px-6 py-3 ${isCreatorMode ? 'bg-pink-500' : 'bg-primary'} disabled:bg-gray-600 rounded-lg font-bold`}
+                  className={`flex-shrink-0 px-6 py-3 ${isCreatorMode ? 'bg-pink-500' : 'bg-primary'} disabled:bg-gray-600 rounded-lg font-bold`}
                 >
                   <Send size={20} />
                 </button>
@@ -669,11 +728,10 @@ export default function Home() {
               
               {recordedAudio && (
                 <div className="mt-2 p-3 bg-white/5 rounded-lg flex justify-between text-sm">
-                  <span>🎤 Recorded</span>
-                  <div className="flex gap-2">
-                    <button onClick={() => {sendMessage('🎤 Voice'); setRecordedAudio(null);}} className="px-3 py-1 bg-primary rounded text-xs">Send</button>
-                    <button onClick={() => setRecordedAudio(null)} className="px-3 py-1 bg-red-500 rounded text-xs">Delete</button>
-                  </div>
+                  <span>🎤 Voice recorded</span>
+                  <button onClick={() => setRecordedAudio(null)} className="px-3 py-1 bg-red-500 rounded text-xs">
+                    Clear
+                  </button>
                 </div>
               )}
             </div>
@@ -681,32 +739,28 @@ export default function Home() {
         )}
       </div>
 
-      {/* RIGHT SIDEBAR */}
+      {/* RIGHT SIDEBAR - Fixed height, independent scroll */}
       {showSettings && (
-        <div className="w-80 border-l border-primary/20 bg-black/20 flex flex-col">
+        <div className="w-80 border-l border-primary/20 bg-black/20 flex flex-col h-screen overflow-hidden z-10">
           
-          {/* Profile Card */}
-          <ProfileCard
-            avatarPath={getAvatarImage()}
-            mood={currentMood}
-            isCreatorMode={isCreatorMode}
-            animationsEnabled={animationsEnabled}
-          />
-
-          {/* Settings Header */}
-          <div className="p-4 border-b border-primary/20">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold">⚙️ Settings</h2>
-              <button onClick={() => setShowSettings(false)} className="p-1 hover:bg-white/10 rounded">
-                <X size={20} />
-              </button>
-            </div>
+          {/* Profile Card - Fixed */}
+          <div className="flex-shrink-0">
+            <ProfileCard
+              avatarPath={getAvatarImage()}
+              mood={currentMood}
+              isCreatorMode={isCreatorMode}
+              animationsEnabled={animationsEnabled}
+            />
           </div>
 
-          {/* Settings Content */}
+          {/* Settings Header - Fixed */}
+          <div className="flex-shrink-0 p-4 border-b border-primary/20">
+            <h2 className="text-lg font-bold">⚙️ Settings</h2>
+          </div>
+
+          {/* Settings Content - Scrollable */}
           <div className="flex-1 overflow-y-auto settings-scroll p-4 space-y-4">
             
-            {/* Avatar */}
             <div className="settings-section">
               <h3>🎨 Appearance</h3>
               <button
@@ -721,7 +775,6 @@ export default function Home() {
               </label>
             </div>
 
-            {/* Audio */}
             <div className="settings-section">
               <h3>🔊 Audio</h3>
               <label className="flex items-center justify-between mb-2 cursor-pointer text-sm">
@@ -734,7 +787,6 @@ export default function Home() {
               </label>
             </div>
 
-            {/* Chat */}
             <div className="settings-section">
               <h3>💬 Chat</h3>
               <label className="block mb-3">
@@ -751,7 +803,6 @@ export default function Home() {
               </label>
             </div>
 
-            {/* Data */}
             <div className="settings-section">
               <h3>💾 Data</h3>
               <label className="flex items-center justify-between mb-2 cursor-pointer text-sm">
@@ -762,12 +813,10 @@ export default function Home() {
               {user && !isGuest && <p className="text-xs text-green-400">✅ Cloud synced</p>}
             </div>
 
-            {/* Study Timer */}
             {isCreatorMode && (
               <StudyTimer />
             )}
 
-            {/* Creator Access */}
             {!isCreatorMode && (
               <div className="settings-section bg-danger/10 border-danger/30">
                 <h3 className="text-danger">💝 Special</h3>

@@ -12,30 +12,30 @@ import {
 import type { Message, MoodType, Conversation } from '@/types';
 
 // ─── Components ───────────────────────────────────────────────────────────────
-import SecretVerification   from '@/components/SecretVerification';
-import PersonalDashboard    from '@/components/PersonalDashboard';
-import AvatarPresets        from '@/components/AvatarPresets';
-import NotesPanel           from '@/components/NotesPanel';
-import ProfileCard          from '@/components/ProfileCard';
-import StudyTimer           from '@/components/StudyTimer';
-import PlannerHub           from '@/components/PlannerHub';
-import FlashcardGenerator   from '@/components/FlashcardGenerator';
-import ReportCard           from '@/components/ReportCard';
-import StreakDashboard      from '@/components/StreakDashboard';
-import MessageRenderer      from '@/components/MessageRenderer';
+import SecretVerification from '@/components/SecretVerification';
+import PersonalDashboard  from '@/components/PersonalDashboard';
+import AvatarPresets      from '@/components/AvatarPresets';
+import NotesPanel         from '@/components/NotesPanel';
+import ProfileCard        from '@/components/ProfileCard';
+import StudyTimer         from '@/components/StudyTimer';
+import PlannerHub         from '@/components/PlannerHub';
+import FlashcardGenerator from '@/components/FlashcardGenerator';
+import ReportCard         from '@/components/ReportCard';
+import StreakDashboard    from '@/components/StreakDashboard';
+import MessageRenderer    from '@/components/MessageRenderer';
 
 // ─── Lib ──────────────────────────────────────────────────────────────────────
-import { supabase, getCurrentUser, signOut } from '@/lib/supabase';
-import { MOOD_DESCRIPTIONS }                 from '@/lib/mood';
-import { getRandomWelcomeMessage }           from '@/lib/profile';
-import { estimateCalories }                  from '@/lib/food-database';
+import { supabase, getCurrentUser, signOut }         from '@/lib/supabase';
+import { MOOD_DESCRIPTIONS }                          from '@/lib/mood';
+import { getRandomWelcomeMessage }                    from '@/lib/profile';
+import { estimateCalories }                           from '@/lib/food-database';
 import {
   shouldBeProactive, getProactiveQuestion,
   detectMealInResponse, detectSleepInResponse, getSleepReaction,
 } from '@/lib/proactive-tessa';
 import {
-  buildMemoryContext, extractMemoriesFromMessage, getAllMemories,
-  deleteMemory, clearAllMemories,
+  buildMemoryContext, extractMemoriesFromMessage,
+  getAllMemories, deleteMemory, clearAllMemories,
 } from '@/lib/memory';
 import {
   getStreaks, incrementStreak, getStreakCelebration,
@@ -48,89 +48,117 @@ type Theme          = 'dark' | 'light';
 type ResponseLength = 'short' | 'medium' | 'long';
 
 interface HealthSnapshot {
-  weight      : number;
-  height      : number;
-  meals       : { time: string; meal: string; calories: number; confidence: string }[];
+  weight       : number;
+  height       : number;
+  meals        : { time: string; meal: string; calories: number; confidence: string }[];
   totalCalories: number;
-  sleepHours? : number;
-  date        : string;
+  sleepHours?  : number;
+  date         : string;
 }
 
-// ─── Theme helpers ────────────────────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
+const MAX_TOKENS: Record<ResponseLength, number> = { short: 350, medium: 700, long: 1400 };
+
+const VALID_MOODS: MoodType[] = [
+  'happy', 'calm', 'confident', 'worried',
+  'flirty', 'loving', 'thinking', 'listening', 'playful', 'focused',
+];
+
+// ─── Theme tokens ─────────────────────────────────────────────────────────────
 const TC = {
   dark: {
-    root  : 'bg-gradient-to-br from-[#0a0e27] via-[#141830] to-[#0d1020]',
-    rootC : 'bg-gradient-to-br from-[#1a0a20] via-[#220a30] to-[#1a0820]',
-    aside : 'bg-black/25 border-white/8',
-    header: 'bg-black/30 border-white/8 backdrop-blur-xl',
-    headerC:'bg-pink-950/20 border-pink-500/15 backdrop-blur-xl',
-    card  : 'bg-white/4 border-white/8',
-    body  : 'text-white',
-    sub   : 'text-gray-400',
-    msgU  : 'bg-[#0d1a2e] border-l-4 border-cyan-500',
-    msgUC : 'bg-[#1f0a28] border-l-4 border-pink-500',
-    msgA  : 'bg-[#0a1520] border-l-4 border-violet-500',
-    msgAC : 'bg-[#130a20] border-l-4 border-purple-500',
-    input : 'bg-white/5 border-white/15 text-white placeholder:text-white/30 focus:border-cyan-400/60',
-    inputC: 'bg-pink-950/30 border-pink-500/25 text-white placeholder:text-pink-300/40 focus:border-pink-400/70',
-    btnPrimary : 'bg-cyan-500 hover:bg-cyan-400 text-white',
-    btnPrimaryC: 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400 text-white',
-    btnSoft : 'border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300',
-    btnSoftC: 'border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300',
-    sectionH: 'text-cyan-400',
-    sectionHC:'text-pink-400',
+    root    : 'bg-gradient-to-br from-[#0a0e27] via-[#141830] to-[#0d1020]',
+    rootC   : 'bg-gradient-to-br from-[#1a0a20] via-[#220a30] to-[#1a0820]',
+    aside   : 'bg-black/25 border-white/8',
+    header  : 'bg-black/30 border-white/8 backdrop-blur-xl',
+    headerC : 'bg-pink-950/20 border-pink-500/15 backdrop-blur-xl',
+    card    : 'bg-white/4 border-white/8',
+    body    : 'text-white',
+    sub     : 'text-gray-400',
+    msgU    : 'bg-[#0d1a2e] border-l-4 border-cyan-500',
+    msgUC   : 'bg-[#1f0a28] border-l-4 border-pink-500',
+    msgA    : 'bg-[#0a1520] border-l-4 border-violet-500',
+    msgAC   : 'bg-[#130a20] border-l-4 border-purple-500',
+    input   : 'bg-white/5 border-white/15 text-white placeholder:text-white/30 focus:border-cyan-400/60',
+    inputC  : 'bg-pink-950/30 border-pink-500/25 text-white placeholder:text-pink-300/40 focus:border-pink-400/70',
+    btnP    : 'bg-cyan-500 hover:bg-cyan-400 text-white',
+    btnPC   : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400 text-white',
+    btnS    : 'border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300',
+    btnSC   : 'border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300',
+    sH      : 'text-cyan-400',
+    sHC     : 'text-pink-400',
     accent  : 'text-cyan-400',
     accentC : 'text-pink-400',
   },
   light: {
-    root  : 'bg-gradient-to-br from-slate-50 via-white to-blue-50/30',
-    rootC : 'bg-gradient-to-br from-pink-50 via-white to-purple-50/30',
-    aside : 'bg-white border-slate-200',
-    header: 'bg-white/90 border-slate-200 backdrop-blur-xl shadow-sm',
-    headerC:'bg-pink-50/90 border-pink-200 backdrop-blur-xl shadow-sm',
-    card  : 'bg-slate-50 border-slate-200',
-    body  : 'text-slate-800',
-    sub   : 'text-slate-500',
-    msgU  : 'bg-cyan-50 border-l-4 border-cyan-500',
-    msgUC : 'bg-pink-50 border-l-4 border-pink-400',
-    msgA  : 'bg-indigo-50/70 border-l-4 border-violet-400',
-    msgAC : 'bg-purple-50/70 border-l-4 border-purple-400',
-    input : 'bg-white border-slate-300 text-slate-800 placeholder:text-slate-400 focus:border-cyan-400',
-    inputC: 'bg-white border-pink-300 text-slate-800 placeholder:text-pink-300 focus:border-pink-400',
-    btnPrimary : 'bg-cyan-500 hover:bg-cyan-600 text-white',
-    btnPrimaryC: 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white',
-    btnSoft : 'border border-cyan-500/50 bg-cyan-50 hover:bg-cyan-100 text-cyan-700',
-    btnSoftC: 'border border-pink-500/50 bg-pink-50 hover:bg-pink-100 text-pink-700',
-    sectionH: 'text-cyan-600',
-    sectionHC:'text-pink-500',
+    root    : 'bg-gradient-to-br from-slate-50 via-white to-blue-50/30',
+    rootC   : 'bg-gradient-to-br from-pink-50 via-white to-purple-50/30',
+    aside   : 'bg-white border-slate-200',
+    header  : 'bg-white/90 border-slate-200 backdrop-blur-xl shadow-sm',
+    headerC : 'bg-pink-50/90 border-pink-200 backdrop-blur-xl shadow-sm',
+    card    : 'bg-slate-50 border-slate-200',
+    body    : 'text-slate-800',
+    sub     : 'text-slate-500',
+    msgU    : 'bg-cyan-50 border-l-4 border-cyan-500',
+    msgUC   : 'bg-pink-50 border-l-4 border-pink-400',
+    msgA    : 'bg-indigo-50/70 border-l-4 border-violet-400',
+    msgAC   : 'bg-purple-50/70 border-l-4 border-purple-400',
+    input   : 'bg-white border-slate-300 text-slate-800 placeholder:text-slate-400 focus:border-cyan-400',
+    inputC  : 'bg-white border-pink-300 text-slate-800 placeholder:text-pink-300 focus:border-pink-400',
+    btnP    : 'bg-cyan-500 hover:bg-cyan-600 text-white',
+    btnPC   : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white',
+    btnS    : 'border border-cyan-500/50 bg-cyan-50 hover:bg-cyan-100 text-cyan-700',
+    btnSC   : 'border border-pink-500/50 bg-pink-50 hover:bg-pink-100 text-pink-700',
+    sH      : 'text-cyan-600',
+    sHC     : 'text-pink-500',
     accent  : 'text-cyan-600',
     accentC : 'text-pink-500',
   },
 } as const;
 
-function useTc(theme: Theme, creatorMode: boolean) {
-  const base = TC[theme];
+// ─── Theme hook ───────────────────────────────────────────────────────────────
+function useTc(theme: Theme, creator: boolean) {
+  const b = TC[theme];
   return {
-    root    : creatorMode ? base.rootC    : base.root,
-    aside   : base.aside,
-    header  : creatorMode ? base.headerC  : base.header,
-    card    : base.card,
-    body    : base.body,
-    sub     : base.sub,
-    msgU    : creatorMode ? base.msgUC    : base.msgU,
-    msgA    : creatorMode ? base.msgAC    : base.msgA,
-    input   : creatorMode ? base.inputC   : base.input,
-    primary : creatorMode ? base.btnPrimaryC : base.btnPrimary,
-    soft    : creatorMode ? base.btnSoftC : base.btnSoft,
-    sectionH: creatorMode ? base.sectionHC: base.sectionH,
-    accent  : creatorMode ? base.accentC  : base.accent,
+    root    : creator ? b.rootC   : b.root,
+    aside   : b.aside,
+    header  : creator ? b.headerC : b.header,
+    card    : b.card,
+    body    : b.body,
+    sub     : b.sub,
+    msgU    : creator ? b.msgUC  : b.msgU,
+    msgA    : creator ? b.msgAC  : b.msgA,
+    input   : creator ? b.inputC : b.input,
+    primary : creator ? b.btnPC  : b.btnP,
+    soft    : creator ? b.btnSC  : b.btnS,
+    sH      : creator ? b.sHC    : b.sH,
+    accent  : creator ? b.accentC: b.accent,
   };
 }
 
-// ─── MAX TOKENS MAP ───────────────────────────────────────────────────────────
-const MAX_TOKENS: Record<ResponseLength, number> = { short: 350, medium: 700, long: 1400 };
+// ─── Safe mood helper ─────────────────────────────────────────────────────────
+function safeMood(m?: string): MoodType {
+  return VALID_MOODS.includes(m as MoodType) ? (m as MoodType) : 'calm';
+}
 
-// ─── COMPONENT ────────────────────────────────────────────────────────────────
+// ─── localStorage helpers ─────────────────────────────────────────────────────
+function lsGet(key: string): string | null {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+function lsSet(key: string, val: string): void {
+  try { localStorage.setItem(key, val); } catch {}
+}
+function lsRemove(key: string): void {
+  try { localStorage.removeItem(key); } catch {}
+}
+function lsGetJson<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch { return fallback; }
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 export default function Home() {
 
   // ── Auth ──────────────────────────────────────────────────────────────────
@@ -139,72 +167,75 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   // ── Chat ──────────────────────────────────────────────────────────────────
-  const [messages,       setMessages]       = useState<Message[]>([]);
-  const [input,          setInput]          = useState('');
-  const [isLoading,      setIsLoading]      = useState(false);
-  const [currentMood,    setCurrentMood]    = useState<MoodType>('calm');
-  const [isCreatorMode,  setIsCreatorMode]  = useState(false);
-  const [conversations,  setConversations]  = useState<Conversation[]>([]);
-  const [currentConvId,  setCurrentConvId]  = useState<string>(() => uuidv4());
+  const [messages,      setMessages]      = useState<Message[]>([]);
+  const [input,         setInput]         = useState('');
+  const [isLoading,     setIsLoading]     = useState(false);
+  const [currentMood,   setCurrentMood]   = useState<MoodType>('calm');
+  const [isCreatorMode, setIsCreatorMode] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [currentConvId, setCurrentConvId] = useState<string>(() => uuidv4());
+  const [latestMsgId,   setLatestMsgId]   = useState<string | null>(null);
 
-  // ── UI toggles ─────────────────────────────────────────────────────────────
-  const [showSidebar,          setShowSidebar]          = useState(false);
-  const [showSettings,         setShowSettings]         = useState(false);
-  const [showDashboard,        setShowDashboard]        = useState(false);
-  const [showSecretModal,      setShowSecretModal]      = useState(false);
-  const [showAvatarModal,      setShowAvatarModal]      = useState(false);
-  const [showPlanners,         setShowPlanners]         = useState(false);
-  const [notesExpanded,        setNotesExpanded]        = useState(true);
-  const [showFlashcards,       setShowFlashcards]       = useState(false);
-  const [showReportCard,       setShowReportCard]       = useState(false);
-  const [typingEnabled,        setTypingEnabled]        = useState(true);
-  const [latestMsgId,          setLatestMsgId]          = useState<string | null>(null);
+  // ── UI panels ─────────────────────────────────────────────────────────────
+  const [showSidebar,     setShowSidebar]     = useState(false);
+  const [showSettings,    setShowSettings]    = useState(false);
+  const [showDashboard,   setShowDashboard]   = useState(false);
+  const [showSecretModal, setShowSecretModal] = useState(false);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [showPlanners,    setShowPlanners]    = useState(false);
+  const [showFlashcards,  setShowFlashcards]  = useState(false);
+  const [showReportCard,  setShowReportCard]  = useState(false);
+  const [notesExpanded,   setNotesExpanded]   = useState(true);
+  const [typingEnabled,   setTypingEnabled]   = useState(true);
 
-  // ── Settings values ────────────────────────────────────────────────────────
-  const [theme,          setThemeState]  = useState<Theme>('dark');
-  const [autoSearch,     setAutoSearch]  = useState(true);
-  const [voiceOutput,    setVoiceOutput] = useState(false);
-  const [responseLength, setResponseLength] = useState<ResponseLength>('medium');
-  const [animations,     setAnimations]  = useState(true);
-  const [sfx,            setSfx]         = useState(true);
-  const [autoSave,       setAutoSave]    = useState(true);
-  const [avatar,         setAvatar]      = useState('/avatars/cosmic.png');
+  // ── Settings ──────────────────────────────────────────────────────────────
+  const [theme,          setThemeState]    = useState<Theme>('dark');
+  const [autoSearch,     setAutoSearch]    = useState(true);
+  const [voiceOutput,    setVoiceOutput]   = useState(false);
+  const [responseLength, setResponseLength]= useState<ResponseLength>('medium');
+  const [animations,     setAnimations]    = useState(true);
+  const [sfx,            setSfx]           = useState(true);
+  const [autoSave,       setAutoSave]      = useState(true);
+  const [avatar,         setAvatar]        = useState('/avatars/cosmic.png');
 
-  // ── Voice ──────────────────────────────────────────────────────────────────
+  // ── Voice ─────────────────────────────────────────────────────────────────
   const [isRecording, setIsRecording] = useState(false);
 
-  // ── Refs ───────────────────────────────────────────────────────────────────
-  const bottomRef       = useRef<HTMLDivElement>(null);
-  const textareaRef     = useRef<HTMLTextAreaElement>(null);
-  const mediaRecRef     = useRef<MediaRecorder | null>(null);
-  const audioChunks     = useRef<Blob[]>([]);
-  const proactiveTimer  = useRef<ReturnType<typeof setInterval> | null>(null);
-  const voicesReady     = useRef(false);
+  // ── Refs ──────────────────────────────────────────────────────────────────
+  const bottomRef      = useRef<HTMLDivElement>(null);
+  const textareaRef    = useRef<HTMLTextAreaElement>(null);
+  const mediaRecRef    = useRef<MediaRecorder | null>(null);
+  const audioChunks    = useRef<Blob[]>([]);
+  const proactiveTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const voicesReady    = useRef(false);
 
-  // derived
-  const tc = useTc(theme, isCreatorMode);
+  // ── Derived ───────────────────────────────────────────────────────────────
+  const tc        = useTc(theme, isCreatorMode);
+  const avatarSrc = avatar || '/avatars/cosmic.png';
+  const shownConvs = conversations.filter(
+    c => c.mode === (isCreatorMode ? 'creator' : 'standard')
+  );
 
-  // ─── Theme application ─────────────────────────────────────────────────────
+  // ─── Theme setter ───────────────────────────────────────────────────────────
   const setTheme = useCallback((t: Theme) => {
     setThemeState(t);
     document.documentElement.classList.remove('light', 'dark');
     document.documentElement.classList.add(t);
-    localStorage.setItem('tessa-theme', t);
+    lsSet('tessa-theme', t);
   }, []);
 
-  // ─── Initialisation ────────────────────────────────────────────────────────
+  // ─── Bootstrap ─────────────────────────────────────────────────────────────
   useEffect(() => {
-    // Load persisted preferences
+    // Restore persisted preferences
     const saved = {
-      theme          : localStorage.getItem('tessa-theme') as Theme | null,
-      avatar         : localStorage.getItem('tessa-avatar-preset'),
-      autoSearch     : localStorage.getItem('tessa-auto-search'),
-      voiceOutput    : localStorage.getItem('tessa-voice-output'),
-      responseLength : localStorage.getItem('tessa-response-length') as ResponseLength | null,
-      animations     : localStorage.getItem('tessa-animations'),
-      sfx            : localStorage.getItem('tessa-sfx'),
+      theme         : lsGet('tessa-theme') as Theme | null,
+      avatar        : lsGet('tessa-avatar-preset'),
+      autoSearch    : lsGet('tessa-auto-search'),
+      voiceOutput   : lsGet('tessa-voice-output'),
+      responseLength: lsGet('tessa-response-length') as ResponseLength | null,
+      animations    : lsGet('tessa-animations'),
+      sfx           : lsGet('tessa-sfx'),
     };
-
     if (saved.theme)          setTheme(saved.theme);
     if (saved.avatar)         setAvatar(saved.avatar);
     if (saved.autoSearch)     setAutoSearch(saved.autoSearch === 'true');
@@ -213,26 +244,21 @@ export default function Home() {
     if (saved.animations)     setAnimations(saved.animations === 'true');
     if (saved.sfx)            setSfx(saved.sfx === 'true');
 
-    // Preload speech voices
+    // Prime speech synthesis voices
     if ('speechSynthesis' in window) {
       window.speechSynthesis.onvoiceschanged = () => { voicesReady.current = true; };
       if (window.speechSynthesis.getVoices().length) voicesReady.current = true;
     }
 
-    // Auth
     checkAuth();
     hydrateLocalConversations();
 
-    // Morning briefing — deliver once per day in creator mode
-    const checkBriefing = () => {
-      if (shouldDeliverBriefing()) {
-        const briefing = buildMorningBriefing();
-        markBriefingDelivered(briefing);
-        // Will be injected when creator mode is activated
-        localStorage.setItem('tessa-pending-briefing', briefing);
-      }
-    };
-    checkBriefing();
+    // Morning briefing — once per day
+    if (shouldDeliverBriefing()) {
+      const briefing = buildMorningBriefing();
+      markBriefingDelivered(briefing);
+      lsSet('tessa-pending-briefing', briefing);
+    }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       const u = session?.user ?? null;
@@ -247,27 +273,23 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── Persist settings on change ────────────────────────────────────────────
-  useEffect(() => { localStorage.setItem('tessa-auto-search',      String(autoSearch));     }, [autoSearch]);
-  useEffect(() => { localStorage.setItem('tessa-voice-output',     String(voiceOutput));    }, [voiceOutput]);
-  useEffect(() => { localStorage.setItem('tessa-response-length',  responseLength);         }, [responseLength]);
-  useEffect(() => { localStorage.setItem('tessa-animations',       String(animations));     }, [animations]);
-  useEffect(() => { localStorage.setItem('tessa-sfx',              String(sfx));            }, [sfx]);
+  // ─── Persist settings ──────────────────────────────────────────────────────
+  useEffect(() => { lsSet('tessa-auto-search',     String(autoSearch));    }, [autoSearch]);
+  useEffect(() => { lsSet('tessa-voice-output',    String(voiceOutput));   }, [voiceOutput]);
+  useEffect(() => { lsSet('tessa-response-length', responseLength);        }, [responseLength]);
+  useEffect(() => { lsSet('tessa-animations',      String(animations));    }, [animations]);
+  useEffect(() => { lsSet('tessa-sfx',             String(sfx));           }, [sfx]);
 
-  // ─── Proactive T.E.S.S.A. (creator only) ───────────────────────────────────
+  // ─── Proactive check-ins (creator mode only) ───────────────────────────────
   useEffect(() => {
     if (proactiveTimer.current) { clearInterval(proactiveTimer.current); proactiveTimer.current = null; }
-
     if (!isCreatorMode) return;
 
-    // Check once immediately (after short delay so chat is settled)
-    const initialDelay = setTimeout(() => maybeSendProactive(), 5000);
-
-    // Then check every 3 hours
-    proactiveTimer.current = setInterval(() => maybeSendProactive(), 3 * 60 * 60 * 1000);
+    const delay = setTimeout(() => maybeSendProactive(), 5_000);
+    proactiveTimer.current = setInterval(() => maybeSendProactive(), 3 * 60 * 60 * 1_000);
 
     return () => {
-      clearTimeout(initialDelay);
+      clearTimeout(delay);
       if (proactiveTimer.current) clearInterval(proactiveTimer.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -277,24 +299,21 @@ export default function Home() {
     if (!shouldBeProactive()) return;
     const q = getProactiveQuestion();
     if (!q) return;
-    setMessages(prev => [
-      ...prev,
-      {
-        id       : uuidv4(),
-        role     : 'assistant' as const,
-        content  : q.question,
-        timestamp: new Date(),
-        mood     : 'playful' as MoodType,
-      },
-    ]);
+    setMessages(prev => [...prev, {
+      id       : uuidv4(),
+      role     : 'assistant' as const,
+      content  : q.question,
+      timestamp: new Date(),
+      mood     : 'playful' as MoodType,
+    }]);
   };
 
-  // ─── Auto-scroll (messages only, never sidebars) ───────────────────────────
+  // ─── Auto-scroll ───────────────────────────────────────────────────────────
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages, isLoading]);
 
-  // ─── Auth helpers ───────────────────────────────────────────────────────────
+  // ─── Auth ──────────────────────────────────────────────────────────────────
   const checkAuth = async () => {
     try {
       const u = await getCurrentUser();
@@ -314,7 +333,7 @@ export default function Home() {
     hydrateLocalConversations();
   };
 
-  // ─── Conversation management ────────────────────────────────────────────────
+  // ─── Conversations ─────────────────────────────────────────────────────────
   const fetchCloudConversations = async (uid: string) => {
     try {
       const { data, error } = await supabase
@@ -326,57 +345,53 @@ export default function Home() {
 
       if (error || !data) return;
 
-      setConversations(
-        data.map((row: any): Conversation => ({
-          id          : row.conversation_id,
-          title       : row.title,
-          messages    : row.messages,
-          created     : new Date(row.created_at),
-          updated     : new Date(row.updated_at),
-          mode        : row.mode,
-          moodHistory : row.mood_history ?? ['calm'],
-        }))
-      );
-    } catch (_) {}
+      setConversations(data.map((row: any): Conversation => ({
+        id         : row.conversation_id,
+        title      : row.title,
+        messages   : row.messages,
+        created    : new Date(row.created_at),
+        updated    : new Date(row.updated_at),
+        mode       : row.mode,
+        moodHistory: row.mood_history ?? ['calm'],
+      })));
+    } catch {}
   };
 
   const hydrateLocalConversations = () => {
-    try {
-      const raw = localStorage.getItem('tessa-conversations');
-      if (raw) setConversations(JSON.parse(raw));
-    } catch (_) {}
+    const convs = lsGetJson<Conversation[]>('tessa-conversations', []);
+    if (convs.length) setConversations(convs);
   };
 
   const persistConversation = useCallback(async () => {
     if (messages.length === 0) return;
 
     const conv: Conversation = {
-      id          : currentConvId,
-      title       : messages[0].content.slice(0, 55).trimEnd() + '…',
+      id         : currentConvId,
+      title      : messages[0].content.slice(0, 55).trimEnd() + '…',
       messages,
-      created     : new Date(),
-      updated     : new Date(),
-      mode        : isCreatorMode ? 'creator' : 'standard',
-      moodHistory : [currentMood],
+      created    : new Date(),
+      updated    : new Date(),
+      mode       : isCreatorMode ? 'creator' : 'standard',
+      moodHistory: [currentMood],
     };
 
     if (user && !isGuest) {
       try {
         await supabase.from('conversations').upsert({
-          user_id         : user.id,
-          conversation_id : conv.id,
-          title           : conv.title,
-          messages        : conv.messages,
-          mode            : conv.mode,
-          mood_history    : conv.moodHistory,
-          updated_at      : new Date().toISOString(),
+          user_id        : user.id,
+          conversation_id: conv.id,
+          title          : conv.title,
+          messages       : conv.messages,
+          mode           : conv.mode,
+          mood_history   : conv.moodHistory,
+          updated_at     : new Date().toISOString(),
         });
         fetchCloudConversations(user.id);
-      } catch (_) {}
+      } catch {}
     } else if (autoSave) {
       const next = [conv, ...conversations.filter(c => c.id !== currentConvId)].slice(0, 50);
       setConversations(next);
-      localStorage.setItem('tessa-conversations', JSON.stringify(next));
+      lsSet('tessa-conversations', JSON.stringify(next));
     }
   }, [messages, currentConvId, isCreatorMode, currentMood, user, isGuest, autoSave, conversations]);
 
@@ -390,11 +405,13 @@ export default function Home() {
   };
 
   const openConversation = (conv: Conversation) => {
-    const modeOk = (conv.mode === 'creator') === isCreatorMode;
-    if (!modeOk) { alert(`Switch to ${conv.mode} mode first`); return; }
+    if ((conv.mode === 'creator') !== isCreatorMode) {
+      alert(`Switch to ${conv.mode} mode first.`);
+      return;
+    }
     setMessages(conv.messages);
     setCurrentConvId(conv.id);
-    setCurrentMood(conv.moodHistory?.at(-1) ?? 'calm');
+    setCurrentMood(safeMood(conv.moodHistory?.at(-1)));
     setShowSidebar(false);
   };
 
@@ -404,30 +421,28 @@ export default function Home() {
         await supabase.from('conversations').delete()
           .eq('conversation_id', id).eq('user_id', user.id);
         fetchCloudConversations(user.id);
-      } catch (_) {}
+      } catch {}
     } else {
       const next = conversations.filter(c => c.id !== id);
       setConversations(next);
-      localStorage.setItem('tessa-conversations', JSON.stringify(next));
+      lsSet('tessa-conversations', JSON.stringify(next));
     }
   };
 
-  // ─── Dashboard auto-update ──────────────────────────────────────────────────
-  const parseDashboardUpdates = (text: string): string => {
+  // ─── Dashboard auto-update from response text ──────────────────────────────
+  const parseDashboardUpdates = (responseText: string): string => {
     if (!isCreatorMode) return '';
     let extra = '';
 
     try {
-      // Meal detection
-      const foodHit = detectMealInResponse(text);
+      // Meal detection from AI response
+      const foodHit = detectMealInResponse(responseText);
       if (foodHit) {
         const result = estimateCalories(foodHit.food);
-        const rawHealth = localStorage.getItem('tessa-health');
-        const health: HealthSnapshot = rawHealth
-          ? JSON.parse(rawHealth)
-          : { weight: 0, height: 0, meals: [], totalCalories: 0, date: new Date().toISOString().split('T')[0] };
-
-        health.meals = health.meals ?? [];
+        const health = lsGetJson<HealthSnapshot>('tessa-health', {
+          weight: 0, height: 0, meals: [], totalCalories: 0,
+          date: new Date().toISOString().split('T')[0],
+        });
         health.meals.push({
           time      : new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
           meal      : result.food,
@@ -435,38 +450,35 @@ export default function Home() {
           confidence: result.confidence,
         });
         health.totalCalories = (health.totalCalories ?? 0) + result.calories;
-        localStorage.setItem('tessa-health', JSON.stringify(health));
+        lsSet('tessa-health', JSON.stringify(health));
       }
 
-      // Sleep detection
-      const sleepHit = detectSleepInResponse(text);
+      // Sleep detection from AI response
+      const sleepHit = detectSleepInResponse(responseText);
       if (sleepHit) {
-        const rawHealth = localStorage.getItem('tessa-health');
-        const health: HealthSnapshot = rawHealth
-          ? JSON.parse(rawHealth)
-          : { weight: 0, height: 0, meals: [], totalCalories: 0, date: new Date().toISOString().split('T')[0] };
+        const health = lsGetJson<HealthSnapshot>('tessa-health', {
+          weight: 0, height: 0, meals: [], totalCalories: 0,
+          date: new Date().toISOString().split('T')[0],
+        });
         health.sleepHours = sleepHit.hours;
-        localStorage.setItem('tessa-health', JSON.stringify(health));
+        lsSet('tessa-health', JSON.stringify(health));
         extra = '\n\n' + getSleepReaction(sleepHit.hours);
       }
-    } catch (_) {}
+    } catch {}
 
     return extra;
   };
 
-  // ─── Send message ───────────────────────────────────────────────────────────
+  // ─── Send message ──────────────────────────────────────────────────────────
   const sendMessage = async (override?: string) => {
     const text = (override ?? input).trim();
     if (!text || isLoading) return;
 
-    // Parse user message for dashboard updates and get any extra reaction
-    const sleepReaction = parseDashboardUpdates(text);
-
     const userMsg: Message = {
-      id        : uuidv4(),
-      role      : 'user',
-      content   : text,
-      timestamp : new Date(),
+      id       : uuidv4(),
+      role     : 'user',
+      content  : text,
+      timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMsg]);
@@ -496,70 +508,75 @@ export default function Home() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
+      // Parse AI response for dashboard updates (sleep/meal)
+      const dashboardExtra = parseDashboardUpdates(data.content);
+
       const assistantMsg: Message = {
-        id        : uuidv4(),
-        role      : 'assistant',
-        content   : data.content + sleepReaction,
-        timestamp : new Date(),
-        mood      : data.mood as MoodType | undefined,
+        id       : uuidv4(),
+        role     : 'assistant',
+        content  : data.content + dashboardExtra,
+        timestamp: new Date(),
+        mood     : safeMood(data.mood) as MoodType,
       };
 
       setMessages(prev => [...prev, assistantMsg]);
-      if (data.mood) setCurrentMood(data.mood as MoodType);
+      setCurrentMood(safeMood(data.mood));
       setLatestMsgId(assistantMsg.id);
 
-      // Extract memories from this exchange
+      // Fire-and-forget memory extraction
       extractMemoriesFromMessage(text, data.content).catch(() => {});
 
-      // Update streaks
+      // Streak increment + celebration
       const updatedStreaks = incrementStreak('study');
       const celebration   = getStreakCelebration('study', updatedStreaks.study.current);
       if (celebration) {
         setTimeout(() => {
           setMessages(prev => [...prev, {
-            id: uuidv4(), role: 'assistant' as const,
-            content: `🎉 ${celebration}`, timestamp: new Date(), mood: 'loving' as MoodType,
+            id       : uuidv4(),
+            role     : 'assistant' as const,
+            content  : `🎉 ${celebration}`,
+            timestamp: new Date(),
+            mood     : 'loving' as MoodType,
           }]);
-        }, 1500);
+        }, 1_500);
       }
 
-      // Water nudge check
+      // Water nudge (40% chance when due)
       const waterNudge = shouldNudgeWater();
       if (waterNudge && Math.random() < 0.4) {
         setTimeout(() => {
           setMessages(prev => [...prev, {
-            id: uuidv4(), role: 'assistant' as const,
-            content: `💧 ${waterNudge}`, timestamp: new Date(), mood: 'caring' as MoodType,
+            id       : uuidv4(),
+            role     : 'assistant' as const,
+            content  : `💧 ${waterNudge}`,
+            timestamp: new Date(),
+            mood     : 'loving' as MoodType,   // ← was 'caring' (invalid)
           }]);
-        }, 3000);
+        }, 3_000);
       }
 
       if (voiceOutput) speakText(data.content);
       if (sfx)         playChime();
-      if (autoSave)    setTimeout(persistConversation, 1000);
+      if (autoSave)    setTimeout(persistConversation, 1_000);
 
     } catch (err: any) {
-      setMessages(prev => [
-        ...prev,
-        {
-          id       : uuidv4(),
-          role     : 'assistant' as const,
-          content  : `⚠️ ${err?.message ?? 'Something went wrong — please try again.'}`,
-          timestamp: new Date(),
-        },
-      ]);
+      setMessages(prev => [...prev, {
+        id       : uuidv4(),
+        role     : 'assistant' as const,
+        content  : `⚠️ ${err?.message ?? 'Something went wrong — please try again.'}`,
+        timestamp: new Date(),
+      }]);
     } finally {
       setIsLoading(false);
       textareaRef.current?.focus();
     }
   };
 
-  // ─── Speech synthesis ───────────────────────────────────────────────────────
+  // ─── TTS ───────────────────────────────────────────────────────────────────
   const speakText = (raw: string) => {
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
 
-    // Strip markdown-ish symbols for cleaner TTS
     const clean = raw
       .replace(/\*\*/g, '')
       .replace(/#{1,6}\s/g, '')
@@ -571,29 +588,23 @@ export default function Home() {
     utter.rate  = 1.1;
     utter.lang  = 'en-IN';
 
-    const assignFemaleVoice = () => {
-      const voices = window.speechSynthesis.getVoices();
-      // Priority order: known good female voices
-      const female = voices.find(v =>
+    const assignVoice = () => {
+      const voices  = window.speechSynthesis.getVoices();
+      const female  = voices.find(v =>
         /samantha|victoria|karen|moira|fiona|kate|veena|zira|google (us english|uk english female)/i.test(v.name)
-      ) ?? voices.find(v =>
-        /female|woman/i.test(v.name)
-      );
+      ) ?? voices.find(v => /female|woman/i.test(v.name));
       if (female) utter.voice = female;
       window.speechSynthesis.speak(utter);
     };
 
     if (voicesReady.current) {
-      assignFemaleVoice();
+      assignVoice();
     } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        voicesReady.current = true;
-        assignFemaleVoice();
-      };
+      window.speechSynthesis.onvoiceschanged = () => { voicesReady.current = true; assignVoice(); };
     }
   };
 
-  // ─── Audio chime ────────────────────────────────────────────────────────────
+  // ─── Audio chime ───────────────────────────────────────────────────────────
   const playChime = () => {
     try {
       const ctx  = new AudioContext();
@@ -607,28 +618,21 @@ export default function Home() {
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + 0.25);
-    } catch (_) {}
+    } catch {}
   };
 
-  // ─── Voice recording ────────────────────────────────────────────────────────
+  // ─── Voice recording ───────────────────────────────────────────────────────
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioChunks.current = [];
-
       const rec = new MediaRecorder(stream, { mimeType: 'audio/webm' });
       mediaRecRef.current = rec;
-
       rec.ondataavailable = e => { if (e.data.size > 0) audioChunks.current.push(e.data); };
-
-      rec.onstop = () => {
-        stream.getTracks().forEach(t => t.stop());
-        runSpeechRecognition();
-      };
-
+      rec.onstop = () => { stream.getTracks().forEach(t => t.stop()); runSpeechRecognition(); };
       rec.start();
       setIsRecording(true);
-    } catch (_) {
+    } catch {
       alert('Microphone access denied — please allow mic permissions in your browser settings.');
     }
   };
@@ -647,39 +651,41 @@ export default function Home() {
       return;
     }
     const rec = new SR();
-    rec.lang             = 'en-IN';
-    rec.continuous       = false;
-    rec.interimResults   = false;
-    rec.onresult         = (e: any) => setInput(e.results[0][0].transcript);
-    rec.onerror          = ()       => setInput('🎤 Couldn\'t understand — please type instead.');
-    try { rec.start(); } catch (_) {}
+    rec.lang           = 'en-IN';
+    rec.continuous     = false;
+    rec.interimResults = false;
+    rec.onresult       = (e: any) => setInput(e.results[0][0].transcript);
+    rec.onerror        = () => setInput("🎤 Couldn't understand — please type instead.");
+    try { rec.start(); } catch {}
   };
 
-  // ─── Creator mode ────────────────────────────────────────────────────────────
+  // ─── Creator mode ──────────────────────────────────────────────────────────
   const unlockCreatorMode = () => {
     persistConversation();
     setIsCreatorMode(true);
     setCurrentConvId(uuidv4());
     setCurrentMood('loving');
 
-    const msgs: Message[] = [];
+    const pendingBriefing = lsGet('tessa-pending-briefing');
+    const initMsg: Message = pendingBriefing
+      ? {
+          id       : uuidv4(),
+          role     : 'assistant',
+          content  : pendingBriefing,
+          timestamp: new Date(),
+          mood     : 'loving' as MoodType,   // ← was 'caring' (invalid)
+        }
+      : {
+          id       : uuidv4(),
+          role     : 'assistant',
+          content  : getRandomWelcomeMessage(),
+          timestamp: new Date(),
+          mood     : 'loving' as MoodType,
+        };
 
-    // Morning briefing if pending
-    const pendingBriefing = localStorage.getItem('tessa-pending-briefing');
-    if (pendingBriefing) {
-      msgs.push({
-        id: uuidv4(), role: 'assistant', content: pendingBriefing,
-        timestamp: new Date(), mood: 'caring',
-      });
-      localStorage.removeItem('tessa-pending-briefing');
-    } else {
-      msgs.push({
-        id: uuidv4(), role: 'assistant', content: getRandomWelcomeMessage(),
-        timestamp: new Date(), mood: 'loving',
-      });
-    }
+    if (pendingBriefing) lsRemove('tessa-pending-briefing');
 
-    setMessages(msgs);
+    setMessages([initMsg]);
     setShowSecretModal(false);
     setShowSettings(false);
     if (sfx) playChime();
@@ -694,48 +700,54 @@ export default function Home() {
     setShowDashboard(false);
   };
 
-  // ─── Keyboard handler ────────────────────────────────────────────────────────
+  // ─── Keyboard / textarea helpers ───────────────────────────────────────────
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   };
 
-  // ─── Textarea auto-resize ────────────────────────────────────────────────────
   const handleTextareaInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
     const el = e.currentTarget;
     el.style.height = 'auto';
     el.style.height = Math.min(el.scrollHeight, 144) + 'px';
   };
 
-  // ─── Derived UI ───────────────────────────────────────────────────────────────
-  const shownConversations = conversations.filter(
-    c => c.mode === (isCreatorMode ? 'creator' : 'standard')
+  // ─── Settings toggle row ───────────────────────────────────────────────────
+  const ToggleRow = ({
+    label, checked, onChange,
+  }: { label: string; checked: boolean; onChange: (v: boolean) => void }) => (
+    <label className="flex items-center justify-between cursor-pointer text-xs">
+      <span>{label}</span>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={e => onChange(e.target.checked)}
+        className="w-3.5 h-3.5 accent-pink-500"
+      />
+    </label>
   );
 
-  const avatarSrc = avatar || '/avatars/cosmic.png';
-
-  // ─── Loading screen ───────────────────────────────────────────────────────────
+  // ─── Loading screen ────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="h-screen bg-[#0a0e27] flex items-center justify-center">
         <div className="text-center">
           <div className={`text-5xl mb-5 ${animations ? 'animate-bounce' : ''}`}>🌌</div>
-          <p className="text-gray-400 text-sm tracking-[0.2em] uppercase">Initialising T.E.S.S.A.</p>
+          <p className="text-gray-400 text-sm tracking-[0.2em] uppercase">
+            Initialising T.E.S.S.A.
+          </p>
         </div>
       </div>
     );
   }
 
-  // ─── RENDER ───────────────────────────────────────────────────────────────────
+  // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <div className={`h-screen ${tc.root} ${tc.body} flex overflow-hidden relative transition-colors duration-500`}>
 
-      {/* ── Ambient floating hearts (creator, animated) ──────────────────── */}
+      {/* ── Floating hearts (creator + animations) ────────────────────── */}
       {isCreatorMode && animations && (
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden>
-          {['8%','22%','38%','55%','70%','87%'].map((left, i) => (
+          {['8%', '22%', '38%', '55%', '70%', '87%'].map((left, i) => (
             <span
               key={i}
               className="absolute text-lg select-none opacity-0 animate-float-heart"
@@ -747,9 +759,9 @@ export default function Home() {
         </div>
       )}
 
-      {/* ════════════════════════════════════════════════════════════════════
+      {/* ══════════════════════════════════════════════════════════════════
           LEFT SIDEBAR
-      ════════════════════════════════════════════════════════════════════ */}
+      ══════════════════════════════════════════════════════════════════ */}
       <aside
         className={`
           flex-shrink-0 border-r ${tc.aside}
@@ -757,22 +769,19 @@ export default function Home() {
           transition-all duration-300 ease-in-out
           ${showSidebar ? 'w-[17rem] md:w-72' : 'w-0'}
         `}
-        aria-label="Left sidebar"
+        aria-label="Navigation sidebar"
       >
-        {/* ── Notes panel ──────────────────────────────────────────── */}
+        {/* Notes panel */}
         <div className="flex-shrink-0">
           <button
             onClick={() => setNotesExpanded(p => !p)}
             className={`
               w-full flex items-center justify-between px-4 py-3
-              border-b ${tc.aside} text-sm font-semibold ${tc.sectionH}
+              border-b ${tc.aside} text-sm font-semibold ${tc.sH}
               hover:bg-white/5 transition-colors
             `}
           >
-            <span className="flex items-center gap-2">
-              <StickyNote size={14} />
-              Quick Notes
-            </span>
+            <span className="flex items-center gap-2"><StickyNote size={14} />Quick Notes</span>
             {notesExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
           </button>
           {notesExpanded && (
@@ -782,30 +791,25 @@ export default function Home() {
           )}
         </div>
 
-        {/* ── Chat history ─────────────────────────────────────────── */}
+        {/* Chat history */}
         <div className="flex-1 flex flex-col min-h-0 border-t border-white/5">
-
-          {/* Header + new chat */}
           <div className="flex-shrink-0 p-3 pb-2">
-            <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 ${tc.sectionH}`}>
+            <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 ${tc.sH}`}>
               💬 {isCreatorMode ? 'Our Chats' : 'History'}
             </p>
             <button
               onClick={startNewChat}
               className={`w-full py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${tc.soft}`}
             >
-              <Plus size={13} />
-              New Chat
+              <Plus size={13} /> New Chat
             </button>
           </div>
 
-          {/* Scrollable list — fixed height, never expands with content */}
           <div className="flex-1 overflow-y-auto sidebar-scroll px-3 pb-3 space-y-1.5">
-            {shownConversations.length === 0 && (
+            {shownConvs.length === 0 && (
               <p className={`text-xs text-center py-8 ${tc.sub}`}>No chats yet</p>
             )}
-
-            {shownConversations.map(conv => (
+            {shownConvs.map(conv => (
               <div
                 key={conv.id}
                 onClick={() => openConversation(conv)}
@@ -819,7 +823,6 @@ export default function Home() {
               >
                 <p className="text-xs font-medium truncate pr-5 leading-snug">{conv.title}</p>
                 <p className={`text-[10px] mt-0.5 ${tc.sub}`}>{conv.messages.length} messages</p>
-
                 <button
                   onClick={e => { e.stopPropagation(); removeConversation(conv.id); }}
                   className="absolute right-2 top-2.5 opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-opacity"
@@ -832,13 +835,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── Account section ───────────────────────────────────────── */}
+        {/* Account section */}
         <div className={`flex-shrink-0 p-3 border-t ${tc.aside}`}>
-          <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5 ${tc.sectionH}`}>
-            <User size={12} />
-            Account
+          <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5 ${tc.sH}`}>
+            <User size={12} /> Account
           </p>
-
           {user && !isGuest ? (
             <div className="space-y-1.5">
               <p className={`text-xs truncate ${tc.sub}`}>{user.email}</p>
@@ -846,8 +847,7 @@ export default function Home() {
                 onClick={handleSignOut}
                 className="w-full py-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-400 text-xs flex items-center justify-center gap-1.5 transition-all"
               >
-                <LogOut size={12} />
-                Sign Out
+                <LogOut size={12} /> Sign Out
               </button>
             </div>
           ) : (
@@ -864,18 +864,17 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* ════════════════════════════════════════════════════════════════════
+      {/* ══════════════════════════════════════════════════════════════════
           MAIN AREA
-      ════════════════════════════════════════════════════════════════════ */}
+      ══════════════════════════════════════════════════════════════════ */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden min-w-0 z-10">
 
-        {/* ── Header ──────────────────────────────────────────────────── */}
+        {/* Header */}
         <header className={`flex-shrink-0 border-b ${tc.header} px-3 py-2.5`}>
           <div className="flex items-center justify-between gap-2">
 
             {/* Left cluster */}
             <div className="flex items-center gap-2.5 min-w-0">
-              {/* Hamburger */}
               <button
                 onClick={() => setShowSidebar(p => !p)}
                 className="flex-shrink-0 p-1.5 rounded-lg hover:bg-white/10 transition-colors"
@@ -887,7 +886,7 @@ export default function Home() {
               {/* Avatar */}
               <div className="relative flex-shrink-0">
                 <div className={`
-                  w-10 h-10 rounded-full overflow-hidden border-2 flex-shrink-0
+                  w-10 h-10 rounded-full overflow-hidden border-2
                   ${isCreatorMode
                     ? `border-pink-500 ${animations ? 'animate-edge-pulse-creator' : ''}`
                     : `border-cyan-400 ${animations ? 'animate-edge-pulse-standard' : ''}`
@@ -895,11 +894,10 @@ export default function Home() {
                 `}>
                   <img
                     src={avatarSrc}
-                    alt="T.E.S.S.A. avatar"
-                    className={`w-full h-full object-cover ${
-                      animations
-                        ? isCreatorMode ? 'neon-avatar-creator' : 'neon-avatar-standard'
-                        : ''
+                    alt="T.E.S.S.A."
+                    className={`w-full h-full object-cover ${animations
+                      ? isCreatorMode ? 'neon-avatar-creator' : 'neon-avatar-standard'
+                      : ''
                     }`}
                     onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                   />
@@ -914,7 +912,7 @@ export default function Home() {
                 />
               </div>
 
-              {/* Name + subtitle */}
+              {/* Name */}
               <div className="min-w-0">
                 <h1 className="text-lg font-bold leading-none holographic-text">T.E.S.S.A.</h1>
                 <p className={`text-[10px] mt-0.5 ${tc.sub}`}>
@@ -925,7 +923,7 @@ export default function Home() {
 
             {/* Right cluster */}
             <div className="flex items-center gap-1 flex-shrink-0">
-              {/* Mood chip — hidden on tiny screens */}
+              {/* Mood chip */}
               <span className={`
                 hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] border
                 ${isCreatorMode
@@ -933,10 +931,9 @@ export default function Home() {
                   : 'bg-cyan-500/10 border-cyan-500/25 text-cyan-300'
                 }
               `}>
-                {(MOOD_DESCRIPTIONS as Record<string,string>)[currentMood] ?? currentMood}
+                {(MOOD_DESCRIPTIONS as Record<string, string>)[currentMood] ?? currentMood}
               </span>
 
-              {/* Creator-only: Planners */}
               {isCreatorMode && (
                 <button
                   onClick={() => setShowPlanners(true)}
@@ -947,21 +944,16 @@ export default function Home() {
                 </button>
               )}
 
-              {/* Creator-only: Dashboard */}
               {isCreatorMode && (
                 <button
                   onClick={() => setShowDashboard(p => !p)}
-                  className={`
-                    p-1.5 rounded-lg transition-colors
-                    ${showDashboard ? 'bg-pink-500/20 text-pink-300' : 'hover:bg-white/10'}
-                  `}
+                  className={`p-1.5 rounded-lg transition-colors ${showDashboard ? 'bg-pink-500/20 text-pink-300' : 'hover:bg-white/10'}`}
                   title="Personal Dashboard"
                 >
                   <LayoutDashboard size={17} />
                 </button>
               )}
 
-              {/* Theme toggle */}
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                 className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
@@ -970,7 +962,6 @@ export default function Home() {
                 {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
               </button>
 
-              {/* Settings */}
               <button
                 onClick={() => setShowSettings(p => !p)}
                 className={`p-1.5 rounded-lg transition-colors ${showSettings ? 'bg-white/10' : 'hover:bg-white/10'}`}
@@ -982,16 +973,13 @@ export default function Home() {
           </div>
         </header>
 
-        {/* ── Messages / Dashboard ──────────────────────────────────── */}
+        {/* Messages / Dashboard */}
         <div className="flex-1 overflow-y-auto px-3 py-5 md:px-6">
           <div className="max-w-2xl mx-auto">
 
-            {/* Dashboard view */}
             {showDashboard && isCreatorMode ? (
               <PersonalDashboard />
-
             ) : (
-              /* Chat view */
               <div className="space-y-3">
 
                 {/* Empty state */}
@@ -1001,24 +989,21 @@ export default function Home() {
                       {isCreatorMode ? '💝' : '🌌'}
                     </div>
                     <p className={`text-base font-semibold ${tc.body}`}>
-                      {isCreatorMode ? `Hey Ankit! 💕` : 'Hello!'}
+                      {isCreatorMode ? 'Hey Ankit! 💕' : 'Hello!'}
                     </p>
                     <p className={`text-sm mt-1 ${tc.sub}`}>
                       {isCreatorMode
                         ? "What's on your mind today?"
-                        : 'Ask me anything — I\'m here to help!'}
+                        : "Ask me anything — I'm here to help!"}
                     </p>
                   </div>
                 )}
 
-                {/* Messages */}
+                {/* Message list */}
                 {messages.map(msg => (
                   <div
                     key={msg.id}
-                    className={`
-                      rounded-xl px-4 py-3.5 animate-fadeIn
-                      ${msg.role === 'user' ? tc.msgU : tc.msgA}
-                    `}
+                    className={`rounded-xl px-4 py-3.5 animate-fadeIn ${msg.role === 'user' ? tc.msgU : tc.msgA}`}
                   >
                     <MessageRenderer
                       content={msg.content}
@@ -1029,10 +1014,9 @@ export default function Home() {
                     <p className={`text-[10px] mt-2 ${tc.sub}`}>
                       {msg.role === 'user' ? '👤 You' : '✨ T.E.S.S.A.'}
                       {' · '}
-                      {msg.timestamp instanceof Date
-                        ? msg.timestamp.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
-                        : new Date(msg.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
-                      }
+                      {new Date(msg.timestamp).toLocaleTimeString('en-IN', {
+                        hour: '2-digit', minute: '2-digit',
+                      })}
                     </p>
                   </div>
                 ))}
@@ -1045,9 +1029,7 @@ export default function Home() {
                         {[0, 150, 300].map(delay => (
                           <div
                             key={delay}
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              isCreatorMode ? 'bg-pink-400' : 'bg-cyan-400'
-                            } animate-bounce`}
+                            className={`w-1.5 h-1.5 rounded-full ${isCreatorMode ? 'bg-pink-400' : 'bg-cyan-400'} animate-bounce`}
                             style={{ animationDelay: `${delay}ms` }}
                           />
                         ))}
@@ -1059,19 +1041,16 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Scroll anchor */}
                 <div ref={bottomRef} />
               </div>
             )}
           </div>
         </div>
 
-        {/* ── Input bar (hidden when dashboard is open) ─────────────── */}
+        {/* Input bar */}
         {!showDashboard && (
           <div className={`flex-shrink-0 border-t ${tc.header} px-3 py-3 md:px-6`}>
             <div className="max-w-2xl mx-auto flex gap-2 items-end">
-
-              {/* Mic button */}
               <button
                 onMouseDown={startRecording}
                 onMouseUp={stopRecording}
@@ -1081,17 +1060,13 @@ export default function Home() {
                 className={`
                   flex-shrink-0 p-2.5 rounded-xl border transition-all
                   disabled:opacity-40 disabled:cursor-not-allowed
-                  ${isRecording
-                    ? 'bg-red-500/80 border-red-400 recording-indicator'
-                    : tc.soft
-                  }
+                  ${isRecording ? 'bg-red-500/80 border-red-400 recording-indicator' : tc.soft}
                 `}
                 title="Hold to speak"
               >
                 {isRecording ? <MicOff size={17} /> : <Mic size={17} />}
               </button>
 
-              {/* Textarea */}
               <textarea
                 ref={textareaRef}
                 value={input}
@@ -1105,13 +1080,11 @@ export default function Home() {
                   flex-1 px-3.5 py-2.5 rounded-xl border text-sm resize-none
                   focus:outline-none focus:ring-2
                   ${isCreatorMode ? 'focus:ring-pink-500/30' : 'focus:ring-cyan-500/30'}
-                  ${tc.input}
-                  transition-all duration-200
+                  ${tc.input} transition-all duration-200
                 `}
                 style={{ minHeight: '44px', maxHeight: '144px' }}
               />
 
-              {/* Send button */}
               <button
                 onClick={() => sendMessage()}
                 disabled={!input.trim() || isLoading}
@@ -1129,9 +1102,9 @@ export default function Home() {
         )}
       </main>
 
-      {/* ════════════════════════════════════════════════════════════════════
+      {/* ══════════════════════════════════════════════════════════════════
           RIGHT SIDEBAR — SETTINGS
-      ════════════════════════════════════════════════════════════════════ */}
+      ══════════════════════════════════════════════════════════════════ */}
       {showSettings && (
         <aside
           className={`
@@ -1141,7 +1114,7 @@ export default function Home() {
           `}
           aria-label="Settings panel"
         >
-          {/* Profile card — fixed at top */}
+          {/* Profile card */}
           <div className="flex-shrink-0">
             <ProfileCard
               avatarPath={avatarSrc}
@@ -1151,19 +1124,17 @@ export default function Home() {
             />
           </div>
 
-          {/* Settings header */}
           <div className={`flex-shrink-0 px-4 py-2.5 border-b ${tc.aside}`}>
-            <h2 className={`font-bold text-sm ${tc.sectionH}`}>⚙️ Settings</h2>
+            <h2 className={`font-bold text-sm ${tc.sH}`}>⚙️ Settings</h2>
           </div>
 
-          {/* Scrollable settings body */}
           <div className="flex-1 overflow-y-auto settings-scroll px-3 py-3 space-y-3">
 
-            {/* ── Theme ────────────────────────────────────────────── */}
+            {/* Theme */}
             <section className="settings-section">
               <h3>{theme === 'dark' ? '🌙' : '☀️'} Theme</h3>
               <div className="flex rounded-lg overflow-hidden border border-white/10 mt-2">
-                {(['dark','light'] as Theme[]).map(t => (
+                {(['dark', 'light'] as Theme[]).map(t => (
                   <button
                     key={t}
                     onClick={() => setTheme(t)}
@@ -1181,7 +1152,7 @@ export default function Home() {
               </div>
             </section>
 
-            {/* ── Avatar ───────────────────────────────────────────── */}
+            {/* Avatar */}
             <section className="settings-section">
               <h3>🎨 Avatar</h3>
               <button
@@ -1192,37 +1163,23 @@ export default function Home() {
               </button>
             </section>
 
-            {/* ── Audio ────────────────────────────────────────────── */}
+            {/* Audio */}
             <section className="settings-section">
               <h3>🔊 Audio</h3>
               <div className="space-y-2 mt-1">
-                {([
-                  { label: 'Voice Output (female)', val: voiceOutput, set: setVoiceOutput },
-                  { label: 'Sound Effects',         val: sfx,         set: setSfx         },
-                ] as const).map(({ label, val, set }) => (
-                  <label key={label} className="flex items-center justify-between cursor-pointer text-xs">
-                    <span>{label}</span>
-                    <input
-                      type="checkbox"
-                      checked={val}
-                      onChange={e => (set as (v: boolean) => void)(e.target.checked)}
-                      className="w-3.5 h-3.5 accent-pink-500"
-                    />
-                  </label>
-                ))}
+                <ToggleRow label="Voice Output (female)" checked={voiceOutput} onChange={setVoiceOutput} />
+                <ToggleRow label="Sound Effects"         checked={sfx}         onChange={setSfx} />
               </div>
             </section>
 
-            {/* ── Chat ─────────────────────────────────────────────── */}
+            {/* Chat */}
             <section className="settings-section">
               <h3>💬 Chat</h3>
               <div className="space-y-3 mt-1">
-
-                {/* Response length */}
                 <div>
                   <p className="text-xs mb-1.5">Response Length</p>
                   <div className="flex rounded-lg overflow-hidden border border-white/10">
-                    {(['short','medium','long'] as ResponseLength[]).map(l => (
+                    {(['short', 'medium', 'long'] as ResponseLength[]).map(l => (
                       <button
                         key={l}
                         onClick={() => setResponseLength(l)}
@@ -1239,70 +1196,38 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-
-                <label className="flex items-center justify-between cursor-pointer text-xs">
-                  <span>Auto Web Search</span>
-                  <input
-                    type="checkbox"
-                    checked={autoSearch}
-                    onChange={e => setAutoSearch(e.target.checked)}
-                    className="w-3.5 h-3.5 accent-pink-500"
-                  />
-                </label>
+                <ToggleRow label="Auto Web Search" checked={autoSearch} onChange={setAutoSearch} />
               </div>
             </section>
 
-            {/* ── Visual ───────────────────────────────────────────── */}
+            {/* Visual */}
             <section className="settings-section">
               <h3>✨ Visual</h3>
-              <label className="flex items-center justify-between cursor-pointer text-xs mt-1">
-                <span>Animations & Glows</span>
-                <input
-                  type="checkbox"
-                  checked={animations}
-                  onChange={e => setAnimations(e.target.checked)}
-                  className="w-3.5 h-3.5 accent-pink-500"
-                />
-              </label>
+              <div className="mt-1">
+                <ToggleRow label="Animations & Glows" checked={animations} onChange={setAnimations} />
+              </div>
             </section>
 
-            {/* ── Data ─────────────────────────────────────────────── */}
+            {/* Typing */}
+            <section className="settings-section">
+              <h3>⌨️ Typing</h3>
+              <div className="mt-1">
+                <ToggleRow label="Word-by-word animation" checked={typingEnabled} onChange={setTypingEnabled} />
+              </div>
+            </section>
+
+            {/* Data */}
             <section className="settings-section">
               <h3>💾 Data</h3>
-              <label className="flex items-center justify-between cursor-pointer text-xs mt-1 mb-2">
-                <span>Auto-save Chats</span>
-                <input
-                  type="checkbox"
-                  checked={autoSave}
-                  onChange={e => setAutoSave(e.target.checked)}
-                  className="w-3.5 h-3.5 accent-pink-500"
-                />
-              </label>
+              <div className="mt-1 mb-2">
+                <ToggleRow label="Auto-save Chats" checked={autoSave} onChange={setAutoSave} />
+              </div>
               <p className={`text-[10px] ${tc.sub}`}>
                 {user && !isGuest ? '☁️ Cloud synced to Supabase' : '📱 Stored locally on device'}
               </p>
             </section>
 
-            {/* ── Typing animation ─────────────────────────────────── */}
-            <section className="settings-section">
-              <h3>⌨️ Typing</h3>
-              <label className="flex items-center justify-between cursor-pointer text-xs mt-1">
-                <span>Word-by-word animation</span>
-                <input type="checkbox" checked={typingEnabled}
-                  onChange={e => setTypingEnabled(e.target.checked)}
-                  className="w-3.5 h-3.5 accent-pink-500" />
-              </label>
-            </section>
-
-            {/* ── Water tracker ─────────────────────────────────────── */}
-            <section className="settings-section">
-              <h3>💧 Water Tracker</h3>
-              <div className="mt-2">
-                <WaterTracker isCreatorMode={isCreatorMode} />
-              </div>
-            </section>
-
-            {/* ── Streaks ───────────────────────────────────────────── */}
+            {/* Streaks (always visible) */}
             <section className="settings-section">
               <h3>🔥 Streaks</h3>
               <div className="mt-2">
@@ -1310,24 +1235,28 @@ export default function Home() {
               </div>
             </section>
 
-            {/* ── Flashcards & Report ───────────────────────────────── */}
+            {/* Creator-only study tools */}
             {isCreatorMode && (
               <section className="settings-section">
                 <h3>📚 Study Tools</h3>
                 <div className="space-y-2 mt-2">
-                  <button onClick={() => setShowFlashcards(true)}
-                    className={`w-full py-1.5 rounded-lg text-xs font-semibold transition-all ${tc.soft}`}>
+                  <button
+                    onClick={() => setShowFlashcards(true)}
+                    className={`w-full py-1.5 rounded-lg text-xs font-semibold transition-all ${tc.soft}`}
+                  >
                     ⚡ Flashcard Generator
                   </button>
-                  <button onClick={() => setShowReportCard(true)}
-                    className={`w-full py-1.5 rounded-lg text-xs font-semibold transition-all ${tc.soft}`}>
+                  <button
+                    onClick={() => setShowReportCard(true)}
+                    className={`w-full py-1.5 rounded-lg text-xs font-semibold transition-all ${tc.soft}`}
+                  >
                     📊 Weekly Report Card
                   </button>
                 </div>
               </section>
             )}
 
-            {/* ── Memory ───────────────────────────────────────────── */}
+            {/* Creator-only memory */}
             {isCreatorMode && (
               <section className="settings-section">
                 <h3>🧠 Memory</h3>
@@ -1343,17 +1272,15 @@ export default function Home() {
               </section>
             )}
 
-            {/* ── Study timer (creator only) ────────────────────────── */}
+            {/* Creator-only study timer */}
             {isCreatorMode && (
               <section className="settings-section">
                 <h3>⏱️ Study Timer</h3>
-                <div className="mt-2">
-                  <StudyTimer />
-                </div>
+                <div className="mt-2"><StudyTimer /></div>
               </section>
             )}
 
-            {/* ── Smart planners (creator only) ─────────────────────── */}
+            {/* Creator-only planners */}
             {isCreatorMode && (
               <section className="settings-section">
                 <h3>📋 Smart Planners</h3>
@@ -1366,7 +1293,7 @@ export default function Home() {
               </section>
             )}
 
-            {/* ── Unlock / Exit creator ─────────────────────────────── */}
+            {/* Unlock / Exit creator */}
             {!isCreatorMode ? (
               <section className="settings-section" style={{ borderColor: 'rgba(236,72,153,0.3)' }}>
                 <h3 className="text-pink-400">💝 Special Access</h3>
@@ -1394,11 +1321,10 @@ export default function Home() {
         </aside>
       )}
 
-      {/* ════════════════════════════════════════════════════════════════════
+      {/* ══════════════════════════════════════════════════════════════════
           MODALS
-      ════════════════════════════════════════════════════════════════════ */}
+      ══════════════════════════════════════════════════════════════════ */}
 
-      {/* Secret verification */}
       {showSecretModal && (
         <SecretVerification
           onSuccess={unlockCreatorMode}
@@ -1406,24 +1332,21 @@ export default function Home() {
         />
       )}
 
-      {/* Avatar presets */}
       {showAvatarModal && (
         <AvatarPresets
           currentAvatar={avatar}
           onAvatarChange={path => {
             setAvatar(path);
-            localStorage.setItem('tessa-avatar-preset', path);
+            lsSet('tessa-avatar-preset', path);
           }}
           onClose={() => setShowAvatarModal(false)}
         />
       )}
 
-      {/* Smart planners hub */}
       {showPlanners && (
         <PlannerHub onClose={() => setShowPlanners(false)} />
       )}
 
-      {/* Flashcard generator */}
       {showFlashcards && (
         <FlashcardGenerator
           isCreatorMode={isCreatorMode}
@@ -1431,7 +1354,6 @@ export default function Home() {
         />
       )}
 
-      {/* Weekly report card */}
       {showReportCard && (
         <ReportCard
           isCreatorMode={isCreatorMode}

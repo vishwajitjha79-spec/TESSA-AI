@@ -74,6 +74,7 @@ export default function SpotifyPlayer({
       const data = await res.json();
 
       if (data.error) throw new Error(data.error);
+      if (!res.ok)    throw new Error(`HTTP ${res.status}`);
 
       setTracks(data.tracks ?? []);
 
@@ -228,7 +229,23 @@ export default function SpotifyPlayer({
             <Loader2 size={14} className="absolute right-2.5 top-2.5 text-gray-400 animate-spin" />
           )}
         </div>
-        {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+        {error && (
+          <div className="px-4 pb-3">
+            <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-2">
+              ⚠️ {error}
+            </p>
+            <button
+              onClick={async () => {
+                const res = await fetch('/api/spotify/search?debug=1');
+                const d = await res.json();
+                setError(JSON.stringify(d, null, 2));
+              }}
+              className="mt-1.5 text-[10px] text-gray-500 hover:text-white underline"
+            >
+              Run diagnostics
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Now playing */}

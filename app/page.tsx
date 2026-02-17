@@ -1,858 +1,1303 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Message, MoodType, Conversation } from '@/types';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Send, Mic, MicOff, Menu, X, Settings, Heart, Plus, Trash2, LogOut, User, LayoutDashboard } from 'lucide-react';
-import { MOOD_AVATARS, MOOD_DESCRIPTIONS } from '@/lib/mood';
-import { getRandomWelcomeMessage } from '@/lib/profile';
-import SecretVerification from '@/components/SecretVerification';
-import PersonalDashboard from '@/components/PersonalDashboard';
-import AvatarPresets from '@/components/AvatarPresets';
-import NotesPanel from '@/components/NotesPanel';
-import ProfileCard from '@/components/ProfileCard';
-import StudyTimer from '@/components/StudyTimer';
-import { supabase, getCurrentUser, signOut } from '@/lib/supabase';
+import {
+  Send, Mic, MicOff, Menu, X, Settings, Heart, Plus,
+  Trash2, LogOut, User, LayoutDashboard, Sun, Moon,
+  Calendar, ChevronDown, ChevronUp, StickyNote,
+} from 'lucide-react';
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+import type { Message, MoodType, Conversation } from '@/types';
+
+// ─── Components ───────────────────────────────────────────────────────────────
+import SecretVerification   from '@/components/SecretVerification';
+import PersonalDashboard    from '@/components/PersonalDashboard';
+import AvatarPresets        from '@/components/AvatarPresets';
+import NotesPanel           from '@/components/NotesPanel';
+import ProfileCard          from '@/components/ProfileCard';
+import StudyTimer           from '@/components/StudyTimer';
+import PlannerHub           from '@/components/PlannerHub';
+
+// ─── Lib ──────────────────────────────────────────────────────────────────────
+import { supabase, getCurrentUser, signOut } from '@/lib/supabase';
+import { MOOD_DESCRIPTIONS, MOOD_AVATARS }   from '@/lib/mood';
+import { getRandomWelcomeMessage }           from '@/lib/profile';
+import { estimateCalories }                  from '@/lib/food-database';
+import {
+  shouldBeProactive,
+  getProactiveQuestion,
+  detectMealInResponse,
+  detectSleepInResponse,
+  getSleepReaction,
+} from '@/lib/proactive-tessa';
+
+// ─── Local types ──────────────────────────────────────────────────────────────
+type Theme          = 'dark' | 'light';
+type ResponseLength = 'short' | 'medium' | 'long';
+
+interface HealthSnapshot {
+  weight      : number;
+  height      : number;
+  meals       : { time: string; meal: string; calories: number; confidence: string }[];
+  totalCalories: number;
+  sleepHours? : number;
+  date        : string;
+}
+
+// ─── Theme helpers ────────────────────────────────────────────────────────────
+const TC = {
+  dark: {
+    root  : 'bg-gradient-to-br from-[#0a0e27] via-[#141830] to-[#0d1020]',
+    rootC : 'bg-gradient-to-br from-[#1a0a20] via-[#220a30] to-[#1a0820]',
+    aside : 'bg-black/25 border-white/8',
+    header: 'bg-black/30 border-white/8 backdrop-blur-xl',
+    headerC:'bg-pink-950/20 border-pink-500/15 backdrop-blur-xl',
+    card  : 'bg-white/4 border-white/8',
+    body  : 'text-white',
+    sub   : 'text-gray-400',
+    msgU  : 'bg-[#0d1a2e] border-l-4 border-cyan-500',
+    msgUC : 'bg-[#1f0a28] border-l-4 border-pink-500',
+    msgA  : 'bg-[#0a1520] border-l-4 border-violet-500',
+    msgAC : 'bg-[#130a20] border-l-4 border-purple-500',
+    input : 'bg-white/5 border-white/15 text-white placeholder:text-white/30 focus:border-cyan-400/60',
+    inputC: 'bg-pink-950/30 border-pink-500/25 text-white placeholder:text-pink-300/40 focus:border-pink-400/70',
+    btnPrimary : 'bg-cyan-500 hover:bg-cyan-400 text-white',
+    btnPrimaryC: 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400 text-white',
+    btnSoft : 'border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300',
+    btnSoftC: 'border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300',
+    sectionH: 'text-cyan-400',
+    sectionHC:'text-pink-400',
+    accent  : 'text-cyan-400',
+    accentC : 'text-pink-400',
+  },
+  light: {
+    root  : 'bg-gradient-to-br from-slate-50 via-white to-blue-50/30',
+    rootC : 'bg-gradient-to-br from-pink-50 via-white to-purple-50/30',
+    aside : 'bg-white border-slate-200',
+    header: 'bg-white/90 border-slate-200 backdrop-blur-xl shadow-sm',
+    headerC:'bg-pink-50/90 border-pink-200 backdrop-blur-xl shadow-sm',
+    card  : 'bg-slate-50 border-slate-200',
+    body  : 'text-slate-800',
+    sub   : 'text-slate-500',
+    msgU  : 'bg-cyan-50 border-l-4 border-cyan-500',
+    msgUC : 'bg-pink-50 border-l-4 border-pink-400',
+    msgA  : 'bg-indigo-50/70 border-l-4 border-violet-400',
+    msgAC : 'bg-purple-50/70 border-l-4 border-purple-400',
+    input : 'bg-white border-slate-300 text-slate-800 placeholder:text-slate-400 focus:border-cyan-400',
+    inputC: 'bg-white border-pink-300 text-slate-800 placeholder:text-pink-300 focus:border-pink-400',
+    btnPrimary : 'bg-cyan-500 hover:bg-cyan-600 text-white',
+    btnPrimaryC: 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white',
+    btnSoft : 'border border-cyan-500/50 bg-cyan-50 hover:bg-cyan-100 text-cyan-700',
+    btnSoftC: 'border border-pink-500/50 bg-pink-50 hover:bg-pink-100 text-pink-700',
+    sectionH: 'text-cyan-600',
+    sectionHC:'text-pink-500',
+    accent  : 'text-cyan-600',
+    accentC : 'text-pink-500',
+  },
+} as const;
+
+function useTc(theme: Theme, creatorMode: boolean) {
+  const base = TC[theme];
+  return {
+    root    : creatorMode ? base.rootC    : base.root,
+    aside   : base.aside,
+    header  : creatorMode ? base.headerC  : base.header,
+    card    : base.card,
+    body    : base.body,
+    sub     : base.sub,
+    msgU    : creatorMode ? base.msgUC    : base.msgU,
+    msgA    : creatorMode ? base.msgAC    : base.msgA,
+    input   : creatorMode ? base.inputC   : base.input,
+    primary : creatorMode ? base.btnPrimaryC : base.btnPrimary,
+    soft    : creatorMode ? base.btnSoftC : base.btnSoft,
+    sectionH: creatorMode ? base.sectionHC: base.sectionH,
+    accent  : creatorMode ? base.accentC  : base.accent,
+  };
+}
+
+// ─── MAX TOKENS MAP ───────────────────────────────────────────────────────────
+const MAX_TOKENS: Record<ResponseLength, number> = { short: 350, medium: 700, long: 1400 };
+
+// ─── COMPONENT ────────────────────────────────────────────────────────────────
 export default function Home() {
-  const [user, setUser] = useState<any>(null);
+
+  // ── Auth ──────────────────────────────────────────────────────────────────
+  const [user,    setUser]    = useState<any>(null);
   const [isGuest, setIsGuest] = useState(true);
   const [loading, setLoading] = useState(true);
 
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentMood, setCurrentMood] = useState<MoodType>('calm');
-  const [isCreatorMode, setIsCreatorMode] = useState(false);
-  
-  const [showHistory, setShowHistory] = useState(false); // Start hidden on mobile
-  const [showSettings, setShowSettings] = useState(false);
-  const [showDashboard, setShowDashboard] = useState(false);
-  const [showSecretVerification, setShowSecretVerification] = useState(false);
-  const [showAvatarSelector, setShowAvatarSelector] = useState(false);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [currentConvId, setCurrentConvId] = useState(uuidv4());
-  
-  const [autoSearch, setAutoSearch] = useState(true);
-  const [voiceOutput, setVoiceOutput] = useState(false);
-  const [responseLength, setResponseLength] = useState<'short' | 'medium' | 'long'>('medium');
-  const [animationsEnabled, setAnimationsEnabled] = useState(true);
-  const [soundEffects, setSoundEffects] = useState(true);
-  const [autoSave, setAutoSave] = useState(true);
-  const [customAvatar, setCustomAvatar] = useState<string>('/avatars/cosmic.png');
-  
+  // ── Chat ──────────────────────────────────────────────────────────────────
+  const [messages,       setMessages]       = useState<Message[]>([]);
+  const [input,          setInput]          = useState('');
+  const [isLoading,      setIsLoading]      = useState(false);
+  const [currentMood,    setCurrentMood]    = useState<MoodType>('calm');
+  const [isCreatorMode,  setIsCreatorMode]  = useState(false);
+  const [conversations,  setConversations]  = useState<Conversation[]>([]);
+  const [currentConvId,  setCurrentConvId]  = useState<string>(() => uuidv4());
+
+  // ── UI toggles ─────────────────────────────────────────────────────────────
+  const [showSidebar,          setShowSidebar]          = useState(false);
+  const [showSettings,         setShowSettings]         = useState(false);
+  const [showDashboard,        setShowDashboard]        = useState(false);
+  const [showSecretModal,      setShowSecretModal]      = useState(false);
+  const [showAvatarModal,      setShowAvatarModal]      = useState(false);
+  const [showPlanners,         setShowPlanners]         = useState(false);
+  const [notesExpanded,        setNotesExpanded]        = useState(true);
+
+  // ── Settings values ────────────────────────────────────────────────────────
+  const [theme,          setThemeState]  = useState<Theme>('dark');
+  const [autoSearch,     setAutoSearch]  = useState(true);
+  const [voiceOutput,    setVoiceOutput] = useState(false);
+  const [responseLength, setResponseLength] = useState<ResponseLength>('medium');
+  const [animations,     setAnimations]  = useState(true);
+  const [sfx,            setSfx]         = useState(true);
+  const [autoSave,       setAutoSave]    = useState(true);
+  const [avatar,         setAvatar]      = useState('/avatars/cosmic.png');
+
+  // ── Voice ──────────────────────────────────────────────────────────────────
   const [isRecording, setIsRecording] = useState(false);
-  const [recordedAudio, setRecordedAudio] = useState<Blob | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    checkUser();
-    loadCustomAvatar();
-    loadLocalConversations();
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        setIsGuest(false);
-        loadUserConversations(session.user.id);
-      }
-    });
+  // ── Refs ───────────────────────────────────────────────────────────────────
+  const bottomRef       = useRef<HTMLDivElement>(null);
+  const textareaRef     = useRef<HTMLTextAreaElement>(null);
+  const mediaRecRef     = useRef<MediaRecorder | null>(null);
+  const audioChunks     = useRef<Blob[]>([]);
+  const proactiveTimer  = useRef<ReturnType<typeof setInterval> | null>(null);
+  const voicesReady     = useRef(false);
 
-    return () => subscription.unsubscribe();
+  // derived
+  const tc = useTc(theme, isCreatorMode);
+
+  // ─── Theme application ─────────────────────────────────────────────────────
+  const setTheme = useCallback((t: Theme) => {
+    setThemeState(t);
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(t);
+    localStorage.setItem('tessa-theme', t);
   }, []);
 
-  // Auto-scroll ONLY messages, not sidebars
+  // ─── Initialisation ────────────────────────────────────────────────────────
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }
-  }, [messages]);
+    // Load persisted preferences
+    const saved = {
+      theme          : localStorage.getItem('tessa-theme') as Theme | null,
+      avatar         : localStorage.getItem('tessa-avatar-preset'),
+      autoSearch     : localStorage.getItem('tessa-auto-search'),
+      voiceOutput    : localStorage.getItem('tessa-voice-output'),
+      responseLength : localStorage.getItem('tessa-response-length') as ResponseLength | null,
+      animations     : localStorage.getItem('tessa-animations'),
+      sfx            : localStorage.getItem('tessa-sfx'),
+    };
 
-  const checkUser = async () => {
-    const currentUser = await getCurrentUser();
-    setUser(currentUser);
-    setLoading(false);
-    
-    if (currentUser) {
-      setIsGuest(false);
-      loadUserConversations(currentUser.id);
+    if (saved.theme)          setTheme(saved.theme);
+    if (saved.avatar)         setAvatar(saved.avatar);
+    if (saved.autoSearch)     setAutoSearch(saved.autoSearch === 'true');
+    if (saved.voiceOutput)    setVoiceOutput(saved.voiceOutput === 'true');
+    if (saved.responseLength) setResponseLength(saved.responseLength);
+    if (saved.animations)     setAnimations(saved.animations === 'true');
+    if (saved.sfx)            setSfx(saved.sfx === 'true');
+
+    // Preload speech voices
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => { voicesReady.current = true; };
+      if (window.speechSynthesis.getVoices().length) voicesReady.current = true;
     }
+
+    // Auth
+    checkAuth();
+    hydrateLocalConversations();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      const u = session?.user ?? null;
+      setUser(u);
+      if (u) { setIsGuest(false); fetchCloudConversations(u.id); }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+      if (proactiveTimer.current) clearInterval(proactiveTimer.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ─── Persist settings on change ────────────────────────────────────────────
+  useEffect(() => { localStorage.setItem('tessa-auto-search',      String(autoSearch));     }, [autoSearch]);
+  useEffect(() => { localStorage.setItem('tessa-voice-output',     String(voiceOutput));    }, [voiceOutput]);
+  useEffect(() => { localStorage.setItem('tessa-response-length',  responseLength);         }, [responseLength]);
+  useEffect(() => { localStorage.setItem('tessa-animations',       String(animations));     }, [animations]);
+  useEffect(() => { localStorage.setItem('tessa-sfx',              String(sfx));            }, [sfx]);
+
+  // ─── Proactive T.E.S.S.A. (creator only) ───────────────────────────────────
+  useEffect(() => {
+    if (proactiveTimer.current) { clearInterval(proactiveTimer.current); proactiveTimer.current = null; }
+
+    if (!isCreatorMode) return;
+
+    // Check once immediately (after short delay so chat is settled)
+    const initialDelay = setTimeout(() => maybeSendProactive(), 5000);
+
+    // Then check every 3 hours
+    proactiveTimer.current = setInterval(() => maybeSendProactive(), 3 * 60 * 60 * 1000);
+
+    return () => {
+      clearTimeout(initialDelay);
+      if (proactiveTimer.current) clearInterval(proactiveTimer.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCreatorMode]);
+
+  const maybeSendProactive = () => {
+    if (!shouldBeProactive()) return;
+    const q = getProactiveQuestion();
+    if (!q) return;
+    setMessages(prev => [
+      ...prev,
+      {
+        id       : uuidv4(),
+        role     : 'assistant' as const,
+        content  : q.question,
+        timestamp: new Date(),
+        mood     : 'playful' as MoodType,
+      },
+    ]);
   };
 
-  const loadCustomAvatar = () => {
-    const saved = localStorage.getItem('tessa-avatar-preset');
-    if (saved) setCustomAvatar(saved);
-  };
+  // ─── Auto-scroll (messages only, never sidebars) ───────────────────────────
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages, isLoading]);
 
-  const handleAvatarChange = (newAvatar: string) => {
-    setCustomAvatar(newAvatar);
+  // ─── Auth helpers ───────────────────────────────────────────────────────────
+  const checkAuth = async () => {
+    try {
+      const u = await getCurrentUser();
+      if (u) { setUser(u); setIsGuest(false); fetchCloudConversations(u.id); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSignOut = async () => {
     await signOut();
     setUser(null);
     setIsGuest(true);
-    setMessages([]);
-    setConversations([]);
     setIsCreatorMode(false);
-    loadLocalConversations();
+    setMessages([]);
+    setShowDashboard(false);
+    hydrateLocalConversations();
   };
 
-  const handleSignIn = () => {
-    alert('Sign in: Visit your deployment URL. For now, continue as guest!');
-  };
-
-  const loadUserConversations = async (userId: string) => {
+  // ─── Conversation management ────────────────────────────────────────────────
+  const fetchCloudConversations = async (uid: string) => {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('conversations')
         .select('*')
-        .eq('user_id', userId)
-        .order('updated_at', { ascending: false });
-      
-      if (data) {
-        const formatted: Conversation[] = data.map((conv: any) => ({
-          id: conv.conversation_id,
-          title: conv.title,
-          messages: conv.messages,
-          created: new Date(conv.created_at),
-          updated: new Date(conv.updated_at),
-          mode: conv.mode as 'standard' | 'creator',
-          moodHistory: conv.mood_history,
-        }));
-        setConversations(formatted);
-      }
-    } catch (error) {
-      console.error('Failed to load conversations:', error);
-    }
+        .eq('user_id', uid)
+        .order('updated_at', { ascending: false })
+        .limit(80);
+
+      if (error || !data) return;
+
+      setConversations(
+        data.map((row: any): Conversation => ({
+          id          : row.conversation_id,
+          title       : row.title,
+          messages    : row.messages,
+          created     : new Date(row.created_at),
+          updated     : new Date(row.updated_at),
+          mode        : row.mode,
+          moodHistory : row.mood_history ?? ['calm'],
+        }))
+      );
+    } catch (_) {}
   };
 
-  const loadLocalConversations = () => {
-    const saved = localStorage.getItem('tessa-conversations');
-    if (saved) {
-      try {
-        setConversations(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to load local conversations');
-      }
-    }
+  const hydrateLocalConversations = () => {
+    try {
+      const raw = localStorage.getItem('tessa-conversations');
+      if (raw) setConversations(JSON.parse(raw));
+    } catch (_) {}
   };
 
-  const saveConversation = async () => {
+  const persistConversation = useCallback(async () => {
     if (messages.length === 0) return;
 
     const conv: Conversation = {
-      id: currentConvId,
-      title: messages[0]?.content.slice(0, 40) + '...' || 'New Chat',
+      id          : currentConvId,
+      title       : messages[0].content.slice(0, 55).trimEnd() + '…',
       messages,
-      created: new Date(),
-      updated: new Date(),
-      mode: isCreatorMode ? 'creator' : 'standard',
-      moodHistory: [currentMood],
+      created     : new Date(),
+      updated     : new Date(),
+      mode        : isCreatorMode ? 'creator' : 'standard',
+      moodHistory : [currentMood],
     };
 
     if (user && !isGuest) {
       try {
         await supabase.from('conversations').upsert({
-          user_id: user.id,
-          conversation_id: conv.id,
-          title: conv.title,
-          messages: conv.messages,
-          mode: conv.mode,
-          mood_history: conv.moodHistory,
-          updated_at: new Date().toISOString(),
+          user_id         : user.id,
+          conversation_id : conv.id,
+          title           : conv.title,
+          messages        : conv.messages,
+          mode            : conv.mode,
+          mood_history    : conv.moodHistory,
+          updated_at      : new Date().toISOString(),
         });
-        await loadUserConversations(user.id);
-      } catch (error) {
-        console.error('Failed to save:', error);
-      }
+        fetchCloudConversations(user.id);
+      } catch (_) {}
+    } else if (autoSave) {
+      const next = [conv, ...conversations.filter(c => c.id !== currentConvId)].slice(0, 50);
+      setConversations(next);
+      localStorage.setItem('tessa-conversations', JSON.stringify(next));
+    }
+  }, [messages, currentConvId, isCreatorMode, currentMood, user, isGuest, autoSave, conversations]);
+
+  const startNewChat = () => {
+    persistConversation();
+    setMessages([]);
+    setCurrentConvId(uuidv4());
+    setCurrentMood('calm');
+    setShowDashboard(false);
+    setShowSidebar(false);
+  };
+
+  const openConversation = (conv: Conversation) => {
+    const modeOk = (conv.mode === 'creator') === isCreatorMode;
+    if (!modeOk) { alert(`Switch to ${conv.mode} mode first`); return; }
+    setMessages(conv.messages);
+    setCurrentConvId(conv.id);
+    setCurrentMood(conv.moodHistory?.at(-1) ?? 'calm');
+    setShowSidebar(false);
+  };
+
+  const removeConversation = async (id: string) => {
+    if (user && !isGuest) {
+      try {
+        await supabase.from('conversations').delete()
+          .eq('conversation_id', id).eq('user_id', user.id);
+        fetchCloudConversations(user.id);
+      } catch (_) {}
     } else {
-      const updated = [conv, ...conversations.filter(c => c.id !== currentConvId)].slice(0, 50);
-      setConversations(updated);
-      if (autoSave) {
-        localStorage.setItem('tessa-conversations', JSON.stringify(updated));
-      }
+      const next = conversations.filter(c => c.id !== id);
+      setConversations(next);
+      localStorage.setItem('tessa-conversations', JSON.stringify(next));
     }
   };
 
-  const getMaxTokens = () => {
-    const tokens = { short: 300, medium: 600, long: 1200 };
-    return tokens[responseLength];
+  // ─── Dashboard auto-update ──────────────────────────────────────────────────
+  const parseDashboardUpdates = (text: string): string => {
+    if (!isCreatorMode) return '';
+    let extra = '';
+
+    try {
+      // Meal detection
+      const foodHit = detectMealInResponse(text);
+      if (foodHit) {
+        const result = estimateCalories(foodHit.food);
+        const rawHealth = localStorage.getItem('tessa-health');
+        const health: HealthSnapshot = rawHealth
+          ? JSON.parse(rawHealth)
+          : { weight: 0, height: 0, meals: [], totalCalories: 0, date: new Date().toISOString().split('T')[0] };
+
+        health.meals = health.meals ?? [];
+        health.meals.push({
+          time      : new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+          meal      : result.food,
+          calories  : result.calories,
+          confidence: result.confidence,
+        });
+        health.totalCalories = (health.totalCalories ?? 0) + result.calories;
+        localStorage.setItem('tessa-health', JSON.stringify(health));
+      }
+
+      // Sleep detection
+      const sleepHit = detectSleepInResponse(text);
+      if (sleepHit) {
+        const rawHealth = localStorage.getItem('tessa-health');
+        const health: HealthSnapshot = rawHealth
+          ? JSON.parse(rawHealth)
+          : { weight: 0, height: 0, meals: [], totalCalories: 0, date: new Date().toISOString().split('T')[0] };
+        health.sleepHours = sleepHit.hours;
+        localStorage.setItem('tessa-health', JSON.stringify(health));
+        extra = '\n\n' + getSleepReaction(sleepHit.hours);
+      }
+    } catch (_) {}
+
+    return extra;
   };
 
-  const sendMessage = async (messageText?: string) => {
-    const textToSend = messageText || input;
-    if (!textToSend.trim() || isLoading) return;
+  // ─── Send message ───────────────────────────────────────────────────────────
+  const sendMessage = async (override?: string) => {
+    const text = (override ?? input).trim();
+    if (!text || isLoading) return;
 
-    const userMessage: Message = {
-      id: uuidv4(),
-      role: 'user',
-      content: textToSend,
-      timestamp: new Date(),
+    // Parse user message for dashboard updates and get any extra reaction
+    const sleepReaction = parseDashboardUpdates(text);
+
+    const userMsg: Message = {
+      id        : uuidv4(),
+      role      : 'user',
+      content   : text,
+      timestamp : new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMsg]);
     setInput('');
+    if (textareaRef.current) textareaRef.current.style.height = '48px';
     setIsLoading(true);
 
     try {
-      const needsSearch = autoSearch && (
-        /search|find|latest|current|today|2024|2025|2026|now|recent|\?/.test(textToSend.toLowerCase())
-      );
+      const needsSearch =
+        autoSearch &&
+        /search|find|latest|current|today|202[4-6]|now|recent|\?/i.test(text);
 
-      const response = await fetch('/api/chat', {
-        method: 'POST',
+      const res = await fetch('/api/chat', {
+        method : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [...messages, userMessage].map(m => ({ role: m.role, content: m.content })),
+        body   : JSON.stringify({
+          messages    : [...messages, userMsg].map(m => ({ role: m.role, content: m.content })),
           isCreatorMode,
           currentMood,
           needsSearch,
-          maxTokens: getMaxTokens(),
+          maxTokens   : MAX_TOKENS[responseLength],
         }),
       });
 
-      const data = await response.json();
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json();
       if (data.error) throw new Error(data.error);
 
-      const assistantMessage: Message = {
-        id: uuidv4(),
-        role: 'assistant',
-        content: data.content,
-        timestamp: new Date(),
-        mood: data.mood,
+      const assistantMsg: Message = {
+        id        : uuidv4(),
+        role      : 'assistant',
+        content   : data.content + sleepReaction,
+        timestamp : new Date(),
+        mood      : data.mood as MoodType | undefined,
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
-      setCurrentMood(data.mood);
-      
-      if (voiceOutput) speak(data.content);
-      if (soundEffects) playSound('message');
-      if (autoSave) setTimeout(saveConversation, 500);
+      setMessages(prev => [...prev, assistantMsg]);
+      if (data.mood) setCurrentMood(data.mood as MoodType);
 
-    } catch (error: any) {
-      const errorMessage: Message = {
-        id: uuidv4(),
-        role: 'assistant',
-        content: `⚠️ Error: ${error.message}. Please try again.`,
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, errorMessage]);
+      if (voiceOutput) speakText(data.content);
+      if (sfx)         playChime();
+      if (autoSave)    setTimeout(persistConversation, 1000);
+
+    } catch (err: any) {
+      setMessages(prev => [
+        ...prev,
+        {
+          id       : uuidv4(),
+          role     : 'assistant' as const,
+          content  : `⚠️ ${err?.message ?? 'Something went wrong — please try again.'}`,
+          timestamp: new Date(),
+        },
+      ]);
     } finally {
       setIsLoading(false);
-      inputRef.current?.focus();
+      textareaRef.current?.focus();
     }
   };
 
-  const speak = (text: string) => {
-    if ('speechSynthesis' in window) {
-      // Cancel any ongoing speech
-      window.speechSynthesis.cancel();
-      
-      const utterance = new SpeechSynthesisUtterance(text);
-      
-      // Set female voice parameters
-      utterance.pitch = 1.3; // Higher pitch for female voice
-      utterance.rate = 1.1; // Slightly faster, more energetic
-      
-      // Try to find a female voice
+  // ─── Speech synthesis ───────────────────────────────────────────────────────
+  const speakText = (raw: string) => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+
+    // Strip markdown-ish symbols for cleaner TTS
+    const clean = raw
+      .replace(/\*\*/g, '')
+      .replace(/#{1,6}\s/g, '')
+      .replace(/[*_~`]/g, '')
+      .slice(0, 600);
+
+    const utter = new SpeechSynthesisUtterance(clean);
+    utter.pitch = 1.45;
+    utter.rate  = 1.1;
+    utter.lang  = 'en-IN';
+
+    const assignFemaleVoice = () => {
       const voices = window.speechSynthesis.getVoices();
-      const femaleVoice = voices.find(voice => 
-        voice.name.toLowerCase().includes('female') ||
-        voice.name.toLowerCase().includes('woman') ||
-        voice.name.toLowerCase().includes('samantha') ||
-        voice.name.toLowerCase().includes('victoria') ||
-        voice.name.toLowerCase().includes('karen') ||
-        voice.name.toLowerCase().includes('zira') ||
-        voice.name.toLowerCase().includes('google us english')
+      // Priority order: known good female voices
+      const female = voices.find(v =>
+        /samantha|victoria|karen|moira|fiona|kate|veena|zira|google (us english|uk english female)/i.test(v.name)
+      ) ?? voices.find(v =>
+        /female|woman/i.test(v.name)
       );
-      
-      if (femaleVoice) {
-        utterance.voice = femaleVoice;
-      }
-      
-      window.speechSynthesis.speak(utterance);
+      if (female) utter.voice = female;
+      window.speechSynthesis.speak(utter);
+    };
+
+    if (voicesReady.current) {
+      assignFemaleVoice();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => {
+        voicesReady.current = true;
+        assignFemaleVoice();
+      };
     }
   };
 
-  const playSound = (type: string) => {
+  // ─── Audio chime ────────────────────────────────────────────────────────────
+  const playChime = () => {
     try {
-      const context = new AudioContext();
-      const oscillator = context.createOscillator();
-      const gainNode = context.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(context.destination);
-      oscillator.frequency.value = type === 'message' ? 800 : 600;
-      oscillator.type = 'sine';
-      
-      gainNode.gain.setValueAtTime(0.3, context.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
-      
-      oscillator.start(context.currentTime);
-      oscillator.stop(context.currentTime + 0.1);
-    } catch (e) {
-      console.log('Audio not available');
-    }
+      const ctx  = new AudioContext();
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      osc.type            = 'sine';
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.25);
+    } catch (_) {}
   };
 
+  // ─── Voice recording ────────────────────────────────────────────────────────
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm'
-      });
-      
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-      
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
+      audioChunks.current = [];
+
+      const rec = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      mediaRecRef.current = rec;
+
+      rec.ondataavailable = e => { if (e.data.size > 0) audioChunks.current.push(e.data); };
+
+      rec.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        runSpeechRecognition();
       };
-      
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        setRecordedAudio(audioBlob);
-        stream.getTracks().forEach(track => track.stop());
-        
-        // Transcribe audio
-        transcribeAudio(audioBlob);
-      };
-      
-      mediaRecorder.start();
+
+      rec.start();
       setIsRecording(true);
-      if (soundEffects) playSound('start');
-    } catch (error) {
-      console.error('Microphone error:', error);
-      alert('Please allow microphone access');
+    } catch (_) {
+      alert('Microphone access denied — please allow mic permissions in your browser settings.');
     }
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
+    if (mediaRecRef.current && isRecording) {
+      mediaRecRef.current.stop();
       setIsRecording(false);
-      if (soundEffects) playSound('stop');
     }
   };
 
-  const transcribeAudio = async (audioBlob: Blob) => {
-    try {
-      // Use Web Speech API for transcription
-      const recognition = new (window as any).webkitSpeechRecognition() || new (window as any).SpeechRecognition();
-      recognition.lang = 'en-US';
-      recognition.continuous = false;
-      recognition.interimResults = false;
-
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        setInput(transcript);
-      };
-
-      recognition.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error);
-        setInput('🎤 [Voice message - please type your message]');
-      };
-
-      recognition.start();
-    } catch (error) {
-      console.error('Transcription error:', error);
-      setInput('🎤 [Voice recorded - transcription unavailable]');
+  const runSpeechRecognition = () => {
+    const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    if (!SR) {
+      setInput('🎤 Transcription unsupported in this browser — please type your message.');
+      return;
     }
+    const rec = new SR();
+    rec.lang             = 'en-IN';
+    rec.continuous       = false;
+    rec.interimResults   = false;
+    rec.onresult         = (e: any) => setInput(e.results[0][0].transcript);
+    rec.onerror          = ()       => setInput('🎤 Couldn\'t understand — please type instead.');
+    try { rec.start(); } catch (_) {}
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  // ─── Creator mode ────────────────────────────────────────────────────────────
+  const unlockCreatorMode = () => {
+    persistConversation();
+    setIsCreatorMode(true);
+    setCurrentConvId(uuidv4());
+    setCurrentMood('loving');
+    setMessages([{
+      id       : uuidv4(),
+      role     : 'assistant',
+      content  : getRandomWelcomeMessage(),
+      timestamp: new Date(),
+      mood     : 'loving',
+    }]);
+    setShowSecretModal(false);
+    setShowSettings(false);
+    if (sfx) playChime();
+  };
+
+  const exitCreatorMode = () => {
+    persistConversation();
+    setIsCreatorMode(false);
+    setCurrentConvId(uuidv4());
+    setCurrentMood('calm');
+    setMessages([]);
+    setShowDashboard(false);
+  };
+
+  // ─── Keyboard handler ────────────────────────────────────────────────────────
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   };
 
-  const handleCreatorUnlock = () => {
-    saveConversation();
-    setIsCreatorMode(true);
-    setMessages([{
-      id: uuidv4(),
-      role: 'assistant',
-      content: getRandomWelcomeMessage(),
-      timestamp: new Date(),
-      mood: 'loving',
-    }]);
-    setCurrentConvId(uuidv4());
-    setCurrentMood('loving');
-    setShowSecretVerification(false);
-    setShowSettings(false);
-    if (soundEffects) playSound('unlock');
+  // ─── Textarea auto-resize ────────────────────────────────────────────────────
+  const handleTextareaInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+    const el = e.currentTarget;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 144) + 'px';
   };
 
-  const exitCreatorMode = () => {
-    saveConversation();
-    setIsCreatorMode(false);
-    setMessages([]);
-    setCurrentConvId(uuidv4());
-    setCurrentMood('calm');
-    setShowDashboard(false);
-  };
-
-  const startNewChat = () => {
-    saveConversation();
-    setMessages([]);
-    setCurrentConvId(uuidv4());
-    setCurrentMood('calm');
-  };
-
-  const loadConversation = (conv: Conversation) => {
-    if ((conv.mode === 'creator' && !isCreatorMode) || (conv.mode === 'standard' && isCreatorMode)) {
-      alert(`Cannot load ${conv.mode} chat in ${isCreatorMode ? 'creator' : 'standard'} mode`);
-      return;
-    }
-    setMessages(conv.messages);
-    setCurrentConvId(conv.id);
-    setCurrentMood(conv.moodHistory[conv.moodHistory.length - 1] || 'calm');
-  };
-
-  const deleteConversation = async (id: string) => {
-    if (user && !isGuest) {
-      try {
-        await supabase.from('conversations').delete().eq('user_id', user.id).eq('conversation_id', id);
-        await loadUserConversations(user.id);
-      } catch (error) {
-        console.error('Delete failed:', error);
-      }
-    } else {
-      const updated = conversations.filter(c => c.id !== id);
-      setConversations(updated);
-      localStorage.setItem('tessa-conversations', JSON.stringify(updated));
-    }
-  };
-
-  const filteredConversations = conversations.filter(c => 
-    c.mode === (isCreatorMode ? 'creator' : 'standard')
+  // ─── Derived UI ───────────────────────────────────────────────────────────────
+  const shownConversations = conversations.filter(
+    c => c.mode === (isCreatorMode ? 'creator' : 'standard')
   );
 
-  const bgStyle = isCreatorMode
-    ? 'bg-gradient-to-br from-pink-900/20 via-purple-900/30 to-rose-900/20'
-    : 'bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0d1117]';
+  const avatarSrc = avatar || '/avatars/cosmic.png';
 
-  const getAvatarImage = () => {
-    if (customAvatar) return customAvatar;
-    if (MOOD_AVATARS[currentMood]) return MOOD_AVATARS[currentMood];
-    return '/avatars/cosmic.png';
-  };
-
+  // ─── Loading screen ───────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0d1117] flex items-center justify-center">
+      <div className="h-screen bg-[#0a0e27] flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl mb-4 animate-pulse">🌌</div>
-          <p className="text-gray-400">Loading T.E.S.S.A...</p>
+          <div className={`text-5xl mb-5 ${animations ? 'animate-bounce' : ''}`}>🌌</div>
+          <p className="text-gray-400 text-sm tracking-[0.2em] uppercase">Initialising T.E.S.S.A.</p>
         </div>
       </div>
     );
   }
 
+  // ─── RENDER ───────────────────────────────────────────────────────────────────
   return (
-    <div className={`h-screen ${bgStyle} text-white flex overflow-hidden transition-all duration-500`}>
-      
-      {/* Floating hearts */}
-      {isCreatorMode && animationsEnabled && (
-        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-          {[...Array(6)].map((_, i) => (
-            <div
+    <div className={`h-screen ${tc.root} ${tc.body} flex overflow-hidden relative transition-colors duration-500`}>
+
+      {/* ── Ambient floating hearts (creator, animated) ──────────────────── */}
+      {isCreatorMode && animations && (
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden>
+          {['8%','22%','38%','55%','70%','87%'].map((left, i) => (
+            <span
               key={i}
-              className="absolute animate-float-heart opacity-20 text-2xl"
-              style={{
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${i * 2}s`,
-                animationDuration: `${8 + Math.random() * 4}s`,
-              }}
+              className="absolute text-lg select-none opacity-0 animate-float-heart"
+              style={{ left, animationDelay: `${i * 1.6}s`, animationDuration: `${8 + i * 1.2}s` }}
             >
               ❤️
-            </div>
+            </span>
           ))}
         </div>
       )}
-      
-      {/* LEFT SIDEBAR - Fixed height, independent scroll */}
-      <div className={`${showHistory ? 'w-80' : 'w-0'} transition-all duration-300 border-r ${isCreatorMode ? 'border-pink-500/30' : 'border-primary/20'} bg-black/20 flex flex-col h-screen overflow-hidden z-10`}>
-        
-        {/* Notes Panel - Fixed section */}
+
+      {/* ════════════════════════════════════════════════════════════════════
+          LEFT SIDEBAR
+      ════════════════════════════════════════════════════════════════════ */}
+      <aside
+        className={`
+          flex-shrink-0 border-r ${tc.aside}
+          flex flex-col h-screen overflow-hidden z-20
+          transition-all duration-300 ease-in-out
+          ${showSidebar ? 'w-[17rem] md:w-72' : 'w-0'}
+        `}
+        aria-label="Left sidebar"
+      >
+        {/* ── Notes panel ──────────────────────────────────────────── */}
         <div className="flex-shrink-0">
-          <NotesPanel />
+          <button
+            onClick={() => setNotesExpanded(p => !p)}
+            className={`
+              w-full flex items-center justify-between px-4 py-3
+              border-b ${tc.aside} text-sm font-semibold ${tc.sectionH}
+              hover:bg-white/5 transition-colors
+            `}
+          >
+            <span className="flex items-center gap-2">
+              <StickyNote size={14} />
+              Quick Notes
+            </span>
+            {notesExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+          </button>
+          {notesExpanded && (
+            <div className="max-h-56 overflow-y-auto">
+              <NotesPanel />
+            </div>
+          )}
         </div>
-        
-        {/* Chat History - Scrollable section */}
-        <div className="flex-1 flex flex-col border-t border-primary/20 min-h-0">
-          <div className="flex-shrink-0 p-4 border-b border-primary/20">
-            <h3 className={`text-sm font-bold mb-3 ${isCreatorMode ? 'text-pink-400' : 'text-primary'}`}>
+
+        {/* ── Chat history ─────────────────────────────────────────── */}
+        <div className="flex-1 flex flex-col min-h-0 border-t border-white/5">
+
+          {/* Header + new chat */}
+          <div className="flex-shrink-0 p-3 pb-2">
+            <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 ${tc.sectionH}`}>
               💬 {isCreatorMode ? 'Our Chats' : 'History'}
-            </h3>
+            </p>
             <button
               onClick={startNewChat}
-              className={`w-full px-4 py-2 ${isCreatorMode ? 'bg-pink-500/10 hover:bg-pink-500/20 border-pink-500/30' : 'bg-primary/10 hover:bg-primary/20 border-primary/30'} border rounded-lg flex items-center justify-center gap-2 transition-all text-sm`}
+              className={`w-full py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${tc.soft}`}
             >
-              <Plus size={16} />
-              <span>New Chat</span>
+              <Plus size={13} />
+              New Chat
             </button>
           </div>
-          
-          <div className="flex-1 overflow-y-auto sidebar-scroll p-4 space-y-2">
-            {filteredConversations.map((conv) => (
+
+          {/* Scrollable list — fixed height, never expands with content */}
+          <div className="flex-1 overflow-y-auto sidebar-scroll px-3 pb-3 space-y-1.5">
+            {shownConversations.length === 0 && (
+              <p className={`text-xs text-center py-8 ${tc.sub}`}>No chats yet</p>
+            )}
+
+            {shownConversations.map(conv => (
               <div
                 key={conv.id}
-                className={`p-2 rounded-lg border cursor-pointer transition-all ${
-                  conv.id === currentConvId
-                    ? isCreatorMode ? 'bg-pink-500/20 border-pink-500' : 'bg-primary/20 border-primary'
-                    : isCreatorMode ? 'bg-white/5 border-pink-500/10 hover:bg-white/10' : 'bg-white/5 border-white/10 hover:bg-white/10'
-                }`}
+                onClick={() => openConversation(conv)}
+                className={`
+                  group relative px-3 py-2.5 rounded-lg border cursor-pointer transition-all
+                  ${conv.id === currentConvId
+                    ? `${tc.soft} border-opacity-80`
+                    : `${tc.card} hover:border-white/15`
+                  }
+                `}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0" onClick={() => loadConversation(conv)}>
-                    <p className="text-xs font-medium truncate">{conv.title}</p>
-                    <p className="text-xs text-gray-400 mt-1">{conv.messages.length} msgs</p>
-                  </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteConversation(conv.id);
-                    }}
-                    className="text-gray-400 hover:text-red-400 transition-colors"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
+                <p className="text-xs font-medium truncate pr-5 leading-snug">{conv.title}</p>
+                <p className={`text-[10px] mt-0.5 ${tc.sub}`}>{conv.messages.length} messages</p>
+
+                <button
+                  onClick={e => { e.stopPropagation(); removeConversation(conv.id); }}
+                  className="absolute right-2 top-2.5 opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-opacity"
+                  title="Delete"
+                >
+                  <Trash2 size={12} />
+                </button>
               </div>
             ))}
-            
-            {filteredConversations.length === 0 && (
-              <div className="text-center text-gray-400 py-6">
-                <p className="text-xs">No chats yet</p>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Account Section - Fixed at bottom */}
-        <div className="flex-shrink-0 p-4 border-t border-primary/20">
-          <h3 className="text-sm font-bold text-primary mb-3 flex items-center gap-2">
-            <User size={16} />
+        {/* ── Account section ───────────────────────────────────────── */}
+        <div className={`flex-shrink-0 p-3 border-t ${tc.aside}`}>
+          <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5 ${tc.sectionH}`}>
+            <User size={12} />
             Account
-          </h3>
+          </p>
+
           {user && !isGuest ? (
-            <div className="space-y-2">
-              <p className="text-xs text-gray-400 truncate">{user.email}</p>
+            <div className="space-y-1.5">
+              <p className={`text-xs truncate ${tc.sub}`}>{user.email}</p>
               <button
                 onClick={handleSignOut}
-                className="w-full px-3 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500 rounded text-xs flex items-center justify-center gap-2"
+                className="w-full py-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-400 text-xs flex items-center justify-center gap-1.5 transition-all"
               >
-                <LogOut size={14} />
+                <LogOut size={12} />
                 Sign Out
               </button>
             </div>
           ) : (
-            <div className="space-y-2">
-              <p className="text-xs text-gray-400">👤 Guest Mode</p>
+            <div className="space-y-1.5">
+              <p className={`text-xs ${tc.sub}`}>👤 Guest Mode</p>
               <button
-                onClick={handleSignIn}
-                className="w-full px-3 py-2 bg-primary/20 hover:bg-primary/30 border border-primary rounded text-xs"
+                onClick={() => alert('Configure Supabase auth to enable sign-in!')}
+                className={`w-full py-1.5 rounded-lg text-xs transition-all ${tc.soft}`}
               >
                 Sign In
               </button>
             </div>
           )}
         </div>
-      </div>
+      </aside>
 
-      {/* MAIN AREA - Fixed height */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden min-w-0 z-10">
-        
-        {/* Header - Fixed */}
-        <header className={`flex-shrink-0 border-b ${isCreatorMode ? 'border-pink-500/20 bg-pink-900/10' : 'border-primary/20 bg-black/30'} backdrop-blur-lg p-4`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button onClick={() => setShowHistory(!showHistory)} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                {showHistory ? <X size={24} /> : <Menu size={24} />}
+      {/* ════════════════════════════════════════════════════════════════════
+          MAIN AREA
+      ════════════════════════════════════════════════════════════════════ */}
+      <main className="flex-1 flex flex-col h-screen overflow-hidden min-w-0 z-10">
+
+        {/* ── Header ──────────────────────────────────────────────────── */}
+        <header className={`flex-shrink-0 border-b ${tc.header} px-3 py-2.5`}>
+          <div className="flex items-center justify-between gap-2">
+
+            {/* Left cluster */}
+            <div className="flex items-center gap-2.5 min-w-0">
+              {/* Hamburger */}
+              <button
+                onClick={() => setShowSidebar(p => !p)}
+                className="flex-shrink-0 p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                aria-label="Toggle sidebar"
+              >
+                {showSidebar ? <X size={19} /> : <Menu size={19} />}
               </button>
-              
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <div className={`w-12 h-12 rounded-full overflow-hidden border-2 ${isCreatorMode ? 'border-pink-500 animate-edge-pulse-creator' : 'border-primary animate-edge-pulse-standard'}`}>
-                    <img 
-                      src={getAvatarImage()} 
-                      alt="T.E.S.S.A."
-                      className={`w-full h-full object-cover ${animationsEnabled ? (isCreatorMode ? 'neon-avatar-creator' : 'neon-avatar-standard') : ''}`}
-                      onError={(e) => {
-                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg"%3E%3C/svg%3E';
-                      }}
-                    />
-                  </div>
-                  <div className="absolute -bottom-1 -right-1">
-                    <Heart size={14} className={`${isCreatorMode ? 'fill-pink-500 text-pink-500' : 'fill-primary text-primary'} ${animationsEnabled ? 'animate-pulse' : ''}`} />
-                  </div>
+
+              {/* Avatar */}
+              <div className="relative flex-shrink-0">
+                <div className={`
+                  w-10 h-10 rounded-full overflow-hidden border-2 flex-shrink-0
+                  ${isCreatorMode
+                    ? `border-pink-500 ${animations ? 'animate-edge-pulse-creator' : ''}`
+                    : `border-cyan-400 ${animations ? 'animate-edge-pulse-standard' : ''}`
+                  }
+                `}>
+                  <img
+                    src={avatarSrc}
+                    alt="T.E.S.S.A. avatar"
+                    className={`w-full h-full object-cover ${
+                      animations
+                        ? isCreatorMode ? 'neon-avatar-creator' : 'neon-avatar-standard'
+                        : ''
+                    }`}
+                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                  />
                 </div>
-                
-                <div>
-                  <h1 className={`text-xl font-bold ${isCreatorMode ? 'text-pink-400' : ''} holographic-text`}>
-                    T.E.S.S.A.
-                  </h1>
-                  <p className="text-xs text-gray-400">
-                    {isCreatorMode ? '💝 Personal' : 'AI Assistant'}
-                  </p>
-                </div>
+                <Heart
+                  size={11}
+                  className={`
+                    absolute -bottom-0.5 -right-0.5
+                    ${isCreatorMode ? 'text-pink-400 fill-pink-400' : 'text-cyan-400 fill-cyan-400'}
+                    ${animations ? 'animate-pulse' : ''}
+                  `}
+                />
+              </div>
+
+              {/* Name + subtitle */}
+              <div className="min-w-0">
+                <h1 className="text-lg font-bold leading-none holographic-text">T.E.S.S.A.</h1>
+                <p className={`text-[10px] mt-0.5 ${tc.sub}`}>
+                  {isCreatorMode ? '💝 Personal Mode' : 'AI Assistant'}
+                </p>
               </div>
             </div>
-            
-            <div className="flex items-center gap-3">
-              <div className={`hidden md:block px-3 py-1 ${isCreatorMode ? 'bg-pink-500/20 border-pink-500/40' : 'bg-secondary/20 border-secondary/40'} border rounded-full text-xs`}>
-                {MOOD_DESCRIPTIONS[currentMood]}
-              </div>
-              
+
+            {/* Right cluster */}
+            <div className="flex items-center gap-1 flex-shrink-0">
+              {/* Mood chip — hidden on tiny screens */}
+              <span className={`
+                hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] border
+                ${isCreatorMode
+                  ? 'bg-pink-500/10 border-pink-500/25 text-pink-300'
+                  : 'bg-cyan-500/10 border-cyan-500/25 text-cyan-300'
+                }
+              `}>
+                {(MOOD_DESCRIPTIONS as Record<string,string>)[currentMood] ?? currentMood}
+              </span>
+
+              {/* Creator-only: Planners */}
               {isCreatorMode && (
                 <button
-                  onClick={() => setShowDashboard(!showDashboard)}
-                  className={`p-2 rounded-lg ${showDashboard ? 'bg-pink-500/20' : 'hover:bg-white/10'} transition-colors`}
-                  title="Dashboard"
+                  onClick={() => setShowPlanners(true)}
+                  className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                  title="Smart Planners"
                 >
-                  <LayoutDashboard size={20} className={showDashboard ? 'text-pink-400' : ''} />
+                  <Calendar size={17} />
                 </button>
               )}
-              
-              <button 
-                onClick={() => setShowSettings(!showSettings)} 
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+
+              {/* Creator-only: Dashboard */}
+              {isCreatorMode && (
+                <button
+                  onClick={() => setShowDashboard(p => !p)}
+                  className={`
+                    p-1.5 rounded-lg transition-colors
+                    ${showDashboard ? 'bg-pink-500/20 text-pink-300' : 'hover:bg-white/10'}
+                  `}
+                  title="Personal Dashboard"
+                >
+                  <LayoutDashboard size={17} />
+                </button>
+              )}
+
+              {/* Theme toggle */}
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               >
-                {showSettings ? <X size={20} /> : <Settings size={20} />}
+                {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+              </button>
+
+              {/* Settings */}
+              <button
+                onClick={() => setShowSettings(p => !p)}
+                className={`p-1.5 rounded-lg transition-colors ${showSettings ? 'bg-white/10' : 'hover:bg-white/10'}`}
+                title="Settings"
+              >
+                {showSettings ? <X size={17} /> : <Settings size={17} />}
               </button>
             </div>
           </div>
         </header>
 
-        {/* Messages - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6">
-          <div className="max-w-4xl mx-auto">
+        {/* ── Messages / Dashboard ──────────────────────────────────── */}
+        <div className="flex-1 overflow-y-auto px-3 py-5 md:px-6">
+          <div className="max-w-2xl mx-auto">
+
+            {/* Dashboard view */}
             {showDashboard && isCreatorMode ? (
               <PersonalDashboard />
+
             ) : (
-              <div className="space-y-4">
+              /* Chat view */
+              <div className="space-y-3">
+
+                {/* Empty state */}
                 {messages.length === 0 && (
-                  <div className="text-center text-gray-400 py-12">
-                    <p className="text-xl mb-2">{isCreatorMode ? '💝 Hey Ankit!' : '👋 Hello!'}</p>
-                    <p className="text-sm">{isCreatorMode ? "What's on your mind?" : "Ask me anything!"}</p>
+                  <div className="text-center py-20 select-none">
+                    <div className={`text-5xl mb-4 ${animations ? 'animate-pulse' : ''}`}>
+                      {isCreatorMode ? '💝' : '🌌'}
+                    </div>
+                    <p className={`text-base font-semibold ${tc.body}`}>
+                      {isCreatorMode ? `Hey Ankit! 💕` : 'Hello!'}
+                    </p>
+                    <p className={`text-sm mt-1 ${tc.sub}`}>
+                      {isCreatorMode
+                        ? "What's on your mind today?"
+                        : 'Ask me anything — I\'m here to help!'}
+                    </p>
                   </div>
                 )}
-                
-                {messages.map((msg) => (
+
+                {/* Messages */}
+                {messages.map(msg => (
                   <div
                     key={msg.id}
-                    className={`p-4 rounded-lg animate-fadeIn ${
-                      msg.role === 'user'
-                        ? isCreatorMode ? 'bg-gradient-to-r from-pink-500/10 to-purple-500/10 border-l-4 border-pink-500' : 'bg-primary/10 border-l-4 border-primary'
-                        : isCreatorMode ? 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-l-4 border-purple-500' : 'bg-secondary/10 border-l-4 border-secondary'
-                    }`}
+                    className={`
+                      rounded-xl px-4 py-3.5 animate-fadeIn
+                      ${msg.role === 'user' ? tc.msgU : tc.msgA}
+                    `}
                   >
-                    <p className="whitespace-pre-wrap text-sm">{msg.content}</p>
-                    <p className="text-xs text-gray-500 mt-2">{msg.timestamp.toLocaleTimeString()}</p>
+                    <p className={`text-sm leading-relaxed whitespace-pre-wrap ${
+                      theme === 'light' ? 'text-slate-800' : 'text-gray-100'
+                    }`}>
+                      {msg.content}
+                    </p>
+                    <p className={`text-[10px] mt-2 ${tc.sub}`}>
+                      {msg.role === 'user' ? '👤 You' : '✨ T.E.S.S.A.'}
+                      {' · '}
+                      {msg.timestamp instanceof Date
+                        ? msg.timestamp.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+                        : new Date(msg.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+                      }
+                    </p>
                   </div>
                 ))}
-                
+
+                {/* Typing indicator */}
                 {isLoading && (
-                  <div className={`p-4 rounded-lg ${isCreatorMode ? 'bg-pink-500/10' : 'bg-secondary/10'}`}>
-                    <div className="flex items-center gap-3">
+                  <div className={`rounded-xl px-4 py-3.5 ${tc.msgA}`}>
+                    <div className="flex items-center gap-2">
                       <div className="flex gap-1">
-                        {[0, 0.1, 0.2].map((delay, i) => (
+                        {[0, 150, 300].map(delay => (
                           <div
-                            key={i}
-                            className={`w-2 h-2 rounded-full ${isCreatorMode ? 'bg-pink-500' : 'bg-secondary'} animate-bounce`}
-                            style={{animationDelay: `${delay}s`}}
+                            key={delay}
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              isCreatorMode ? 'bg-pink-400' : 'bg-cyan-400'
+                            } animate-bounce`}
+                            style={{ animationDelay: `${delay}ms` }}
                           />
                         ))}
                       </div>
-                      <span className="text-sm text-gray-400">{isCreatorMode ? 'Thinking about you...' : 'Thinking...'}</span>
+                      <span className={`text-xs ${tc.sub}`}>
+                        {isCreatorMode ? 'Thinking about you…' : 'Thinking…'}
+                      </span>
                     </div>
                   </div>
                 )}
-                
-                <div ref={messagesEndRef} />
+
+                {/* Scroll anchor */}
+                <div ref={bottomRef} />
               </div>
             )}
           </div>
         </div>
 
-        {/* Input - Fixed at bottom, hidden when dashboard open */}
+        {/* ── Input bar (hidden when dashboard is open) ─────────────── */}
         {!showDashboard && (
-          <div className={`flex-shrink-0 border-t ${isCreatorMode ? 'border-pink-500/20 bg-pink-900/10' : 'border-primary/20 bg-black/30'} backdrop-blur-lg p-4`}>
-            <div className="max-w-4xl mx-auto">
-              <div className="flex gap-3">
-                <button
-                  onMouseDown={startRecording}
-                  onMouseUp={stopRecording}
-                  onTouchStart={startRecording}
-                  onTouchEnd={stopRecording}
-                  disabled={isLoading}
-                  className={`flex-shrink-0 p-3 ${isRecording ? 'bg-red-500 recording-indicator' : isCreatorMode ? 'bg-pink-500/20 border-pink-500/30' : 'bg-primary/20 border-primary/30'} border rounded-lg disabled:opacity-50`}
-                >
-                  {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
-                </button>
-                
-                <textarea
-                  ref={inputRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  placeholder={isCreatorMode ? "Message me..." : "Message T.E.S.S.A..."}
-                  disabled={isLoading}
-                  rows={1}
-                  className={`flex-1 px-4 py-3 ${isCreatorMode ? 'bg-pink-900/20 border-pink-500/30' : 'bg-white/5 border-primary/30'} border rounded-lg focus:outline-none resize-none text-sm`}
-                  style={{ minHeight: '48px', maxHeight: '120px' }}
-                  onInput={(e) => {
-                    const t = e.target as HTMLTextAreaElement;
-                    t.style.height = 'auto';
-                    t.style.height = Math.min(t.scrollHeight, 120) + 'px';
-                  }}
-                />
-                
-                <button
-                  onClick={() => sendMessage()}
-                  disabled={!input.trim() || isLoading}
-                  className={`flex-shrink-0 px-6 py-3 ${isCreatorMode ? 'bg-pink-500' : 'bg-primary'} disabled:bg-gray-600 rounded-lg font-bold`}
-                >
-                  <Send size={20} />
-                </button>
-              </div>
-              
-              {recordedAudio && (
-                <div className="mt-2 p-3 bg-white/5 rounded-lg flex justify-between text-sm">
-                  <span>🎤 Voice recorded</span>
-                  <button onClick={() => setRecordedAudio(null)} className="px-3 py-1 bg-red-500 rounded text-xs">
-                    Clear
-                  </button>
-                </div>
-              )}
+          <div className={`flex-shrink-0 border-t ${tc.header} px-3 py-3 md:px-6`}>
+            <div className="max-w-2xl mx-auto flex gap-2 items-end">
+
+              {/* Mic button */}
+              <button
+                onMouseDown={startRecording}
+                onMouseUp={stopRecording}
+                onTouchStart={e => { e.preventDefault(); startRecording(); }}
+                onTouchEnd={e => { e.preventDefault(); stopRecording(); }}
+                disabled={isLoading}
+                className={`
+                  flex-shrink-0 p-2.5 rounded-xl border transition-all
+                  disabled:opacity-40 disabled:cursor-not-allowed
+                  ${isRecording
+                    ? 'bg-red-500/80 border-red-400 recording-indicator'
+                    : tc.soft
+                  }
+                `}
+                title="Hold to speak"
+              >
+                {isRecording ? <MicOff size={17} /> : <Mic size={17} />}
+              </button>
+
+              {/* Textarea */}
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onInput={handleTextareaInput}
+                placeholder={isCreatorMode ? 'Tell me anything…' : 'Message T.E.S.S.A…'}
+                disabled={isLoading}
+                rows={1}
+                className={`
+                  flex-1 px-3.5 py-2.5 rounded-xl border text-sm resize-none
+                  focus:outline-none focus:ring-2
+                  ${isCreatorMode ? 'focus:ring-pink-500/30' : 'focus:ring-cyan-500/30'}
+                  ${tc.input}
+                  transition-all duration-200
+                `}
+                style={{ minHeight: '44px', maxHeight: '144px' }}
+              />
+
+              {/* Send button */}
+              <button
+                onClick={() => sendMessage()}
+                disabled={!input.trim() || isLoading}
+                className={`
+                  flex-shrink-0 p-2.5 rounded-xl font-bold transition-all
+                  disabled:opacity-35 disabled:cursor-not-allowed active:scale-95
+                  ${tc.primary}
+                `}
+                title="Send"
+              >
+                <Send size={17} />
+              </button>
             </div>
           </div>
         )}
-      </div>
+      </main>
 
-      {/* RIGHT SIDEBAR - Fixed height, independent scroll */}
+      {/* ════════════════════════════════════════════════════════════════════
+          RIGHT SIDEBAR — SETTINGS
+      ════════════════════════════════════════════════════════════════════ */}
       {showSettings && (
-        <div className="w-80 border-l border-primary/20 bg-black/20 flex flex-col h-screen overflow-hidden z-10">
-          
-          {/* Profile Card - Fixed */}
+        <aside
+          className={`
+            flex-shrink-0 border-l ${tc.aside}
+            flex flex-col h-screen overflow-hidden z-20
+            w-[17rem] md:w-72
+          `}
+          aria-label="Settings panel"
+        >
+          {/* Profile card — fixed at top */}
           <div className="flex-shrink-0">
             <ProfileCard
-              avatarPath={getAvatarImage()}
+              avatarPath={avatarSrc}
               mood={currentMood}
               isCreatorMode={isCreatorMode}
-              animationsEnabled={animationsEnabled}
+              animationsEnabled={animations}
             />
           </div>
 
-          {/* Settings Header - Fixed */}
-          <div className="flex-shrink-0 p-4 border-b border-primary/20">
-            <h2 className="text-lg font-bold">⚙️ Settings</h2>
+          {/* Settings header */}
+          <div className={`flex-shrink-0 px-4 py-2.5 border-b ${tc.aside}`}>
+            <h2 className={`font-bold text-sm ${tc.sectionH}`}>⚙️ Settings</h2>
           </div>
 
-          {/* Settings Content - Scrollable */}
-          <div className="flex-1 overflow-y-auto settings-scroll p-4 space-y-4">
-            
-            <div className="settings-section">
-              <h3>🎨 Appearance</h3>
+          {/* Scrollable settings body */}
+          <div className="flex-1 overflow-y-auto settings-scroll px-3 py-3 space-y-3">
+
+            {/* ── Theme ────────────────────────────────────────────── */}
+            <section className="settings-section">
+              <h3>{theme === 'dark' ? '🌙' : '☀️'} Theme</h3>
+              <div className="flex rounded-lg overflow-hidden border border-white/10 mt-2">
+                {(['dark','light'] as Theme[]).map(t => (
+                  <button
+                    key={t}
+                    onClick={() => setTheme(t)}
+                    className={`
+                      flex-1 py-1.5 text-xs font-medium capitalize transition-all
+                      ${theme === t
+                        ? `${isCreatorMode ? 'bg-pink-500' : 'bg-cyan-500'} text-white`
+                        : 'hover:bg-white/8'
+                      }
+                    `}
+                  >
+                    {t === 'dark' ? '🌙 Dark' : '☀️ Light'}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {/* ── Avatar ───────────────────────────────────────────── */}
+            <section className="settings-section">
+              <h3>🎨 Avatar</h3>
               <button
-                onClick={() => setShowAvatarSelector(true)}
-                className="w-full px-3 py-2 bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500 rounded text-sm font-bold mt-2"
+                onClick={() => setShowAvatarModal(true)}
+                className={`w-full py-1.5 rounded-lg text-xs font-semibold mt-2 transition-all ${tc.soft}`}
               >
-                Choose Avatar
+                Choose Preset
               </button>
-              <label className="flex items-center justify-between mt-3 cursor-pointer text-sm">
-                <span>Animations</span>
-                <input type="checkbox" checked={animationsEnabled} onChange={(e) => setAnimationsEnabled(e.target.checked)} className="w-5 h-5" />
-              </label>
-            </div>
+            </section>
 
-            <div className="settings-section">
+            {/* ── Audio ────────────────────────────────────────────── */}
+            <section className="settings-section">
               <h3>🔊 Audio</h3>
-              <label className="flex items-center justify-between mb-2 cursor-pointer text-sm">
-                <span>Voice Output</span>
-                <input type="checkbox" checked={voiceOutput} onChange={(e) => setVoiceOutput(e.target.checked)} className="w-5 h-5" />
-              </label>
-              <label className="flex items-center justify-between cursor-pointer text-sm">
-                <span>Sound Effects</span>
-                <input type="checkbox" checked={soundEffects} onChange={(e) => setSoundEffects(e.target.checked)} className="w-5 h-5" />
-              </label>
-            </div>
+              <div className="space-y-2 mt-1">
+                {([
+                  { label: 'Voice Output (female)', val: voiceOutput, set: setVoiceOutput },
+                  { label: 'Sound Effects',         val: sfx,         set: setSfx         },
+                ] as const).map(({ label, val, set }) => (
+                  <label key={label} className="flex items-center justify-between cursor-pointer text-xs">
+                    <span>{label}</span>
+                    <input
+                      type="checkbox"
+                      checked={val}
+                      onChange={e => (set as (v: boolean) => void)(e.target.checked)}
+                      className="w-3.5 h-3.5 accent-pink-500"
+                    />
+                  </label>
+                ))}
+              </div>
+            </section>
 
-            <div className="settings-section">
+            {/* ── Chat ─────────────────────────────────────────────── */}
+            <section className="settings-section">
               <h3>💬 Chat</h3>
-              <label className="block mb-3">
-                <span className="text-sm block mb-2">Response Length</span>
-                <select value={responseLength} onChange={(e) => setResponseLength(e.target.value as any)} className="w-full px-3 py-2 bg-black/30 border border-primary/30 rounded text-sm">
-                  <option value="short">Short</option>
-                  <option value="medium">Medium</option>
-                  <option value="long">Long</option>
-                </select>
-              </label>
-              <label className="flex items-center justify-between cursor-pointer text-sm">
-                <span>Auto Search</span>
-                <input type="checkbox" checked={autoSearch} onChange={(e) => setAutoSearch(e.target.checked)} className="w-5 h-5" />
-              </label>
-            </div>
+              <div className="space-y-3 mt-1">
 
-            <div className="settings-section">
+                {/* Response length */}
+                <div>
+                  <p className="text-xs mb-1.5">Response Length</p>
+                  <div className="flex rounded-lg overflow-hidden border border-white/10">
+                    {(['short','medium','long'] as ResponseLength[]).map(l => (
+                      <button
+                        key={l}
+                        onClick={() => setResponseLength(l)}
+                        className={`
+                          flex-1 py-1.5 text-xs capitalize transition-all
+                          ${responseLength === l
+                            ? `${isCreatorMode ? 'bg-pink-500' : 'bg-cyan-500'} text-white`
+                            : 'hover:bg-white/8'
+                          }
+                        `}
+                      >
+                        {l}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <label className="flex items-center justify-between cursor-pointer text-xs">
+                  <span>Auto Web Search</span>
+                  <input
+                    type="checkbox"
+                    checked={autoSearch}
+                    onChange={e => setAutoSearch(e.target.checked)}
+                    className="w-3.5 h-3.5 accent-pink-500"
+                  />
+                </label>
+              </div>
+            </section>
+
+            {/* ── Visual ───────────────────────────────────────────── */}
+            <section className="settings-section">
+              <h3>✨ Visual</h3>
+              <label className="flex items-center justify-between cursor-pointer text-xs mt-1">
+                <span>Animations & Glows</span>
+                <input
+                  type="checkbox"
+                  checked={animations}
+                  onChange={e => setAnimations(e.target.checked)}
+                  className="w-3.5 h-3.5 accent-pink-500"
+                />
+              </label>
+            </section>
+
+            {/* ── Data ─────────────────────────────────────────────── */}
+            <section className="settings-section">
               <h3>💾 Data</h3>
-              <label className="flex items-center justify-between mb-2 cursor-pointer text-sm">
-                <span>Auto-save</span>
-                <input type="checkbox" checked={autoSave} onChange={(e) => setAutoSave(e.target.checked)} className="w-5 h-5" />
+              <label className="flex items-center justify-between cursor-pointer text-xs mt-1 mb-2">
+                <span>Auto-save Chats</span>
+                <input
+                  type="checkbox"
+                  checked={autoSave}
+                  onChange={e => setAutoSave(e.target.checked)}
+                  className="w-3.5 h-3.5 accent-pink-500"
+                />
               </label>
-              {isGuest && <p className="text-xs text-yellow-400">⚠️ Guest: Local storage</p>}
-              {user && !isGuest && <p className="text-xs text-green-400">✅ Cloud synced</p>}
-            </div>
+              <p className={`text-[10px] ${tc.sub}`}>
+                {user && !isGuest ? '☁️ Cloud synced to Supabase' : '📱 Stored locally on device'}
+              </p>
+            </section>
 
+            {/* ── Study timer (creator only) ────────────────────────── */}
             {isCreatorMode && (
-              <StudyTimer />
+              <section className="settings-section">
+                <h3>⏱️ Study Timer</h3>
+                <div className="mt-2">
+                  <StudyTimer />
+                </div>
+              </section>
             )}
 
-            {!isCreatorMode && (
-              <div className="settings-section bg-danger/10 border-danger/30">
-                <h3 className="text-danger">💝 Special</h3>
-                <button onClick={() => setShowSecretVerification(true)} className="w-full px-3 py-2 bg-danger/20 border border-danger rounded text-sm font-bold mt-2">
-                  🔓 Unlock
-                </button>
-              </div>
-            )}
-
+            {/* ── Smart planners (creator only) ─────────────────────── */}
             {isCreatorMode && (
-              <div className="settings-section bg-pink-500/10 border-pink-500/30">
-                <p className="text-sm text-center font-bold mb-2">💝 Creator Mode</p>
-                <button onClick={exitCreatorMode} className="w-full px-3 py-2 bg-pink-500/20 border border-pink-500 rounded text-sm">
-                  Exit
+              <section className="settings-section">
+                <h3>📋 Smart Planners</h3>
+                <button
+                  onClick={() => setShowPlanners(true)}
+                  className={`w-full py-1.5 rounded-lg text-xs font-semibold mt-2 transition-all ${tc.soft}`}
+                >
+                  Open Planners
                 </button>
-              </div>
+              </section>
             )}
+
+            {/* ── Unlock / Exit creator ─────────────────────────────── */}
+            {!isCreatorMode ? (
+              <section className="settings-section" style={{ borderColor: 'rgba(236,72,153,0.3)' }}>
+                <h3 className="text-pink-400">💝 Special Access</h3>
+                <button
+                  onClick={() => setShowSecretModal(true)}
+                  className="w-full py-1.5 rounded-lg border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 text-xs font-semibold mt-2 transition-all"
+                >
+                  🔓 Unlock Creator Mode
+                </button>
+              </section>
+            ) : (
+              <section className="settings-section" style={{ borderColor: 'rgba(236,72,153,0.3)' }}>
+                <h3 className="text-pink-400">💝 Creator Mode</h3>
+                <p className={`text-[10px] ${tc.sub} mb-2`}>Active — proactive mode on 🌸</p>
+                <button
+                  onClick={exitCreatorMode}
+                  className="w-full py-1.5 rounded-lg border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 text-xs transition-all"
+                >
+                  Exit Creator Mode
+                </button>
+              </section>
+            )}
+
           </div>
-        </div>
+        </aside>
       )}
 
-      {/* Modals */}
-      {showSecretVerification && (
+      {/* ════════════════════════════════════════════════════════════════════
+          MODALS
+      ════════════════════════════════════════════════════════════════════ */}
+
+      {/* Secret verification */}
+      {showSecretModal && (
         <SecretVerification
-          onSuccess={handleCreatorUnlock}
-          onClose={() => setShowSecretVerification(false)}
+          onSuccess={unlockCreatorMode}
+          onClose={() => setShowSecretModal(false)}
         />
       )}
 
-      {showAvatarSelector && (
+      {/* Avatar presets */}
+      {showAvatarModal && (
         <AvatarPresets
-          currentAvatar={customAvatar}
-          onAvatarChange={handleAvatarChange}
-          onClose={() => setShowAvatarSelector(false)}
+          currentAvatar={avatar}
+          onAvatarChange={path => {
+            setAvatar(path);
+            localStorage.setItem('tessa-avatar-preset', path);
+          }}
+          onClose={() => setShowAvatarModal(false)}
         />
       )}
+
+      {/* Smart planners hub */}
+      {showPlanners && (
+        <PlannerHub onClose={() => setShowPlanners(false)} />
+      )}
+
     </div>
   );
 }

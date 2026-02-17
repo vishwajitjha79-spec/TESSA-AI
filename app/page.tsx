@@ -21,7 +21,6 @@ import StudyTimer           from '@/components/StudyTimer';
 import PlannerHub           from '@/components/PlannerHub';
 import FlashcardGenerator   from '@/components/FlashcardGenerator';
 import ReportCard           from '@/components/ReportCard';
-import WaterTracker         from '@/components/WaterTracker';
 import StreakDashboard      from '@/components/StreakDashboard';
 import MessageRenderer      from '@/components/MessageRenderer';
 

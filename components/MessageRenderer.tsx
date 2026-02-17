@@ -9,6 +9,41 @@ interface MessageRendererProps {
   isCreatorMode?: boolean;
 }
 
+// ── KaTeX lazy loader ─────────────────────────────────────────────────────────
+let katexLoaded = false;
+let katexPromise: Promise<void> | null = null;
+
+function loadKaTeX(): Promise<void> {
+  if (katexLoaded) return Promise.resolve();
+  if (katexPromise) return katexPromise;
+
+  katexPromise = new Promise<void>((resolve, reject) => {
+    // Inject KaTeX CSS if not already present
+    if (!document.getElementById('katex-css')) {
+      const link   = document.createElement('link');
+      link.id      = 'katex-css';
+      link.rel     = 'stylesheet';
+      link.href    = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css';
+      document.head.appendChild(link);
+    }
+
+    // Inject KaTeX JS if not already present
+    if (!(window as any).katex) {
+      const script  = document.createElement('script');
+      script.src    = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js';
+      script.async  = true;
+      script.onload = () => { katexLoaded = true; resolve(); };
+      script.onerror = reject;
+      document.head.appendChild(script);
+    } else {
+      katexLoaded = true;
+      resolve();
+    }
+  });
+
+  return katexPromise;
+}
+
 // ── Typing animation ──────────────────────────────────────────────────────────
 function useTyping(text: string, enabled: boolean) {
   const [displayed, setDisplayed] = useState(enabled ? '' : text);
@@ -33,16 +68,17 @@ function useTyping(text: string, enabled: boolean) {
   return { displayed, done };
 }
 
+// ── Component ─────────────────────────────────────────────────────────────────
 export default function MessageRenderer({
   content,
-  className    = '',
-  animate      = false,
+  className     = '',
+  animate       = false,
   isCreatorMode = false,
 }: MessageRendererProps) {
-  const ref              = useRef<HTMLDivElement>(null);
+  const ref                 = useRef<HTMLDivElement>(null);
   const { displayed, done } = useTyping(content, animate);
-  const renderText       = animate ? displayed : content;
-  const cursorColor      = isCreatorMode ? '#ec4899' : '#22d3ee';
+  const renderText          = animate ? displayed : content;
+  const cursorColor         = isCreatorMode ? '#ec4899' : '#22d3ee';
 
   useEffect(() => {
     loadKaTeX().then(() => {
@@ -52,8 +88,12 @@ export default function MessageRenderer({
         const formula     = el.getAttribute('data-formula') ?? '';
         const displayMode = el.getAttribute('data-display') === 'true';
         try {
-          win.katex.render(formula, el as HTMLElement, { throwOnError: false, displayMode, output: 'html' });
-        } catch { /* keep raw */ }
+          win.katex.render(formula, el as HTMLElement, {
+            throwOnError: false,
+            displayMode,
+            output: 'html',
+          });
+        } catch { /* keep raw formula text */ }
       });
     }).catch(() => {});
   }, [renderText]);
@@ -64,22 +104,36 @@ export default function MessageRenderer({
     <div ref={ref} className={`leading-relaxed ${className}`}>
       {segments.map((seg, i) => {
         if (seg.type === 'text') {
-          return <span key={i} className="whitespace-pre-wrap">{seg.value}</span>;
+          return (
+            <span key={i} className="whitespace-pre-wrap">
+              {seg.value}
+            </span>
+          );
         }
         if (seg.type === 'block') {
           return (
-            <span key={i} data-formula={seg.value} data-display="true"
-              className="block text-center my-3 overflow-x-auto text-lg">
+            <span
+              key={i}
+              data-formula={seg.value}
+              data-display="true"
+              className="block text-center my-3 overflow-x-auto text-lg"
+            >
               {seg.value}
             </span>
           );
         }
         return (
-          <span key={i} data-formula={seg.value} data-display="false" className="inline-block mx-0.5">
+          <span
+            key={i}
+            data-formula={seg.value}
+            data-display="false"
+            className="inline-block mx-0.5"
+          >
             {seg.value}
           </span>
         );
       })}
+
       {animate && !done && (
         <span
           className="inline-block w-0.5 h-4 ml-0.5 align-middle rounded-full animate-pulse"
@@ -90,8 +144,7 @@ export default function MessageRenderer({
   );
 }
 
-// ── Parser ────────────────────────────────────────────────────────────────────
-
+// ── Formula parser ────────────────────────────────────────────────────────────
 interface Segment {
   type : 'text' | 'inline' | 'block';
   value: string;
@@ -99,13 +152,11 @@ interface Segment {
 
 function parseFormulas(text: string): Segment[] {
   const segments: Segment[] = [];
-  // Match $$...$$ (block) then $...$ (inline)
   const pattern = /\$\$([^$]+)\$\$|\$([^$\n]+)\$/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
   while ((match = pattern.exec(text)) !== null) {
-    // Text before match
     if (match.index > lastIndex) {
       segments.push({ type: 'text', value: text.slice(lastIndex, match.index) });
     }
@@ -117,7 +168,6 @@ function parseFormulas(text: string): Segment[] {
     lastIndex = match.index + match[0].length;
   }
 
-  // Remaining text
   if (lastIndex < text.length) {
     segments.push({ type: 'text', value: text.slice(lastIndex) });
   }

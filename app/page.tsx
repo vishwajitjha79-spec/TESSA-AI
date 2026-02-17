@@ -463,31 +463,6 @@ export default function Home() {
     // Parse user message for dashboard updates and get any extra reaction
     const sleepReaction = parseDashboardUpdates(text);
 
-    // ── Music command detection ──────────────────────────────────────────────
-    const musicCmd = parseMusicCommand(text);
-    if (musicCmd) {
-      const musicReply = getMusicResponse(musicCmd);
-
-      const userMsg: Message = {
-        id: uuidv4(), role: 'user', content: text, timestamp: new Date(),
-      };
-      const botMsg: Message = {
-        id: uuidv4(), role: 'assistant', content: musicReply, timestamp: new Date(), mood: 'playful',
-      };
-      setMessages(prev => [...prev, userMsg, botMsg]);
-      setInput('');
-      if (textareaRef.current) textareaRef.current.style.height = '48px';
-
-      if (musicCmd.type === 'play' || musicCmd.type === 'search') {
-        setSpotifyQuery(musicCmd.query);
-        setShowSpotify(true);
-      }
-      if (musicCmd.type === 'close') setShowSpotify(false);
-      if (sfx) playChime();
-      return;                        // ← skip normal API call
-    }
-    // ────────────────────────────────────────────────────────────────────────
-
     const userMsg: Message = {
       id        : uuidv4(),
       role      : 'user',
@@ -973,15 +948,6 @@ export default function Home() {
                 </button>
               )}
 
-              {/* Music player toggle — always visible */}
-              <button
-                onClick={() => setShowSpotify(p => !p)}
-                className={`p-1.5 rounded-lg transition-colors ${showSpotify ? 'bg-green-500/20 text-green-400' : 'hover:bg-white/10'}`}
-                title="Music Player"
-              >
-                🎵
-              </button>
-
               {/* Creator-only: Dashboard */}
               {isCreatorMode && (
                 <button
@@ -1028,17 +994,6 @@ export default function Home() {
             ) : (
               /* Chat view */
               <div className="space-y-3">
-
-                {/* Spotify player — floating above chat */}
-                {showSpotify && (
-                  <div className="flex justify-center mb-2">
-                    <SpotifyPlayer
-                      isCreatorMode={isCreatorMode}
-                      initialQuery={spotifyQuery}
-                      onClose={() => setShowSpotify(false)}
-                    />
-                  </div>
-                )}
 
                 {/* Empty state */}
                 {messages.length === 0 && (

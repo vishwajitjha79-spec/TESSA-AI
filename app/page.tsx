@@ -19,21 +19,30 @@ import NotesPanel           from '@/components/NotesPanel';
 import ProfileCard          from '@/components/ProfileCard';
 import StudyTimer           from '@/components/StudyTimer';
 import PlannerHub           from '@/components/PlannerHub';
-import SpotifyPlayer        from '@/components/SpotifyPlayer';
-import { parseMusicCommand, getMusicResponse } from '@/lib/music-commands';
+import FlashcardGenerator   from '@/components/FlashcardGenerator';
+import ReportCard           from '@/components/ReportCard';
+import WaterTracker         from '@/components/WaterTracker';
+import StreakDashboard      from '@/components/StreakDashboard';
+import MessageRenderer      from '@/components/MessageRenderer';
 
 // ─── Lib ──────────────────────────────────────────────────────────────────────
 import { supabase, getCurrentUser, signOut } from '@/lib/supabase';
-import { MOOD_DESCRIPTIONS, MOOD_AVATARS }   from '@/lib/mood';
+import { MOOD_DESCRIPTIONS }                 from '@/lib/mood';
 import { getRandomWelcomeMessage }           from '@/lib/profile';
 import { estimateCalories }                  from '@/lib/food-database';
 import {
-  shouldBeProactive,
-  getProactiveQuestion,
-  detectMealInResponse,
-  detectSleepInResponse,
-  getSleepReaction,
+  shouldBeProactive, getProactiveQuestion,
+  detectMealInResponse, detectSleepInResponse, getSleepReaction,
 } from '@/lib/proactive-tessa';
+import {
+  buildMemoryContext, extractMemoriesFromMessage, getAllMemories,
+  deleteMemory, clearAllMemories,
+} from '@/lib/memory';
+import {
+  getStreaks, incrementStreak, getStreakCelebration,
+  shouldNudgeWater, buildMorningBriefing,
+  shouldDeliverBriefing, markBriefingDelivered,
+} from '@/lib/streaks-water';
 
 // ─── Local types ──────────────────────────────────────────────────────────────
 type Theme          = 'dark' | 'light';
@@ -147,8 +156,10 @@ export default function Home() {
   const [showAvatarModal,      setShowAvatarModal]      = useState(false);
   const [showPlanners,         setShowPlanners]         = useState(false);
   const [notesExpanded,        setNotesExpanded]        = useState(true);
-  const [showSpotify,          setShowSpotify]          = useState(false);
-  const [spotifyQuery,         setSpotifyQuery]         = useState<string | undefined>(undefined);
+  const [showFlashcards,       setShowFlashcards]       = useState(false);
+  const [showReportCard,       setShowReportCard]       = useState(false);
+  const [typingEnabled,        setTypingEnabled]        = useState(true);
+  const [latestMsgId,          setLatestMsgId]          = useState<string | null>(null);
 
   // ── Settings values ────────────────────────────────────────────────────────
   const [theme,          setThemeState]  = useState<Theme>('dark');
@@ -212,6 +223,17 @@ export default function Home() {
     // Auth
     checkAuth();
     hydrateLocalConversations();
+
+    // Morning briefing — deliver once per day in creator mode
+    const checkBriefing = () => {
+      if (shouldDeliverBriefing()) {
+        const briefing = buildMorningBriefing();
+        markBriefingDelivered(briefing);
+        // Will be injected when creator mode is activated
+        localStorage.setItem('tessa-pending-briefing', briefing);
+      }
+    };
+    checkBriefing();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       const u = session?.user ?? null;
@@ -510,6 +532,33 @@ export default function Home() {
 
       setMessages(prev => [...prev, assistantMsg]);
       if (data.mood) setCurrentMood(data.mood as MoodType);
+      setLatestMsgId(assistantMsg.id);
+
+      // Extract memories from this exchange
+      extractMemoriesFromMessage(text, data.content).catch(() => {});
+
+      // Update streaks
+      const updatedStreaks = incrementStreak('study');
+      const celebration   = getStreakCelebration('study', updatedStreaks.study.current);
+      if (celebration) {
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            id: uuidv4(), role: 'assistant' as const,
+            content: `🎉 ${celebration}`, timestamp: new Date(), mood: 'loving' as MoodType,
+          }]);
+        }, 1500);
+      }
+
+      // Water nudge check
+      const waterNudge = shouldNudgeWater();
+      if (waterNudge && Math.random() < 0.4) {
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            id: uuidv4(), role: 'assistant' as const,
+            content: `💧 ${waterNudge}`, timestamp: new Date(), mood: 'caring' as MoodType,
+          }]);
+        }, 3000);
+      }
 
       if (voiceOutput) speakText(data.content);
       if (sfx)         playChime();
@@ -638,13 +687,25 @@ export default function Home() {
     setIsCreatorMode(true);
     setCurrentConvId(uuidv4());
     setCurrentMood('loving');
-    setMessages([{
-      id       : uuidv4(),
-      role     : 'assistant',
-      content  : getRandomWelcomeMessage(),
-      timestamp: new Date(),
-      mood     : 'loving',
-    }]);
+
+    const msgs: Message[] = [];
+
+    // Morning briefing if pending
+    const pendingBriefing = localStorage.getItem('tessa-pending-briefing');
+    if (pendingBriefing) {
+      msgs.push({
+        id: uuidv4(), role: 'assistant', content: pendingBriefing,
+        timestamp: new Date(), mood: 'caring',
+      });
+      localStorage.removeItem('tessa-pending-briefing');
+    } else {
+      msgs.push({
+        id: uuidv4(), role: 'assistant', content: getRandomWelcomeMessage(),
+        timestamp: new Date(), mood: 'loving',
+      });
+    }
+
+    setMessages(msgs);
     setShowSecretModal(false);
     setShowSettings(false);
     if (sfx) playChime();
@@ -1005,11 +1066,12 @@ export default function Home() {
                       ${msg.role === 'user' ? tc.msgU : tc.msgA}
                     `}
                   >
-                    <p className={`text-sm leading-relaxed whitespace-pre-wrap ${
-                      theme === 'light' ? 'text-slate-800' : 'text-gray-100'
-                    }`}>
-                      {msg.content}
-                    </p>
+                    <MessageRenderer
+                      content={msg.content}
+                      className={`text-sm ${theme === 'light' ? 'text-slate-800' : 'text-gray-100'}`}
+                      animate={typingEnabled && msg.role === 'assistant' && msg.id === latestMsgId}
+                      isCreatorMode={isCreatorMode}
+                    />
                     <p className={`text-[10px] mt-2 ${tc.sub}`}>
                       {msg.role === 'user' ? '👤 You' : '✨ T.E.S.S.A.'}
                       {' · '}
@@ -1267,8 +1329,65 @@ export default function Home() {
               </p>
             </section>
 
-            {/* ── Study timer (creator only) ────────────────────────── */}
+            {/* ── Typing animation ─────────────────────────────────── */}
+            <section className="settings-section">
+              <h3>⌨️ Typing</h3>
+              <label className="flex items-center justify-between cursor-pointer text-xs mt-1">
+                <span>Word-by-word animation</span>
+                <input type="checkbox" checked={typingEnabled}
+                  onChange={e => setTypingEnabled(e.target.checked)}
+                  className="w-3.5 h-3.5 accent-pink-500" />
+              </label>
+            </section>
+
+            {/* ── Water tracker ─────────────────────────────────────── */}
+            <section className="settings-section">
+              <h3>💧 Water Tracker</h3>
+              <div className="mt-2">
+                <WaterTracker isCreatorMode={isCreatorMode} />
+              </div>
+            </section>
+
+            {/* ── Streaks ───────────────────────────────────────────── */}
+            <section className="settings-section">
+              <h3>🔥 Streaks</h3>
+              <div className="mt-2">
+                <StreakDashboard isCreatorMode={isCreatorMode} />
+              </div>
+            </section>
+
+            {/* ── Flashcards & Report ───────────────────────────────── */}
             {isCreatorMode && (
+              <section className="settings-section">
+                <h3>📚 Study Tools</h3>
+                <div className="space-y-2 mt-2">
+                  <button onClick={() => setShowFlashcards(true)}
+                    className={`w-full py-1.5 rounded-lg text-xs font-semibold transition-all ${tc.soft}`}>
+                    ⚡ Flashcard Generator
+                  </button>
+                  <button onClick={() => setShowReportCard(true)}
+                    className={`w-full py-1.5 rounded-lg text-xs font-semibold transition-all ${tc.soft}`}>
+                    📊 Weekly Report Card
+                  </button>
+                </div>
+              </section>
+            )}
+
+            {/* ── Memory ───────────────────────────────────────────── */}
+            {isCreatorMode && (
+              <section className="settings-section">
+                <h3>🧠 Memory</h3>
+                <p className={`text-[10px] ${tc.sub} mb-2`}>
+                  {getAllMemories().length} facts remembered
+                </p>
+                <button
+                  onClick={() => { if (confirm('Clear all memories?')) clearAllMemories(); }}
+                  className="w-full py-1.5 rounded-lg text-xs border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all"
+                >
+                  Clear Memory
+                </button>
+              </section>
+            )}
               <section className="settings-section">
                 <h3>⏱️ Study Timer</h3>
                 <div className="mt-2">
@@ -1345,6 +1464,22 @@ export default function Home() {
       {/* Smart planners hub */}
       {showPlanners && (
         <PlannerHub onClose={() => setShowPlanners(false)} />
+      )}
+
+      {/* Flashcard generator */}
+      {showFlashcards && (
+        <FlashcardGenerator
+          isCreatorMode={isCreatorMode}
+          onClose={() => setShowFlashcards(false)}
+        />
+      )}
+
+      {/* Weekly report card */}
+      {showReportCard && (
+        <ReportCard
+          isCreatorMode={isCreatorMode}
+          onClose={() => setShowReportCard(false)}
+        />
       )}
 
     </div>

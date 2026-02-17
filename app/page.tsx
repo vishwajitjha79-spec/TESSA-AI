@@ -1388,6 +1388,9 @@ export default function Home() {
                 </button>
               </section>
             )}
+
+            {/* ── Study timer (creator only) ────────────────────────── */}
+            {isCreatorMode && (
               <section className="settings-section">
                 <h3>⏱️ Study Timer</h3>
                 <div className="mt-2">

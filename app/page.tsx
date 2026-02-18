@@ -12,6 +12,8 @@ import {
 import type { Message, MoodType, Conversation } from '@/types';
 
 // ─── Components ───────────────────────────────────────────────────────────────
+import { Paperclip, ChevronRight } from 'lucide-react';
+import TessaInsights      from '@/components/TessaInsights';
 import SecretVerification from '@/components/SecretVerification';
 import PersonalDashboard  from '@/components/PersonalDashboard';
 import AvatarPresets      from '@/components/AvatarPresets';
@@ -68,125 +70,169 @@ const VALID_MOODS: MoodType[] = [
 
 // ─── Theme tokens ─────────────────────────────────────────────────────────────
 const TC = {
+  // COMPLETE THEME CONFIGURATION - Replace TC constant in page.tsx
+
+const TC = {
   dark: {
+    // Standard mode
     root    : 'bg-gradient-to-br from-[#0a0e27] via-[#141830] to-[#0d1020]',
-    rootC   : 'bg-gradient-to-br from-[#1a0a20] via-[#220a30] to-[#1a0820]',
     aside   : 'bg-black/25 border-white/8',
     header  : 'bg-black/30 border-white/8 backdrop-blur-xl',
-    headerC : 'bg-pink-950/20 border-pink-500/15 backdrop-blur-xl',
     card    : 'bg-white/4 border-white/8',
     body    : 'text-white',
     sub     : 'text-gray-400',
     msgU    : 'bg-[#0d1a2e] border-l-4 border-cyan-500',
-    msgUC   : 'bg-[#1f0a28] border-l-4 border-pink-500',
     msgA    : 'bg-[#0a1520] border-l-4 border-violet-500',
-    msgAC   : 'bg-[#130a20] border-l-4 border-purple-500',
     input   : 'bg-white/5 border-white/15 text-white placeholder:text-white/30 focus:border-cyan-400/60',
-    inputC  : 'bg-pink-950/30 border-pink-500/25 text-white placeholder:text-pink-300/40 focus:border-pink-400/70',
     btnP    : 'bg-cyan-500 hover:bg-cyan-400 text-white',
-    btnPC   : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400 text-white',
     btnS    : 'border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300',
-    btnSC   : 'border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300',
     sH      : 'text-cyan-400',
-    sHC     : 'text-pink-400',
     accent  : 'text-cyan-400',
+    
+    // Creator mode variant
+    rootC   : 'bg-gradient-to-br from-[#1a0a20] via-[#220a30] to-[#1a0820]',
+    headerC : 'bg-pink-950/20 border-pink-500/15 backdrop-blur-xl',
+    msgUC   : 'bg-[#1f0a28] border-l-4 border-pink-500',
+    msgAC   : 'bg-[#130a20] border-l-4 border-purple-500',
+    inputC  : 'bg-pink-950/30 border-pink-500/25 text-white placeholder:text-pink-300/40 focus:border-pink-400/70',
+    btnPC   : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400 text-white',
+    btnSC   : 'border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300',
+    sHC     : 'text-pink-400',
     accentC : 'text-pink-400',
   },
+
   light: {
+    // Standard mode
     root    : 'bg-gradient-to-br from-slate-50 via-white to-blue-50/30',
-    rootC   : 'bg-gradient-to-br from-pink-50 via-white to-purple-50/30',
     aside   : 'bg-white border-slate-200',
     header  : 'bg-white/90 border-slate-200 backdrop-blur-xl shadow-sm',
-    headerC : 'bg-pink-50/90 border-pink-200 backdrop-blur-xl shadow-sm',
     card    : 'bg-slate-50 border-slate-200',
     body    : 'text-slate-800',
     sub     : 'text-slate-500',
     msgU    : 'bg-cyan-50 border-l-4 border-cyan-500',
-    msgUC   : 'bg-pink-50 border-l-4 border-pink-400',
     msgA    : 'bg-indigo-50/70 border-l-4 border-violet-400',
-    msgAC   : 'bg-purple-50/70 border-l-4 border-purple-400',
     input   : 'bg-white border-slate-300 text-slate-800 placeholder:text-slate-400 focus:border-cyan-400',
-    inputC  : 'bg-white border-pink-300 text-slate-800 placeholder:text-pink-300 focus:border-pink-400',
     btnP    : 'bg-cyan-500 hover:bg-cyan-600 text-white',
-    btnPC   : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white',
     btnS    : 'border border-cyan-500/50 bg-cyan-50 hover:bg-cyan-100 text-cyan-700',
-    btnSC   : 'border border-pink-500/50 bg-pink-50 hover:bg-pink-100 text-pink-700',
     sH      : 'text-cyan-600',
-    sHC     : 'text-pink-500',
     accent  : 'text-cyan-600',
+    
+    // Creator mode variant
+    rootC   : 'bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50/30',
+    headerC : 'bg-gradient-to-r from-pink-100/60 to-purple-100/60 border-pink-300/60 backdrop-blur-xl shadow-sm',
+    msgUC   : 'bg-pink-50 border-l-4 border-pink-400',
+    msgAC   : 'bg-purple-50/70 border-l-4 border-purple-400',
+    inputC  : 'bg-white border-pink-300 text-slate-800 placeholder:text-pink-300 focus:border-pink-400',
+    btnPC   : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white',
+    btnSC   : 'border border-pink-500/50 bg-pink-50 hover:bg-pink-100 text-pink-700',
+    sHC     : 'text-pink-500',
     accentC : 'text-pink-500',
   },
+
   cyberpunk: {
+    // Standard mode
     root    : 'bg-gradient-to-br from-[#0a0014] via-[#1a0028] to-[#0f001f]',
-    rootC   : 'bg-gradient-to-br from-[#1a0a20] via-[#220a30] to-[#1a0820]',
     aside   : 'bg-black/40 border-purple-500/20',
     header  : 'bg-black/50 border-purple-500/20 backdrop-blur-xl',
-    headerC : 'bg-pink-950/20 border-pink-500/15 backdrop-blur-xl',
     card    : 'bg-purple-950/20 border-purple-500/20',
     body    : 'text-purple-100',
     sub     : 'text-purple-300',
     msgU    : 'bg-[#1a0030] border-l-4 border-purple-400',
-    msgUC   : 'bg-[#1f0a28] border-l-4 border-pink-500',
     msgA    : 'bg-[#0f0025] border-l-4 border-cyan-400',
-    msgAC   : 'bg-[#130a20] border-l-4 border-purple-500',
     input   : 'bg-black/40 border-purple-500/30 text-purple-100 placeholder:text-purple-300/40 focus:border-purple-400/70',
-    inputC  : 'bg-pink-950/30 border-pink-500/25 text-white placeholder:text-pink-300/40 focus:border-pink-400/70',
     btnP    : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white',
-    btnPC   : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400 text-white',
     btnS    : 'border border-purple-500/50 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300',
-    btnSC   : 'border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300',
     sH      : 'text-purple-400',
-    sHC     : 'text-pink-400',
     accent  : 'text-purple-400',
+    
+    // Creator mode variant (intense pink/purple)
+    rootC   : 'bg-gradient-to-br from-[#1f0a28] via-[#2d0a3d] to-[#1f0a28]',
+    headerC : 'bg-gradient-to-r from-pink-900/40 to-purple-900/40 border-pink-500/30 backdrop-blur-xl',
+    msgUC   : 'bg-[#2d1040] border-l-4 border-pink-500',
+    msgAC   : 'bg-[#1f0838] border-l-4 border-purple-400',
+    inputC  : 'bg-pink-950/30 border-pink-500/40 text-pink-50 placeholder:text-pink-300/40 focus:border-pink-400/70',
+    btnPC   : 'bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white',
+    btnSC   : 'border border-pink-500/50 bg-pink-500/15 hover:bg-pink-500/25 text-pink-300',
+    sHC     : 'text-pink-400',
     accentC : 'text-pink-400',
   },
+
   ocean: {
+    // Standard mode
     root    : 'bg-gradient-to-br from-[#001a33] via-[#002244] to-[#001428]',
-    rootC   : 'bg-gradient-to-br from-[#1a0a20] via-[#220a30] to-[#1a0820]',
     aside   : 'bg-black/30 border-blue-500/20',
     header  : 'bg-black/40 border-blue-500/20 backdrop-blur-xl',
-    headerC : 'bg-pink-950/20 border-pink-500/15 backdrop-blur-xl',
     card    : 'bg-blue-950/20 border-blue-500/20',
     body    : 'text-blue-50',
     sub     : 'text-blue-300',
     msgU    : 'bg-[#002850] border-l-4 border-teal-400',
-    msgUC   : 'bg-[#1f0a28] border-l-4 border-pink-500',
     msgA    : 'bg-[#001f40] border-l-4 border-blue-400',
-    msgAC   : 'bg-[#130a20] border-l-4 border-purple-500',
     input   : 'bg-black/30 border-blue-500/30 text-blue-50 placeholder:text-blue-300/40 focus:border-teal-400/70',
-    inputC  : 'bg-pink-950/30 border-pink-500/25 text-white placeholder:text-pink-300/40 focus:border-pink-400/70',
     btnP    : 'bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-400 hover:to-blue-400 text-white',
-    btnPC   : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400 text-white',
     btnS    : 'border border-teal-500/50 bg-teal-500/10 hover:bg-teal-500/20 text-teal-300',
-    btnSC   : 'border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300',
     sH      : 'text-teal-400',
-    sHC     : 'text-pink-400',
     accent  : 'text-teal-400',
+    
+    // Creator mode variant (pink coral over ocean)
+    rootC   : 'bg-gradient-to-br from-[#1a122d] via-[#22183d] to-[#1a0f33]',
+    headerC : 'bg-gradient-to-r from-pink-900/25 to-blue-900/25 border-pink-500/25 backdrop-blur-xl',
+    msgUC   : 'bg-[#281838] border-l-4 border-pink-400',
+    msgAC   : 'bg-[#1a1030] border-l-4 border-purple-400',
+    inputC  : 'bg-pink-950/20 border-pink-500/30 text-pink-50 placeholder:text-pink-300/40 focus:border-pink-400/70',
+    btnPC   : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400 text-white',
+    btnSC   : 'border border-pink-500/50 bg-pink-500/12 hover:bg-pink-500/22 text-pink-300',
+    sHC     : 'text-pink-400',
     accentC : 'text-pink-400',
   },
+
   sunset: {
+    // Standard mode
     root    : 'bg-gradient-to-br from-[#2d1810] via-[#3d2418] to-[#251510]',
-    rootC   : 'bg-gradient-to-br from-[#1a0a20] via-[#220a30] to-[#1a0820]',
     aside   : 'bg-black/30 border-orange-500/20',
     header  : 'bg-black/40 border-orange-500/20 backdrop-blur-xl',
-    headerC : 'bg-pink-950/20 border-pink-500/15 backdrop-blur-xl',
     card    : 'bg-orange-950/20 border-orange-500/20',
     body    : 'text-orange-50',
     sub     : 'text-orange-300',
     msgU    : 'bg-[#3d2010] border-l-4 border-orange-400',
-    msgUC   : 'bg-[#1f0a28] border-l-4 border-pink-500',
     msgA    : 'bg-[#2d1808] border-l-4 border-amber-400',
-    msgAC   : 'bg-[#130a20] border-l-4 border-purple-500',
     input   : 'bg-black/30 border-orange-500/30 text-orange-50 placeholder:text-orange-300/40 focus:border-amber-400/70',
-    inputC  : 'bg-pink-950/30 border-pink-500/25 text-white placeholder:text-pink-300/40 focus:border-pink-400/70',
     btnP    : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 text-white',
-    btnPC   : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400 text-white',
     btnS    : 'border border-orange-500/50 bg-orange-500/10 hover:bg-orange-500/20 text-orange-300',
-    btnSC   : 'border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300',
     sH      : 'text-orange-400',
-    sHC     : 'text-pink-400',
     accent  : 'text-orange-400',
+    
+    // Creator mode variant (more pink/red warmth)
+    rootC   : 'bg-gradient-to-br from-[#3d1820] via-[#4d2428] to-[#351518]',
+    headerC : 'bg-gradient-to-r from-pink-900/35 to-red-900/35 border-pink-500/30 backdrop-blur-xl',
+    msgUC   : 'bg-[#4d2030] border-l-4 border-pink-400',
+    msgAC   : 'bg-[#351820] border-l-4 border-rose-400',
+    inputC  : 'bg-pink-950/25 border-pink-500/35 text-pink-50 placeholder:text-pink-300/40 focus:border-pink-400/70',
+    btnPC   : 'bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-400 hover:to-red-400 text-white',
+    btnSC   : 'border border-pink-500/50 bg-pink-500/12 hover:bg-pink-500/22 text-pink-300',
+    sHC     : 'text-pink-400',
     accentC : 'text-pink-400',
+  },
+} as const;
+
+// UPDATED useTc function to properly use creator variants
+function useTc(theme: Theme, creator: boolean) {
+  const b = TC[theme];
+  return {
+    root    : creator ? (b.rootC || b.root) : b.root,
+    aside   : b.aside,
+    header  : creator ? (b.headerC || b.header) : b.header,
+    card    : b.card,
+    body    : b.body,
+    sub     : b.sub,
+    msgU    : creator ? (b.msgUC || b.msgU) : b.msgU,
+    msgA    : creator ? (b.msgAC || b.msgA) : b.msgA,
+    input   : creator ? (b.inputC || b.input) : b.input,
+    primary : creator ? (b.btnPC || b.btnP) : b.btnP,
+    soft    : creator ? (b.btnSC || b.btnS) : b.btnS,
+    sH      : creator ? (b.sHC || b.sH) : b.sH,
+    accent  : creator ? (b.accentC || b.accent) : b.accent,
+  };
+}
   },
 } as const;
 

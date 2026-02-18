@@ -226,3 +226,89 @@ export function getStreakCelebration(): string | null {
 export function shouldNudgeWater(): string | null {
   return shouldAskAboutWater();
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MORNING BRIEFING (kept for compatibility)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export interface BriefingData {
+  date      : string;
+  delivered : boolean;
+  content   : string;
+}
+
+export function shouldDeliverBriefing(): boolean {
+  try {
+    const raw = localStorage.getItem('tessa-briefing');
+    if (!raw) return true;
+    const data = JSON.parse(raw) as BriefingData;
+    return data.date !== today() || !data.delivered;
+  } catch {
+    return true;
+  }
+}
+
+export function markBriefingDelivered(content: string): void {
+  localStorage.setItem('tessa-briefing', JSON.stringify({
+    date     : today(),
+    delivered: true,
+    content,
+  }));
+}
+
+export function buildMorningBriefing(): string {
+  const hour    = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
+  const wellness = getDailyWellness();
+
+  let exams: any[] = [];
+  try { exams = JSON.parse(localStorage.getItem('tessa-exams') ?? '[]'); } catch {}
+
+  const upcomingExams = exams
+    .filter((e: any) => !e.completed)
+    .map((e: any) => {
+      const days = Math.ceil((new Date(e.date).getTime() - Date.now()) / 86400000);
+      return { ...e, days };
+    })
+    .filter((e: any) => e.days >= 0 && e.days <= 30)
+    .sort((a: any, b: any) => a.days - b.days)
+    .slice(0, 3);
+
+  const lines: string[] = [];
+
+  lines.push(`${greeting}, Ankit! 💝 Here's your daily briefing:\n`);
+
+  if (upcomingExams.length > 0) {
+    lines.push('📚 **Upcoming Exams:**');
+    for (const e of upcomingExams) {
+      const urgency = e.days === 0 ? '🔴 TODAY!' : e.days <= 3 ? '🟠' : '🟢';
+      lines.push(`  ${urgency} ${e.subject} — ${e.days === 0 ? 'TODAY' : `${e.days} day${e.days === 1 ? '' : 's'}`}`);
+    }
+    lines.push('');
+  }
+
+  lines.push(`💧 **Water:** ${wellness.water}/${wellness.waterGoal} glasses — ${
+    wellness.water === 0 ? "haven't started yet!" :
+    wellness.water >= wellness.waterGoal ? 'goal met! 🎉' :
+    `${wellness.waterGoal - wellness.water} to go`
+  }`);
+
+  const completed = [
+    wellness.breakfast, wellness.lunch, wellness.snacks, wellness.dinner, wellness.study
+  ].filter(Boolean).length;
+
+  if (completed > 0) {
+    lines.push(`\n✨ **Daily Progress:** ${completed}/6 tasks complete`);
+  }
+
+  const closers = [
+    "\nYou've got this today! I believe in you 💪",
+    "\nMake today count — I'm cheering for you! 🌟",
+    "\nLet's have an amazing day! I'm right here with you 💕",
+    "\nSmall steps every day — you're doing great! ✨",
+  ];
+  lines.push(closers[Math.floor(Math.random() * closers.length)]);
+
+  return lines.join('\n');
+}

@@ -6,17 +6,17 @@ import { getDailyWellness, type WellnessData } from '@/lib/streaks-water';
 
 interface DailyWellnessProps {
   isCreatorMode: boolean;
+  refreshTrigger?: number; // NEW: triggers re-render when wellness data changes
 }
 
-export default function DailyWellness({ isCreatorMode }: DailyWellnessProps) {
+export default function DailyWellness({ isCreatorMode, refreshTrigger }: DailyWellnessProps) {
   const [wellness, setWellness] = useState<WellnessData | null>(null);
 
   useEffect(() => {
     setWellness(getDailyWellness());
-    // Refresh every minute to update time windows
     const interval = setInterval(() => setWellness(getDailyWellness()), 60_000);
     return () => clearInterval(interval);
-  }, []);
+  }, [refreshTrigger]); // Re-fetch when refreshTrigger changes
 
   if (!wellness) return null;
 
@@ -97,7 +97,7 @@ export default function DailyWellness({ isCreatorMode }: DailyWellnessProps) {
         </div>
       )}
 
-      {/* Motivational message */}
+      {/* Perfect day message */}
       {completed === items.length && (
         <div className={`p-2.5 rounded-lg border text-center ${accentBg}`}>
           <p className={`text-xs font-semibold ${accent}`}>

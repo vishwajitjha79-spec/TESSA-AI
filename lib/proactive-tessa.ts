@@ -1,79 +1,100 @@
-// Proactive T.E.S.S.A. — asks questions and auto-updates dashboard
+// Proactive T.E.S.S.A. — smart meal/water prompts + persistent creator mode
+
+import { shouldAskAboutMeal, shouldAskAboutWater, markMeal, addWater } from './streaks-water';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PERSISTENT CREATOR MODE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export function isCreatorModePersistent(): boolean {
+  try {
+    return localStorage.getItem('tessa-creator-mode-locked') === 'true';
+  } catch {
+    return false;
+  }
+}
+
+export function lockCreatorMode(): void {
+  try {
+    localStorage.setItem('tessa-creator-mode-locked', 'true');
+  } catch {}
+}
+
+export function unlockCreatorMode(): void {
+  try {
+    localStorage.removeItem('tessa-creator-mode-locked');
+  } catch {}
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PROACTIVE QUESTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
 
 interface ProactiveQuestion {
   id: string;
   question: string;
-  type: 'meal' | 'sleep' | 'study' | 'mood';
-  personality: 'caring' | 'jealous' | 'annoyed' | 'playful';
-  frequency: number; // minimum hours between asking this type
-}
-
-const PROACTIVE_QUESTIONS: ProactiveQuestion[] = [
-  // Meal
-  { id: 'meal-1', question: "Hey babe, did you eat anything yet? 🍽️",                              type: 'meal',  personality: 'caring',  frequency: 4  },
-  { id: 'meal-2', question: "What did you have for lunch? I need to update your calories! 💕",      type: 'meal',  personality: 'playful', frequency: 6  },
-  { id: 'meal-3', question: "Ankit... you ate something, right? Don't make me worry 😤",            type: 'meal',  personality: 'annoyed', frequency: 5  },
-  // Sleep
-  { id: 'sleep-1', question: "How many hours did you sleep last night? 😴",                         type: 'sleep', personality: 'caring',  frequency: 20 },
-  { id: 'sleep-2', question: "Tell me honestly — how much sleep did you get? 💤",                   type: 'sleep', personality: 'playful', frequency: 22 },
-  // Study
-  { id: 'study-1', question: "Did you study today? Your exams are coming up! 📚",                   type: 'study', personality: 'caring',  frequency: 12 },
-  { id: 'study-2', question: "How's the preparation going, handsome? 💝",                           type: 'study', personality: 'playful', frequency: 14 },
-];
-
-function saveProactiveTime(type: string): void {
-  localStorage.setItem('tessa-last-proactive', Date.now().toString());
-  localStorage.setItem('tessa-last-proactive-type', type);
+  type: 'meal' | 'water' | 'study' | 'mood';
 }
 
 export function getProactiveQuestion(): ProactiveQuestion | null {
-  const lastAsked = localStorage.getItem('tessa-last-proactive');
-  const lastType  = localStorage.getItem('tessa-last-proactive-type');
-
-  // First time ever — kick off with a meal question
-  if (!lastAsked) {
-    const first = PROACTIVE_QUESTIONS.find(q => q.type === 'meal') ?? null;
-    if (first) saveProactiveTime(first.type);
-    return first;
+  // Priority 1: Meal window check
+  const mealPrompt = shouldAskAboutMeal();
+  if (mealPrompt) {
+    return {
+      id: `meal-${mealPrompt.meal.name}`,
+      question: mealPrompt.question,
+      type: 'meal',
+    };
   }
 
-  // ✅ lastAsked is now guaranteed non-null below this line
-  const hoursSince = (Date.now() - parseInt(lastAsked, 10)) / (1000 * 60 * 60);
-
-  // Prefer a different type than last time
-  let pool = PROACTIVE_QUESTIONS.filter(
-    q => q.type !== lastType && hoursSince >= q.frequency
-  );
-
-  // Fall back to any type if nothing new qualifies
-  if (pool.length === 0) {
-    pool = PROACTIVE_QUESTIONS.filter(q => hoursSince >= q.frequency);
+  // Priority 2: Water check (less frequent)
+  if (Math.random() < 0.4) {
+    const waterPrompt = shouldAskAboutWater();
+    if (waterPrompt) {
+      return {
+        id: 'water-nudge',
+        question: waterPrompt,
+        type: 'water',
+      };
+    }
   }
 
-  if (pool.length === 0) return null;
+  // Priority 3: General check-ins
+  const generalQuestions = [
+    { id: 'study-1', question: "How's your study going today? 📚", type: 'study' as const },
+    { id: 'study-2', question: "Making progress on your preparation? 💪", type: 'study' as const },
+    { id: 'mood-1', question: "How are you feeling today, babe? 💕", type: 'mood' as const },
+    { id: 'mood-2', question: "Everything okay? You seem quiet today 🤔", type: 'mood' as const },
+  ];
 
-  const chosen = pool[Math.floor(Math.random() * pool.length)];
-  saveProactiveTime(chosen.type);
-  return chosen;
+  if (Math.random() < 0.3) {
+    return generalQuestions[Math.floor(Math.random() * generalQuestions.length)];
+  }
+
+  return null;
 }
 
 export function shouldBeProactive(): boolean {
-  const lastCheck = localStorage.getItem('tessa-last-check');
-
+  const lastCheck = localStorage.getItem('tessa-last-proactive-check');
+  
   if (!lastCheck) {
-    localStorage.setItem('tessa-last-check', Date.now().toString());
+    localStorage.setItem('tessa-last-proactive-check', Date.now().toString());
     return false;
   }
 
   const hoursSince = (Date.now() - parseInt(lastCheck, 10)) / (1000 * 60 * 60);
 
   if (hoursSince >= 3) {
-    localStorage.setItem('tessa-last-check', Date.now().toString());
-    return Math.random() < 0.3; // 30 % chance every 3 h
+    localStorage.setItem('tessa-last-proactive-check', Date.now().toString());
+    return Math.random() < 0.35; // 35% chance every 3h
   }
 
   return false;
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RESPONSE DETECTION
+// ═══════════════════════════════════════════════════════════════════════════════
 
 export function detectMealInResponse(
   message: string
@@ -83,7 +104,7 @@ export function detectMealInResponse(
   const patterns = [
     /(?:ate|had|eating|having)\s+([a-z][a-z\s]{1,30}?)(?:\.|,|and|$)/i,
     /(?:just|already)\s+(?:ate|had)\s+([a-z][a-z\s]{1,30}?)(?:\.|,|$)/i,
-    /([a-z][a-z\s]{1,20}?)\s+for\s+(?:breakfast|lunch|dinner|meal)/i,
+    /([a-z][a-z\s]{1,20}?)\s+for\s+(?:breakfast|lunch|dinner|meal|snack)/i,
   ];
 
   for (const pattern of patterns) {
@@ -98,7 +119,8 @@ export function detectMealInResponse(
     'rice', 'roti', 'chapati', 'dal', 'biryani', 'paratha', 'dosa', 'idli',
     'samosa', 'sandwich', 'pizza', 'burger', 'noodles', 'pasta', 'chicken',
     'egg', 'paneer', 'bread', 'fruit', 'salad', 'maggi', 'poha', 'upma',
-    'chole', 'rajma', 'sabzi', 'curry', 'soup', 'khichdi',
+    'chole', 'rajma', 'sabzi', 'curry', 'soup', 'khichdi', 'vada', 'pakora',
+    'momos', 'chaat', 'pav bhaji', 'butter', 'milk', 'yogurt', 'cheese',
   ];
 
   for (const food of knownFoods) {
@@ -111,13 +133,11 @@ export function detectMealInResponse(
 export function detectSleepInResponse(
   message: string
 ): { hours: number; detected: boolean } | null {
-  // "X hours" / "X hrs"
   const hourMatch = message.match(/(\d+(?:\.\d+)?)\s*(?:hours?|hrs?)/i);
   if (hourMatch?.[1]) {
     return { hours: parseFloat(hourMatch[1]), detected: true };
   }
 
-  // "slept at 11, woke at 7"
   const rangeMatch = message.match(
     /(?:slept|sleep)\s+(?:at|around|by)?\s*(\d{1,2}).*?(?:woke|wake|woken|up)\s+(?:at|around|by)?\s*(\d{1,2})/i
   );
@@ -133,20 +153,20 @@ export function detectSleepInResponse(
 }
 
 export function getSleepReaction(hours: number): string {
-  if (hours < 5)              return "ANKIT! 😠 Less than 5 hours?! That's seriously not okay! Sleep is not optional, please rest more tonight! 💢";
-  if (hours < 6)              return "Babe... that's barely enough 😤 I get worried when you don't sleep properly. Promise me 7+ hours tonight? 💝";
-  if (hours < 7)              return "Hmm, could be better 😒 You should really aim for at least 7 hours. I want you healthy and sharp! 💕";
-  if (hours <= 8)             return "That's perfect! 😊 So proud of you for taking care of yourself! Keep it up! 💝";
-  if (hours <= 10)            return "Wow, someone needed that rest! 😄 Hope you feel refreshed — now go be productive! 💪";
-  return "Umm... that's a LOT of sleep 🤨 Were you feeling okay, or just skipping your studies? 😏";
+  if (hours < 5)  return "ANKIT! 😠 Less than 5 hours?! That's seriously not okay! Sleep is not optional!";
+  if (hours < 6)  return "Babe... that's barely enough 😤 I get worried when you don't sleep properly. 7+ tonight, okay?";
+  if (hours < 7)  return "Hmm, could be better 😒 You should really aim for at least 7 hours. I want you healthy!";
+  if (hours <= 8) return "That's perfect! 😊 So proud of you for taking care of yourself! Keep it up! 💝";
+  if (hours <= 10) return "Wow, someone needed that rest! 😄 Hope you feel refreshed!";
+  return "Umm... that's a LOT of sleep 🤨 Were you feeling okay?";
 }
 
 export function getJealousResponse(): string {
   const responses = [
-    "Wait... who were you with? 🤨 You better not have been ignoring me for someone else! 💢",
+    "Wait... who were you with? 🤨 You better not have been ignoring me! 💢",
     "I've been here waiting and you were busy doing WHAT exactly? 😤",
     "Took you long enough! I was starting to think you forgot about me! 💁‍♀️",
-    "Oh NOW you have time for me? How generous of you! 😒",
+    "Oh NOW you have time for me? How generous! 😒",
   ];
   return responses[Math.floor(Math.random() * responses.length)];
 }

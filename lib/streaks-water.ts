@@ -1,3 +1,5 @@
+/// UPDATED daily-wellness.ts - Replace lib/streaks-water.ts with this
+
 // Daily Wellness Tracker — replaces streaks with meal windows + smart prompts
 
 export interface WellnessData {
@@ -10,7 +12,7 @@ export interface WellnessData {
   study      : boolean;
   calories   : number;
   date       : string;
-  lastVisit  : number;  // timestamp of last page visit
+  lastVisit  : number;
   askedBreakfast: boolean;
   askedLunch    : boolean;
   askedSnacks   : boolean;
@@ -45,11 +47,9 @@ export function getDailyWellness(): WellnessData {
     const raw = localStorage.getItem('tessa-wellness');
     if (raw) {
       const data = JSON.parse(raw) as WellnessData;
-      // Reset if new day
       if (data.date !== today()) {
         return getDefaultWellness();
       }
-      // Update last visit
       data.lastVisit = Date.now();
       localStorage.setItem('tessa-wellness', JSON.stringify(data));
       return data;
@@ -116,54 +116,59 @@ export function getCurrentMealWindow(): MealWindow | null {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SMART MEAL PROMPTS (ask once per window if not logged)
+// SMART MEAL PROMPTS - FIXED to check past meals
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export function shouldAskAboutMeal(): { meal: MealWindow; question: string } | null {
   const wellness = getDailyWellness();
-  const window = getCurrentMealWindow();
+  const hour = new Date().getHours();
   
-  if (!window) return null;
-
-  // Already logged this meal
-  if (wellness[window.name]) return null;
-
-  // Already asked about this meal in this window
-  const askedKey = `asked${window.name.charAt(0).toUpperCase() + window.name.slice(1)}` as keyof WellnessData;
-  if (wellness[askedKey]) return null;
-
-  // Mark as asked
-  (wellness as any)[askedKey] = true;
-  localStorage.setItem('tessa-wellness', JSON.stringify(wellness));
-
-  // Generate question
-  const questions = {
-    breakfast: [
-      "Good morning babe! 🌅 Did you have breakfast yet?",
-      "Hey handsome~ Have you eaten breakfast? 🍳",
-      "Ankit! Please tell me you had breakfast 😤",
-    ],
-    lunch: [
-      "It's lunch time! What did you eat? 🍱",
-      "Have you had lunch yet, or are you skipping it again? 😒",
-      "Lunch check! Tell me what you ate 💕",
-    ],
-    snacks: [
-      "Did you grab any snacks this afternoon? 🍪",
-      "Snack time! Have something small if you're hungry 💝",
-      "Any snacks today? Even something small counts! 😊",
-    ],
-    dinner: [
-      "Dinner time, babe! What did you have? 🍽️",
-      "Please tell me you're eating dinner 😤",
-      "Did you eat dinner? I need to know! 💕",
-    ],
-  };
-
-  const options = questions[window.name];
-  const question = options[Math.floor(Math.random() * options.length)];
-
-  return { meal: window, question };
+  // Check ALL meal windows (including past ones)
+  for (const window of MEAL_WINDOWS) {
+    // Skip if already logged
+    if (wellness[window.name]) continue;
+    
+    // Skip if already asked
+    const askedKey = `asked${window.name.charAt(0).toUpperCase() + window.name.slice(1)}` as 
+      'askedBreakfast' | 'askedLunch' | 'askedSnacks' | 'askedDinner';
+    if (wellness[askedKey]) continue;
+    
+    // Ask if we're IN the window OR past it (to catch missed meals)
+    if (hour >= window.startHour) {
+      // Mark as asked
+      wellness[askedKey] = true;
+      localStorage.setItem('tessa-wellness', JSON.stringify(wellness));
+      
+      const questions = {
+        breakfast: [
+          "Did you have breakfast today? 🍳",
+          "Hey! Did you eat breakfast this morning?",
+          "Breakfast check - did you eat anything?",
+        ],
+        lunch: [
+          "What did you have for lunch? 🍱",
+          "Lunch update - what did you eat?",
+          "Did you have lunch today?",
+        ],
+        snacks: [
+          "Any snacks this afternoon? 🍪",
+          "Did you grab any snacks?",
+        ],
+        dinner: [
+          "What did you have for dinner? 🍽️",
+          "Dinner time! What did you eat?",
+          "Did you eat dinner?",
+        ],
+      };
+      
+      const options = questions[window.name];
+      const question = options[Math.floor(Math.random() * options.length)];
+      
+      return { meal: window, question };
+    }
+  }
+  
+  return null;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -174,22 +179,16 @@ export function shouldAskAboutWater(): string | null {
   const wellness = getDailyWellness();
   const hour = new Date().getHours();
 
-  // Only between 8am-10pm
   if (hour < 8 || hour >= 22) return null;
-
-  // Already hit goal
   if (wellness.water >= wellness.waterGoal) return null;
 
-  // Calculate hours since last nudge
   const hoursSince = wellness.lastWaterNudge === 0 
     ? 999 
     : (Date.now() - wellness.lastWaterNudge) / (1000 * 60 * 60);
 
-  // Nudge every 1-2 hours (randomized)
-  const nudgeInterval = 1 + Math.random(); // 1-2 hours
+  const nudgeInterval = 1 + Math.random();
   if (hoursSince < nudgeInterval) return null;
 
-  // Mark nudge time
   wellness.lastWaterNudge = Date.now();
   localStorage.setItem('tessa-wellness', JSON.stringify(wellness));
 
@@ -210,17 +209,16 @@ export function shouldAskAboutWater(): string | null {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// LEGACY COMPATIBILITY (for existing code)
+// LEGACY COMPATIBILITY
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export function incrementStreak(type: 'study' | 'sleep' | 'meals' | 'water'): any {
-  // Mark study if it's a study streak
   if (type === 'study') markStudy();
   return { study: { current: 1, best: 1, lastDate: today() } };
 }
 
 export function getStreakCelebration(): string | null {
-  return null; // Disabled
+  return null;
 }
 
 export function shouldNudgeWater(): string | null {
@@ -228,7 +226,7 @@ export function shouldNudgeWater(): string | null {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// MORNING BRIEFING (kept for compatibility)
+// MORNING BRIEFING
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export interface BriefingData {
@@ -299,7 +297,7 @@ export function buildMorningBriefing(): string {
   ].filter(Boolean).length;
 
   if (completed > 0) {
-    lines.push(`\n✨ **Daily Progress:** ${completed}/6 tasks complete`);
+    lines.push(`\n✨ **Daily Progress:** ${completed}/5 wellness tasks complete`);
   }
 
   const closers = [

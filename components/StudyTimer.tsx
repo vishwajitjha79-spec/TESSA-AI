@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, RotateCcw, Clock } from 'lucide-react';
+import { Play, Pause, RotateCcw } from 'lucide-react';
 
 export default function StudyTimer() {
   const [minutes, setMinutes] = useState(25);
@@ -16,7 +16,6 @@ export default function StudyTimer() {
       intervalRef.current = setInterval(() => {
         if (seconds === 0) {
           if (minutes === 0) {
-            // Timer complete
             playSound();
             if (isBreak) {
               setIsBreak(false);
@@ -47,29 +46,21 @@ export default function StudyTimer() {
 
   const playSound = () => {
     try {
-      const context = new AudioContext();
-      const oscillator = context.createOscillator();
-      const gainNode = context.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(context.destination);
-      oscillator.frequency.value = 800;
-      oscillator.type = 'sine';
-      
-      gainNode.gain.setValueAtTime(0.3, context.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5);
-      
-      oscillator.start(context.currentTime);
-      oscillator.stop(context.currentTime + 0.5);
-    } catch (e) {
-      console.log('Audio not available');
-    }
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 800;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.5);
+    } catch {}
   };
 
-  const toggleTimer = () => {
-    setIsActive(!isActive);
-  };
-
+  const toggleTimer = () => setIsActive(!isActive);
   const resetTimer = () => {
     setIsActive(false);
     setIsBreak(false);
@@ -77,9 +68,8 @@ export default function StudyTimer() {
     setSeconds(0);
   };
 
-  const formatTime = (mins: number, secs: number) => {
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+  const formatTime = (mins: number, secs: number) =>
+    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 
   const getProgress = () => {
     const total = isBreak ? 5 * 60 : 25 * 60;
@@ -87,79 +77,79 @@ export default function StudyTimer() {
     return ((total - current) / total) * 100;
   };
 
+  const circumference = 2 * Math.PI * 52; // radius 52
+
   return (
-    <div className="bg-white/5 rounded-lg p-6 border border-pink-500/20">
-      <h3 className="text-lg font-bold text-pink-400 mb-4 flex items-center gap-2">
-        <Clock size={20} />
-        Study Timer
-      </h3>
-
-      <div className="text-center mb-6">
-        <p className="text-sm text-gray-400 mb-2">
-          {isBreak ? '☕ Break Time' : '📚 Focus Time'}
-        </p>
-        <p className="text-6xl font-bold text-pink-400 mb-4">
-          {formatTime(minutes, seconds)}
-        </p>
+    <div className="flex flex-col items-center">
+      {/* Compact timer display */}
+      <div className="relative w-32 h-32 mb-3">
+        <svg className="transform -rotate-90 w-32 h-32">
+          <circle
+            cx="64" cy="64" r="52"
+            stroke="currentColor" strokeWidth="6" fill="transparent"
+            className="text-gray-700/30"
+          />
+          <circle
+            cx="64" cy="64" r="52"
+            stroke="currentColor" strokeWidth="6" fill="transparent"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference - (circumference * getProgress()) / 100}
+            className={isBreak ? 'text-green-500' : 'text-pink-500'}
+            style={{ transition: 'stroke-dashoffset 0.3s ease' }}
+          />
+        </svg>
         
-        {/* Progress circle */}
-        <div className="relative w-48 h-48 mx-auto mb-4">
-          <svg className="transform -rotate-90 w-48 h-48">
-            <circle
-              cx="96"
-              cy="96"
-              r="88"
-              stroke="currentColor"
-              strokeWidth="8"
-              fill="transparent"
-              className="text-gray-700"
-            />
-            <circle
-              cx="96"
-              cy="96"
-              r="88"
-              stroke="currentColor"
-              strokeWidth="8"
-              fill="transparent"
-              strokeDasharray={553}
-              strokeDashoffset={553 - (553 * getProgress()) / 100}
-              className={isBreak ? 'text-green-500' : 'text-pink-500'}
-            />
-          </svg>
-        </div>
-
-        <div className="flex justify-center gap-3 mb-4">
-          <button
-            onClick={toggleTimer}
-            className={`p-4 rounded-full ${
-              isActive ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-pink-500 hover:bg-pink-600'
-            } transition-all`}
-          >
-            {isActive ? <Pause size={24} /> : <Play size={24} />}
-          </button>
-          <button
-            onClick={resetTimer}
-            className="p-4 rounded-full bg-gray-700 hover:bg-gray-600 transition-all"
-          >
-            <RotateCcw size={24} />
-          </button>
-        </div>
-
-        <div className="flex justify-center gap-2">
-          {[...Array(completedPomodoros)].map((_, i) => (
-            <div key={i} className="w-3 h-3 rounded-full bg-pink-500" />
-          ))}
-          {completedPomodoros > 0 && (
-            <p className="text-xs text-gray-400 ml-2">
-              {completedPomodoros} completed today
-            </p>
-          )}
+        {/* Time in center */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <p className="text-2xl font-black text-pink-400 leading-none">
+            {formatTime(minutes, seconds)}
+          </p>
+          <p className="text-[9px] text-gray-500 mt-1">
+            {isBreak ? '☕ Break' : '📚 Focus'}
+          </p>
         </div>
       </div>
 
-      <div className="bg-pink-500/10 border border-pink-500/30 rounded-lg p-3">
-        <p className="text-xs text-pink-300 text-center">
-          💡 Tip: 25 min focus + 5 min break = 1 Pomodoro
+      {/* Controls */}
+      <div className="flex gap-2 mb-3">
+        <button
+          onClick={toggleTimer}
+          className={`p-2.5 rounded-full transition-all ${
+            isActive 
+              ? 'bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/40 text-yellow-400' 
+              : 'bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/40 text-pink-400'
+          }`}
+          title={isActive ? 'Pause' : 'Start'}
+        >
+          {isActive ? <Pause size={16} /> : <Play size={16} />}
+        </button>
+        <button
+          onClick={resetTimer}
+          className="p-2.5 rounded-full bg-gray-700/30 hover:bg-gray-700/50 border border-gray-600/40 text-gray-400 transition-all"
+          title="Reset"
+        >
+          <RotateCcw size={16} />
+        </button>
+      </div>
+
+      {/* Pomodoro dots */}
+      {completedPomodoros > 0 && (
+        <div className="flex items-center gap-1.5">
+          <div className="flex gap-1">
+            {[...Array(Math.min(completedPomodoros, 8))].map((_, i) => (
+              <div key={i} className="w-1.5 h-1.5 rounded-full bg-pink-500" />
+            ))}
+          </div>
+          <p className="text-[10px] text-gray-500">
+            {completedPomodoros} today
+          </p>
+        </div>
+      )}
+
+      {/* Tip */}
+      <div className="mt-3 bg-pink-500/5 border border-pink-500/20 rounded-lg px-3 py-2">
+        <p className="text-[10px] text-pink-300/80 text-center leading-snug">
+          💡 25 min focus + 5 min break
         </p>
       </div>
     </div>

@@ -133,7 +133,7 @@ export function shouldAskAboutMeal(): { meal: MealWindow; question: string } | n
   if (wellness[askedKey]) return null;
 
   // Mark as asked
-  wellness[askedKey] = true;
+  (wellness as any)[askedKey] = true;
   localStorage.setItem('tessa-wellness', JSON.stringify(wellness));
 
   // Generate question

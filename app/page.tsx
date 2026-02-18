@@ -191,8 +191,32 @@ const TC = {
   },
 } as const;
 
-function useTc(theme: Theme, creator: boolean) {
-  const b = TC[theme] as typeof TC.dark; // Type assertion to fix 'never' type
+// REPLACE THE ENTIRE useTc FUNCTION WITH THIS:
+
+function useTc(theme: Theme, creator: boolean): {
+  root: string;
+  aside: string;
+  header: string;
+  card: string;
+  body: string;
+  sub: string;
+  msgU: string;
+  msgA: string;
+  input: string;
+  primary: string;
+  soft: string;
+  sH: string;
+  accent: string;
+} {
+  let b: any;
+  
+  if (theme === 'dark') b = TC.dark;
+  else if (theme === 'light') b = TC.light;
+  else if (theme === 'cyberpunk') b = TC.cyberpunk;
+  else if (theme === 'ocean') b = TC.ocean;
+  else if (theme === 'sunset') b = TC.sunset;
+  else b = TC.dark;
+  
   return {
     root    : creator ? (b.rootC || b.root) : b.root,
     aside   : b.aside,

@@ -106,7 +106,7 @@ export default function MessageRenderer({
         if (seg.type === 'text') {
           return (
             <span key={i} className="whitespace-pre-wrap">
-              {seg.value}
+              {formatText(seg.value)}
             </span>
           );
         }
@@ -173,4 +173,31 @@ function parseFormulas(text: string): Segment[] {
   }
 
   return segments;
+}
+
+// ── Text formatter for bold/italic ────────────────────────────────────────────
+function formatText(text: string): React.ReactNode[] {
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  
+  // Match **bold** or __bold__
+  const boldPattern = /(\*\*|__)(.+?)\1/g;
+  let match: RegExpExecArray | null;
+  
+  while ((match = boldPattern.exec(text)) !== null) {
+    // Add text before match
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    // Add bold text
+    parts.push(<strong key={match.index} className="font-semibold">{match[2]}</strong>);
+    lastIndex = match.index + match[0].length;
+  }
+  
+  // Add remaining text
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+  
+  return parts.length > 0 ? parts : [text];
 }

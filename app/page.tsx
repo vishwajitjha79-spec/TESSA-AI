@@ -5,15 +5,13 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   Send, Mic, MicOff, Menu, X, Settings, Heart, Plus,
   Trash2, LogOut, User, LayoutDashboard, Sun, Moon,
-  Calendar, ChevronDown, ChevronUp, StickyNote,
+  Calendar, ChevronDown, ChevronUp, StickyNote, Paperclip, ChevronRight,
 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 import type { Message, MoodType, Conversation } from '@/types';
 
 // ─── Components ───────────────────────────────────────────────────────────────
-import { Paperclip, ChevronRight } from 'lucide-react';
-import TessaInsights      from '@/components/TessaInsights';
 import SecretVerification from '@/components/SecretVerification';
 import PersonalDashboard  from '@/components/PersonalDashboard';
 import AvatarPresets      from '@/components/AvatarPresets';
@@ -24,6 +22,7 @@ import PlannerHub         from '@/components/PlannerHub';
 import FlashcardGenerator from '@/components/FlashcardGenerator';
 import ReportCard         from '@/components/ReportCard';
 import DailyWellness      from '@/components/StreakDashboard';
+import TessaInsights      from '@/components/TessaInsights';
 import MessageRenderer    from '@/components/MessageRenderer';
 
 // ─── Lib ──────────────────────────────────────────────────────────────────────
@@ -70,11 +69,7 @@ const VALID_MOODS: MoodType[] = [
 
 // ─── Theme tokens ─────────────────────────────────────────────────────────────
 const TC = {
-  // COMPLETE THEME CONFIGURATION - Replace TC constant in page.tsx
-
-const TC = {
   dark: {
-    // Standard mode
     root    : 'bg-gradient-to-br from-[#0a0e27] via-[#141830] to-[#0d1020]',
     aside   : 'bg-black/25 border-white/8',
     header  : 'bg-black/30 border-white/8 backdrop-blur-xl',
@@ -88,8 +83,6 @@ const TC = {
     btnS    : 'border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300',
     sH      : 'text-cyan-400',
     accent  : 'text-cyan-400',
-    
-    // Creator mode variant
     rootC   : 'bg-gradient-to-br from-[#1a0a20] via-[#220a30] to-[#1a0820]',
     headerC : 'bg-pink-950/20 border-pink-500/15 backdrop-blur-xl',
     msgUC   : 'bg-[#1f0a28] border-l-4 border-pink-500',
@@ -100,9 +93,7 @@ const TC = {
     sHC     : 'text-pink-400',
     accentC : 'text-pink-400',
   },
-
   light: {
-    // Standard mode
     root    : 'bg-gradient-to-br from-slate-50 via-white to-blue-50/30',
     aside   : 'bg-white border-slate-200',
     header  : 'bg-white/90 border-slate-200 backdrop-blur-xl shadow-sm',
@@ -116,8 +107,6 @@ const TC = {
     btnS    : 'border border-cyan-500/50 bg-cyan-50 hover:bg-cyan-100 text-cyan-700',
     sH      : 'text-cyan-600',
     accent  : 'text-cyan-600',
-    
-    // Creator mode variant
     rootC   : 'bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50/30',
     headerC : 'bg-gradient-to-r from-pink-100/60 to-purple-100/60 border-pink-300/60 backdrop-blur-xl shadow-sm',
     msgUC   : 'bg-pink-50 border-l-4 border-pink-400',
@@ -128,9 +117,7 @@ const TC = {
     sHC     : 'text-pink-500',
     accentC : 'text-pink-500',
   },
-
   cyberpunk: {
-    // Standard mode
     root    : 'bg-gradient-to-br from-[#0a0014] via-[#1a0028] to-[#0f001f]',
     aside   : 'bg-black/40 border-purple-500/20',
     header  : 'bg-black/50 border-purple-500/20 backdrop-blur-xl',
@@ -144,8 +131,6 @@ const TC = {
     btnS    : 'border border-purple-500/50 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300',
     sH      : 'text-purple-400',
     accent  : 'text-purple-400',
-    
-    // Creator mode variant (intense pink/purple)
     rootC   : 'bg-gradient-to-br from-[#1f0a28] via-[#2d0a3d] to-[#1f0a28]',
     headerC : 'bg-gradient-to-r from-pink-900/40 to-purple-900/40 border-pink-500/30 backdrop-blur-xl',
     msgUC   : 'bg-[#2d1040] border-l-4 border-pink-500',
@@ -156,9 +141,7 @@ const TC = {
     sHC     : 'text-pink-400',
     accentC : 'text-pink-400',
   },
-
   ocean: {
-    // Standard mode
     root    : 'bg-gradient-to-br from-[#001a33] via-[#002244] to-[#001428]',
     aside   : 'bg-black/30 border-blue-500/20',
     header  : 'bg-black/40 border-blue-500/20 backdrop-blur-xl',
@@ -172,8 +155,6 @@ const TC = {
     btnS    : 'border border-teal-500/50 bg-teal-500/10 hover:bg-teal-500/20 text-teal-300',
     sH      : 'text-teal-400',
     accent  : 'text-teal-400',
-    
-    // Creator mode variant (pink coral over ocean)
     rootC   : 'bg-gradient-to-br from-[#1a122d] via-[#22183d] to-[#1a0f33]',
     headerC : 'bg-gradient-to-r from-pink-900/25 to-blue-900/25 border-pink-500/25 backdrop-blur-xl',
     msgUC   : 'bg-[#281838] border-l-4 border-pink-400',
@@ -184,9 +165,7 @@ const TC = {
     sHC     : 'text-pink-400',
     accentC : 'text-pink-400',
   },
-
   sunset: {
-    // Standard mode
     root    : 'bg-gradient-to-br from-[#2d1810] via-[#3d2418] to-[#251510]',
     aside   : 'bg-black/30 border-orange-500/20',
     header  : 'bg-black/40 border-orange-500/20 backdrop-blur-xl',
@@ -200,8 +179,6 @@ const TC = {
     btnS    : 'border border-orange-500/50 bg-orange-500/10 hover:bg-orange-500/20 text-orange-300',
     sH      : 'text-orange-400',
     accent  : 'text-orange-400',
-    
-    // Creator mode variant (more pink/red warmth)
     rootC   : 'bg-gradient-to-br from-[#3d1820] via-[#4d2428] to-[#351518]',
     headerC : 'bg-gradient-to-r from-pink-900/35 to-red-900/35 border-pink-500/30 backdrop-blur-xl',
     msgUC   : 'bg-[#4d2030] border-l-4 border-pink-400',
@@ -214,7 +191,6 @@ const TC = {
   },
 } as const;
 
-// UPDATED useTc function to properly use creator variants
 function useTc(theme: Theme, creator: boolean) {
   const b = TC[theme];
   return {
@@ -231,27 +207,6 @@ function useTc(theme: Theme, creator: boolean) {
     soft    : creator ? (b.btnSC || b.btnS) : b.btnS,
     sH      : creator ? (b.sHC || b.sH) : b.sH,
     accent  : creator ? (b.accentC || b.accent) : b.accent,
-  };
-}
-  },
-} as const;
-
-function useTc(theme: Theme, creator: boolean) {
-  const b = TC[theme];
-  return {
-    root    : creator ? b.rootC   : b.root,
-    aside   : b.aside,
-    header  : creator ? b.headerC : b.header,
-    card    : b.card,
-    body    : b.body,
-    sub     : b.sub,
-    msgU    : creator ? b.msgUC  : b.msgU,
-    msgA    : creator ? b.msgAC  : b.msgA,
-    input   : creator ? b.inputC : b.input,
-    primary : creator ? b.btnPC  : b.btnP,
-    soft    : creator ? b.btnSC  : b.btnS,
-    sH      : creator ? b.sHC    : b.sH,
-    accent  : creator ? b.accentC: b.accent,
   };
 }
 
@@ -300,7 +255,6 @@ export default function Home() {
   const [showFlashcards,  setShowFlashcards]  = useState(false);
   const [showReportCard,  setShowReportCard]  = useState(false);
   const [notesExpanded,   setNotesExpanded]   = useState(true);
-  const [settingsExpanded, setSettingsExpanded] = useState(false); // NEW: settings in left sidebar
   const [typingEnabled,   setTypingEnabled]   = useState(true);
 
   const [theme,          setThemeState]    = useState<Theme>('dark');
@@ -313,11 +267,13 @@ export default function Home() {
   const [avatar,         setAvatar]        = useState('/avatars/cosmic.png');
 
   const [isRecording, setIsRecording] = useState(false);
+  const [wellnessVersion, setWellnessVersion] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const bottomRef      = useRef<HTMLDivElement>(null);
   const textareaRef    = useRef<HTMLTextAreaElement>(null);
-  const mediaRecRef    = useRef<MediaRecorder | null>(null);
-  const audioChunks    = useRef<Blob[]>([]);
+  const recognitionRef = useRef<any>(null);
+  const fileInputRef   = useRef<HTMLInputElement>(null);
   const proactiveTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const voicesReady    = useRef(false);
 
@@ -353,7 +309,6 @@ export default function Home() {
     if (saved.animations)     setAnimations(saved.animations === 'true');
     if (saved.sfx)            setSfx(saved.sfx === 'true');
 
-    // Persistent creator mode check
     if (isCreatorModePersistent()) {
       setIsCreatorMode(true);
       setCurrentMood('loving');
@@ -437,7 +392,7 @@ export default function Home() {
     setUser(null);
     setIsGuest(true);
     setIsCreatorMode(false);
-    unlockCreatorMode(); // Clear persistent flag
+    unlockCreatorMode();
     setMessages([]);
     setShowDashboard(false);
     hydrateLocalConversations();
@@ -559,10 +514,10 @@ export default function Home() {
         health.totalCalories = (health.totalCalories ?? 0) + result.calories;
         lsSet('tessa-health', JSON.stringify(health));
 
-        // Mark meal in wellness tracker
         const window = getCurrentMealWindow();
         if (window) markMeal(window.name);
         addCalories(result.calories);
+        setWellnessVersion(prev => prev + 1);
       }
 
       const sleepHit = detectSleepInResponse(responseText);
@@ -580,19 +535,43 @@ export default function Home() {
     return extra;
   };
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image must be under 5MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => setSelectedImage(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const removeSelectedImage = () => {
+    setSelectedImage(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const sendMessage = async (override?: string) => {
     const text = (override ?? input).trim();
-    if (!text || isLoading) return;
+    if (!text && !selectedImage) return;
+    if (isLoading) return;
 
     const userMsg: Message = {
       id       : uuidv4(),
       role     : 'user',
-      content  : text,
+      content  : text || '📷 [Image attached]',
       timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMsg]);
     setInput('');
+    
+    const imageCopy = selectedImage;
+    removeSelectedImage();
+
     if (textareaRef.current) textareaRef.current.style.height = '48px';
     setIsLoading(true);
 
@@ -601,16 +580,34 @@ export default function Home() {
         autoSearch &&
         /search|find|latest|current|today|202[4-6]|now|recent|\?/i.test(text);
 
+      const messagePayload = imageCopy
+        ? {
+            messages    : [...messages, userMsg].map(m => ({
+              role: m.role,
+              content: m.role === 'user' && imageCopy
+                ? [
+                    { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageCopy.split(',')[1] } },
+                    { type: 'text', text: m.content }
+                  ]
+                : m.content
+            })),
+            isCreatorMode,
+            currentMood,
+            needsSearch,
+            maxTokens: MAX_TOKENS[responseLength],
+          }
+        : {
+            messages    : [...messages, userMsg].map(m => ({ role: m.role, content: m.content })),
+            isCreatorMode,
+            currentMood,
+            needsSearch,
+            maxTokens   : MAX_TOKENS[responseLength],
+          };
+
       const res = await fetch('/api/chat', {
         method : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body   : JSON.stringify({
-          messages    : [...messages, userMsg].map(m => ({ role: m.role, content: m.content })),
-          isCreatorMode,
-          currentMood,
-          needsSearch,
-          maxTokens   : MAX_TOKENS[responseLength],
-        }),
+        body   : JSON.stringify(messagePayload),
       });
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -633,7 +630,7 @@ export default function Home() {
       setLatestMsgId(assistantMsg.id);
 
       extractMemoriesFromMessage(text, data.content).catch(() => {});
-      markStudy(); // Every interaction counts as study engagement
+      markStudy();
 
       if (voiceOutput) speakText(data.content);
       if (sfx)         playChime();
@@ -699,41 +696,47 @@ export default function Home() {
     } catch {}
   };
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioChunks.current = [];
-      const rec = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-      mediaRecRef.current = rec;
-      rec.ondataavailable = e => { if (e.data.size > 0) audioChunks.current.push(e.data); };
-      rec.onstop = () => { stream.getTracks().forEach(t => t.stop()); runSpeechRecognition(); };
-      rec.start();
-      setIsRecording(true);
-    } catch {
-      alert('Microphone access denied — please allow mic permissions.');
+  const startRecording = () => {
+    const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    if (!SR) {
+      alert('Speech recognition not supported');
+      return;
     }
-  };
 
-  const stopRecording = () => {
-    if (mediaRecRef.current && isRecording) {
-      mediaRecRef.current.stop();
+    const recognition = new SR();
+    recognition.lang = 'en-IN';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => setIsRecording(true);
+    
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results)
+        .map((result: any) => result[0].transcript)
+        .join(' ');
+      setInput(transcript);
+    };
+
+    recognition.onerror = () => {
+      setIsRecording(false);
+      alert('Voice recognition failed');
+    };
+
+    recognition.onend = () => setIsRecording(false);
+
+    recognitionRef.current = recognition;
+    try {
+      recognition.start();
+    } catch {
       setIsRecording(false);
     }
   };
 
-  const runSpeechRecognition = () => {
-    const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
-    if (!SR) {
-      setInput('🎤 Transcription unsupported — please type.');
-      return;
+  const stopRecording = () => {
+    if (recognitionRef.current && isRecording) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
     }
-    const rec = new SR();
-    rec.lang           = 'en-IN';
-    rec.continuous     = false;
-    rec.interimResults = false;
-    rec.onresult       = (e: any) => setInput(e.results[0][0].transcript);
-    rec.onerror        = () => setInput("🎤 Couldn't understand — please type.");
-    try { rec.start(); } catch {}
   };
 
   const unlockCreatorModeAction = () => {
@@ -741,7 +744,7 @@ export default function Home() {
     setIsCreatorMode(true);
     setCurrentConvId(uuidv4());
     setCurrentMood('loving');
-    lockCreatorMode(); // Persistent across refreshes
+    lockCreatorMode();
 
     const pendingBriefing = lsGet('tessa-pending-briefing');
     const initMsg: Message = pendingBriefing
@@ -771,7 +774,7 @@ export default function Home() {
   const exitCreatorMode = () => {
     persistConversation();
     setIsCreatorMode(false);
-    unlockCreatorMode(); // Clear persistent flag
+    unlockCreatorMode();
     setCurrentConvId(uuidv4());
     setCurrentMood('calm');
     setMessages([]);
@@ -844,7 +847,6 @@ export default function Home() {
         `}
         aria-label="Navigation sidebar"
       >
-        {/* Notes panel */}
         <div className="flex-shrink-0">
           <button
             onClick={() => setNotesExpanded(p => !p)}
@@ -864,7 +866,6 @@ export default function Home() {
           )}
         </div>
 
-        {/* Chat history */}
         <div className="flex-1 flex flex-col min-h-0 border-t border-white/5">
           <div className="flex-shrink-0 p-3 pb-2">
             <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 ${tc.sH}`}>
@@ -908,10 +909,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* NEW: Settings section in left sidebar */}
         <div className="flex-shrink-0 border-t border-white/5">
           <button
-            onClick={() => setSettingsExpanded(p => !p)}
+            onClick={() => setShowSettings(p => !p)}
             className={`
               w-full flex items-center justify-between px-4 py-3
               text-sm font-semibold ${tc.sH}
@@ -919,131 +919,10 @@ export default function Home() {
             `}
           >
             <span className="flex items-center gap-2"><Settings size={14} />Settings</span>
-            {settingsExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+            {showSettings ? <X size={13} /> : <ChevronRight size={13} />}
           </button>
-
-          {settingsExpanded && (
-            <div className="max-h-[50vh] overflow-y-auto settings-scroll px-3 py-3 space-y-3">
-              
-              {/* Theme */}
-              <section className="settings-section">
-                <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Theme</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {([
-                    ['dark', '🌙 Dark'],
-                    ['light', '☀️ Light'],
-                    ['cyberpunk', '⚡ Cyberpunk'],
-                    ['ocean', '🌊 Ocean'],
-                    ['sunset', '🌅 Sunset'],
-                  ] as [Theme, string][]).map(([t, label]) => (
-                    <button
-                      key={t}
-                      onClick={() => setTheme(t)}
-                      className={`
-                        py-2 px-2 text-[10px] font-medium rounded-lg transition-all
-                        ${theme === t
-                          ? `${isCreatorMode ? 'bg-pink-500' : 'bg-cyan-500'} text-white border-2 border-white/20`
-                          : 'bg-white/5 hover:bg-white/10 border border-white/10'
-                        }
-                      `}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </section>
-
-              {/* Avatar */}
-              <section className="settings-section">
-                <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Avatar</h3>
-                <button
-                  onClick={() => setShowAvatarModal(true)}
-                  className={`w-full py-1.5 rounded-lg text-xs font-semibold transition-all ${tc.soft}`}
-                >
-                  Choose Preset
-                </button>
-              </section>
-
-              {/* Audio */}
-              <section className="settings-section">
-                <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Audio</h3>
-                <div className="space-y-2">
-                  <ToggleRow label="Voice Output" checked={voiceOutput} onChange={setVoiceOutput} />
-                  <ToggleRow label="Sound Effects" checked={sfx} onChange={setSfx} />
-                </div>
-              </section>
-
-              {/* Chat */}
-              <section className="settings-section">
-                <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Chat</h3>
-                <div className="space-y-2">
-                  <div>
-                    <p className="text-[10px] text-gray-400 mb-1">Response Length</p>
-                    <div className="flex rounded-lg overflow-hidden border border-white/10">
-                      {(['short', 'medium', 'long'] as ResponseLength[]).map(l => (
-                        <button
-                          key={l}
-                          onClick={() => setResponseLength(l)}
-                          className={`
-                            flex-1 py-1 text-[10px] capitalize transition-all
-                            ${responseLength === l
-                              ? `${isCreatorMode ? 'bg-pink-500' : 'bg-cyan-500'} text-white`
-                              : 'hover:bg-white/8'
-                            }
-                          `}
-                        >
-                          {l}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <ToggleRow label="Auto Web Search" checked={autoSearch} onChange={setAutoSearch} />
-                  <ToggleRow label="Typing Animation" checked={typingEnabled} onChange={setTypingEnabled} />
-                </div>
-              </section>
-
-              {/* Visual */}
-              <section className="settings-section">
-                <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Visual</h3>
-                <ToggleRow label="Animations & Glows" checked={animations} onChange={setAnimations} />
-              </section>
-
-              {/* Data */}
-              <section className="settings-section">
-                <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Data</h3>
-                <ToggleRow label="Auto-save Chats" checked={autoSave} onChange={setAutoSave} />
-                <p className={`text-[9px] ${tc.sub} mt-1`}>
-                  {user && !isGuest ? '☁️ Cloud synced' : '📱 Local storage'}
-                </p>
-              </section>
-
-              {/* Creator mode */}
-              {!isCreatorMode ? (
-                <section className="settings-section border-pink-500/20">
-                  <button
-                    onClick={() => setShowSecretModal(true)}
-                    className="w-full py-2 rounded-lg border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 text-xs font-semibold transition-all"
-                  >
-                    🔓 Unlock Creator Mode
-                  </button>
-                </section>
-              ) : (
-                <section className="settings-section border-pink-500/20">
-                  <p className={`text-[10px] ${tc.sub} mb-2`}>Creator Mode Active 💝</p>
-                  <button
-                    onClick={exitCreatorMode}
-                    className="w-full py-1.5 rounded-lg border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 text-xs transition-all"
-                  >
-                    Exit Creator Mode
-                  </button>
-                </section>
-              )}
-
-            </div>
-          )}
         </div>
 
-        {/* Account */}
         <div className={`flex-shrink-0 p-3 border-t ${tc.aside}`}>
           <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5 ${tc.sH}`}>
             <User size={12} /> Account
@@ -1072,12 +951,149 @@ export default function Home() {
         </div>
       </aside>
 
+      {/* Settings Overlay Panel */}
+      {showSettings && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
+            onClick={() => setShowSettings(false)}
+          />
+          
+          <div className={`
+            fixed left-0 top-0 bottom-0 z-40
+            w-[17rem] md:w-80
+            ${tc.aside} border-r
+            transform transition-transform duration-300
+          `}>
+            <div className={`flex items-center justify-between px-4 py-3 border-b ${tc.aside}`}>
+              <h2 className={`font-bold text-sm ${tc.sH}`}>⚙️ Settings</h2>
+              <button
+                onClick={() => setShowSettings(false)}
+                className="p-1 hover:bg-white/10 rounded transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto h-[calc(100vh-57px)] settings-scroll px-3 py-3 space-y-3">
+              
+              <section className="settings-section">
+                <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Theme</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {([
+                    ['dark', '🌙 Dark'],
+                    ['light', '☀️ Light'],
+                    ['cyberpunk', '⚡ Cyberpunk'],
+                    ['ocean', '🌊 Ocean'],
+                    ['sunset', '🌅 Sunset'],
+                  ] as [Theme, string][]).map(([t, label]) => (
+                    <button
+                      key={t}
+                      onClick={() => setTheme(t)}
+                      className={`
+                        py-2 px-2 text-[10px] font-medium rounded-lg transition-all
+                        ${theme === t
+                          ? `${isCreatorMode ? 'bg-pink-500' : 'bg-cyan-500'} text-white border-2 border-white/20`
+                          : 'bg-white/5 hover:bg-white/10 border border-white/10'
+                        }
+                      `}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </section>
+
+              <section className="settings-section">
+                <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Avatar</h3>
+                <button
+                  onClick={() => setShowAvatarModal(true)}
+                  className={`w-full py-1.5 rounded-lg text-xs font-semibold transition-all ${tc.soft}`}
+                >
+                  Choose Preset
+                </button>
+              </section>
+
+              <section className="settings-section">
+                <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Audio</h3>
+                <div className="space-y-2">
+                  <ToggleRow label="Voice Output" checked={voiceOutput} onChange={setVoiceOutput} />
+                  <ToggleRow label="Sound Effects" checked={sfx} onChange={setSfx} />
+                </div>
+              </section>
+
+              <section className="settings-section">
+                <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Chat</h3>
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1">Response Length</p>
+                    <div className="flex rounded-lg overflow-hidden border border-white/10">
+                      {(['short', 'medium', 'long'] as ResponseLength[]).map(l => (
+                        <button
+                          key={l}
+                          onClick={() => setResponseLength(l)}
+                          className={`
+                            flex-1 py-1 text-[10px] capitalize transition-all
+                            ${responseLength === l
+                              ? `${isCreatorMode ? 'bg-pink-500' : 'bg-cyan-500'} text-white`
+                              : 'hover:bg-white/8'
+                            }
+                          `}
+                        >
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <ToggleRow label="Auto Web Search" checked={autoSearch} onChange={setAutoSearch} />
+                  <ToggleRow label="Typing Animation" checked={typingEnabled} onChange={setTypingEnabled} />
+                </div>
+              </section>
+
+              <section className="settings-section">
+                <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Visual</h3>
+                <ToggleRow label="Animations & Glows" checked={animations} onChange={setAnimations} />
+              </section>
+
+              <section className="settings-section">
+                <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Data</h3>
+                <ToggleRow label="Auto-save Chats" checked={autoSave} onChange={setAutoSave} />
+                <p className={`text-[9px] ${tc.sub} mt-1`}>
+                  {user && !isGuest ? '☁️ Cloud synced' : '📱 Local storage'}
+                </p>
+              </section>
+
+              {!isCreatorMode ? (
+                <section className="settings-section border-pink-500/20">
+                  <button
+                    onClick={() => setShowSecretModal(true)}
+                    className="w-full py-2 rounded-lg border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 text-xs font-semibold transition-all"
+                  >
+                    🔓 Unlock Creator Mode
+                  </button>
+                </section>
+              ) : (
+                <section className="settings-section border-pink-500/20">
+                  <p className={`text-[10px] ${tc.sub} mb-2`}>Creator Mode Active 💝</p>
+                  <button
+                    onClick={exitCreatorMode}
+                    className="w-full py-1.5 rounded-lg border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 text-xs transition-all"
+                  >
+                    Exit Creator Mode
+                  </button>
+                </section>
+              )}
+
+            </div>
+          </div>
+        </>
+      )}
+
       {/* ══════════════════════════════════════════════════════════════════
           MAIN AREA
       ══════════════════════════════════════════════════════════════════ */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden min-w-0 z-10">
 
-        {/* Header */}
         <header className={`flex-shrink-0 border-b ${tc.header} px-3 py-2.5`}>
           <div className="flex items-center justify-between gap-2">
 
@@ -1164,19 +1180,10 @@ export default function Home() {
               >
                 {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
               </button>
-
-              <button
-                onClick={() => setShowSettings(p => !p)}
-                className={`p-1.5 rounded-lg transition-colors ${showSettings ? 'bg-white/10' : 'hover:bg-white/10'}`}
-                title="Right Panel"
-              >
-                {showSettings ? <X size={17} /> : <Settings size={17} />}
-              </button>
             </div>
           </div>
         </header>
 
-        {/* Messages / Dashboard */}
         <div className="flex-1 overflow-y-auto px-3 py-5 md:px-6">
           <div className="max-w-2xl mx-auto">
 
@@ -1247,65 +1254,104 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Input bar */}
         {!showDashboard && (
           <div className={`flex-shrink-0 border-t ${tc.header} px-3 py-3 md:px-6`}>
-            <div className="max-w-2xl mx-auto flex gap-2 items-end">
-              <button
-                onMouseDown={startRecording}
-                onMouseUp={stopRecording}
-                onTouchStart={e => { e.preventDefault(); startRecording(); }}
-                onTouchEnd={e => { e.preventDefault(); stopRecording(); }}
-                disabled={isLoading}
-                className={`
-                  flex-shrink-0 p-2.5 rounded-xl border transition-all
-                  disabled:opacity-40 disabled:cursor-not-allowed
-                  ${isRecording ? 'bg-red-500/80 border-red-400 recording-indicator' : tc.soft}
-                `}
-                title="Hold to speak"
-              >
-                {isRecording ? <MicOff size={17} /> : <Mic size={17} />}
-              </button>
+            <div className="max-w-2xl mx-auto">
+              
+              {selectedImage && (
+                <div className="mb-2 relative inline-block">
+                  <img
+                    src={selectedImage}
+                    alt="Preview"
+                    className="max-w-xs max-h-40 rounded-lg border border-white/20"
+                  />
+                  <button
+                    onClick={removeSelectedImage}
+                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
 
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onInput={handleTextareaInput}
-                placeholder={isCreatorMode ? 'Tell me anything…' : 'Message T.E.S.S.A…'}
-                disabled={isLoading}
-                rows={1}
-                className={`
-                  flex-1 px-3.5 py-2.5 rounded-xl border text-sm resize-none
-                  focus:outline-none focus:ring-2
-                  ${isCreatorMode ? 'focus:ring-pink-500/30' : 'focus:ring-cyan-500/30'}
-                  ${tc.input} transition-all duration-200
-                `}
-                style={{ minHeight: '44px', maxHeight: '144px' }}
-              />
+              <div className="flex gap-2 items-end">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageSelect}
+                  className="hidden"
+                />
 
-              <button
-                onClick={() => sendMessage()}
-                disabled={!input.trim() || isLoading}
-                className={`
-                  flex-shrink-0 p-2.5 rounded-xl font-bold transition-all
-                  disabled:opacity-35 disabled:cursor-not-allowed active:scale-95
-                  ${tc.primary}
-                `}
-                title="Send"
-              >
-                <Send size={17} />
-              </button>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isLoading}
+                  className={`
+                    flex-shrink-0 p-2.5 rounded-xl border transition-all
+                    disabled:opacity-40 disabled:cursor-not-allowed
+                    ${tc.soft}
+                  `}
+                  title="Attach image"
+                >
+                  <Paperclip size={17} />
+                </button>
+
+                <button
+                  onMouseDown={startRecording}
+                  onMouseUp={stopRecording}
+                  onTouchStart={e => { e.preventDefault(); startRecording(); }}
+                  onTouchEnd={e => { e.preventDefault(); stopRecording(); }}
+                  disabled={isLoading}
+                  className={`
+                    flex-shrink-0 p-2.5 rounded-xl border transition-all
+                    disabled:opacity-40 disabled:cursor-not-allowed
+                    ${isRecording ? 'bg-red-500/80 border-red-400 recording-indicator' : tc.soft}
+                  `}
+                  title="Hold to speak"
+                >
+                  {isRecording ? <MicOff size={17} /> : <Mic size={17} />}
+                </button>
+
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onInput={handleTextareaInput}
+                  placeholder={isCreatorMode ? 'Tell me anything…' : 'Message T.E.S.S.A…'}
+                  disabled={isLoading}
+                  rows={1}
+                  className={`
+                    flex-1 px-3.5 py-2.5 rounded-xl border text-sm resize-none
+                    focus:outline-none focus:ring-2
+                    ${isCreatorMode ? 'focus:ring-pink-500/30' : 'focus:ring-cyan-500/30'}
+                    ${tc.input} transition-all duration-200
+                  `}
+                  style={{ minHeight: '44px', maxHeight: '144px' }}
+                />
+
+                <button
+                  onClick={() => sendMessage()}
+                  disabled={!input.trim() || isLoading}
+                  className={`
+                    flex-shrink-0 p-2.5 rounded-xl font-bold transition-all
+                    disabled:opacity-35 disabled:cursor-not-allowed active:scale-95
+                    ${tc.primary}
+                  `}
+                  title="Send"
+                >
+                  <Send size={17} />
+                </button>
+              </div>
             </div>
           </div>
         )}
       </main>
 
       {/* ══════════════════════════════════════════════════════════════════
-          RIGHT SIDEBAR — TIMER ONLY
+          RIGHT SIDEBAR
       ══════════════════════════════════════════════════════════════════ */}
-      {showSettings && (
+      {showDashboard && (
         <aside
           className={`
             flex-shrink-0 border-l ${tc.aside}
@@ -1314,7 +1360,6 @@ export default function Home() {
           `}
           aria-label="Right panel"
         >
-          {/* Profile card */}
           <div className="flex-shrink-0">
             <ProfileCard
               avatarPath={avatarSrc}
@@ -1324,11 +1369,24 @@ export default function Home() {
             />
           </div>
 
-          {/* Wellness tracker */}
           <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
-            <DailyWellness isCreatorMode={isCreatorMode} />
+            <DailyWellness 
+              isCreatorMode={isCreatorMode} 
+              refreshTrigger={wellnessVersion}
+            />
 
-            {/* Study timer */}
+            {isCreatorMode && (
+              <button
+                onClick={() => {
+                  addWater(1);
+                  setWellnessVersion(v => v + 1);
+                }}
+                className={`w-full py-2 rounded-lg text-xs font-medium transition-all ${tc.soft}`}
+              >
+                💧 +1 Water Glass
+              </button>
+            )}
+
             {isCreatorMode && (
               <div>
                 <p className={`text-xs font-bold ${tc.sH} mb-3`}>⏱️ Study Timer</p>
@@ -1336,7 +1394,12 @@ export default function Home() {
               </div>
             )}
 
-            {/* Memory */}
+            {isCreatorMode && (
+              <div className="border-t border-white/5 pt-4">
+                <TessaInsights isCreatorMode={isCreatorMode} />
+              </div>
+            )}
+
             {isCreatorMode && (
               <div className="settings-section">
                 <h3 className="text-xs font-bold text-gray-400 mb-2">🧠 Memory</h3>

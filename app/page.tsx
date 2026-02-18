@@ -192,7 +192,7 @@ const TC = {
 } as const;
 
 function useTc(theme: Theme, creator: boolean) {
-  const b = TC[theme];
+  const b = TC[theme] as typeof TC.dark; // Type assertion to fix 'never' type
   return {
     root    : creator ? (b.rootC || b.root) : b.root,
     aside   : b.aside,

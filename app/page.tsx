@@ -192,7 +192,7 @@ const TC = {
 } as const;
 
 function useTc(theme: Theme, creator: boolean) {
-  const b = TC[theme] as typeof TC.dark; // Type assertion to fix 'never' type
+  const b = TC[theme] as typeof TC.dark;
   return {
     root    : creator ? (b.rootC || b.root) : b.root,
     aside   : b.aside,
@@ -328,6 +328,32 @@ export default function Home() {
       lsSet('tessa-pending-briefing', briefing);
     }
 
+    // ── MIDNIGHT RESET: check for date change on page load ──
+    const checkMidnightReset = () => {
+      const currentDate = new Date().toISOString().split('T')[0];
+      const lastDate = lsGet('tessa-last-date');
+
+      if (lastDate && lastDate !== currentDate) {
+        // New day detected - reset health snapshot
+        const health = lsGetJson<HealthSnapshot>('tessa-health', {
+          weight: 0, height: 0, meals: [], totalCalories: 0,
+          date: currentDate,
+        });
+        health.meals = [];
+        health.totalCalories = 0;
+        health.date = currentDate;
+        lsSet('tessa-health', JSON.stringify(health));
+        console.log('🌙 Midnight reset - cleared health data');
+      }
+
+      lsSet('tessa-last-date', currentDate);
+    };
+
+    checkMidnightReset();
+
+    // Check every minute if date changed
+    const midnightChecker = setInterval(checkMidnightReset, 60000);
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       const u = session?.user ?? null;
       setUser(u);
@@ -336,6 +362,7 @@ export default function Home() {
 
     return () => {
       subscription.unsubscribe();
+      clearInterval(midnightChecker);
       if (proactiveTimer.current) clearInterval(proactiveTimer.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -493,31 +520,73 @@ export default function Home() {
     }
   };
 
+  // ── FIX: parseDashboardUpdates — handles MULTIPLE food items ──
   const parseDashboardUpdates = (responseText: string): string => {
     if (!isCreatorMode) return '';
     let extra = '';
 
     try {
-      const foodHit = detectMealInResponse(responseText);
-      if (foodHit) {
-        const result = estimateCalories(foodHit.food);
+      const foodItems = detectMealInResponse(responseText);
+
+      if (foodItems) {
+        let totalCalories = 0;
+        const mealsList: string[] = [];
+
+        // Split food string by common separators
+        const foods = foodItems.food
+          .split(/,|and|\+|with/i)
+          .map((f: string) => f.trim())
+          .filter(Boolean);
+
+        // Process EACH food item
+        for (const food of foods) {
+          // Check for quantity multipliers (e.g. "4 roti", "2 samosas")
+          const quantityMatch = food.match(/^(\d+)\s+(.+)/);
+          let quantity = 1;
+          let foodName = food;
+
+          if (quantityMatch) {
+            quantity = parseInt(quantityMatch[1]);
+            foodName = quantityMatch[2];
+          }
+
+          const result = estimateCalories(foodName);
+          const itemCalories = result.calories * quantity;
+          totalCalories += itemCalories;
+
+          mealsList.push(`${quantity > 1 ? quantity + ' ' : ''}${result.food} (${itemCalories} cal)`);
+        }
+
+        // Update health snapshot
         const health = lsGetJson<HealthSnapshot>('tessa-health', {
           weight: 0, height: 0, meals: [], totalCalories: 0,
           date: new Date().toISOString().split('T')[0],
         });
+
+        // Reset if date changed
+        const currentDate = new Date().toISOString().split('T')[0];
+        if (health.date !== currentDate) {
+          health.meals = [];
+          health.totalCalories = 0;
+          health.date = currentDate;
+        }
+
         health.meals.push({
           time      : new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-          meal      : result.food,
-          calories  : result.calories,
-          confidence: result.confidence,
+          meal      : mealsList.join(', '),
+          calories  : totalCalories,
+          confidence: 'high',
         });
-        health.totalCalories = (health.totalCalories ?? 0) + result.calories;
+        health.totalCalories = (health.totalCalories ?? 0) + totalCalories;
         lsSet('tessa-health', JSON.stringify(health));
 
         const window = getCurrentMealWindow();
         if (window) markMeal(window.name);
-        addCalories(result.calories);
+
+        addCalories(totalCalories);
         setWellnessVersion(prev => prev + 1);
+
+        console.log(`✅ Logged ${foods.length} food items, ${totalCalories} total calories`);
       }
 
       const sleepHit = detectSleepInResponse(responseText);
@@ -530,7 +599,9 @@ export default function Home() {
         lsSet('tessa-health', JSON.stringify(health));
         extra = '\n\n' + getSleepReaction(sleepHit.hours);
       }
-    } catch {}
+    } catch (err) {
+      console.error('Error parsing dashboard updates:', err);
+    }
 
     return extra;
   };
@@ -568,8 +639,10 @@ export default function Home() {
 
     setMessages(prev => [...prev, userMsg]);
     setInput('');
-    
+
+    // CRITICAL: Copy image before clearing
     const imageCopy = selectedImage;
+    const hasImage = !!imageCopy;
     removeSelectedImage();
 
     if (textareaRef.current) textareaRef.current.style.height = '48px';
@@ -580,37 +653,58 @@ export default function Home() {
         autoSearch &&
         /search|find|latest|current|today|202[4-6]|now|recent|\?/i.test(text);
 
-      const messagePayload = imageCopy
-        ? {
-            messages    : [...messages, userMsg].map(m => ({
-              role: m.role,
-              content: m.role === 'user' && imageCopy
-                ? [
-                    { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageCopy.split(',')[1] } },
-                    { type: 'text', text: m.content }
-                  ]
-                : m.content
-            })),
-            isCreatorMode,
-            currentMood,
-            needsSearch,
-            maxTokens: MAX_TOKENS[responseLength],
+      // Build conversation history
+      const conversationHistory = [...messages, userMsg].slice(-10);
+
+      let formattedMessages;
+
+      if (hasImage && imageCopy) {
+        // Format messages with image on the current/last user message only
+        formattedMessages = conversationHistory.map((m, idx) => {
+          if (idx === conversationHistory.length - 1 && m.role === 'user') {
+            return {
+              role: 'user',
+              content: [
+                {
+                  type: 'image',
+                  source: {
+                    type: 'base64',
+                    media_type: 'image/jpeg',
+                    data: imageCopy.split(',')[1],
+                  },
+                },
+                { type: 'text', text: m.content },
+              ],
+            };
           }
-        : {
-            messages    : [...messages, userMsg].map(m => ({ role: m.role, content: m.content })),
-            isCreatorMode,
-            currentMood,
-            needsSearch,
-            maxTokens   : MAX_TOKENS[responseLength],
-          };
+          return { role: m.role, content: m.content };
+        });
+      } else {
+        formattedMessages = conversationHistory.map(m => ({
+          role: m.role,
+          content: m.content,
+        }));
+      }
+
+      console.log('📤 Sending message:', { hasImage, messageCount: formattedMessages.length });
 
       const res = await fetch('/api/chat', {
         method : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body   : JSON.stringify(messagePayload),
+        body   : JSON.stringify({
+          messages    : formattedMessages,
+          isCreatorMode,
+          currentMood,
+          needsSearch,
+          maxTokens   : MAX_TOKENS[responseLength],
+        }),
       });
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('API Error:', res.status, errorText);
+        throw new Error(`HTTP ${res.status}: ${errorText.slice(0, 100)}`);
+      }
 
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -709,7 +803,7 @@ export default function Home() {
     recognition.interimResults = false;
 
     recognition.onstart = () => setIsRecording(true);
-    
+
     recognition.onresult = (event: any) => {
       const transcript = Array.from(event.results)
         .map((result: any) => result[0].transcript)
@@ -951,22 +1045,27 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* Settings Overlay Panel */}
+      {/* ── Settings Overlay Panel (FIX: scrollable, flex-col) ── */}
       {showSettings && (
         <>
-          <div 
+          <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
             onClick={() => setShowSettings(false)}
           />
-          
+
           <div className={`
             fixed left-0 top-0 bottom-0 z-40
-            w-[17rem] md:w-80
+            w-[80vw] max-w-[320px]
             ${tc.aside} border-r
             transform transition-transform duration-300
             flex flex-col
+            overflow-hidden
           `}>
-            <div className={`flex items-center justify-between px-4 py-3 border-b ${tc.aside} flex-shrink-0`}>
+            {/* Header - Fixed */}
+            <div className={`
+              flex items-center justify-between px-4 py-3 border-b
+              ${tc.aside} flex-shrink-0 bg-inherit
+            `}>
               <h2 className={`font-bold text-sm ${tc.sH}`}>⚙️ Settings</h2>
               <button
                 onClick={() => setShowSettings(false)}
@@ -976,8 +1075,9 @@ export default function Home() {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto settings-scroll px-3 py-3 space-y-3">
-              
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto settings-scroll px-3 py-3 space-y-3 overscroll-contain">
+
               <section className="settings-section">
                 <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Theme</h3>
                 <div className="grid grid-cols-2 gap-2">
@@ -1258,7 +1358,7 @@ export default function Home() {
         {!showDashboard && (
           <div className={`flex-shrink-0 border-t ${tc.header} px-3 py-3 md:px-6`}>
             <div className="max-w-2xl mx-auto">
-              
+
               {selectedImage && (
                 <div className="mb-2 relative inline-block">
                   <img
@@ -1371,8 +1471,8 @@ export default function Home() {
           </div>
 
           <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
-            <DailyWellness 
-              isCreatorMode={isCreatorMode} 
+            <DailyWellness
+              isCreatorMode={isCreatorMode}
               refreshTrigger={wellnessVersion}
             />
 

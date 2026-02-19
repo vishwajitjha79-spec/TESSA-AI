@@ -1,4 +1,5 @@
 // EXPANDED FOOD DATABASE - 1000+ Indian & International Foods
+// EXPANDED FOOD DATABASE - 1000+ Indian & International Foods
 
 interface FoodItem {
   food: string;
@@ -218,6 +219,14 @@ const FOOD_DATABASE: Record<string, number> = {
   'soya chunks': 345, 'soya curry': 200, 'soya tikka': 180,
   'soya keema': 190, 'tofu': 76, 'tofu curry': 150, 'protein bar': 200,
 };
+
+export function getFoodSuggestions(query: string): string[] {
+  const normalized = query.toLowerCase().trim();
+  if (!normalized) return [];
+  return Object.keys(FOOD_DATABASE)
+    .filter(key => key.includes(normalized) || normalized.includes(key))
+    .slice(0, 8);
+}
 
 export function estimateCalories(food: string): FoodItem {
   const normalized = food.toLowerCase().trim();

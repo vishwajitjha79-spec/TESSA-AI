@@ -191,30 +191,8 @@ const TC = {
   },
 } as const;
 
-function useTc(theme: Theme, creator: boolean): {
-  root: string;
-  aside: string;
-  header: string;
-  card: string;
-  body: string;
-  sub: string;
-  msgU: string;
-  msgA: string;
-  input: string;
-  primary: string;
-  soft: string;
-  sH: string;
-  accent: string;
-} {
-  let b: any;
-  
-  if (theme === 'dark') b = TC.dark;
-  else if (theme === 'light') b = TC.light;
-  else if (theme === 'cyberpunk') b = TC.cyberpunk;
-  else if (theme === 'ocean') b = TC.ocean;
-  else if (theme === 'sunset') b = TC.sunset;
-  else b = TC.dark;
-  
+function useTc(theme: Theme, creator: boolean) {
+  const b = TC[theme] as typeof TC.dark; // Type assertion to fix 'never' type
   return {
     root    : creator ? (b.rootC || b.root) : b.root,
     aside   : b.aside,
@@ -368,25 +346,6 @@ export default function Home() {
   useEffect(() => { lsSet('tessa-response-length', responseLength);        }, [responseLength]);
   useEffect(() => { lsSet('tessa-animations',      String(animations));    }, [animations]);
   useEffect(() => { lsSet('tessa-sfx',             String(sfx));           }, [sfx]);
-
-  // ─── Mobile: lock body scroll when sidebar/settings overlay is open ────────
-  useEffect(() => {
-    if (showSidebar || showSettings) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-    };
-  }, [showSidebar, showSettings]);
 
   useEffect(() => {
     if (proactiveTimer.current) { clearInterval(proactiveTimer.current); proactiveTimer.current = null; }
@@ -1005,8 +964,9 @@ export default function Home() {
             w-[17rem] md:w-80
             ${tc.aside} border-r
             transform transition-transform duration-300
+            flex flex-col
           `}>
-            <div className={`flex items-center justify-between px-4 py-3 border-b ${tc.aside}`}>
+            <div className={`flex items-center justify-between px-4 py-3 border-b ${tc.aside} flex-shrink-0`}>
               <h2 className={`font-bold text-sm ${tc.sH}`}>⚙️ Settings</h2>
               <button
                 onClick={() => setShowSettings(false)}
@@ -1016,7 +976,7 @@ export default function Home() {
               </button>
             </div>
 
-            <div className="overflow-y-auto h-[calc(100vh-57px)] settings-scroll px-3 py-3 space-y-3">
+            <div className="flex-1 overflow-y-auto settings-scroll px-3 py-3 space-y-3">
               
               <section className="settings-section">
                 <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Theme</h3>
@@ -1135,8 +1095,7 @@ export default function Home() {
       ══════════════════════════════════════════════════════════════════ */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden min-w-0 z-10">
 
-        {/* Sticky header - stays put when keyboard opens on mobile */}
-        <header className={`flex-shrink-0 border-b ${tc.header} px-3 py-2.5 sticky top-0 z-30`}>
+        <header className={`flex-shrink-0 border-b ${tc.header} px-3 py-2.5`}>
           <div className="flex items-center justify-between gap-2">
 
             <div className="flex items-center gap-2.5 min-w-0">
@@ -1226,7 +1185,7 @@ export default function Home() {
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-2 py-3 md:px-3 md:py-5">
+        <div className="flex-1 overflow-y-auto px-3 py-5 md:px-6">
           <div className="max-w-2xl mx-auto">
 
             {showDashboard && isCreatorMode ? (
@@ -1296,32 +1255,27 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── Mobile-optimised input bar ── */}
         {!showDashboard && (
-          <div className={`
-            flex-shrink-0 border-t ${tc.header}
-            px-3 py-2 md:px-6 md:py-3
-            safe-bottom
-          `}>
+          <div className={`flex-shrink-0 border-t ${tc.header} px-3 py-3 md:px-6`}>
             <div className="max-w-2xl mx-auto">
-
+              
               {selectedImage && (
                 <div className="mb-2 relative inline-block">
                   <img
                     src={selectedImage}
                     alt="Preview"
-                    className="max-w-[200px] max-h-32 rounded-lg border border-white/20"
+                    className="max-w-xs max-h-40 rounded-lg border border-white/20"
                   />
                   <button
                     onClick={removeSelectedImage}
-                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5"
+                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1"
                   >
-                    <X size={16} />
+                    <X size={14} />
                   </button>
                 </div>
               )}
 
-              <div className="flex gap-1.5 items-end">
+              <div className="flex gap-2 items-end">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -1334,13 +1288,13 @@ export default function Home() {
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isLoading}
                   className={`
-                    flex-shrink-0 p-2 md:p-2.5 rounded-xl border transition-all
+                    flex-shrink-0 p-2.5 rounded-xl border transition-all
                     disabled:opacity-40 disabled:cursor-not-allowed
                     ${tc.soft}
                   `}
                   title="Attach image"
                 >
-                  <Paperclip size={16} />
+                  <Paperclip size={17} />
                 </button>
 
                 <button
@@ -1350,13 +1304,13 @@ export default function Home() {
                   onTouchEnd={e => { e.preventDefault(); stopRecording(); }}
                   disabled={isLoading}
                   className={`
-                    flex-shrink-0 p-2 md:p-2.5 rounded-xl border transition-all
+                    flex-shrink-0 p-2.5 rounded-xl border transition-all
                     disabled:opacity-40 disabled:cursor-not-allowed
                     ${isRecording ? 'bg-red-500/80 border-red-400 recording-indicator' : tc.soft}
                   `}
                   title="Hold to speak"
                 >
-                  {isRecording ? <MicOff size={16} /> : <Mic size={16} />}
+                  {isRecording ? <MicOff size={17} /> : <Mic size={17} />}
                 </button>
 
                 <textarea
@@ -1365,35 +1319,29 @@ export default function Home() {
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   onInput={handleTextareaInput}
-                  placeholder={isCreatorMode ? 'Message...' : 'Type here...'}
+                  placeholder={isCreatorMode ? 'Tell me anything…' : 'Message T.E.S.S.A…'}
                   disabled={isLoading}
                   rows={1}
                   className={`
-                    flex-1 px-3 py-2 md:px-3.5 md:py-2.5
-                    rounded-xl border text-sm resize-none
+                    flex-1 px-3.5 py-2.5 rounded-xl border text-sm resize-none
                     focus:outline-none focus:ring-2
                     ${isCreatorMode ? 'focus:ring-pink-500/30' : 'focus:ring-cyan-500/30'}
                     ${tc.input} transition-all duration-200
-                    touch-manipulation
                   `}
-                  style={{
-                    minHeight: '40px',
-                    maxHeight: '120px',
-                    WebkitAppearance: 'none' as any,
-                  }}
+                  style={{ minHeight: '44px', maxHeight: '144px' }}
                 />
 
                 <button
                   onClick={() => sendMessage()}
                   disabled={!input.trim() || isLoading}
                   className={`
-                    flex-shrink-0 p-2 md:p-2.5 rounded-xl font-bold transition-all
+                    flex-shrink-0 p-2.5 rounded-xl font-bold transition-all
                     disabled:opacity-35 disabled:cursor-not-allowed active:scale-95
                     ${tc.primary}
                   `}
                   title="Send"
                 >
-                  <Send size={16} />
+                  <Send size={17} />
                 </button>
               </div>
             </div>

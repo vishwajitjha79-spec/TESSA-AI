@@ -20,25 +20,40 @@ export async function getChatCompletion(
     maxTokens = 600 
   } = options;
 
-  // Validate API key
   if (!process.env.GROQ_API_KEY) {
     throw new Error('GROQ_API_KEY is not configured');
   }
 
-  // Validate messages
   if (!messages || messages.length === 0) {
     throw new Error('Messages array cannot be empty');
   }
 
-  // Cap temperature
   const safeTemp = Math.min(Math.max(temperature, 0), 2);
-  
-  // Cap tokens
   const safeTokens = Math.min(Math.max(maxTokens, 50), 1400);
+
+  // ═══ FIX: Check for images and strip them (Groq doesn't support vision) ═══
+  const hasImage = messages.some(m => 
+    Array.isArray(m.content) && 
+    m.content.some((c: any) => c.type === 'image')
+  );
+
+  // If image detected, convert to text-only
+  const processedMessages = hasImage 
+    ? messages.map(m => {
+        if (Array.isArray(m.content)) {
+          const textContent = m.content.find((c: any) => c.type === 'text');
+          return {
+            role: m.role,
+            content: textContent?.text || 'What do you see in this image?'
+          };
+        }
+        return m;
+      })
+    : messages;
 
   try {
     const completion = await groq.chat.completions.create({
-      messages: messages as any,
+      messages: processedMessages as any,
       model,
       temperature: safeTemp,
       max_tokens: safeTokens,
@@ -46,7 +61,6 @@ export async function getChatCompletion(
       stream: false,
     });
 
-    // Validate response
     if (!completion?.choices?.[0]?.message?.content) {
       throw new Error('Empty response from Groq API');
     }
@@ -56,7 +70,6 @@ export async function getChatCompletion(
       usage: completion.usage,
     };
   } catch (error: any) {
-    // Enhanced error logging
     console.error('Groq API Error Details:', {
       error: error.message,
       status: error.status,
@@ -64,7 +77,6 @@ export async function getChatCompletion(
       type: error.type,
     });
 
-    // Rethrow with more context
     if (error.status === 429) {
       throw new Error('Rate limit exceeded. Please try again in a moment.');
     }

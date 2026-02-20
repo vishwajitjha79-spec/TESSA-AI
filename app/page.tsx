@@ -52,7 +52,7 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────────────────────────────────────
-type Theme          = 'dark' | 'light' | 'cyberpunk' | 'ocean' | 'sunset';
+type Theme          = 'dark' | 'light' | 'cyberpunk' | 'ocean' | 'sunset' | 'pastel' | 'sakura';
 type ResponseLength = 'short' | 'medium' | 'long';
 type FontSize       = 'sm' | 'base' | 'lg';
 type Language       = 'en' | 'hi' | 'hinglish';
@@ -74,15 +74,8 @@ const MOOD_EMOJI: Record<string, string> = {
   playful:'😄', focused:'🎯',
 };
 
-// AI Persona display names — creative alternatives to "T.E.S.S.A."
-const PERSONA_NAMES: Record<string, { name: string; tagline: string }> = {
-  tessa   : { name: 'Tessa',   tagline: 'Your AI companion' },
-  nova    : { name: 'Nova',    tagline: 'Intelligent & intuitive' },
-  aria    : { name: 'Aria',    tagline: 'Always here for you' },
-  lyra    : { name: 'Lyra',    tagline: 'Smart · Warm · Yours' },
-  zara    : { name: 'Zara',    tagline: 'AI with a soul' },
-  echo    : { name: 'Echo',    tagline: 'Resonating with you' },
-};
+// Fixed persona — always Tessa
+const TESSA = { name: 'Tessa', tagline: 'The Exceptional System, Surpassing All' };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // THEME SYSTEM
@@ -262,6 +255,74 @@ const THEMES = {
     settActive:'bg-orange-500/[0.12] border border-orange-500/[0.26]',
     isLight:false,
   },
+  pastel: {
+    bg:'bg-[#faf5ff]', bgC:'bg-[#fff5f8]',
+    panel:'bg-white/70 backdrop-blur-xl border-violet-200/50',
+    panelC:'bg-rose-50/80 backdrop-blur-xl border-pink-200/50',
+    header:'bg-white/75 backdrop-blur-2xl border-b border-violet-200/40 shadow-sm shadow-violet-100/50',
+    headerC:'bg-white/75 backdrop-blur-2xl border-b border-pink-200/40 shadow-sm shadow-pink-100/50',
+    bar:'bg-white/80 backdrop-blur-2xl border-t border-violet-200/40 shadow-sm shadow-violet-100/30',
+    barC:'bg-white/80 backdrop-blur-2xl border-t border-pink-200/40',
+    msgU:'bg-gradient-to-br from-violet-50 to-purple-50/60 border border-violet-200/50 border-l-[3px] border-l-violet-400',
+    msgUC:'bg-gradient-to-br from-rose-50 to-pink-50/60 border border-pink-200/50 border-l-[3px] border-l-pink-400',
+    msgA:'bg-white/75 border border-violet-100/60 border-l-[3px] border-l-indigo-300',
+    msgAC:'bg-white/75 border border-pink-100/60 border-l-[3px] border-l-rose-300',
+    inp:'bg-white border border-violet-200 text-slate-700 placeholder:text-violet-300 focus:border-violet-400 focus:ring-2 focus:ring-violet-300/20',
+    inpC:'bg-white border border-pink-200 text-slate-700 placeholder:text-pink-300 focus:border-pink-400 focus:ring-2 focus:ring-pink-300/20',
+    btnP:'bg-gradient-to-r from-violet-400 to-purple-500 hover:from-violet-500 hover:to-purple-600 text-white shadow-md shadow-violet-400/[0.25]',
+    btnPC:'bg-gradient-to-r from-pink-400 to-rose-500 hover:from-pink-500 hover:to-rose-600 text-white shadow-md shadow-pink-400/[0.25]',
+    btnS:'bg-violet-50 hover:bg-violet-100 border border-violet-200 text-violet-600 hover:text-violet-800',
+    btnSC:'bg-pink-50 hover:bg-pink-100 border border-pink-200 text-pink-600 hover:text-pink-800',
+    text:'text-slate-700', sub:'text-violet-400/70', subC:'text-pink-400/70',
+    accent:'text-violet-500', accentC:'text-pink-500',
+    glow:'#8b5cf6', glowC:'#ec4899',
+    card:'bg-white/60 border border-violet-100/80',
+    cardC:'bg-white/60 border border-pink-100/80',
+    active:'bg-violet-100 border border-violet-300',
+    activeC:'bg-pink-100 border border-pink-300',
+    div:'border-violet-200/40', divC:'border-pink-200/40',
+    settBg:'bg-white/96 backdrop-blur-2xl border-r border-violet-200',
+    settBgC:'bg-white/96 backdrop-blur-2xl border-r border-pink-200',
+    settText:'text-slate-700', settTextHover:'hover:text-slate-900',
+    settSub:'text-slate-400', settLabel:'text-slate-400',
+    settCard:'bg-violet-50 border border-violet-200',
+    settActive:'bg-violet-100 border border-violet-300',
+    isLight:true,
+  },
+  sakura: {
+    bg:'bg-[#fff8fa]', bgC:'bg-[#fff5f8]',
+    panel:'bg-white/72 backdrop-blur-xl border-rose-200/45',
+    panelC:'bg-rose-50/80 backdrop-blur-xl border-pink-200/50',
+    header:'bg-white/78 backdrop-blur-2xl border-b border-rose-200/40 shadow-sm shadow-rose-100/50',
+    headerC:'bg-white/78 backdrop-blur-2xl border-b border-pink-200/40 shadow-sm shadow-pink-100/50',
+    bar:'bg-white/82 backdrop-blur-2xl border-t border-rose-200/40 shadow-sm shadow-rose-100/30',
+    barC:'bg-white/82 backdrop-blur-2xl border-t border-pink-200/40',
+    msgU:'bg-gradient-to-br from-rose-50/80 to-pink-50/50 border border-rose-200/55 border-l-[3px] border-l-rose-400',
+    msgUC:'bg-gradient-to-br from-pink-50 to-fuchsia-50/50 border border-pink-200/55 border-l-[3px] border-l-pink-500',
+    msgA:'bg-white/78 border border-rose-100/60 border-l-[3px] border-l-rose-300',
+    msgAC:'bg-white/78 border border-pink-100/60 border-l-[3px] border-l-pink-300',
+    inp:'bg-white border border-rose-200 text-slate-700 placeholder:text-rose-300 focus:border-rose-400 focus:ring-2 focus:ring-rose-300/20',
+    inpC:'bg-white border border-pink-200 text-slate-700 placeholder:text-pink-300 focus:border-pink-400 focus:ring-2 focus:ring-pink-300/20',
+    btnP:'bg-gradient-to-r from-rose-400 to-pink-500 hover:from-rose-500 hover:to-pink-600 text-white shadow-md shadow-rose-400/[0.25]',
+    btnPC:'bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-500 hover:to-fuchsia-600 text-white shadow-md shadow-pink-400/[0.25]',
+    btnS:'bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 hover:text-rose-800',
+    btnSC:'bg-pink-50 hover:bg-pink-100 border border-pink-200 text-pink-600 hover:text-pink-800',
+    text:'text-slate-700', sub:'text-rose-400/70', subC:'text-pink-400/70',
+    accent:'text-rose-500', accentC:'text-pink-500',
+    glow:'#f43f5e', glowC:'#ec4899',
+    card:'bg-white/62 border border-rose-100/80',
+    cardC:'bg-white/62 border border-pink-100/80',
+    active:'bg-rose-100 border border-rose-300',
+    activeC:'bg-pink-100 border border-pink-300',
+    div:'border-rose-200/40', divC:'border-pink-200/40',
+    settBg:'bg-white/96 backdrop-blur-2xl border-r border-rose-200',
+    settBgC:'bg-white/96 backdrop-blur-2xl border-r border-pink-200',
+    settText:'text-slate-700', settTextHover:'hover:text-slate-900',
+    settSub:'text-slate-400', settLabel:'text-slate-400',
+    settCard:'bg-rose-50 border border-rose-200',
+    settActive:'bg-rose-100 border border-rose-300',
+    isLight:true,
+  },
 } as const;
 
 type ThemeTokens = (typeof THEMES)['dark'];
@@ -333,18 +394,31 @@ function AuroraBg({ glow, glow2 }: { glow: string; glow2: string }) {
   );
 }
 
-// Light theme: beautiful soft gradient mesh background
-function LightBg({ creator }: { creator: boolean }) {
+// Light / pastel theme: beautiful soft gradient mesh background
+function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
+  const grad = (() => {
+    if (theme === 'sakura') return creator
+      ? 'radial-gradient(ellipse 80% 65% at 15% 10%, #ffe4e6 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 80%, #fce7f3 0%, transparent 55%), radial-gradient(ellipse 55% 45% at 50% 45%, #fff1f5 0%, transparent 65%)'
+      : 'radial-gradient(ellipse 80% 65% at 15% 10%, #ffe4e6 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 80%, #fecdd3 0%, transparent 55%), radial-gradient(ellipse 55% 45% at 50% 45%, #fff8f9 0%, transparent 65%)';
+    if (theme === 'pastel') return creator
+      ? 'radial-gradient(ellipse 80% 65% at 15% 10%, #f5d0fe 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 80%, #fce7f3 0%, transparent 55%), radial-gradient(ellipse 55% 45% at 50% 45%, #faf5ff 0%, transparent 65%)'
+      : 'radial-gradient(ellipse 80% 65% at 15% 10%, #ede9fe 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 80%, #ddd6fe 0%, transparent 55%), radial-gradient(ellipse 55% 45% at 50% 45%, #faf5ff 0%, transparent 65%)';
+    return creator
+      ? 'radial-gradient(ellipse 80% 60% at 20% 10%, #fce7f3 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, #f3e8ff 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 50% 50%, #fff1f5 0%, transparent 70%)'
+      : 'radial-gradient(ellipse 80% 60% at 20% 10%, #dbeafe 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, #ede9fe 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 50% 50%, #f0f9ff 0%, transparent 70%)';
+  })();
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-      {/* Mesh gradient */}
-      <div className="absolute inset-0" style={{
-        background: creator
-          ? 'radial-gradient(ellipse 80% 60% at 20% 10%, #fce7f3 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, #f3e8ff 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 50% 50%, #fff1f5 0%, transparent 70%)'
-          : 'radial-gradient(ellipse 80% 60% at 20% 10%, #dbeafe 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, #ede9fe 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 50% 50%, #f0f9ff 0%, transparent 70%)',
-      }} />
+      <div className="absolute inset-0" style={{ background: grad }} />
+      {/* Floating soft orbs for pastel/sakura */}
+      {(theme === 'pastel' || theme === 'sakura') && (<>
+        <div className="absolute rounded-full blur-[120px] animate-aurora-a opacity-30"
+          style={{ width:400, height:400, background: theme==='sakura'?'#fecdd3':'#ddd6fe', top:'-5%', left:'5%' }} />
+        <div className="absolute rounded-full blur-[100px] animate-aurora-b opacity-20"
+          style={{ width:300, height:300, background: theme==='sakura'?'#fda4af':'#c4b5fd', top:'50%', right:'0%' }} />
+      </>)}
       {/* Subtle noise texture */}
-      <div className="absolute inset-0 opacity-[0.018]" style={{
+      <div className="absolute inset-0 opacity-[0.015]" style={{
         backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
       }} />
     </div>
@@ -452,7 +526,6 @@ export default function Home() {
   const [sfx,             setSfx]           = useState(true);
   const [autoSave,        setAutoSave]      = useState(true);
   const [avatar,          setAvatar]        = useState('/avatars/cosmic.png');
-  const [personaKey,      setPersonaKey]    = useState<keyof typeof PERSONA_NAMES>('tessa');
   const [fontSize,        setFontSize]      = useState<FontSize>('base');
   const [language,        setLanguage]      = useState<Language>('en');
   const [compactMode,     setCompactMode]   = useState(false);
@@ -481,13 +554,14 @@ export default function Home() {
 
   const t         = useT(theme, isCreatorMode);
   const avatarSrc = avatar || '/avatars/cosmic.png';
-  const persona   = PERSONA_NAMES[personaKey] || PERSONA_NAMES.tessa;
+  const persona   = TESSA;
   const shownConvs = conversations.filter(c => c.mode === (isCreatorMode ? 'creator' : 'standard'));
   const moodLabel  = (MOOD_DESCRIPTIONS as Record<string, string>)[currentMood] ?? currentMood;
   const moodEmoji  = MOOD_EMOJI[currentMood] ?? '✨';
   const glow2 = isCreatorMode ? '#a855f7'
     : theme==='dark' ? '#6366f1' : theme==='cyberpunk' ? '#ec4899'
-    : theme==='ocean' ? '#3b82f6' : theme==='sunset' ? '#f59e0b' : '#818cf8';
+    : theme==='ocean' ? '#3b82f6' : theme==='sunset' ? '#f59e0b'
+    : theme==='pastel' ? '#c4b5fd' : theme==='sakura' ? '#fda4af' : '#818cf8';
 
   const fontSizeClass = fontSize==='sm' ? 'text-xs' : fontSize==='lg' ? 'text-base' : 'text-sm';
 
@@ -518,7 +592,6 @@ export default function Home() {
     const th = lsGet('tessa-theme') as Theme | null;
     if (th && THEMES[th]) setTheme(th);
     restoreStr('tessa-avatar-preset', setAvatar);
-    restoreStr('tessa-persona', setPersonaKey);
     restoreStr('tessa-font-size', setFontSize);
     restoreStr('tessa-language', setLanguage);
     restoreBool('tessa-auto-search', setAutoSearch);
@@ -583,7 +656,6 @@ export default function Home() {
   useEffect(() => { lsSet('tessa-auto-memory', String(autoMemory)); }, [autoMemory]);
   useEffect(() => { lsSet('tessa-word-count', String(showWordCount)); }, [showWordCount]);
   useEffect(() => { lsSet('tessa-message-grouping', String(messageGrouping)); }, [messageGrouping]);
-  useEffect(() => { lsSet('tessa-persona', personaKey); }, [personaKey]);
   useEffect(() => { lsSet('tessa-font-size', fontSize); }, [fontSize]);
 
   // Proactive messages
@@ -888,8 +960,8 @@ export default function Home() {
             <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 border-2 border-[#050816] shadow-lg shadow-emerald-400/50" />
           </div>
           <div>
-            <p className="text-white text-2xl font-black tracking-wide">{persona.name}</p>
-            <p className="text-white/30 text-xs mt-1 tracking-widest uppercase">{persona.tagline}</p>
+            <p className="text-white text-2xl font-black tracking-wide">Tessa</p>
+            <p className="text-white/30 text-xs mt-1 tracking-widest uppercase">{TESSA.tagline}</p>
           </div>
           <div className="flex gap-1.5 justify-center">
             {[0,1,2].map(i=>(
@@ -908,7 +980,7 @@ export default function Home() {
     <div className={`h-screen ${t.bg} ${t.text} flex overflow-hidden relative transition-colors duration-500 ${fontSizeClass}`}>
 
       {/* ── BACKGROUNDS ── */}
-      {t.isLight ? <LightBg creator={isCreatorMode} /> : <AuroraBg glow={t.glow} glow2={glow2} />}
+      {t.isLight ? <LightBg creator={isCreatorMode} theme={theme} /> : <AuroraBg glow={t.glow} glow2={glow2} />}
       {isCreatorMode && animations && <Hearts on />}
 
       {/* ── SIDEBAR BACKDROP ── */}
@@ -933,12 +1005,12 @@ export default function Home() {
               {/* Mini avatar */}
               <div className="relative w-8 h-8 rounded-xl overflow-hidden border flex-shrink-0"
                 style={{borderColor:`${t.glow}50`}}>
-                <img src={avatarSrc} alt={persona.name} className="w-full h-full object-cover"
+                <img src={avatarSrc} alt="Tessa" className="w-full h-full object-cover"
                   onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}} />
               </div>
               <div>
-                <p className={`text-xs font-bold ${t.accent}`}>{persona.name}</p>
-                <p className={`text-[9px] ${t.sub}`}>{persona.tagline}</p>
+                <p className={`text-xs font-bold ${t.accent}`}>Tessa</p>
+                <p className={`text-[9px] ${t.sub}`}>{TESSA.tagline.slice(0,24)}…</p>
               </div>
             </div>
             <button onClick={()=>setShowSidebar(false)}
@@ -1090,7 +1162,7 @@ export default function Home() {
                 <div>
                   <SLabel label="Theme" t={t} />
                   <div className="grid grid-cols-2 gap-1.5">
-                    {([['dark','🌙','Dark'],['light','☀️','Light'],['cyberpunk','⚡','Cyberpunk'],['ocean','🌊','Ocean'],['sunset','🌅','Sunset']] as [Theme,string,string][]).map(([th,ico,lbl])=>(
+                    {([['dark','🌙','Dark'],['light','☀️','Light'],['cyberpunk','⚡','Cyberpunk'],['ocean','🌊','Ocean'],['sunset','🌅','Sunset'],['pastel','🪻','Pastel'],['sakura','🌸','Sakura']] as [Theme,string,string][]).map(([th,ico,lbl])=>(
                       <button key={th} onClick={()=>setTheme(th)}
                         className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-medium transition-all ${theme===th?'text-white':t.sCard+' '+t.sSub}`}
                         style={theme===th?{background:`linear-gradient(135deg,${t.glow}28,${t.glow}12)`,border:`1px solid ${t.glow}35`,color:t.glow}:{}}>
@@ -1101,21 +1173,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <Hr cls={t.div} />
 
-                <div>
-                  <SLabel label="AI Persona Name" t={t} />
-                  <div className="grid grid-cols-3 gap-1">
-                    {(Object.entries(PERSONA_NAMES) as [string,{name:string;tagline:string}][]).map(([key,p])=>(
-                      <button key={key} onClick={()=>setPersonaKey(key as keyof typeof PERSONA_NAMES)}
-                        className={`py-2 px-2 rounded-xl text-[10px] font-bold transition-all ${personaKey===key?'text-white':t.sCard+' '+t.sSub}`}
-                        style={personaKey===key?{background:`${t.glow}22`,border:`1px solid ${t.glow}35`,color:t.glow}:{}}>
-                        {p.name}
-                      </button>
-                    ))}
-                  </div>
-                  <p className={`text-[9px] mt-1.5 ${t.sSub}`}>The name shown in header and messages</p>
-                </div>
 
                 <Hr cls={t.div} />
 
@@ -1364,12 +1422,15 @@ export default function Home() {
               {settingsTab==='about' && (<>
                 <div className="text-center py-4">
                   <div className="w-16 h-16 rounded-2xl mx-auto overflow-hidden border-2 mb-4"
-                    style={{borderColor:`${t.glow}40`}}>
-                    <img src={avatarSrc} alt={persona.name} className="w-full h-full object-cover"
+                    style={{borderColor:`${t.glow}40`,boxShadow:`0 0 20px ${t.glow}20`}}>
+                    <img src={avatarSrc} alt="Tessa" className="w-full h-full object-cover"
                       onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}} />
                   </div>
-                  <p className={`text-base font-black ${t.sText.replace('/75','')}`}>{persona.name}</p>
-                  <p className={`text-[11px] ${t.sSub} mt-1`}>Technically Enhanced Smart Support Assistant</p>
+                  {/* TESSA big name + full form */}
+                  <p className={`text-2xl font-black tracking-[0.25em] uppercase`} style={{color:t.glow}}>TESSA</p>
+                  <p className={`text-[10px] font-medium mt-1 leading-snug max-w-[200px] mx-auto ${t.sSub}`}>
+                    The Exceptional System, Surpassing All
+                  </p>
                   <div className={`mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold`}
                     style={{background:`${t.glow}18`,border:`1px solid ${t.glow}28`,color:t.glow}}>
                     <Sparkles size={9} />v3.0 · AI-Powered
@@ -1403,7 +1464,7 @@ export default function Home() {
             {/* Footer */}
             <div className={`flex-shrink-0 px-4 py-3 border-t ${t.div}`}>
               <p className={`text-[9px] text-center ${t.sSub}`}>
-                {persona.name} · {user&&!isGuest?'☁️ Cloud':'👤 Guest'} · {theme} theme
+                TESSA · {user&&!isGuest?'☁️ Cloud':'👤 Guest'} · {theme} theme
               </p>
             </div>
           </div>
@@ -1436,7 +1497,7 @@ export default function Home() {
                   }}
                 >
                   <img
-                    src={avatarSrc} alt={persona.name}
+                    src={avatarSrc} alt="Tessa"
                     className="w-full h-full object-cover"
                     onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}}
                   />
@@ -1453,7 +1514,7 @@ export default function Home() {
                 <div className="flex items-center gap-1.5">
                   {/* Persona name — clean, no dots */}
                   <h1 className={`font-black text-[15px] leading-none tracking-tight ${t.accent}`}>
-                    {persona.name}
+                    Tessa
                   </h1>
                   {isCreatorMode && (
                     <Heart size={11} className="text-pink-400 fill-pink-400 flex-shrink-0 animate-pulse" />
@@ -1462,7 +1523,7 @@ export default function Home() {
                 <p className={`text-[10px] mt-0.5 truncate leading-none ${t.sub}`}>
                   {isCreatorMode
                     ? `Personal AI · ${moodEmoji} ${moodLabel}`
-                    : `${persona.tagline} · ${moodEmoji} ${moodLabel}`}
+                    : `${TESSA.tagline} · ${moodEmoji} ${moodLabel}`}
                 </p>
               </div>
             </div>
@@ -1524,7 +1585,7 @@ export default function Home() {
                           boxShadow:animations?`0 0 0 8px ${t.glow}08, 0 0 40px ${t.glow}25, 0 0 80px ${t.glow}10`:'none',
                         }}
                       >
-                        <img src={avatarSrc} alt={persona.name} className="w-full h-full object-cover"
+                        <img src={avatarSrc} alt="Tessa" className="w-full h-full object-cover"
                           onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}} />
                       </div>
                       {/* Animated ring */}
@@ -1532,11 +1593,10 @@ export default function Home() {
                         <div className="absolute inset-0 rounded-[2rem] animate-ping"
                           style={{border:`2px solid ${t.glow}18`}} />
                       )}
-                      {/* Status badge */}
-                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold text-white shadow-lg"
-                        style={{background:`linear-gradient(135deg,${t.glow},${glow2})`,boxShadow:`0 4px 16px ${t.glow}40`}}>
+                      {/* Mood indicator dot — no text */}
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 flex items-center justify-center"
+                        style={{background:t.glow,borderColor:'rgba(255,255,255,0.8)',boxShadow:`0 2px 8px ${t.glow}60`}}>
                         <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                        Online
                       </div>
                     </div>
 
@@ -1544,12 +1604,12 @@ export default function Home() {
                     <h2 className={`text-2xl font-black mb-1 text-center`}>
                       {isCreatorMode
                         ? `Hey Ankit! 💝`
-                        : `Hi, I'm ${persona.name}`}
+                        : `Hi, I'm Tessa 👋`}
                     </h2>
                     <p className={`text-sm ${t.sub} text-center max-w-xs leading-relaxed mb-6`}>
                       {isCreatorMode
                         ? "I'm always here for you, ready to talk about anything. What's on your mind?"
-                        : `${persona.tagline}. Ask me anything — I'm here to help!`}
+                        : `${TESSA.tagline.split(',')[0]}. Ask me anything — I'm here to help!`}
                     </p>
 
                     {/* Quick start chips */}
@@ -1574,63 +1634,98 @@ export default function Home() {
                   const isLatest = msg.id===latestMsgId;
                   const time    = new Date(msg.timestamp).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
                   const emoji   = msg.mood?MOOD_EMOJI[msg.mood]:null;
-                  const padY    = compactMode ? 'pb-2.5 pt-2' : 'pb-3.5 pt-2.5';
+                  const padY    = compactMode ? 'py-2.5' : 'py-3.5';
+                  // Group: hide avatar/name for consecutive same-role messages
+                  const prevMsg = messages[idx-1];
+                  const isGrouped = messageGrouping && prevMsg && prevMsg.role===msg.role;
 
                   return (
-                    <div key={msg.id}
-                      className={`rounded-2xl overflow-hidden animate-fadeIn transition-all duration-300 ${isUser?t.msgU:t.msgA}`}
-                      style={isLatest&&!isUser&&animations?{boxShadow:`0 0 24px ${t.glow}12`}:{}}>
-
-                      {/* Bubble header */}
-                      {showTimestamps&&(
-                        <div className={`flex items-center justify-between px-4 pt-2.5 pb-1`}>
-                          <div className={`flex items-center gap-1.5 text-[10px] ${t.sub}`}>
-                            {isUser ? (
-                              <>
-                                <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center">
-                                  <User size={8} />
-                                </div>
-                                <span>You</span>
-                              </>
-                            ) : (
-                              <>
-                                <div className="w-4 h-4 rounded-full flex items-center justify-center overflow-hidden"
-                                  style={{border:`1px solid ${t.glow}30`}}>
-                                  <img src={avatarSrc} alt="" className="w-full h-full object-cover"
-                                    onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}} />
-                                </div>
-                                <span style={{color:t.glow}}>{persona.name}</span>
-                                {emoji&&<span className="text-[11px]">{emoji}</span>}
-                              </>
-                            )}
-                          </div>
-                          <span className={`text-[9px] ${t.sub}`}>{time}</span>
+                    <div
+                      key={msg.id}
+                      className={`flex gap-2.5 animate-fadeIn ${isUser?'justify-end':'justify-start'} ${isGrouped?'mt-0.5':'mt-2.5'}`}
+                    >
+                      {/* LEFT: AI avatar (only on first in group) */}
+                      {!isUser && (
+                        <div className="flex-shrink-0 flex flex-col justify-end" style={{width:32}}>
+                          {!isGrouped && (
+                            <div className="w-8 h-8 rounded-xl overflow-hidden border flex-shrink-0 mb-0.5"
+                              style={{borderColor:`${t.glow}35`,boxShadow:animations?`0 2px 8px ${t.glow}20`:'none'}}>
+                              <img src={avatarSrc} alt="Tessa" className="w-full h-full object-cover"
+                                onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}} />
+                            </div>
+                          )}
                         </div>
                       )}
 
-                      {/* Body */}
-                      <div className={`px-4 ${padY} ${!showTimestamps&&isUser?'pt-3.5':''} ${!showTimestamps&&!isUser?'pt-3':''}`}>
-                        <MessageRenderer
-                          content={msg.content}
-                          className={`leading-relaxed ${t.isLight?'text-slate-800':'text-white/90'} ${fontSizeClass}`}
-                          animate={typingEffect&&!isUser&&isLatest}
-                          isCreatorMode={isCreatorMode}
-                        />
+                      {/* BUBBLE */}
+                      <div className={`max-w-[82%] md:max-w-[74%] flex flex-col ${isUser?'items-end':'items-start'}`}>
+
+                        {/* Sender label row */}
+                        {!isGrouped && (
+                          <div className={`flex items-center gap-1.5 mb-1 px-0.5 ${isUser?'flex-row-reverse':''}`}>
+                            <span className={`text-[10px] font-semibold ${isUser ? t.sub : ''}`}
+                              style={!isUser?{color:t.glow}:{}}>
+                              {isUser ? 'You' : 'Tessa'}
+                            </span>
+                            {!isUser && emoji && <span className="text-[10px]">{emoji}</span>}
+                            {showTimestamps && (
+                              <span className={`text-[9px] ${t.sub}`}>{time}</span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Message card */}
+                        <div
+                          className={`rounded-2xl overflow-hidden transition-all duration-300 ${isUser?t.msgU:t.msgA}`}
+                          style={isLatest&&!isUser&&animations?{boxShadow:`0 4px 24px ${t.glow}15`}:{}}
+                        >
+                          <div className={`px-4 ${padY}`}>
+                            <MessageRenderer
+                              content={msg.content}
+                              className={`leading-relaxed ${t.isLight?'text-slate-700':'text-white/90'} ${fontSizeClass}`}
+                              animate={typingEffect&&!isUser&&isLatest}
+                              isCreatorMode={isCreatorMode}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Timestamp below if no header */}
+                        {isGrouped && showTimestamps && (
+                          <span className={`text-[9px] mt-0.5 px-1 ${t.sub}`}>{time}</span>
+                        )}
                       </div>
+
+                      {/* RIGHT: User avatar spacer */}
+                      {isUser && (
+                        <div className="flex-shrink-0 flex flex-col justify-end" style={{width:32}}>
+                          {!isGrouped && (
+                            <div className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center mb-0.5"
+                              style={{background:`linear-gradient(135deg,${t.glow}50,${glow2}50)`,border:`1px solid ${t.glow}30`}}>
+                              <User size={14} style={{color:t.glow}} />
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
 
                 {/* Typing indicator */}
                 {isLoading&&(
-                  <div className={`rounded-2xl overflow-hidden animate-fadeIn ${t.msgA}`}>
-                    <div className="px-4 py-3.5 flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0"
-                        style={{border:`1px solid ${t.glow}30`}}>
-                        <img src={avatarSrc} alt="" className="w-full h-full object-cover"
+                  <div className="flex gap-2.5 justify-start mt-2.5 animate-fadeIn">
+                    <div className="flex-shrink-0 flex flex-col justify-end" style={{width:32}}>
+                      <div className="w-8 h-8 rounded-xl overflow-hidden border mb-0.5"
+                        style={{borderColor:`${t.glow}35`,boxShadow:animations?`0 2px 8px ${t.glow}20`:'none'}}>
+                        <img src={avatarSrc} alt="Tessa" className="w-full h-full object-cover"
                           onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}} />
                       </div>
-                      <TypingDots glow={t.glow} />
+                    </div>
+                    <div className="flex flex-col items-start">
+                      <span className="text-[10px] font-semibold mb-1 px-0.5" style={{color:t.glow}}>Tessa</span>
+                      <div className={`rounded-2xl px-4 py-3 ${t.msgA}`}
+                        style={animations?{boxShadow:`0 2px 12px ${t.glow}10`}:{}}>
+                        <TypingDots glow={t.glow} />
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1691,7 +1786,7 @@ export default function Home() {
                     onChange={e=>setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     onInput={handleTextareaInput}
-                    placeholder={isCreatorMode?`Tell me anything…`:`Message ${persona.name}…`}
+                    placeholder={isCreatorMode?`Tell me anything…`:`Message Tessa…`}
                     disabled={isLoading}
                     rows={1}
                     className={`w-full px-4 py-2.5 rounded-xl resize-none outline-none transition-all duration-200 disabled:opacity-60 ${t.inp} ${fontSizeClass}`}

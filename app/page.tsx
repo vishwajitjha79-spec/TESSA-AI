@@ -8,10 +8,8 @@ import {
   Calendar, ChevronDown, ChevronUp, StickyNote, Paperclip, ChevronRight,
 } from 'lucide-react';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 import type { Message, MoodType, Conversation } from '@/types';
 
-// ─── Components ───────────────────────────────────────────────────────────────
 import SecretVerification from '@/components/SecretVerification';
 import PersonalDashboard  from '@/components/PersonalDashboard';
 import AvatarPresets      from '@/components/AvatarPresets';
@@ -25,7 +23,6 @@ import DailyWellness      from '@/components/StreakDashboard';
 import TessaInsights      from '@/components/TessaInsights';
 import MessageRenderer    from '@/components/MessageRenderer';
 
-// ─── Lib ──────────────────────────────────────────────────────────────────────
 import { supabase, getCurrentUser, signOut }         from '@/lib/supabase';
 import { MOOD_DESCRIPTIONS }                          from '@/lib/mood';
 import { getRandomWelcomeMessage }                    from '@/lib/profile';
@@ -46,7 +43,6 @@ import {
 } from '@/lib/streaks-water';
 import { buildMorningBriefing, shouldDeliverBriefing, markBriefingDelivered } from '@/lib/streaks-water';
 
-// ─── Local types ──────────────────────────────────────────────────────────────
 type Theme          = 'dark' | 'light' | 'cyberpunk' | 'ocean' | 'sunset';
 type ResponseLength = 'short' | 'medium' | 'long';
 
@@ -59,7 +55,6 @@ interface HealthSnapshot {
   date         : string;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
 const MAX_TOKENS: Record<ResponseLength, number> = { short: 350, medium: 700, long: 1400 };
 
 const VALID_MOODS: MoodType[] = [
@@ -67,7 +62,6 @@ const VALID_MOODS: MoodType[] = [
   'flirty', 'loving', 'thinking', 'listening', 'playful', 'focused',
 ];
 
-// ─── Theme tokens ─────────────────────────────────────────────────────────────
 const TC = {
   dark: {
     root    : 'bg-gradient-to-br from-[#0a0e27] via-[#141830] to-[#0d1020]',
@@ -192,7 +186,7 @@ const TC = {
 } as const;
 
 function useTc(theme: Theme, creator: boolean) {
-  const b = TC[theme] as typeof TC.dark; // Type assertion to fix 'never' type
+  const b = TC[theme] as typeof TC.dark;
   return {
     root    : creator ? (b.rootC || b.root) : b.root,
     aside   : b.aside,
@@ -230,7 +224,6 @@ function lsGetJson<T>(key: string, fallback: T): T {
   } catch { return fallback; }
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
 export default function Home() {
 
   const [user,    setUser]    = useState<any>(null);
@@ -266,9 +259,9 @@ export default function Home() {
   const [autoSave,       setAutoSave]      = useState(true);
   const [avatar,         setAvatar]        = useState('/avatars/cosmic.png');
 
-  const [isRecording, setIsRecording] = useState(false);
+  const [isRecording,     setIsRecording]     = useState(false);
   const [wellnessVersion, setWellnessVersion] = useState(0);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage,   setSelectedImage]   = useState<string | null>(null);
 
   const bottomRef      = useRef<HTMLDivElement>(null);
   const textareaRef    = useRef<HTMLTextAreaElement>(null);
@@ -277,8 +270,8 @@ export default function Home() {
   const proactiveTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const voicesReady    = useRef(false);
 
-  const tc        = useTc(theme, isCreatorMode);
-  const avatarSrc = avatar || '/avatars/cosmic.png';
+  const tc         = useTc(theme, isCreatorMode);
+  const avatarSrc  = avatar || '/avatars/cosmic.png';
   const shownConvs = conversations.filter(
     c => c.mode === (isCreatorMode ? 'creator' : 'standard')
   );
@@ -290,7 +283,6 @@ export default function Home() {
     lsSet('tessa-theme', t);
   }, []);
 
-  // ─── Bootstrap ─────────────────────────────────────────────────────────────
   useEffect(() => {
     const saved = {
       theme         : lsGet('tessa-theme') as Theme | null,
@@ -538,12 +530,7 @@ export default function Home() {
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Image must be under 5MB');
-      return;
-    }
-
+    if (file.size > 5 * 1024 * 1024) { alert('Image must be under 5MB'); return; }
     const reader = new FileReader();
     reader.onloadend = () => setSelectedImage(reader.result as string);
     reader.readAsDataURL(file);
@@ -556,55 +543,50 @@ export default function Home() {
 
   const sendMessage = async (override?: string) => {
     const text = (override ?? input).trim();
-    
-    // ═══ FIX: Allow sending image without text ═══
     if (!text && !selectedImage) return;
     if (isLoading) return;
 
     const userMsg: Message = {
       id       : uuidv4(),
       role     : 'user',
-      content  : text || (selectedImage ? '📷 [Sent an image]' : ''),
+      content  : text || '📷 [Sent an image]',
       timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMsg]);
     setInput('');
-    
+
+    // ─── declare imageCopy & hasImage BEFORE needsSearch uses them ───
     const imageCopy = selectedImage;
+    const hasImage  = !!imageCopy;
     removeSelectedImage();
 
     if (textareaRef.current) textareaRef.current.style.height = '48px';
     setIsLoading(true);
 
     try {
-      // ═══ FIX: Smarter search detection - don't search needlessly ═══
-      const needsSearch = 
-        autoSearch && 
-        text &&
-        !hasImage && // Don't search for image queries
-        !isCreatorMode && // Don't search in creator mode
+      const needsSearch =
+        autoSearch &&
+        !!text &&
+        !hasImage &&
+        !isCreatorMode &&
         (
-          // Question about current events
           /\b(latest|current|today|now|recent|this week|this month|202[4-6])\b/i.test(text) ||
-          // Explicit search request
           /\b(search|find|look up|google)\b/i.test(text) ||
-          // Question format (only if substantial)
           (/\?/.test(text) && text.split(' ').length > 3)
         ) &&
-        // EXCLUDE personal/conversational queries
         !/\b(how are you|what do you think|tell me about yourself|your opinion|you like|i feel|i think|my day|i'm|i am)\b/i.test(text);
 
-      const messagePayload = imageCopy
+      const messagePayload = hasImage && imageCopy
         ? {
-            messages    : [...messages, userMsg].map(m => ({
-              role: m.role,
+            messages  : [...messages, userMsg].map(m => ({
+              role   : m.role,
               content: m.role === 'user' && imageCopy
                 ? [
                     { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageCopy.split(',')[1] } },
-                    { type: 'text', text: m.content }
+                    { type: 'text', text: m.content },
                   ]
-                : m.content
+                : m.content,
             })),
             isCreatorMode,
             currentMood,
@@ -612,11 +594,11 @@ export default function Home() {
             maxTokens: MAX_TOKENS[responseLength],
           }
         : {
-            messages    : [...messages, userMsg].map(m => ({ role: m.role, content: m.content })),
+            messages  : [...messages, userMsg].map(m => ({ role: m.role, content: m.content })),
             isCreatorMode,
             currentMood,
             needsSearch,
-            maxTokens   : MAX_TOKENS[responseLength],
+            maxTokens : MAX_TOKENS[responseLength],
           };
 
       const res = await fetch('/api/chat', {
@@ -652,21 +634,19 @@ export default function Home() {
       if (autoSave)    setTimeout(persistConversation, 1_000);
 
     } catch (err: any) {
-      console.error('❌ Send message error:', err);
-      
-      // ═══ FIX: More helpful error messages ═══
+      console.error('❌ Send error:', err);
+
       let errorMsg = err?.message || 'Something went wrong. Please try again.';
-      
       if (errorMsg.includes('429') || errorMsg.includes('rate limit')) {
-        errorMsg = '⏱️ Too many requests. Please wait a moment and try again.';
+        errorMsg = '⏱️ Too many requests. Please wait a moment.';
       } else if (errorMsg.includes('401') || errorMsg.includes('API key')) {
         errorMsg = '🔑 Configuration error. Please contact support.';
       } else if (errorMsg.includes('context length')) {
         errorMsg = '📝 Message too long. Please try a shorter message.';
       } else if (hasImage) {
-        errorMsg = '📷 Image processing failed. The AI will describe what it would see based on your message.';
+        errorMsg = '📷 Image processing failed. Please try again.';
       }
-      
+
       setMessages(prev => [...prev, {
         id       : uuidv4(),
         role     : 'assistant' as const,
@@ -682,117 +662,64 @@ export default function Home() {
   const speakText = (raw: string) => {
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
-
-    const clean = raw
-      .replace(/\*\*/g, '')
-      .replace(/#{1,6}\s/g, '')
-      .replace(/[*_~`]/g, '')
-      .slice(0, 600);
-
+    const clean = raw.replace(/\*\*/g, '').replace(/#{1,6}\s/g, '').replace(/[*_~`]/g, '').slice(0, 600);
     const utter = new SpeechSynthesisUtterance(clean);
-    utter.pitch = 1.45;
-    utter.rate  = 1.1;
-    utter.lang  = 'en-IN';
-
+    utter.pitch = 1.45; utter.rate = 1.1; utter.lang = 'en-IN';
     const assignVoice = () => {
-      const voices  = window.speechSynthesis.getVoices();
-      const female  = voices.find(v =>
+      const voices = window.speechSynthesis.getVoices();
+      const female = voices.find(v =>
         /samantha|victoria|karen|moira|fiona|kate|veena|zira|google (us english|uk english female)/i.test(v.name)
       ) ?? voices.find(v => /female|woman/i.test(v.name));
       if (female) utter.voice = female;
       window.speechSynthesis.speak(utter);
     };
-
-    if (voicesReady.current) {
-      assignVoice();
-    } else {
-      window.speechSynthesis.onvoiceschanged = () => { voicesReady.current = true; assignVoice(); };
-    }
+    if (voicesReady.current) { assignVoice(); }
+    else { window.speechSynthesis.onvoiceschanged = () => { voicesReady.current = true; assignVoice(); }; }
   };
 
   const playChime = () => {
     try {
-      const ctx  = new AudioContext();
-      const osc  = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value = 880;
-      osc.type            = 'sine';
+      const ctx = new AudioContext(); const osc = ctx.createOscillator(); const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 880; osc.type = 'sine';
       gain.gain.setValueAtTime(0.12, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.25);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.25);
     } catch {}
   };
 
   const startRecording = () => {
     const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
-    if (!SR) {
-      alert('Speech recognition not supported');
-      return;
-    }
+    if (!SR) { alert('Speech recognition not supported'); return; }
 
     const recognition = new SR();
-    
-    // ═══ FIX: Better recognition settings for accuracy ═══
     recognition.lang = 'en-IN';
-    recognition.continuous = false; // Better accuracy
-    recognition.interimResults = true; // Show results as speaking
-    recognition.maxAlternatives = 3; // Get best alternatives
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 3;
 
     let finalTranscript = '';
-    let interimTranscript = '';
 
-    recognition.onstart = () => {
-      setIsRecording(true);
-      console.log('🎤 Listening...');
-    };
-    
+    recognition.onstart  = () => setIsRecording(true);
     recognition.onresult = (event: any) => {
-      interimTranscript = '';
-      
+      let interim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript + ' ';
-        } else {
-          interimTranscript += transcript;
-        }
+        const t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) finalTranscript += t + ' ';
+        else interim += t;
       }
-      
-      // Show interim results while speaking
-      setInput(finalTranscript + interimTranscript);
+      setInput(finalTranscript + interim);
     };
-
     recognition.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
       setIsRecording(false);
-      
-      if (event.error === 'no-speech') {
-        // Silent, just stop
-      } else if (event.error === 'audio-capture') {
-        alert('Microphone not found. Please check permissions.');
-      } else if (event.error === 'not-allowed') {
-        alert('Microphone access denied. Please allow in browser settings.');
-      } else {
-        alert('Voice recognition failed. Please try again.');
-      }
+      if (event.error === 'audio-capture') alert('Microphone not found.');
+      else if (event.error === 'not-allowed') alert('Microphone access denied.');
+      else if (event.error !== 'no-speech') alert('Voice recognition failed.');
     };
-
-    recognition.onend = () => {
-      setIsRecording(false);
-      console.log('🎤 Stopped listening');
-    };
+    recognition.onend = () => setIsRecording(false);
 
     recognitionRef.current = recognition;
-    try {
-      recognition.start();
-    } catch (err) {
-      console.error('Failed to start recognition:', err);
-      setIsRecording(false);
-    }
+    try { recognition.start(); } catch { setIsRecording(false); }
   };
 
   const stopRecording = () => {
@@ -811,23 +738,10 @@ export default function Home() {
 
     const pendingBriefing = lsGet('tessa-pending-briefing');
     const initMsg: Message = pendingBriefing
-      ? {
-          id       : uuidv4(),
-          role     : 'assistant',
-          content  : pendingBriefing,
-          timestamp: new Date(),
-          mood     : 'loving' as MoodType,
-        }
-      : {
-          id       : uuidv4(),
-          role     : 'assistant',
-          content  : getRandomWelcomeMessage(),
-          timestamp: new Date(),
-          mood     : 'loving' as MoodType,
-        };
+      ? { id: uuidv4(), role: 'assistant', content: pendingBriefing, timestamp: new Date(), mood: 'loving' as MoodType }
+      : { id: uuidv4(), role: 'assistant', content: getRandomWelcomeMessage(), timestamp: new Date(), mood: 'loving' as MoodType };
 
     if (pendingBriefing) lsRemove('tessa-pending-briefing');
-
     setMessages([initMsg]);
     setShowSecretModal(false);
     setShowSettings(false);
@@ -854,17 +768,10 @@ export default function Home() {
     el.style.height = Math.min(el.scrollHeight, 144) + 'px';
   };
 
-  const ToggleRow = ({
-    label, checked, onChange,
-  }: { label: string; checked: boolean; onChange: (v: boolean) => void }) => (
+  const ToggleRow = ({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) => (
     <label className="flex items-center justify-between cursor-pointer text-xs">
       <span>{label}</span>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={e => onChange(e.target.checked)}
-        className="w-3.5 h-3.5 accent-pink-500"
-      />
+      <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} className="w-3.5 h-3.5 accent-pink-500" />
     </label>
   );
 
@@ -873,9 +780,7 @@ export default function Home() {
       <div className="h-screen bg-[#0a0e27] flex items-center justify-center">
         <div className="text-center">
           <div className={`text-5xl mb-5 ${animations ? 'animate-bounce' : ''}`}>🌌</div>
-          <p className="text-gray-400 text-sm tracking-[0.2em] uppercase">
-            Initialising T.E.S.S.A.
-          </p>
+          <p className="text-gray-400 text-sm tracking-[0.2em] uppercase">Initialising T.E.S.S.A.</p>
         </div>
       </div>
     );
@@ -887,84 +792,39 @@ export default function Home() {
       {isCreatorMode && animations && (
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden>
           {['8%', '22%', '38%', '55%', '70%', '87%'].map((left, i) => (
-            <span
-              key={i}
-              className="absolute text-lg select-none opacity-0 animate-float-heart"
-              style={{ left, animationDelay: `${i * 1.6}s`, animationDuration: `${8 + i * 1.2}s` }}
-            >
-              ❤️
-            </span>
+            <span key={i} className="absolute text-lg select-none opacity-0 animate-float-heart"
+              style={{ left, animationDelay: `${i * 1.6}s`, animationDuration: `${8 + i * 1.2}s` }}>❤️</span>
           ))}
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════
-          LEFT SIDEBAR
-      ══════════════════════════════════════════════════════════════════ */}
-      <aside
-        className={`
-          flex-shrink-0 border-r ${tc.aside}
-          flex flex-col h-screen overflow-hidden z-20
-          transition-all duration-300 ease-in-out
-          ${showSidebar ? 'w-[17rem] md:w-72' : 'w-0'}
-        `}
-        aria-label="Navigation sidebar"
-      >
+      {/* LEFT SIDEBAR */}
+      <aside className={`flex-shrink-0 border-r ${tc.aside} flex flex-col h-screen overflow-hidden z-20 transition-all duration-300 ease-in-out ${showSidebar ? 'w-[17rem] md:w-72' : 'w-0'}`} aria-label="Navigation sidebar">
         <div className="flex-shrink-0">
-          <button
-            onClick={() => setNotesExpanded(p => !p)}
-            className={`
-              w-full flex items-center justify-between px-4 py-3
-              border-b ${tc.aside} text-sm font-semibold ${tc.sH}
-              hover:bg-white/5 transition-colors
-            `}
-          >
+          <button onClick={() => setNotesExpanded(p => !p)} className={`w-full flex items-center justify-between px-4 py-3 border-b ${tc.aside} text-sm font-semibold ${tc.sH} hover:bg-white/5 transition-colors`}>
             <span className="flex items-center gap-2"><StickyNote size={14} />Quick Notes</span>
             {notesExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
           </button>
-          {notesExpanded && (
-            <div className="max-h-56 overflow-y-auto">
-              <NotesPanel />
-            </div>
-          )}
+          {notesExpanded && <div className="max-h-56 overflow-y-auto"><NotesPanel /></div>}
         </div>
 
         <div className="flex-1 flex flex-col min-h-0 border-t border-white/5">
           <div className="flex-shrink-0 p-3 pb-2">
-            <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 ${tc.sH}`}>
-              💬 {isCreatorMode ? 'Our Chats' : 'History'}
-            </p>
-            <button
-              onClick={startNewChat}
-              className={`w-full py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${tc.soft}`}
-            >
+            <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 ${tc.sH}`}>💬 {isCreatorMode ? 'Our Chats' : 'History'}</p>
+            <button onClick={startNewChat} className={`w-full py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${tc.soft}`}>
               <Plus size={13} /> New Chat
             </button>
           </div>
 
           <div className="flex-1 overflow-y-auto sidebar-scroll px-3 pb-3 space-y-1.5">
-            {shownConvs.length === 0 && (
-              <p className={`text-xs text-center py-8 ${tc.sub}`}>No chats yet</p>
-            )}
+            {shownConvs.length === 0 && <p className={`text-xs text-center py-8 ${tc.sub}`}>No chats yet</p>}
             {shownConvs.map(conv => (
-              <div
-                key={conv.id}
-                onClick={() => openConversation(conv)}
-                className={`
-                  group relative px-3 py-2.5 rounded-lg border cursor-pointer transition-all
-                  ${conv.id === currentConvId
-                    ? `${tc.soft} border-opacity-80`
-                    : `${tc.card} hover:border-white/15`
-                  }
-                `}
-              >
+              <div key={conv.id} onClick={() => openConversation(conv)}
+                className={`group relative px-3 py-2.5 rounded-lg border cursor-pointer transition-all ${conv.id === currentConvId ? `${tc.soft} border-opacity-80` : `${tc.card} hover:border-white/15`}`}>
                 <p className="text-xs font-medium truncate pr-5 leading-snug">{conv.title}</p>
                 <p className={`text-[10px] mt-0.5 ${tc.sub}`}>{conv.messages.length} messages</p>
-                <button
-                  onClick={e => { e.stopPropagation(); removeConversation(conv.id); }}
-                  className="absolute right-2 top-2.5 opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-opacity"
-                  title="Delete"
-                >
+                <button onClick={e => { e.stopPropagation(); removeConversation(conv.id); }}
+                  className="absolute right-2 top-2.5 opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-opacity" title="Delete">
                   <Trash2 size={12} />
                 </button>
               </div>
@@ -973,96 +833,48 @@ export default function Home() {
         </div>
 
         <div className="flex-shrink-0 border-t border-white/5">
-          <button
-            onClick={() => setShowSettings(p => !p)}
-            className={`
-              w-full flex items-center justify-between px-4 py-3
-              text-sm font-semibold ${tc.sH}
-              hover:bg-white/5 transition-colors
-            `}
-          >
+          <button onClick={() => setShowSettings(p => !p)} className={`w-full flex items-center justify-between px-4 py-3 text-sm font-semibold ${tc.sH} hover:bg-white/5 transition-colors`}>
             <span className="flex items-center gap-2"><Settings size={14} />Settings</span>
             {showSettings ? <X size={13} /> : <ChevronRight size={13} />}
           </button>
         </div>
 
         <div className={`flex-shrink-0 p-3 border-t ${tc.aside}`}>
-          <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5 ${tc.sH}`}>
-            <User size={12} /> Account
-          </p>
+          <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5 ${tc.sH}`}><User size={12} /> Account</p>
           {user && !isGuest ? (
             <div className="space-y-1.5">
               <p className={`text-xs truncate ${tc.sub}`}>{user.email}</p>
-              <button
-                onClick={handleSignOut}
-                className="w-full py-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-400 text-xs flex items-center justify-center gap-1.5 transition-all"
-              >
+              <button onClick={handleSignOut} className="w-full py-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-400 text-xs flex items-center justify-center gap-1.5 transition-all">
                 <LogOut size={12} /> Sign Out
               </button>
             </div>
           ) : (
             <div className="space-y-1.5">
               <p className={`text-xs ${tc.sub}`}>👤 Guest Mode</p>
-              <button
-                onClick={() => alert('Configure Supabase auth!')}
-                className={`w-full py-1.5 rounded-lg text-xs transition-all ${tc.soft}`}
-              >
-                Sign In
-              </button>
+              <button onClick={() => alert('Configure Supabase auth!')} className={`w-full py-1.5 rounded-lg text-xs transition-all ${tc.soft}`}>Sign In</button>
             </div>
           )}
         </div>
       </aside>
 
-      {/* Settings Overlay Panel */}
+      {/* SETTINGS OVERLAY — scrollable, flex-col, Creator Mode reachable on mobile */}
       {showSettings && (
         <>
-          <div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
-            onClick={() => setShowSettings(false)}
-          />
-          
-          <div className={`
-            fixed left-0 top-0 bottom-0 z-40
-            w-[17rem] md:w-80
-            ${tc.aside} border-r
-            transform transition-transform duration-300
-            flex flex-col
-          `}>
-            <div className={`flex items-center justify-between px-4 py-3 border-b ${tc.aside} flex-shrink-0`}>
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30" onClick={() => setShowSettings(false)} />
+          <div className={`fixed left-0 top-0 bottom-0 z-40 w-[80vw] max-w-[320px] ${tc.aside} border-r flex flex-col overflow-hidden`}>
+            <div className={`flex items-center justify-between px-4 py-3 border-b ${tc.aside} flex-shrink-0 bg-inherit`}>
               <h2 className={`font-bold text-sm ${tc.sH}`}>⚙️ Settings</h2>
-              <button
-                onClick={() => setShowSettings(false)}
-                className="p-1 hover:bg-white/10 rounded transition-colors"
-              >
-                <X size={16} />
-              </button>
+              <button onClick={() => setShowSettings(false)} className="p-1 hover:bg-white/10 rounded transition-colors"><X size={16} /></button>
             </div>
 
-            <div className="flex-1 overflow-y-auto settings-scroll px-3 py-3 space-y-3">
-              
+            <div className="flex-1 overflow-y-auto settings-scroll px-3 py-3 space-y-3 overscroll-contain">
+
               <section className="settings-section">
                 <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Theme</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  {([
-                    ['dark', '🌙 Dark'],
-                    ['light', '☀️ Light'],
-                    ['cyberpunk', '⚡ Cyberpunk'],
-                    ['ocean', '🌊 Ocean'],
-                    ['sunset', '🌅 Sunset'],
-                  ] as [Theme, string][]).map(([t, label]) => (
-                    <button
-                      key={t}
-                      onClick={() => setTheme(t)}
-                      className={`
-                        py-2 px-2 text-[10px] font-medium rounded-lg transition-all
-                        ${theme === t
-                          ? `${isCreatorMode ? 'bg-pink-500' : 'bg-cyan-500'} text-white border-2 border-white/20`
-                          : 'bg-white/5 hover:bg-white/10 border border-white/10'
-                        }
-                      `}
-                    >
-                      {label}
+                  {(['dark','light','cyberpunk','ocean','sunset'] as Theme[]).map((t, i) => (
+                    <button key={t} onClick={() => setTheme(t)} className={`py-2 px-2 text-[10px] font-medium rounded-lg transition-all ${theme === t ? `${isCreatorMode ? 'bg-pink-500' : 'bg-cyan-500'} text-white border-2 border-white/20` : 'bg-white/5 hover:bg-white/10 border border-white/10'}`}>
+                      {['🌙 Dark','☀️ Light','⚡ Cyberpunk','🌊 Ocean','🌅 Sunset'][i]}
                     </button>
                   ))}
                 </div>
@@ -1070,12 +882,7 @@ export default function Home() {
 
               <section className="settings-section">
                 <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Avatar</h3>
-                <button
-                  onClick={() => setShowAvatarModal(true)}
-                  className={`w-full py-1.5 rounded-lg text-xs font-semibold transition-all ${tc.soft}`}
-                >
-                  Choose Preset
-                </button>
+                <button onClick={() => setShowAvatarModal(true)} className={`w-full py-1.5 rounded-lg text-xs font-semibold transition-all ${tc.soft}`}>Choose Preset</button>
               </section>
 
               <section className="settings-section">
@@ -1092,20 +899,8 @@ export default function Home() {
                   <div>
                     <p className="text-[10px] text-gray-400 mb-1">Response Length</p>
                     <div className="flex rounded-lg overflow-hidden border border-white/10">
-                      {(['short', 'medium', 'long'] as ResponseLength[]).map(l => (
-                        <button
-                          key={l}
-                          onClick={() => setResponseLength(l)}
-                          className={`
-                            flex-1 py-1 text-[10px] capitalize transition-all
-                            ${responseLength === l
-                              ? `${isCreatorMode ? 'bg-pink-500' : 'bg-cyan-500'} text-white`
-                              : 'hover:bg-white/8'
-                            }
-                          `}
-                        >
-                          {l}
-                        </button>
+                      {(['short','medium','long'] as ResponseLength[]).map(l => (
+                        <button key={l} onClick={() => setResponseLength(l)} className={`flex-1 py-1 text-[10px] capitalize transition-all ${responseLength === l ? `${isCreatorMode ? 'bg-pink-500' : 'bg-cyan-500'} text-white` : 'hover:bg-white/8'}`}>{l}</button>
                       ))}
                     </div>
                   </div>
@@ -1122,27 +917,19 @@ export default function Home() {
               <section className="settings-section">
                 <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Data</h3>
                 <ToggleRow label="Auto-save Chats" checked={autoSave} onChange={setAutoSave} />
-                <p className={`text-[9px] ${tc.sub} mt-1`}>
-                  {user && !isGuest ? '☁️ Cloud synced' : '📱 Local storage'}
-                </p>
+                <p className={`text-[9px] ${tc.sub} mt-1`}>{user && !isGuest ? '☁️ Cloud synced' : '📱 Local storage'}</p>
               </section>
 
               {!isCreatorMode ? (
-                <section className="settings-section border-pink-500/20">
-                  <button
-                    onClick={() => setShowSecretModal(true)}
-                    className="w-full py-2 rounded-lg border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 text-xs font-semibold transition-all"
-                  >
+                <section className="settings-section">
+                  <button onClick={() => setShowSecretModal(true)} className="w-full py-2 rounded-lg border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 text-xs font-semibold transition-all">
                     🔓 Unlock Creator Mode
                   </button>
                 </section>
               ) : (
-                <section className="settings-section border-pink-500/20">
+                <section className="settings-section">
                   <p className={`text-[10px] ${tc.sub} mb-2`}>Creator Mode Active 💝</p>
-                  <button
-                    onClick={exitCreatorMode}
-                    className="w-full py-1.5 rounded-lg border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 text-xs transition-all"
-                  >
+                  <button onClick={exitCreatorMode} className="w-full py-1.5 rounded-lg border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 text-xs transition-all">
                     Exit Creator Mode
                   </button>
                 </section>
@@ -1153,95 +940,34 @@ export default function Home() {
         </>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════
-          MAIN AREA
-      ══════════════════════════════════════════════════════════════════ */}
+      {/* MAIN AREA */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden min-w-0 z-10">
-
         <header className={`flex-shrink-0 border-b ${tc.header} px-3 py-2.5`}>
           <div className="flex items-center justify-between gap-2">
-
             <div className="flex items-center gap-2.5 min-w-0">
-              <button
-                onClick={() => setShowSidebar(p => !p)}
-                className="flex-shrink-0 p-1.5 rounded-lg hover:bg-white/10 transition-colors"
-                aria-label="Toggle sidebar"
-              >
+              <button onClick={() => setShowSidebar(p => !p)} className="flex-shrink-0 p-1.5 rounded-lg hover:bg-white/10 transition-colors" aria-label="Toggle sidebar">
                 {showSidebar ? <X size={19} /> : <Menu size={19} />}
               </button>
-
               <div className="relative flex-shrink-0">
-                <div className={`
-                  w-10 h-10 rounded-full overflow-hidden border-2
-                  ${isCreatorMode
-                    ? `border-pink-500 ${animations ? 'animate-edge-pulse-creator' : ''}`
-                    : `border-cyan-400 ${animations ? 'animate-edge-pulse-standard' : ''}`
-                  }
-                `}>
-                  <img
-                    src={avatarSrc}
-                    alt="T.E.S.S.A."
-                    className={`w-full h-full object-cover ${animations
-                      ? isCreatorMode ? 'neon-avatar-creator' : 'neon-avatar-standard'
-                      : ''
-                    }`}
-                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-                  />
+                <div className={`w-10 h-10 rounded-full overflow-hidden border-2 ${isCreatorMode ? `border-pink-500 ${animations ? 'animate-edge-pulse-creator' : ''}` : `border-cyan-400 ${animations ? 'animate-edge-pulse-standard' : ''}`}`}>
+                  <img src={avatarSrc} alt="T.E.S.S.A." className={`w-full h-full object-cover ${animations ? isCreatorMode ? 'neon-avatar-creator' : 'neon-avatar-standard' : ''}`}
+                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
                 </div>
-                <Heart
-                  size={11}
-                  className={`
-                    absolute -bottom-0.5 -right-0.5
-                    ${isCreatorMode ? 'text-pink-400 fill-pink-400' : 'text-cyan-400 fill-cyan-400'}
-                    ${animations ? 'animate-pulse' : ''}
-                  `}
-                />
+                <Heart size={11} className={`absolute -bottom-0.5 -right-0.5 ${isCreatorMode ? 'text-pink-400 fill-pink-400' : 'text-cyan-400 fill-cyan-400'} ${animations ? 'animate-pulse' : ''}`} />
               </div>
-
               <div className="min-w-0">
                 <h1 className="text-lg font-bold leading-none holographic-text">T.E.S.S.A.</h1>
-                <p className={`text-[10px] mt-0.5 ${tc.sub}`}>
-                  {isCreatorMode ? '💝 Personal Mode' : 'AI Assistant'}
-                </p>
+                <p className={`text-[10px] mt-0.5 ${tc.sub}`}>{isCreatorMode ? '💝 Personal Mode' : 'AI Assistant'}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-1 flex-shrink-0">
-              <span className={`
-                hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] border
-                ${isCreatorMode
-                  ? 'bg-pink-500/10 border-pink-500/25 text-pink-300'
-                  : 'bg-cyan-500/10 border-cyan-500/25 text-cyan-300'
-                }
-              `}>
+              <span className={`hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] border ${isCreatorMode ? 'bg-pink-500/10 border-pink-500/25 text-pink-300' : 'bg-cyan-500/10 border-cyan-500/25 text-cyan-300'}`}>
                 {(MOOD_DESCRIPTIONS as Record<string, string>)[currentMood] ?? currentMood}
               </span>
-
-              {isCreatorMode && (
-                <button
-                  onClick={() => setShowPlanners(true)}
-                  className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
-                  title="Smart Planners"
-                >
-                  <Calendar size={17} />
-                </button>
-              )}
-
-              {isCreatorMode && (
-                <button
-                  onClick={() => setShowDashboard(p => !p)}
-                  className={`p-1.5 rounded-lg transition-colors ${showDashboard ? 'bg-pink-500/20 text-pink-300' : 'hover:bg-white/10'}`}
-                  title="Personal Dashboard"
-                >
-                  <LayoutDashboard size={17} />
-                </button>
-              )}
-
-              <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
-                title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-              >
+              {isCreatorMode && <button onClick={() => setShowPlanners(true)} className="p-1.5 rounded-lg hover:bg-white/10 transition-colors" title="Smart Planners"><Calendar size={17} /></button>}
+              {isCreatorMode && <button onClick={() => setShowDashboard(p => !p)} className={`p-1.5 rounded-lg transition-colors ${showDashboard ? 'bg-pink-500/20 text-pink-300' : 'hover:bg-white/10'}`} title="Personal Dashboard"><LayoutDashboard size={17} /></button>}
+              <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-1.5 rounded-lg hover:bg-white/10 transition-colors">
                 {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
               </button>
             </div>
@@ -1250,45 +976,25 @@ export default function Home() {
 
         <div className="flex-1 overflow-y-auto px-3 py-5 md:px-6">
           <div className="max-w-2xl mx-auto">
-
             {showDashboard && isCreatorMode ? (
               <PersonalDashboard />
             ) : (
               <div className="space-y-3">
-
                 {messages.length === 0 && (
                   <div className="text-center py-20 select-none">
-                    <div className={`text-5xl mb-4 ${animations ? 'animate-pulse' : ''}`}>
-                      {isCreatorMode ? '💝' : '🌌'}
-                    </div>
-                    <p className={`text-base font-semibold ${tc.body}`}>
-                      {isCreatorMode ? 'Hey Ankit! 💕' : 'Hello!'}
-                    </p>
-                    <p className={`text-sm mt-1 ${tc.sub}`}>
-                      {isCreatorMode
-                        ? "What's on your mind today?"
-                        : "Ask me anything — I'm here to help!"}
-                    </p>
+                    <div className={`text-5xl mb-4 ${animations ? 'animate-pulse' : ''}`}>{isCreatorMode ? '💝' : '🌌'}</div>
+                    <p className={`text-base font-semibold ${tc.body}`}>{isCreatorMode ? 'Hey Ankit! 💕' : 'Hello!'}</p>
+                    <p className={`text-sm mt-1 ${tc.sub}`}>{isCreatorMode ? "What's on your mind today?" : "Ask me anything — I'm here to help!"}</p>
                   </div>
                 )}
 
                 {messages.map(msg => (
-                  <div
-                    key={msg.id}
-                    className={`rounded-xl px-4 py-3.5 animate-fadeIn ${msg.role === 'user' ? tc.msgU : tc.msgA}`}
-                  >
-                    <MessageRenderer
-                      content={msg.content}
-                      className={`text-sm ${theme === 'light' ? 'text-slate-800' : 'text-gray-100'}`}
-                      animate={typingEnabled && msg.role === 'assistant' && msg.id === latestMsgId}
-                      isCreatorMode={isCreatorMode}
-                    />
+                  <div key={msg.id} className={`rounded-xl px-4 py-3.5 animate-fadeIn ${msg.role === 'user' ? tc.msgU : tc.msgA}`}>
+                    <MessageRenderer content={msg.content} className={`text-sm ${theme === 'light' ? 'text-slate-800' : 'text-gray-100'}`}
+                      animate={typingEnabled && msg.role === 'assistant' && msg.id === latestMsgId} isCreatorMode={isCreatorMode} />
                     <p className={`text-[10px] mt-2 ${tc.sub}`}>
-                      {msg.role === 'user' ? '👤 You' : '✨ T.E.S.S.A.'}
-                      {' · '}
-                      {new Date(msg.timestamp).toLocaleTimeString('en-IN', {
-                        hour: '2-digit', minute: '2-digit',
-                      })}
+                      {msg.role === 'user' ? '👤 You' : '✨ T.E.S.S.A.'}{' · '}
+                      {new Date(msg.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
                 ))}
@@ -1298,20 +1004,13 @@ export default function Home() {
                     <div className="flex items-center gap-2">
                       <div className="flex gap-1">
                         {[0, 150, 300].map(delay => (
-                          <div
-                            key={delay}
-                            className={`w-1.5 h-1.5 rounded-full ${isCreatorMode ? 'bg-pink-400' : 'bg-cyan-400'} animate-bounce`}
-                            style={{ animationDelay: `${delay}ms` }}
-                          />
+                          <div key={delay} className={`w-1.5 h-1.5 rounded-full ${isCreatorMode ? 'bg-pink-400' : 'bg-cyan-400'} animate-bounce`} style={{ animationDelay: `${delay}ms` }} />
                         ))}
                       </div>
-                      <span className={`text-xs ${tc.sub}`}>
-                        {isCreatorMode ? 'Thinking about you…' : 'Thinking…'}
-                      </span>
+                      <span className={`text-xs ${tc.sub}`}>{isCreatorMode ? 'Thinking about you…' : 'Thinking…'}</span>
                     </div>
                   </div>
                 )}
-
                 <div ref={bottomRef} />
               </div>
             )}
@@ -1321,95 +1020,38 @@ export default function Home() {
         {!showDashboard && (
           <div className={`flex-shrink-0 border-t ${tc.header} px-3 py-3 md:px-6`}>
             <div className="max-w-2xl mx-auto">
-              
               {selectedImage && (
                 <div className="mb-2 relative inline-block">
-                  <img
-                    src={selectedImage}
-                    alt="Preview"
-                    className="max-w-xs max-h-40 rounded-lg border border-white/20"
-                  />
-                  <button
-                    onClick={removeSelectedImage}
-                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1"
-                  >
-                    <X size={14} />
-                  </button>
+                  <img src={selectedImage} alt="Preview" className="max-w-xs max-h-40 rounded-lg border border-white/20" />
+                  <button onClick={removeSelectedImage} className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1"><X size={14} /></button>
                 </div>
               )}
 
               <div className="flex gap-2 items-end">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageSelect}
-                  className="hidden"
-                />
+                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
 
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isLoading}
-                  className={`
-                    flex-shrink-0 p-2.5 rounded-xl border transition-all
-                    disabled:opacity-40 disabled:cursor-not-allowed
-                    ${tc.soft}
-                  `}
-                  title="Attach image"
-                >
+                <button onClick={() => fileInputRef.current?.click()} disabled={isLoading}
+                  className={`flex-shrink-0 p-2.5 rounded-xl border transition-all disabled:opacity-40 disabled:cursor-not-allowed ${tc.soft}`} title="Attach image">
                   <Paperclip size={17} />
                 </button>
 
-                <button
-                  onMouseDown={startRecording}
-                  onMouseUp={stopRecording}
-                  onTouchStart={e => { e.preventDefault(); startRecording(); }}
-                  onTouchEnd={e => { e.preventDefault(); stopRecording(); }}
+                <button onMouseDown={startRecording} onMouseUp={stopRecording}
+                  onTouchStart={e => { e.preventDefault(); startRecording(); }} onTouchEnd={e => { e.preventDefault(); stopRecording(); }}
                   disabled={isLoading}
-                  className={`
-                    flex-shrink-0 p-2.5 rounded-xl border transition-all
-                    disabled:opacity-40 disabled:cursor-not-allowed
-                    ${isRecording ? 'bg-red-500/80 border-red-400 recording-indicator' : tc.soft}
-                  `}
-                  title="Hold to speak"
-                >
+                  className={`flex-shrink-0 p-2.5 rounded-xl border transition-all disabled:opacity-40 disabled:cursor-not-allowed ${isRecording ? 'bg-red-500/80 border-red-400 recording-indicator' : tc.soft}`}
+                  title="Hold to speak">
                   {isRecording ? <MicOff size={17} /> : <Mic size={17} />}
                 </button>
 
-                <textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={e => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  onInput={handleTextareaInput}
+                <textarea ref={textareaRef} value={input} onChange={e => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown} onInput={handleTextareaInput}
                   placeholder={isCreatorMode ? 'Tell me anything…' : 'Message T.E.S.S.A…'}
-                  disabled={isLoading}
-                  rows={1}
-                  className={`
-                    flex-1 px-3.5 py-2.5 rounded-xl border text-sm resize-none
-                    focus:outline-none focus:ring-2
-                    ${isCreatorMode ? 'focus:ring-pink-500/30' : 'focus:ring-cyan-500/30'}
-                    ${tc.input} transition-all duration-200
-                    touch-manipulation
-                  `}
-                  style={{ 
-                    minHeight: '44px', 
-                    maxHeight: '144px',
-                    WebkitAppearance: 'none',
-                    color: theme === 'light' ? '#1f2937' : '#ffffff',
-                  }}
-                />
+                  disabled={isLoading} rows={1}
+                  className={`flex-1 px-3.5 py-2.5 rounded-xl border text-sm resize-none focus:outline-none focus:ring-2 ${isCreatorMode ? 'focus:ring-pink-500/30' : 'focus:ring-cyan-500/30'} ${tc.input} transition-all duration-200 touch-manipulation`}
+                  style={{ minHeight: '44px', maxHeight: '144px', WebkitAppearance: 'none', color: theme === 'light' ? '#1f2937' : '#ffffff' }} />
 
-                <button
-                  onClick={() => sendMessage()}
-                  disabled={!input.trim() || isLoading}
-                  className={`
-                    flex-shrink-0 p-2.5 rounded-xl font-bold transition-all
-                    disabled:opacity-35 disabled:cursor-not-allowed active:scale-95
-                    ${tc.primary}
-                  `}
-                  title="Send"
-                >
+                <button onClick={() => sendMessage()} disabled={(!input.trim() && !selectedImage) || isLoading}
+                  className={`flex-shrink-0 p-2.5 rounded-xl font-bold transition-all disabled:opacity-35 disabled:cursor-not-allowed active:scale-95 ${tc.primary}`} title="Send">
                   <Send size={17} />
                 </button>
               </div>
@@ -1418,68 +1060,27 @@ export default function Home() {
         )}
       </main>
 
-      {/* ══════════════════════════════════════════════════════════════════
-          RIGHT SIDEBAR
-      ══════════════════════════════════════════════════════════════════ */}
+      {/* RIGHT SIDEBAR */}
       {showDashboard && (
-        <aside
-          className={`
-            flex-shrink-0 border-l ${tc.aside}
-            flex flex-col h-screen overflow-hidden z-20
-            w-[15rem]
-          `}
-          aria-label="Right panel"
-        >
+        <aside className={`flex-shrink-0 border-l ${tc.aside} flex flex-col h-screen overflow-hidden z-20 w-[15rem]`} aria-label="Right panel">
           <div className="flex-shrink-0">
-            <ProfileCard
-              avatarPath={avatarSrc}
-              mood={currentMood}
-              isCreatorMode={isCreatorMode}
-              animationsEnabled={animations}
-            />
+            <ProfileCard avatarPath={avatarSrc} mood={currentMood} isCreatorMode={isCreatorMode} animationsEnabled={animations} />
           </div>
-
           <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
-            <DailyWellness 
-              isCreatorMode={isCreatorMode} 
-              refreshTrigger={wellnessVersion}
-            />
-
+            <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion} />
             {isCreatorMode && (
-              <button
-                onClick={() => {
-                  addWater(1);
-                  setWellnessVersion(v => v + 1);
-                }}
-                className={`w-full py-2 rounded-lg text-xs font-medium transition-all ${tc.soft}`}
-              >
+              <button onClick={() => { addWater(1); setWellnessVersion(v => v + 1); }} className={`w-full py-2 rounded-lg text-xs font-medium transition-all ${tc.soft}`}>
                 💧 +1 Water Glass
               </button>
             )}
-
-            {isCreatorMode && (
-              <div>
-                <p className={`text-xs font-bold ${tc.sH} mb-3`}>⏱️ Study Timer</p>
-                <StudyTimer />
-              </div>
-            )}
-
-            {isCreatorMode && (
-              <div className="border-t border-white/5 pt-4">
-                <TessaInsights isCreatorMode={isCreatorMode} />
-              </div>
-            )}
-
+            {isCreatorMode && <div><p className={`text-xs font-bold ${tc.sH} mb-3`}>⏱️ Study Timer</p><StudyTimer /></div>}
+            {isCreatorMode && <div className="border-t border-white/5 pt-4"><TessaInsights isCreatorMode={isCreatorMode} /></div>}
             {isCreatorMode && (
               <div className="settings-section">
                 <h3 className="text-xs font-bold text-gray-400 mb-2">🧠 Memory</h3>
-                <p className={`text-[10px] ${tc.sub} mb-2`}>
-                  {getAllMemories().length} facts remembered
-                </p>
-                <button
-                  onClick={() => { if (confirm('Clear all memories?')) clearAllMemories(); }}
-                  className="w-full py-1.5 rounded-lg text-xs border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all"
-                >
+                <p className={`text-[10px] ${tc.sub} mb-2`}>{getAllMemories().length} facts remembered</p>
+                <button onClick={() => { if (confirm('Clear all memories?')) clearAllMemories(); }}
+                  className="w-full py-1.5 rounded-lg text-xs border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all">
                   Clear Memory
                 </button>
               </div>
@@ -1488,45 +1089,12 @@ export default function Home() {
         </aside>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════
-          MODALS
-      ══════════════════════════════════════════════════════════════════ */}
-
-      {showSecretModal && (
-        <SecretVerification
-          onSuccess={unlockCreatorModeAction}
-          onClose={() => setShowSecretModal(false)}
-        />
-      )}
-
-      {showAvatarModal && (
-        <AvatarPresets
-          currentAvatar={avatar}
-          onAvatarChange={path => {
-            setAvatar(path);
-            lsSet('tessa-avatar-preset', path);
-          }}
-          onClose={() => setShowAvatarModal(false)}
-        />
-      )}
-
-      {showPlanners && (
-        <PlannerHub onClose={() => setShowPlanners(false)} />
-      )}
-
-      {showFlashcards && (
-        <FlashcardGenerator
-          isCreatorMode={isCreatorMode}
-          onClose={() => setShowFlashcards(false)}
-        />
-      )}
-
-      {showReportCard && (
-        <ReportCard
-          isCreatorMode={isCreatorMode}
-          onClose={() => setShowReportCard(false)}
-        />
-      )}
+      {/* MODALS */}
+      {showSecretModal && <SecretVerification onSuccess={unlockCreatorModeAction} onClose={() => setShowSecretModal(false)} />}
+      {showAvatarModal && <AvatarPresets currentAvatar={avatar} onAvatarChange={path => { setAvatar(path); lsSet('tessa-avatar-preset', path); }} onClose={() => setShowAvatarModal(false)} />}
+      {showPlanners    && <PlannerHub onClose={() => setShowPlanners(false)} />}
+      {showFlashcards  && <FlashcardGenerator isCreatorMode={isCreatorMode} onClose={() => setShowFlashcards(false)} />}
+      {showReportCard  && <ReportCard isCreatorMode={isCreatorMode} onClose={() => setShowReportCard(false)} />}
 
     </div>
   );

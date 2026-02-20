@@ -192,7 +192,7 @@ const TC = {
 } as const;
 
 function useTc(theme: Theme, creator: boolean) {
-  const b = TC[theme] as typeof TC.dark;
+  const b = TC[theme] as typeof TC.dark; // Type assertion to fix 'never' type
   return {
     root    : creator ? (b.rootC || b.root) : b.root,
     aside   : b.aside,
@@ -328,32 +328,6 @@ export default function Home() {
       lsSet('tessa-pending-briefing', briefing);
     }
 
-    // ── MIDNIGHT RESET: check for date change on page load ──
-    const checkMidnightReset = () => {
-      const currentDate = new Date().toISOString().split('T')[0];
-      const lastDate = lsGet('tessa-last-date');
-
-      if (lastDate && lastDate !== currentDate) {
-        // New day detected - reset health snapshot
-        const health = lsGetJson<HealthSnapshot>('tessa-health', {
-          weight: 0, height: 0, meals: [], totalCalories: 0,
-          date: currentDate,
-        });
-        health.meals = [];
-        health.totalCalories = 0;
-        health.date = currentDate;
-        lsSet('tessa-health', JSON.stringify(health));
-        console.log('🌙 Midnight reset - cleared health data');
-      }
-
-      lsSet('tessa-last-date', currentDate);
-    };
-
-    checkMidnightReset();
-
-    // Check every minute if date changed
-    const midnightChecker = setInterval(checkMidnightReset, 60000);
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       const u = session?.user ?? null;
       setUser(u);
@@ -362,7 +336,6 @@ export default function Home() {
 
     return () => {
       subscription.unsubscribe();
-      clearInterval(midnightChecker);
       if (proactiveTimer.current) clearInterval(proactiveTimer.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -520,73 +493,31 @@ export default function Home() {
     }
   };
 
-  // ── FIX: parseDashboardUpdates — handles MULTIPLE food items ──
   const parseDashboardUpdates = (responseText: string): string => {
     if (!isCreatorMode) return '';
     let extra = '';
 
     try {
-      const foodItems = detectMealInResponse(responseText);
-
-      if (foodItems) {
-        let totalCalories = 0;
-        const mealsList: string[] = [];
-
-        // Split food string by common separators
-        const foods = foodItems.food
-          .split(/,|and|\+|with/i)
-          .map((f: string) => f.trim())
-          .filter(Boolean);
-
-        // Process EACH food item
-        for (const food of foods) {
-          // Check for quantity multipliers (e.g. "4 roti", "2 samosas")
-          const quantityMatch = food.match(/^(\d+)\s+(.+)/);
-          let quantity = 1;
-          let foodName = food;
-
-          if (quantityMatch) {
-            quantity = parseInt(quantityMatch[1]);
-            foodName = quantityMatch[2];
-          }
-
-          const result = estimateCalories(foodName);
-          const itemCalories = result.calories * quantity;
-          totalCalories += itemCalories;
-
-          mealsList.push(`${quantity > 1 ? quantity + ' ' : ''}${result.food} (${itemCalories} cal)`);
-        }
-
-        // Update health snapshot
+      const foodHit = detectMealInResponse(responseText);
+      if (foodHit) {
+        const result = estimateCalories(foodHit.food);
         const health = lsGetJson<HealthSnapshot>('tessa-health', {
           weight: 0, height: 0, meals: [], totalCalories: 0,
           date: new Date().toISOString().split('T')[0],
         });
-
-        // Reset if date changed
-        const currentDate = new Date().toISOString().split('T')[0];
-        if (health.date !== currentDate) {
-          health.meals = [];
-          health.totalCalories = 0;
-          health.date = currentDate;
-        }
-
         health.meals.push({
           time      : new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-          meal      : mealsList.join(', '),
-          calories  : totalCalories,
-          confidence: 'high',
+          meal      : result.food,
+          calories  : result.calories,
+          confidence: result.confidence,
         });
-        health.totalCalories = (health.totalCalories ?? 0) + totalCalories;
+        health.totalCalories = (health.totalCalories ?? 0) + result.calories;
         lsSet('tessa-health', JSON.stringify(health));
 
         const window = getCurrentMealWindow();
         if (window) markMeal(window.name);
-
-        addCalories(totalCalories);
+        addCalories(result.calories);
         setWellnessVersion(prev => prev + 1);
-
-        console.log(`✅ Logged ${foods.length} food items, ${totalCalories} total calories`);
       }
 
       const sleepHit = detectSleepInResponse(responseText);
@@ -599,9 +530,7 @@ export default function Home() {
         lsSet('tessa-health', JSON.stringify(health));
         extra = '\n\n' + getSleepReaction(sleepHit.hours);
       }
-    } catch (err) {
-      console.error('Error parsing dashboard updates:', err);
-    }
+    } catch {}
 
     return extra;
   };
@@ -627,84 +556,76 @@ export default function Home() {
 
   const sendMessage = async (override?: string) => {
     const text = (override ?? input).trim();
+    
+    // ═══ FIX: Allow sending image without text ═══
     if (!text && !selectedImage) return;
     if (isLoading) return;
 
     const userMsg: Message = {
       id       : uuidv4(),
       role     : 'user',
-      content  : text || '📷 [Image attached]',
+      content  : text || (selectedImage ? '📷 [Sent an image]' : ''),
       timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMsg]);
     setInput('');
-
-    // CRITICAL: Copy image before clearing
+    
     const imageCopy = selectedImage;
-    const hasImage = !!imageCopy;
     removeSelectedImage();
 
     if (textareaRef.current) textareaRef.current.style.height = '48px';
     setIsLoading(true);
 
     try {
-      const needsSearch =
-        autoSearch &&
-        /search|find|latest|current|today|202[4-6]|now|recent|\?/i.test(text);
+      // ═══ FIX: Smarter search detection - don't search needlessly ═══
+      const needsSearch = 
+        autoSearch && 
+        text &&
+        !hasImage && // Don't search for image queries
+        !isCreatorMode && // Don't search in creator mode
+        (
+          // Question about current events
+          /\b(latest|current|today|now|recent|this week|this month|202[4-6])\b/i.test(text) ||
+          // Explicit search request
+          /\b(search|find|look up|google)\b/i.test(text) ||
+          // Question format (only if substantial)
+          (/\?/.test(text) && text.split(' ').length > 3)
+        ) &&
+        // EXCLUDE personal/conversational queries
+        !/\b(how are you|what do you think|tell me about yourself|your opinion|you like|i feel|i think|my day|i'm|i am)\b/i.test(text);
 
-      // Build conversation history
-      const conversationHistory = [...messages, userMsg].slice(-10);
-
-      let formattedMessages;
-
-      if (hasImage && imageCopy) {
-        // Format messages with image on the current/last user message only
-        formattedMessages = conversationHistory.map((m, idx) => {
-          if (idx === conversationHistory.length - 1 && m.role === 'user') {
-            return {
-              role: 'user',
-              content: [
-                {
-                  type: 'image',
-                  source: {
-                    type: 'base64',
-                    media_type: 'image/jpeg',
-                    data: imageCopy.split(',')[1],
-                  },
-                },
-                { type: 'text', text: m.content },
-              ],
-            };
+      const messagePayload = imageCopy
+        ? {
+            messages    : [...messages, userMsg].map(m => ({
+              role: m.role,
+              content: m.role === 'user' && imageCopy
+                ? [
+                    { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageCopy.split(',')[1] } },
+                    { type: 'text', text: m.content }
+                  ]
+                : m.content
+            })),
+            isCreatorMode,
+            currentMood,
+            needsSearch,
+            maxTokens: MAX_TOKENS[responseLength],
           }
-          return { role: m.role, content: m.content };
-        });
-      } else {
-        formattedMessages = conversationHistory.map(m => ({
-          role: m.role,
-          content: m.content,
-        }));
-      }
-
-      console.log('📤 Sending message:', { hasImage, messageCount: formattedMessages.length });
+        : {
+            messages    : [...messages, userMsg].map(m => ({ role: m.role, content: m.content })),
+            isCreatorMode,
+            currentMood,
+            needsSearch,
+            maxTokens   : MAX_TOKENS[responseLength],
+          };
 
       const res = await fetch('/api/chat', {
         method : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body   : JSON.stringify({
-          messages    : formattedMessages,
-          isCreatorMode,
-          currentMood,
-          needsSearch,
-          maxTokens   : MAX_TOKENS[responseLength],
-        }),
+        body   : JSON.stringify(messagePayload),
       });
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error('API Error:', res.status, errorText);
-        throw new Error(`HTTP ${res.status}: ${errorText.slice(0, 100)}`);
-      }
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -731,10 +652,25 @@ export default function Home() {
       if (autoSave)    setTimeout(persistConversation, 1_000);
 
     } catch (err: any) {
+      console.error('❌ Send message error:', err);
+      
+      // ═══ FIX: More helpful error messages ═══
+      let errorMsg = err?.message || 'Something went wrong. Please try again.';
+      
+      if (errorMsg.includes('429') || errorMsg.includes('rate limit')) {
+        errorMsg = '⏱️ Too many requests. Please wait a moment and try again.';
+      } else if (errorMsg.includes('401') || errorMsg.includes('API key')) {
+        errorMsg = '🔑 Configuration error. Please contact support.';
+      } else if (errorMsg.includes('context length')) {
+        errorMsg = '📝 Message too long. Please try a shorter message.';
+      } else if (hasImage) {
+        errorMsg = '📷 Image processing failed. The AI will describe what it would see based on your message.';
+      }
+      
       setMessages(prev => [...prev, {
         id       : uuidv4(),
         role     : 'assistant' as const,
-        content  : `⚠️ ${err?.message ?? 'Something went wrong — please try again.'}`,
+        content  : `⚠️ ${errorMsg}`,
         timestamp: new Date(),
       }]);
     } finally {
@@ -798,30 +734,63 @@ export default function Home() {
     }
 
     const recognition = new SR();
+    
+    // ═══ FIX: Better recognition settings for accuracy ═══
     recognition.lang = 'en-IN';
-    recognition.continuous = true;
-    recognition.interimResults = false;
+    recognition.continuous = false; // Better accuracy
+    recognition.interimResults = true; // Show results as speaking
+    recognition.maxAlternatives = 3; // Get best alternatives
 
-    recognition.onstart = () => setIsRecording(true);
+    let finalTranscript = '';
+    let interimTranscript = '';
 
+    recognition.onstart = () => {
+      setIsRecording(true);
+      console.log('🎤 Listening...');
+    };
+    
     recognition.onresult = (event: any) => {
-      const transcript = Array.from(event.results)
-        .map((result: any) => result[0].transcript)
-        .join(' ');
-      setInput(transcript);
+      interimTranscript = '';
+      
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+      
+      // Show interim results while speaking
+      setInput(finalTranscript + interimTranscript);
     };
 
-    recognition.onerror = () => {
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
       setIsRecording(false);
-      alert('Voice recognition failed');
+      
+      if (event.error === 'no-speech') {
+        // Silent, just stop
+      } else if (event.error === 'audio-capture') {
+        alert('Microphone not found. Please check permissions.');
+      } else if (event.error === 'not-allowed') {
+        alert('Microphone access denied. Please allow in browser settings.');
+      } else {
+        alert('Voice recognition failed. Please try again.');
+      }
     };
 
-    recognition.onend = () => setIsRecording(false);
+    recognition.onend = () => {
+      setIsRecording(false);
+      console.log('🎤 Stopped listening');
+    };
 
     recognitionRef.current = recognition;
     try {
       recognition.start();
-    } catch {
+    } catch (err) {
+      console.error('Failed to start recognition:', err);
       setIsRecording(false);
     }
   };
@@ -1045,27 +1014,22 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* ── Settings Overlay Panel (FIX: scrollable, flex-col) ── */}
+      {/* Settings Overlay Panel */}
       {showSettings && (
         <>
-          <div
+          <div 
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
             onClick={() => setShowSettings(false)}
           />
-
+          
           <div className={`
             fixed left-0 top-0 bottom-0 z-40
-            w-[80vw] max-w-[320px]
+            w-[17rem] md:w-80
             ${tc.aside} border-r
             transform transition-transform duration-300
             flex flex-col
-            overflow-hidden
           `}>
-            {/* Header - Fixed */}
-            <div className={`
-              flex items-center justify-between px-4 py-3 border-b
-              ${tc.aside} flex-shrink-0 bg-inherit
-            `}>
+            <div className={`flex items-center justify-between px-4 py-3 border-b ${tc.aside} flex-shrink-0`}>
               <h2 className={`font-bold text-sm ${tc.sH}`}>⚙️ Settings</h2>
               <button
                 onClick={() => setShowSettings(false)}
@@ -1075,9 +1039,8 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto settings-scroll px-3 py-3 space-y-3 overscroll-contain">
-
+            <div className="flex-1 overflow-y-auto settings-scroll px-3 py-3 space-y-3">
+              
               <section className="settings-section">
                 <h3 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Theme</h3>
                 <div className="grid grid-cols-2 gap-2">
@@ -1358,7 +1321,7 @@ export default function Home() {
         {!showDashboard && (
           <div className={`flex-shrink-0 border-t ${tc.header} px-3 py-3 md:px-6`}>
             <div className="max-w-2xl mx-auto">
-
+              
               {selectedImage && (
                 <div className="mb-2 relative inline-block">
                   <img
@@ -1427,8 +1390,14 @@ export default function Home() {
                     focus:outline-none focus:ring-2
                     ${isCreatorMode ? 'focus:ring-pink-500/30' : 'focus:ring-cyan-500/30'}
                     ${tc.input} transition-all duration-200
+                    touch-manipulation
                   `}
-                  style={{ minHeight: '44px', maxHeight: '144px' }}
+                  style={{ 
+                    minHeight: '44px', 
+                    maxHeight: '144px',
+                    WebkitAppearance: 'none',
+                    color: theme === 'light' ? '#1f2937' : '#ffffff',
+                  }}
                 />
 
                 <button
@@ -1471,8 +1440,8 @@ export default function Home() {
           </div>
 
           <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
-            <DailyWellness
-              isCreatorMode={isCreatorMode}
+            <DailyWellness 
+              isCreatorMode={isCreatorMode} 
               refreshTrigger={wellnessVersion}
             />
 

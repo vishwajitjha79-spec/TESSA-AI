@@ -1406,7 +1406,7 @@ export default function Home() {
                     <button onClick={()=>{if(confirm('Reset ALL settings to defaults?')){{
                       setTheme('dark');setResponseLength('medium');setAutoSearch(true);
                       setVoiceOutput(false);setAnimations(true);setSfx(true);setAutoSave(true);
-                      setFontSize('base');setLanguage('en');setPersonaKey('tessa');
+                      setFontSize('base');setLanguage('en');
                       setCompactMode(false);setTypingEffect(true);setShowTimestamps(true);
                       setShowMoodBadge(true);setSendOnEnter(true);setAutoMemory(true);
                       setShowWordCount(false);setMessageGrouping(true);setProactiveMode(true);

@@ -18,7 +18,6 @@ function loadKaTeX(): Promise<void> {
   if (katexPromise) return katexPromise;
 
   katexPromise = new Promise<void>((resolve, reject) => {
-    // Inject KaTeX CSS if not already present
     if (!document.getElementById('katex-css')) {
       const link   = document.createElement('link');
       link.id      = 'katex-css';
@@ -27,7 +26,6 @@ function loadKaTeX(): Promise<void> {
       document.head.appendChild(link);
     }
 
-    // Inject KaTeX JS if not already present
     if (!(window as any).katex) {
       const script  = document.createElement('script');
       script.src    = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js';
@@ -175,29 +173,87 @@ function parseFormulas(text: string): Segment[] {
   return segments;
 }
 
-// ── Text formatter for bold/italic ────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// ENHANCED: Text formatter with bold, italic, underline, and headings
+// ══════════════════════════════════════════════════════════════════════════════
 function formatText(text: string): React.ReactNode[] {
   const parts: React.ReactNode[] = [];
-  let lastIndex = 0;
-  
-  // Match **bold** or __bold__
-  const boldPattern = /(\*\*|__)(.+?)\1/g;
+  let processedText = text;
+  const elements: Array<{ start: number; end: number; element: React.ReactNode }> = [];
+  let keyCounter = 0;
+
+  // Pattern 1: Headings (###, ##, #)
+  const headingPattern = /^(#{1,3})\s+(.+)$/gm;
   let match: RegExpExecArray | null;
-  
+
+  while ((match = headingPattern.exec(text)) !== null) {
+    const level = match[1].length;
+    const content = match[2];
+    const sizeClass = level === 1 ? 'text-xl' : level === 2 ? 'text-lg' : 'text-base';
+    elements.push({
+      start: match.index,
+      end: match.index + match[0].length,
+      element: (
+        <div key={keyCounter++} className={`${sizeClass} font-bold mt-3 mb-1.5`}>
+          {content}
+        </div>
+      ),
+    });
+  }
+
+  // Pattern 2: Bold (**text** or __text__)
+  const boldPattern = /(\*\*|__)(.+?)\1/g;
   while ((match = boldPattern.exec(text)) !== null) {
-    // Add text before match
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index));
+    // Check if this position is already covered by a heading
+    const isInHeading = elements.some(el => match!.index >= el.start && match!.index < el.end);
+    if (!isInHeading) {
+      elements.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        element: (
+          <strong key={keyCounter++} className="font-bold text-white">
+            {match[2]}
+          </strong>
+        ),
+      });
     }
-    // Add bold text
-    parts.push(<strong key={match.index} className="font-semibold">{match[2]}</strong>);
-    lastIndex = match.index + match[0].length;
   }
-  
-  // Add remaining text
-  if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex));
+
+  // Pattern 3: Italic (*text*)
+  const italicPattern = /\*([^*\n]+?)\*/g;
+  while ((match = italicPattern.exec(text)) !== null) {
+    const isInOtherFormat = elements.some(
+      el => match!.index >= el.start && match!.index < el.end
+    );
+    if (!isInOtherFormat) {
+      elements.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        element: (
+          <em key={keyCounter++} className="italic opacity-90">
+            {match[1]}
+          </em>
+        ),
+      });
+    }
   }
-  
+
+  // Sort elements by start position
+  elements.sort((a, b) => a.start - b.start);
+
+  // Build final output
+  let currentIndex = 0;
+  elements.forEach(elem => {
+    if (elem.start > currentIndex) {
+      parts.push(text.slice(currentIndex, elem.start));
+    }
+    parts.push(elem.element);
+    currentIndex = elem.end;
+  });
+
+  if (currentIndex < text.length) {
+    parts.push(text.slice(currentIndex));
+  }
+
   return parts.length > 0 ? parts : [text];
 }

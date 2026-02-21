@@ -1,4 +1,3 @@
-cat > /mnt/user-data/outputs/page-FINAL-WITH-REAL-AVATARS.tsx << 'ENDFILE'
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';

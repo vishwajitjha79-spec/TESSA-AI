@@ -52,7 +52,7 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────────────────────────────────────
-type Theme          = 'dark' | 'light' | 'cyberpunk' | 'ocean' | 'sunset' | 'pastel' | 'sakura';
+type Theme          = 'dark' | 'light' | 'cyberpunk' | 'ocean' | 'sunset' | 'pastel' | 'sakura' | 'ankit';
 type ResponseLength = 'short' | 'medium' | 'long';
 type FontSize       = 'sm' | 'base' | 'lg';
 type Language       = 'en' | 'hi' | 'hinglish';
@@ -255,73 +255,110 @@ const THEMES = {
     settActive:'bg-orange-500/[0.12] border border-orange-500/[0.26]',
     isLight:false,
   },
+  // ── PASTEL: dark lavender-violet dream ─────────────────────────────────────
   pastel: {
-    bg:'bg-[#faf5ff]', bgC:'bg-[#fff5f8]',
-    panel:'bg-white/70 backdrop-blur-xl border-violet-200/50',
-    panelC:'bg-rose-50/80 backdrop-blur-xl border-pink-200/50',
-    header:'bg-white/75 backdrop-blur-2xl border-b border-violet-200/40 shadow-sm shadow-violet-100/50',
-    headerC:'bg-white/75 backdrop-blur-2xl border-b border-pink-200/40 shadow-sm shadow-pink-100/50',
-    bar:'bg-white/80 backdrop-blur-2xl border-t border-violet-200/40 shadow-sm shadow-violet-100/30',
-    barC:'bg-white/80 backdrop-blur-2xl border-t border-pink-200/40',
-    msgU:'bg-gradient-to-br from-violet-50 to-purple-50/60 border border-violet-200/50 border-l-[3px] border-l-violet-400',
-    msgUC:'bg-gradient-to-br from-rose-50 to-pink-50/60 border border-pink-200/50 border-l-[3px] border-l-pink-400',
-    msgA:'bg-white/75 border border-violet-100/60 border-l-[3px] border-l-indigo-300',
-    msgAC:'bg-white/75 border border-pink-100/60 border-l-[3px] border-l-rose-300',
-    inp:'bg-white border border-violet-200 text-slate-700 placeholder:text-violet-300 focus:border-violet-400 focus:ring-2 focus:ring-violet-300/20',
-    inpC:'bg-white border border-pink-200 text-slate-700 placeholder:text-pink-300 focus:border-pink-400 focus:ring-2 focus:ring-pink-300/20',
-    btnP:'bg-gradient-to-r from-violet-400 to-purple-500 hover:from-violet-500 hover:to-purple-600 text-white shadow-md shadow-violet-400/[0.25]',
-    btnPC:'bg-gradient-to-r from-pink-400 to-rose-500 hover:from-pink-500 hover:to-rose-600 text-white shadow-md shadow-pink-400/[0.25]',
-    btnS:'bg-violet-50 hover:bg-violet-100 border border-violet-200 text-violet-600 hover:text-violet-800',
-    btnSC:'bg-pink-50 hover:bg-pink-100 border border-pink-200 text-pink-600 hover:text-pink-800',
-    text:'text-slate-700', sub:'text-violet-400/70', subC:'text-pink-400/70',
-    accent:'text-violet-500', accentC:'text-pink-500',
-    glow:'#8b5cf6', glowC:'#ec4899',
-    card:'bg-white/60 border border-violet-100/80',
-    cardC:'bg-white/60 border border-pink-100/80',
-    active:'bg-violet-100 border border-violet-300',
-    activeC:'bg-pink-100 border border-pink-300',
-    div:'border-violet-200/40', divC:'border-pink-200/40',
-    settBg:'bg-white/96 backdrop-blur-2xl border-r border-violet-200',
-    settBgC:'bg-white/96 backdrop-blur-2xl border-r border-pink-200',
-    settText:'text-slate-700', settTextHover:'hover:text-slate-900',
-    settSub:'text-slate-400', settLabel:'text-slate-400',
-    settCard:'bg-violet-50 border border-violet-200',
-    settActive:'bg-violet-100 border border-violet-300',
-    isLight:true,
+    bg:'bg-[#100c1f]', bgC:'bg-[#160c22]',
+    panel:'bg-[#1a1230]/80 backdrop-blur-xl border-violet-500/[0.12]',
+    panelC:'bg-[#1e0d30]/80 backdrop-blur-xl border-fuchsia-500/[0.12]',
+    header:'bg-black/40 backdrop-blur-2xl border-b border-violet-500/[0.14]',
+    headerC:'bg-black/45 backdrop-blur-2xl border-b border-fuchsia-500/[0.14]',
+    bar:'bg-black/36 backdrop-blur-2xl border-t border-violet-500/[0.14]',
+    barC:'bg-black/40 backdrop-blur-2xl border-t border-fuchsia-500/[0.14]',
+    msgU:'bg-gradient-to-br from-[#1e1240] to-[#130d2c] border border-violet-400/[0.18] border-l-[3px] border-l-violet-400',
+    msgUC:'bg-gradient-to-br from-[#28103c] to-[#1a0c2a] border border-fuchsia-400/[0.18] border-l-[3px] border-l-fuchsia-400',
+    msgA:'bg-gradient-to-br from-[#120f22] to-[#0e0b1a] border border-purple-500/[0.10] border-l-[3px] border-l-purple-400/60',
+    msgAC:'bg-gradient-to-br from-[#150e26] to-[#100b1e] border border-violet-500/[0.10] border-l-[3px] border-l-violet-400/60',
+    inp:'bg-violet-950/[0.30] border border-violet-400/[0.18] text-violet-50 placeholder:text-violet-300/30 focus:border-violet-400/60 focus:ring-2 focus:ring-violet-500/12',
+    inpC:'bg-fuchsia-950/[0.28] border border-fuchsia-400/[0.18] text-fuchsia-50 placeholder:text-fuchsia-300/28 focus:border-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-500/12',
+    btnP:'bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-400 hover:to-purple-500 text-white shadow-lg shadow-violet-500/[0.30]',
+    btnPC:'bg-gradient-to-r from-fuchsia-500 to-pink-600 hover:from-fuchsia-400 hover:to-pink-500 text-white shadow-lg shadow-fuchsia-500/[0.30]',
+    btnS:'bg-violet-500/[0.08] hover:bg-violet-500/[0.16] border border-violet-500/[0.18] text-violet-300 hover:text-violet-100',
+    btnSC:'bg-fuchsia-500/[0.08] hover:bg-fuchsia-500/[0.16] border border-fuchsia-500/[0.18] text-fuchsia-300 hover:text-fuchsia-100',
+    text:'text-violet-50', sub:'text-violet-300/42', subC:'text-fuchsia-300/42',
+    accent:'text-violet-400', accentC:'text-fuchsia-400',
+    glow:'#7c3aed', glowC:'#d946ef',
+    card:'bg-violet-950/[0.18] border border-violet-500/[0.10]',
+    cardC:'bg-fuchsia-950/[0.18] border border-fuchsia-500/[0.10]',
+    active:'bg-violet-500/[0.12] border border-violet-500/[0.24]',
+    activeC:'bg-fuchsia-500/[0.12] border border-fuchsia-500/[0.24]',
+    div:'border-violet-500/[0.08]', divC:'border-fuchsia-500/[0.08]',
+    settBg:'bg-[#0e0b1e]/96 backdrop-blur-2xl border-r border-violet-500/[0.12]',
+    settBgC:'bg-[#130b22]/96 backdrop-blur-2xl border-r border-fuchsia-500/[0.12]',
+    settText:'text-violet-100/75', settTextHover:'hover:text-violet-50',
+    settSub:'text-violet-300/32', settLabel:'text-violet-300/22',
+    settCard:'bg-violet-950/[0.22] border border-violet-500/[0.12]',
+    settActive:'bg-violet-500/[0.15] border border-violet-500/[0.28]',
+    isLight:false,
   },
+  // ── SAKURA: dark cherry-blossom night ────────────────────────────────────
   sakura: {
-    bg:'bg-[#fff8fa]', bgC:'bg-[#fff5f8]',
-    panel:'bg-white/72 backdrop-blur-xl border-rose-200/45',
-    panelC:'bg-rose-50/80 backdrop-blur-xl border-pink-200/50',
-    header:'bg-white/78 backdrop-blur-2xl border-b border-rose-200/40 shadow-sm shadow-rose-100/50',
-    headerC:'bg-white/78 backdrop-blur-2xl border-b border-pink-200/40 shadow-sm shadow-pink-100/50',
-    bar:'bg-white/82 backdrop-blur-2xl border-t border-rose-200/40 shadow-sm shadow-rose-100/30',
-    barC:'bg-white/82 backdrop-blur-2xl border-t border-pink-200/40',
-    msgU:'bg-gradient-to-br from-rose-50/80 to-pink-50/50 border border-rose-200/55 border-l-[3px] border-l-rose-400',
-    msgUC:'bg-gradient-to-br from-pink-50 to-fuchsia-50/50 border border-pink-200/55 border-l-[3px] border-l-pink-500',
-    msgA:'bg-white/78 border border-rose-100/60 border-l-[3px] border-l-rose-300',
-    msgAC:'bg-white/78 border border-pink-100/60 border-l-[3px] border-l-pink-300',
-    inp:'bg-white border border-rose-200 text-slate-700 placeholder:text-rose-300 focus:border-rose-400 focus:ring-2 focus:ring-rose-300/20',
-    inpC:'bg-white border border-pink-200 text-slate-700 placeholder:text-pink-300 focus:border-pink-400 focus:ring-2 focus:ring-pink-300/20',
-    btnP:'bg-gradient-to-r from-rose-400 to-pink-500 hover:from-rose-500 hover:to-pink-600 text-white shadow-md shadow-rose-400/[0.25]',
-    btnPC:'bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-500 hover:to-fuchsia-600 text-white shadow-md shadow-pink-400/[0.25]',
-    btnS:'bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 hover:text-rose-800',
-    btnSC:'bg-pink-50 hover:bg-pink-100 border border-pink-200 text-pink-600 hover:text-pink-800',
-    text:'text-slate-700', sub:'text-rose-400/70', subC:'text-pink-400/70',
-    accent:'text-rose-500', accentC:'text-pink-500',
+    bg:'bg-[#120810]', bgC:'bg-[#18080f]',
+    panel:'bg-[#200c16]/80 backdrop-blur-xl border-rose-500/[0.12]',
+    panelC:'bg-[#240c1a]/80 backdrop-blur-xl border-pink-500/[0.12]',
+    header:'bg-black/42 backdrop-blur-2xl border-b border-rose-500/[0.14]',
+    headerC:'bg-black/48 backdrop-blur-2xl border-b border-pink-500/[0.14]',
+    bar:'bg-black/38 backdrop-blur-2xl border-t border-rose-500/[0.14]',
+    barC:'bg-black/44 backdrop-blur-2xl border-t border-pink-500/[0.14]',
+    msgU:'bg-gradient-to-br from-[#2a0e1a] to-[#1a0a12] border border-rose-400/[0.18] border-l-[3px] border-l-rose-400',
+    msgUC:'bg-gradient-to-br from-[#2e0c1e] to-[#1e0a16] border border-pink-400/[0.18] border-l-[3px] border-l-pink-400',
+    msgA:'bg-gradient-to-br from-[#170c10] to-[#100810] border border-rose-500/[0.09] border-l-[3px] border-l-rose-300/60',
+    msgAC:'bg-gradient-to-br from-[#1a0c14] to-[#120810] border border-pink-500/[0.09] border-l-[3px] border-l-pink-300/60',
+    inp:'bg-rose-950/[0.28] border border-rose-400/[0.18] text-rose-50 placeholder:text-rose-300/30 focus:border-rose-400/60 focus:ring-2 focus:ring-rose-500/12',
+    inpC:'bg-pink-950/[0.28] border border-pink-400/[0.18] text-pink-50 placeholder:text-pink-300/28 focus:border-pink-400/60 focus:ring-2 focus:ring-pink-500/12',
+    btnP:'bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-400 hover:to-pink-500 text-white shadow-lg shadow-rose-500/[0.28]',
+    btnPC:'bg-gradient-to-r from-pink-500 to-fuchsia-600 hover:from-pink-400 hover:to-fuchsia-500 text-white shadow-lg shadow-pink-500/[0.28]',
+    btnS:'bg-rose-500/[0.08] hover:bg-rose-500/[0.16] border border-rose-500/[0.16] text-rose-300 hover:text-rose-100',
+    btnSC:'bg-pink-500/[0.08] hover:bg-pink-500/[0.16] border border-pink-500/[0.16] text-pink-300 hover:text-pink-100',
+    text:'text-rose-50', sub:'text-rose-300/42', subC:'text-pink-300/42',
+    accent:'text-rose-400', accentC:'text-pink-400',
     glow:'#f43f5e', glowC:'#ec4899',
-    card:'bg-white/62 border border-rose-100/80',
-    cardC:'bg-white/62 border border-pink-100/80',
-    active:'bg-rose-100 border border-rose-300',
-    activeC:'bg-pink-100 border border-pink-300',
-    div:'border-rose-200/40', divC:'border-pink-200/40',
-    settBg:'bg-white/96 backdrop-blur-2xl border-r border-rose-200',
-    settBgC:'bg-white/96 backdrop-blur-2xl border-r border-pink-200',
-    settText:'text-slate-700', settTextHover:'hover:text-slate-900',
-    settSub:'text-slate-400', settLabel:'text-slate-400',
-    settCard:'bg-rose-50 border border-rose-200',
-    settActive:'bg-rose-100 border border-rose-300',
-    isLight:true,
+    card:'bg-rose-950/[0.18] border border-rose-500/[0.10]',
+    cardC:'bg-pink-950/[0.18] border border-pink-500/[0.10]',
+    active:'bg-rose-500/[0.12] border border-rose-500/[0.24]',
+    activeC:'bg-pink-500/[0.12] border border-pink-500/[0.24]',
+    div:'border-rose-500/[0.08]', divC:'border-pink-500/[0.08]',
+    settBg:'bg-[#110810]/96 backdrop-blur-2xl border-r border-rose-500/[0.11]',
+    settBgC:'bg-[#15080e]/96 backdrop-blur-2xl border-r border-pink-500/[0.11]',
+    settText:'text-rose-100/75', settTextHover:'hover:text-rose-50',
+    settSub:'text-rose-300/32', settLabel:'text-rose-300/22',
+    settCard:'bg-rose-950/[0.22] border border-rose-500/[0.12]',
+    settActive:'bg-rose-500/[0.15] border border-rose-500/[0.28]',
+    isLight:false,
+  },
+  // ── ANKIT'S SPECIAL: midnight gold — deep obsidian + warm gold aurora ────
+  ankit: {
+    bg:'bg-[#09080e]', bgC:'bg-[#0e0812]',
+    panel:'bg-[#0f0e1c]/85 backdrop-blur-xl border-yellow-500/[0.10]',
+    panelC:'bg-[#150c20]/85 backdrop-blur-xl border-amber-500/[0.12]',
+    header:'bg-black/55 backdrop-blur-2xl border-b border-yellow-500/[0.12]',
+    headerC:'bg-black/60 backdrop-blur-2xl border-b border-amber-500/[0.14]',
+    bar:'bg-black/50 backdrop-blur-2xl border-t border-yellow-500/[0.12]',
+    barC:'bg-black/55 backdrop-blur-2xl border-t border-amber-500/[0.14]',
+    msgU:'bg-gradient-to-br from-[#1a1508] to-[#0f0e0a] border border-yellow-500/[0.16] border-l-[3px] border-l-yellow-400',
+    msgUC:'bg-gradient-to-br from-[#200d08] to-[#150a08] border border-amber-500/[0.16] border-l-[3px] border-l-amber-400',
+    msgA:'bg-gradient-to-br from-[#100f16] to-[#0c0c12] border border-yellow-500/[0.08] border-l-[3px] border-l-yellow-600/50',
+    msgAC:'bg-gradient-to-br from-[#140d16] to-[#0e0b12] border border-amber-500/[0.08] border-l-[3px] border-l-amber-600/50',
+    inp:'bg-yellow-950/[0.20] border border-yellow-500/[0.18] text-yellow-50 placeholder:text-yellow-300/28 focus:border-yellow-400/55 focus:ring-2 focus:ring-yellow-500/12',
+    inpC:'bg-amber-950/[0.20] border border-amber-500/[0.18] text-amber-50 placeholder:text-amber-300/28 focus:border-amber-400/55 focus:ring-2 focus:ring-amber-500/12',
+    btnP:'bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-black font-bold shadow-lg shadow-yellow-500/[0.30]',
+    btnPC:'bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-bold shadow-lg shadow-amber-500/[0.30]',
+    btnS:'bg-yellow-500/[0.07] hover:bg-yellow-500/[0.14] border border-yellow-500/[0.15] text-yellow-300 hover:text-yellow-100',
+    btnSC:'bg-amber-500/[0.07] hover:bg-amber-500/[0.14] border border-amber-500/[0.15] text-amber-300 hover:text-amber-100',
+    text:'text-yellow-50', sub:'text-yellow-300/38', subC:'text-amber-300/38',
+    accent:'text-yellow-400', accentC:'text-amber-400',
+    glow:'#eab308', glowC:'#f59e0b',
+    card:'bg-yellow-950/[0.14] border border-yellow-500/[0.08]',
+    cardC:'bg-amber-950/[0.14] border border-amber-500/[0.08]',
+    active:'bg-yellow-500/[0.10] border border-yellow-500/[0.22]',
+    activeC:'bg-amber-500/[0.10] border border-amber-500/[0.22]',
+    div:'border-yellow-500/[0.07]', divC:'border-amber-500/[0.07]',
+    settBg:'bg-[#080810]/96 backdrop-blur-2xl border-r border-yellow-500/[0.10]',
+    settBgC:'bg-[#0c0810]/96 backdrop-blur-2xl border-r border-amber-500/[0.10]',
+    settText:'text-yellow-100/75', settTextHover:'hover:text-yellow-50',
+    settSub:'text-yellow-300/30', settLabel:'text-yellow-300/20',
+    settCard:'bg-yellow-950/[0.22] border border-yellow-500/[0.10]',
+    settActive:'bg-yellow-500/[0.14] border border-yellow-500/[0.26]',
+    isLight:false,
   },
 } as const;
 
@@ -368,23 +405,29 @@ function lsGetJson<T>(k: string, fb: T): T {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Beautiful animated background — works for all dark themes
-function AuroraBg({ glow, glow2 }: { glow: string; glow2: string }) {
+function AuroraBg({ glow, glow2, theme }: { glow: string; glow2: string; theme: Theme }) {
+  const isAnkit = theme === 'ankit';
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
       {/* Main aurora blobs */}
       <div className="absolute rounded-full blur-[180px] animate-aurora-a"
-        style={{ width:800, height:800, background:glow, opacity:0.07, top:'-25%', left:'-10%' }} />
+        style={{ width:800, height:800, background:glow, opacity: isAnkit ? 0.10 : 0.07, top:'-25%', left:'-10%' }} />
       <div className="absolute rounded-full blur-[140px] animate-aurora-b"
-        style={{ width:600, height:600, background:glow2, opacity:0.055, top:'30%', right:'-12%' }} />
+        style={{ width:600, height:600, background:glow2, opacity: isAnkit ? 0.08 : 0.055, top:'30%', right:'-12%' }} />
       <div className="absolute rounded-full blur-[120px] animate-aurora-c"
-        style={{ width:400, height:400, background:glow, opacity:0.045, bottom:'-8%', left:'40%' }} />
+        style={{ width:400, height:400, background:glow, opacity: isAnkit ? 0.07 : 0.045, bottom:'-8%', left:'40%' }} />
       {/* Extra mid-screen glow */}
       <div className="absolute rounded-full blur-[200px]"
-        style={{ width:500, height:300, background:glow2, opacity:0.03, top:'55%', left:'15%' }} />
+        style={{ width:500, height:300, background:glow2, opacity: isAnkit ? 0.05 : 0.03, top:'55%', left:'15%' }} />
+      {/* Ankit special: diagonal gold streak */}
+      {isAnkit && (
+        <div className="absolute blur-[80px] animate-aurora-b"
+          style={{ width:900, height:120, background:`linear-gradient(90deg,transparent,${glow}30,${glow2}20,transparent)`, top:'38%', left:'-10%', transform:'rotate(-8deg)' }} />
+      )}
       {/* Fine dot grid */}
       <div className="absolute inset-0" style={{
-        backgroundImage:`radial-gradient(circle, ${glow}16 1px, transparent 1px)`,
-        backgroundSize:'36px 36px', opacity:0.45,
+        backgroundImage:`radial-gradient(circle, ${glow}${isAnkit?'22':'16'} 1px, transparent 1px)`,
+        backgroundSize: isAnkit ? '28px 28px' : '36px 36px', opacity: isAnkit ? 0.55 : 0.45,
       }} />
       {/* Scanline vignette */}
       <div className="absolute inset-0" style={{
@@ -394,30 +437,14 @@ function AuroraBg({ glow, glow2 }: { glow: string; glow2: string }) {
   );
 }
 
-// Light / pastel theme: beautiful soft gradient mesh background
+// Light theme: beautiful soft gradient mesh background (only used for light theme now)
 function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
-  const grad = (() => {
-    if (theme === 'sakura') return creator
-      ? 'radial-gradient(ellipse 80% 65% at 15% 10%, #ffe4e6 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 80%, #fce7f3 0%, transparent 55%), radial-gradient(ellipse 55% 45% at 50% 45%, #fff1f5 0%, transparent 65%)'
-      : 'radial-gradient(ellipse 80% 65% at 15% 10%, #ffe4e6 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 80%, #fecdd3 0%, transparent 55%), radial-gradient(ellipse 55% 45% at 50% 45%, #fff8f9 0%, transparent 65%)';
-    if (theme === 'pastel') return creator
-      ? 'radial-gradient(ellipse 80% 65% at 15% 10%, #f5d0fe 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 80%, #fce7f3 0%, transparent 55%), radial-gradient(ellipse 55% 45% at 50% 45%, #faf5ff 0%, transparent 65%)'
-      : 'radial-gradient(ellipse 80% 65% at 15% 10%, #ede9fe 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 80%, #ddd6fe 0%, transparent 55%), radial-gradient(ellipse 55% 45% at 50% 45%, #faf5ff 0%, transparent 65%)';
-    return creator
-      ? 'radial-gradient(ellipse 80% 60% at 20% 10%, #fce7f3 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, #f3e8ff 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 50% 50%, #fff1f5 0%, transparent 70%)'
-      : 'radial-gradient(ellipse 80% 60% at 20% 10%, #dbeafe 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, #ede9fe 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 50% 50%, #f0f9ff 0%, transparent 70%)';
-  })();
+  const grad = creator
+    ? 'radial-gradient(ellipse 80% 60% at 20% 10%, #fce7f3 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, #f3e8ff 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 50% 50%, #fff1f5 0%, transparent 70%)'
+    : 'radial-gradient(ellipse 80% 60% at 20% 10%, #dbeafe 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, #ede9fe 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 50% 50%, #f0f9ff 0%, transparent 70%)';
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
       <div className="absolute inset-0" style={{ background: grad }} />
-      {/* Floating soft orbs for pastel/sakura */}
-      {(theme === 'pastel' || theme === 'sakura') && (<>
-        <div className="absolute rounded-full blur-[120px] animate-aurora-a opacity-30"
-          style={{ width:400, height:400, background: theme==='sakura'?'#fecdd3':'#ddd6fe', top:'-5%', left:'5%' }} />
-        <div className="absolute rounded-full blur-[100px] animate-aurora-b opacity-20"
-          style={{ width:300, height:300, background: theme==='sakura'?'#fda4af':'#c4b5fd', top:'50%', right:'0%' }} />
-      </>)}
-      {/* Subtle noise texture */}
       <div className="absolute inset-0 opacity-[0.015]" style={{
         backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
       }} />
@@ -542,6 +569,7 @@ export default function Home() {
   const [selectedImage,   setSelectedImage] = useState<string | null>(null);
   const [isRecording,     setIsRecording]   = useState(false);
   const [settingsTab,     setSettingsTab]   = useState<'appearance'|'ai'|'chat'|'data'|'about'>('appearance');
+  const [showTimerFloat,  setShowTimerFloat]  = useState(false);
 
   // ── Refs ──────────────────────────────────────────────────────────────────
   const bottomRef      = useRef<HTMLDivElement>(null);
@@ -561,7 +589,8 @@ export default function Home() {
   const glow2 = isCreatorMode ? '#a855f7'
     : theme==='dark' ? '#6366f1' : theme==='cyberpunk' ? '#ec4899'
     : theme==='ocean' ? '#3b82f6' : theme==='sunset' ? '#f59e0b'
-    : theme==='pastel' ? '#c4b5fd' : theme==='sakura' ? '#fda4af' : '#818cf8';
+    : theme==='pastel' ? '#a855f7' : theme==='sakura' ? '#fb7185'
+    : theme==='ankit' ? '#f59e0b' : '#818cf8';
 
   const fontSizeClass = fontSize==='sm' ? 'text-xs' : fontSize==='lg' ? 'text-base' : 'text-sm';
 
@@ -980,7 +1009,7 @@ export default function Home() {
     <div className={`h-screen ${t.bg} ${t.text} flex overflow-hidden relative transition-colors duration-500 ${fontSizeClass}`}>
 
       {/* ── BACKGROUNDS ── */}
-      {t.isLight ? <LightBg creator={isCreatorMode} theme={theme} /> : <AuroraBg glow={t.glow} glow2={glow2} />}
+      {t.isLight ? <LightBg creator={isCreatorMode} theme={theme} /> : <AuroraBg glow={t.glow} glow2={glow2} theme={theme} />}
       {isCreatorMode && animations && <Hearts on />}
 
       {/* ── SIDEBAR BACKDROP ── */}
@@ -1033,9 +1062,29 @@ export default function Home() {
             )}
           </div>
 
+          {/* Wellness strip in sidebar — compact, collapsible */}
+          {isCreatorMode && (
+            <div className={`flex-shrink-0 mx-3 mb-1`}>
+              <div className={`rounded-xl overflow-hidden ${t.card}`} style={{border:`1px solid ${t.glow}14`}}>
+                {/* Quick stats row */}
+                <div className="px-3 py-2">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className={`text-[9px] font-black tracking-[0.15em] uppercase ${t.sub}`}>Wellness</span>
+                    <button onClick={()=>{addWater(1);setWellnessVersion(v=>v+1);}}
+                      className={`text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1 transition-all active:scale-90 ${t.btnS}`}
+                      style={{border:`1px solid ${t.glow}20`}}>
+                      <Droplets size={8} className="text-blue-400"/>💧
+                    </button>
+                  </div>
+                  <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion}/>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Conversations */}
           <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-            <div className="flex-shrink-0 px-3 pt-3 pb-2">
+            <div className="flex-shrink-0 px-3 pt-2 pb-2">
               <p className={`text-[9px] font-black tracking-[0.18em] uppercase ${t.sub} mb-2`}>
                 {isCreatorMode ? '💬 Our Chats' : '💬 History'}
               </p>
@@ -1162,7 +1211,7 @@ export default function Home() {
                 <div>
                   <SLabel label="Theme" t={t} />
                   <div className="grid grid-cols-2 gap-1.5">
-                    {([['dark','🌙','Dark'],['light','☀️','Light'],['cyberpunk','⚡','Cyberpunk'],['ocean','🌊','Ocean'],['sunset','🌅','Sunset'],['pastel','🪻','Pastel'],['sakura','🌸','Sakura']] as [Theme,string,string][]).map(([th,ico,lbl])=>(
+                    {([['dark','🌙','Dark'],['light','☀️','Light'],['cyberpunk','⚡','Cyberpunk'],['ocean','🌊','Ocean'],['sunset','🌅','Sunset'],['pastel','🪻','Pastel'],['sakura','🌸','Sakura'],['ankit','✨','Ankit\'s']] as [Theme,string,string][]).map(([th,ico,lbl])=>(
                       <button key={th} onClick={()=>setTheme(th)}
                         className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-medium transition-all ${theme===th?'text-white':t.sCard+' '+t.sSub}`}
                         style={theme===th?{background:`linear-gradient(135deg,${t.glow}28,${t.glow}12)`,border:`1px solid ${t.glow}35`,color:t.glow}:{}}>
@@ -1446,7 +1495,7 @@ export default function Home() {
                     ['Storage', user&&!isGuest?'Cloud (Supabase)':'Local Storage'],
                     ['Conversations',`${shownConvs.length} saved`],
                     ['Memories',`${getAllMemories().length} facts`],
-                    ['Theme', theme.charAt(0).toUpperCase()+theme.slice(1)],
+                    ['Theme', theme==='ankit'?"✨ Ankit's Special":theme.charAt(0).toUpperCase()+theme.slice(1)],
                     ['Font Size', fontSize],
                     ['Language', language],
                   ].map(([k,v])=>(
@@ -1513,8 +1562,8 @@ export default function Home() {
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
                   {/* Persona name — clean, no dots */}
-                  <h1 className={`font-black text-[15px] leading-none tracking-tight ${t.accent}`}>
-                    Tessa
+                  <h1 className={`font-black text-[13px] leading-none tracking-[0.12em] uppercase ${t.accent}`}>
+                    TESSA
                   </h1>
                   {isCreatorMode && (
                     <Heart size={11} className="text-pink-400 fill-pink-400 flex-shrink-0 animate-pulse" />
@@ -1544,8 +1593,14 @@ export default function Home() {
                   <Calendar size={16}/>
                 </button>
               )}
+              {/* Study Timer quick-access — always visible */}
+              <button onClick={()=>setShowTimerFloat(p=>!p)} title="Study Timer"
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showTimerFloat?'text-white':'hover:bg-white/[0.07] '+t.sub}`}
+                style={showTimerFloat?{background:`${t.glow}14`,outline:`1px solid ${t.glow}25`}:{}}>
+                <Clock size={16}/>
+              </button>
               {isCreatorMode&&(
-                <button onClick={()=>setShowDashboard(p=>!p)} title="Wellness Dashboard"
+                <button onClick={()=>setShowDashboard(p=>!p)} title="Insights Panel"
                   className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showDashboard?'text-pink-300':'hover:bg-white/[0.07] '+t.sub}`}
                   style={showDashboard?{background:`${t.glow}12`,outline:`1px solid ${t.glow}25`}:{}}>
                   <LayoutDashboard size={16}/>
@@ -1837,56 +1892,106 @@ export default function Home() {
       {showDashboard&&isCreatorMode&&(
         <>
           <div className="fixed inset-0 bg-black/60 z-20 md:hidden" onClick={()=>setShowDashboard(false)}/>
-          <aside className={`fixed right-0 inset-y-0 z-30 md:relative md:z-10 flex-shrink-0 flex flex-col h-screen overflow-hidden border-l w-[min(82vw,248px)] ${t.panel}`}>
-            <div className={`flex-shrink-0 flex items-center justify-between px-3.5 py-3 border-b ${t.div}`}>
-              <div className="flex items-center gap-2">
-                <Activity size={12} style={{color:t.glow}}/>
-                <span className={`text-xs font-bold ${t.accent}`}>Wellness</span>
+          <aside className={`fixed right-0 inset-y-0 z-30 md:relative md:z-10 flex-shrink-0 flex flex-col h-screen overflow-hidden border-l w-[min(82vw,220px)] ${t.panel}`}>
+            {/* Header — compact */}
+            <div className={`flex-shrink-0 flex items-center justify-between px-3 py-2.5 border-b ${t.div}`}>
+              <div className="flex items-center gap-1.5">
+                <Sparkles size={11} style={{color:t.glow}}/>
+                <span className={`text-[11px] font-black tracking-wide ${t.accent}`}>Insights</span>
               </div>
-              <button onClick={()=>setShowDashboard(false)}
-                className="p-1 rounded-lg hover:bg-white/8 transition-colors md:hidden">
-                <X size={13} className={t.sub}/>
+              <button onClick={()=>setShowDashboard(false)} className="p-1 rounded-lg hover:bg-white/8 transition-colors md:hidden">
+                <X size={12} className={t.sub}/>
               </button>
             </div>
-            <div className="flex-shrink-0 p-3">
-              <ProfileCard avatarPath={avatarSrc} mood={currentMood} isCreatorMode={isCreatorMode} animationsEnabled={animations}/>
-            </div>
-            <div className="flex-1 overflow-y-auto px-3 pb-4 space-y-3">
-              <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion}/>
-              <div className={`rounded-xl p-3 ${t.card}`}>
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Droplets size={12} className="text-blue-400"/>
-                  <span className="text-[11px] font-semibold text-blue-400">Hydration</span>
-                </div>
-                <button onClick={()=>{addWater(1);setWellnessVersion(v=>v+1);}}
-                  className={`w-full py-2 rounded-lg text-[11px] font-semibold transition-all active:scale-95 ${t.btnS}`}>
-                  💧 +1 Glass
-                </button>
+
+            {/* Mood strip — replaces ProfileCard, much smaller */}
+            <div className={`flex-shrink-0 mx-3 mt-2.5 mb-1.5 px-3 py-2 rounded-xl flex items-center gap-2.5 ${t.card}`}
+              style={{border:`1px solid ${t.glow}20`}}>
+              <div className="w-7 h-7 rounded-xl overflow-hidden flex-shrink-0 border"
+                style={{borderColor:`${t.glow}40`}}>
+                <img src={avatarSrc} alt="Tessa" className="w-full h-full object-cover"
+                  onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}}/>
               </div>
-              <div className={`rounded-xl p-3 ${t.card}`}>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold" style={{color:t.glow}}>Tessa</p>
+                <p className={`text-[9px] ${t.sub}`}>{moodEmoji} {moodLabel}</p>
+              </div>
+              {isCreatorMode && <Heart size={10} className="ml-auto text-pink-400 fill-pink-400 flex-shrink-0"/>}
+            </div>
+
+            {/* Scrollable content — only insights + quick actions */}
+            <div className="flex-1 overflow-y-auto px-3 pb-4 space-y-2.5">
+
+              {/* Tessa Insights — the main widget */}
+              <div className={`rounded-xl p-2.5 ${t.card}`}>
+                <TessaInsights isCreatorMode={isCreatorMode}/>
+              </div>
+
+              {/* Study Timer — accessible from panel */}
+              <div className={`rounded-xl p-2.5 ${t.card}`}>
                 <div className="flex items-center gap-1.5 mb-2">
-                  <BookOpen size={12} style={{color:t.glow}}/>
-                  <span className={`text-[11px] font-semibold ${t.accent}`}>Study Timer</span>
+                  <Clock size={10} style={{color:t.glow}}/>
+                  <span className={`text-[10px] font-bold ${t.accent}`}>Study Timer</span>
                 </div>
                 <StudyTimer/>
               </div>
-              <div className={`rounded-xl p-3 ${t.card}`}>
-                <TessaInsights isCreatorMode={isCreatorMode}/>
-              </div>
-              <div className={`rounded-xl p-3 ${t.card}`}>
+
+              {/* Quick wellness row */}
+              <div className={`rounded-xl p-2.5 ${t.card}`}>
                 <div className="flex items-center gap-1.5 mb-2">
-                  <Brain size={12} style={{color:t.glow}}/>
-                  <span className={`text-[11px] font-semibold ${t.accent}`}>Memory</span>
+                  <Activity size={10} style={{color:t.glow}}/>
+                  <span className={`text-[10px] font-bold ${t.accent}`}>Quick Actions</span>
                 </div>
-                <p className={`text-[10px] ${t.sub} mb-2`}>{getAllMemories().length} facts remembered</p>
+                <div className="space-y-1.5">
+                  <button onClick={()=>{addWater(1);setWellnessVersion(v=>v+1);}}
+                    className={`w-full py-1.5 rounded-lg text-[10px] font-medium transition-all active:scale-95 flex items-center justify-center gap-1.5 ${t.btnS}`}>
+                    <Droplets size={10} className="text-blue-400"/>💧 Log Water
+                  </button>
+                  <button onClick={()=>setShowDashboard(false)}
+                    className={`w-full py-1.5 rounded-lg text-[10px] font-medium transition-all flex items-center justify-center gap-1.5 ${t.btnS}`}>
+                    <LayoutDashboard size={10}/>Full Dashboard
+                  </button>
+                </div>
+              </div>
+
+              {/* Memory quick view */}
+              <div className={`rounded-xl p-2.5 ${t.card}`}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <Brain size={10} style={{color:t.glow}}/>
+                    <span className={`text-[10px] font-bold ${t.accent}`}>Memory</span>
+                  </div>
+                  <span className={`text-[9px] ${t.sub}`}>{getAllMemories().length} facts</span>
+                </div>
                 <button onClick={()=>{if(confirm('Clear all memories?')) clearAllMemories();}}
-                  className="w-full py-1.5 rounded-lg text-[10px] border border-red-500/20 bg-red-500/[0.07] hover:bg-red-500/15 text-red-400 transition-all">
-                  Clear All Memories
+                  className="w-full py-1.5 rounded-lg text-[9px] border border-red-500/20 bg-red-500/[0.06] hover:bg-red-500/12 text-red-400 transition-all">
+                  Clear Memories
                 </button>
               </div>
             </div>
           </aside>
         </>
+      )}
+
+      {/* ── FLOATING STUDY TIMER ── */}
+      {showTimerFloat && (
+        <div className="fixed bottom-24 right-4 z-50 w-64 animate-fadeIn shadow-2xl">
+          <div className={`rounded-2xl overflow-hidden border ${t.panel}`}
+            style={{boxShadow:`0 8px 32px rgba(0,0,0,0.4), 0 0 24px ${t.glow}15`}}>
+            <div className={`flex items-center justify-between px-3.5 py-2.5 border-b ${t.div}`}>
+              <div className="flex items-center gap-2">
+                <Clock size={12} style={{color:t.glow}}/>
+                <span className={`text-[11px] font-bold ${t.accent}`}>Study Timer</span>
+              </div>
+              <button onClick={()=>setShowTimerFloat(false)} className={`p-1 rounded-lg hover:bg-white/10 ${t.sub}`}>
+                <X size={11}/>
+              </button>
+            </div>
+            <div className="p-3">
+              <StudyTimer/>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ── MODALS ── */}

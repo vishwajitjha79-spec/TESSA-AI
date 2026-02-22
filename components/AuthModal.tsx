@@ -25,7 +25,7 @@ export default function AuthModal({ onClose, onSuccess }: AuthModalProps) {
     try {
       if (mode === 'signup') {
         await signUp(email, password, fullName);
-        alert('Check your email to confirm!');
+        alert('Check your email to confirm your account!');
       } else {
         await signIn(email, password);
         onSuccess();

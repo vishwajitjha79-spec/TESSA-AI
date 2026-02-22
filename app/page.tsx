@@ -425,6 +425,50 @@ function lsGetJson<T>(k: string, fb: T): T {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// CREATOR SYNC  ·  One Supabase row per user keeps all creator data live
+// Table DDL is in creator_sync_migration.sql — run it once in Supabase SQL editor
+// ─────────────────────────────────────────────────────────────────────────────
+function buildCreatorPayload() {
+  return {
+    health:      lsGetJson('tessa-health',   null),
+    memories:    lsGetJson('tessa-memories', []),
+    streaks:     lsGetJson('tessa-streaks',  null),
+    water:       lsGetJson('tessa-water',    null),
+    mood:        lsGet('tessa-last-mood')   ?? 'loving',
+    avatar:      lsGet('tessa-avatar')      ?? 'cosmic',
+    theme:       lsGet('tessa-theme')       ?? 'dark',
+    last_active: new Date().toISOString(),
+  };
+}
+async function pushCreatorSync(userId: string): Promise<void> {
+  try {
+    await supabase.from('creator_sync').upsert(
+      { user_id: userId, payload: buildCreatorPayload(), updated_at: new Date().toISOString() },
+      { onConflict: 'user_id' }
+    );
+  } catch {}
+}
+async function pullCreatorSync(userId: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from('creator_sync').select('payload,updated_at').eq('user_id', userId).single();
+    if (error || !data?.payload) return false;
+    const p   = data.payload as Record<string, any>;
+    const rem = new Date(data.updated_at).getTime();
+    const loc = new Date(lsGet('tessa-last-sync') ?? 0).getTime();
+    if (rem <= loc) return false;               // local is already up-to-date
+    if (p.health)   lsSet('tessa-health',   JSON.stringify(p.health));
+    if (p.memories) lsSet('tessa-memories', JSON.stringify(p.memories));
+    if (p.streaks)  lsSet('tessa-streaks',  JSON.stringify(p.streaks));
+    if (p.water)    lsSet('tessa-water',    JSON.stringify(p.water));
+    if (p.mood)     lsSet('tessa-last-mood', String(p.mood));
+    if (p.avatar)   lsSet('tessa-avatar',   String(p.avatar));
+    lsSet('tessa-last-sync', data.updated_at);
+    return true;
+  } catch { return false; }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // SHARED MICRO-COMPONENTS
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -679,6 +723,7 @@ export default function Home() {
   const [showTimerFloat,  setShowTimerFloat]  = useState(false);
   const [insightsOpen,              setInsightsOpen]             = useState(false);
   const [showMobileMenu,            setShowMobileMenu]           = useState(false);
+  const [syncStatus,                setSyncStatus]               = useState<'idle'|'syncing'|'synced'|'error'>('idle');
   const [showWellness,              setShowWellness]             = useState(false);
   const [showWellnessFloat,         setShowWellnessFloat]         = useState(false);
   const [showAvatarPickerInSettings,setShowAvatarPickerInSettings]= useState(false);
@@ -691,6 +736,8 @@ export default function Home() {
   const proactiveTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const midnightTimer  = useRef<ReturnType<typeof setInterval> | null>(null);
   const voicesReady    = useRef(false);
+  const syncTimer      = useRef<ReturnType<typeof setTimeout>|null>(null);
+  const syncChannel    = useRef<any>(null);
 
   const t         = useT(theme, isCreatorMode);
   const selectedAvatar = AVATARS.find(a => a.id === avatarId) ?? AVATARS[0];
@@ -768,13 +815,40 @@ export default function Home() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       const u = session?.user ?? null; setUser(u);
-      if (u) { setIsGuest(false); fetchCloudConversations(u.id); }
+      if (u) {
+        setIsGuest(false);
+        fetchCloudConversations(u.id);
+        // Pull creator data when auth fires
+        if (isCreatorModePersistent()) {
+          pullCreatorSync(u.id).then(changed => { if (changed) setWellnessVersion(v=>v+1); });
+        }
+      }
     });
+
+    // Real-time subscription — updates when another device pushes
+    const setupRealtimeSync = (uid: string) => {
+      if (syncChannel.current) supabase.removeChannel(syncChannel.current);
+      syncChannel.current = supabase
+        .channel(`creator-sync-${uid}`)
+        .on('postgres_changes', {
+          event: 'UPDATE', schema: 'public', table: 'creator_sync',
+          filter: `user_id=eq.${uid}`,
+        }, () => {
+          // Another device pushed — pull the latest
+          pullCreatorSync(uid).then(changed => {
+            if (changed) { setWellnessVersion(v=>v+1); setSyncStatus('synced'); }
+          });
+        })
+        .subscribe();
+    };
+
+    getCurrentUser().then(u => { if (u) setupRealtimeSync(u.id); });
 
     return () => {
       subscription.unsubscribe();
       if (proactiveTimer.current) clearInterval(proactiveTimer.current);
       if (midnightTimer.current)  clearInterval(midnightTimer.current);
+      if (syncChannel.current)    supabase.removeChannel(syncChannel.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -907,6 +981,10 @@ export default function Home() {
         lsSet('tessa-health', JSON.stringify(h));
         const mw = getCurrentMealWindow(); if (mw) markMeal(mw.name);
         addCalories(totalCal); setWellnessVersion(v => v+1);
+        if (isCreatorMode && user && !isGuest) {
+          if (syncTimer.current) clearTimeout(syncTimer.current);
+          syncTimer.current = setTimeout(() => pushCreatorSync(user.id), 3000);
+        }
       }
       const sleepHit = detectSleepInResponse(responseText);
       if (sleepHit) {
@@ -988,6 +1066,16 @@ export default function Home() {
       if (voiceOutput) speakText(data.content);
       if (sfx) playChime();
       if (autoSave) setTimeout(persistConversation, 1_000);
+      // Debounced creator sync push
+      if (isCreatorMode && user && !isGuest) {
+        setSyncStatus('syncing');
+        if (syncTimer.current) clearTimeout(syncTimer.current);
+        syncTimer.current = setTimeout(async () => {
+          await pushCreatorSync(user.id);
+          setSyncStatus('synced');
+          setTimeout(()=>setSyncStatus('idle'), 3000);
+        }, 3000);
+      }
 
     } catch (err: any) {
       let msg = err?.message || 'Something went wrong.';
@@ -1673,17 +1761,26 @@ export default function Home() {
               {/* Name block */}
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  {/* Persona name — clean, no dots */}
                   <h1 className={`font-black text-[13px] leading-none tracking-[0.12em] uppercase ${t.accent}`}>
                     TESSA
                   </h1>
                   {isCreatorMode && (
                     <Heart size={11} className="text-pink-400 fill-pink-400 flex-shrink-0 animate-pulse" />
                   )}
+                  {/* Sync dot — only in creator mode, signed in */}
+                  {isCreatorMode && user && !isGuest && (
+                    <span title={syncStatus==='syncing'?'Syncing…':syncStatus==='synced'?'Synced ✓':'Live sync'}
+                      className="flex-shrink-0 w-1.5 h-1.5 rounded-full transition-all duration-500"
+                      style={{
+                        background: syncStatus==='syncing'?'#f59e0b':syncStatus==='synced'?'#22c55e':syncStatus==='error'?'#ef4444':'#22c55e',
+                        boxShadow: syncStatus==='syncing'?'0 0 6px #f59e0b':syncStatus==='synced'?'0 0 6px #22c55e':'0 0 5px #22c55e66',
+                        animation: syncStatus==='syncing'?'pulse 1s infinite':'none',
+                      }}/>
+                  )}
                 </div>
                 <p className={`text-[10px] mt-0.5 truncate leading-none ${t.sub}`}>
                   {isCreatorMode
-                    ? `Personal AI · ${moodEmoji} ${moodLabel}`
+                    ? `Personal AI · ${moodEmoji} ${moodLabel}${user&&!isGuest?' · ☁️ Live':''}`
                     : `${TESSA.tagline} · ${moodEmoji} ${moodLabel}`}
                 </p>
               </div>
@@ -1829,7 +1926,7 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={()=>{addWater(1);setWellnessVersion(v=>v+1);}}
+                  <button onClick={()=>{addWater(1);setWellnessVersion(v=>v+1);if(user&&!isGuest)pushCreatorSync(user.id);}}
                     className={`text-[9px] px-2.5 py-1 rounded-full flex items-center gap-1 transition-all active:scale-90 ${t.btnS}`}
                     style={{border:`1px solid ${t.glow}20`}}>
                     <Droplets size={8} className="text-blue-400"/>💧 Log Water

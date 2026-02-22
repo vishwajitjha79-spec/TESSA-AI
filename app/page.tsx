@@ -1269,344 +1269,355 @@ export default function Home() {
       </aside>
 
       {/* ═══════════════════════════════════════════════════════════════════
-          RADIAL SETTINGS MENU
+          SETTINGS — Radial hub + bottom-sheet sub-pages
       ═══════════════════════════════════════════════════════════════════ */}
       {showSettings && (
         <>
           {/* Backdrop */}
-          <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-md" onClick={()=>setShowSettings(false)} />
+          <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={()=>{setShowSettings(false);setSettingsTab('main');}} />
 
-          {/* Radial container */}
-          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-            <div className="relative pointer-events-auto" style={{width:380,height:380}} onClick={e=>e.stopPropagation()}>
+          {/* ── RADIAL HUB (main) ── */}
+          {settingsTab==='main' && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+              <div className="relative pointer-events-auto" style={{width:'min(340px,88vw)',height:'min(340px,88vw)'}} onClick={e=>e.stopPropagation()}>
 
-              {/* ── Hub: centre circle ── */}
-              {settingsTab==='main' && (<>
                 {/* SVG connector lines */}
-                <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{zIndex:0}}>
+                <svg className="absolute inset-0 w-full h-full pointer-events-none">
                   {[0,72,144,216,288].map((deg,i)=>{
-                    const r=130, cx=190, cy=190;
+                    const r=42, cx=50, cy=50;
                     const rad=(deg-90)*Math.PI/180;
-                    return <line key={i} x1={cx} y1={cy} x2={cx+r*Math.cos(rad)} y2={cy+r*Math.sin(rad)}
-                      stroke={`${t.glow}`} strokeWidth="1" strokeDasharray="4 4" strokeOpacity="0.25"/>;
+                    return <line key={i}
+                      x1={`${cx}%`} y1={`${cy}%`}
+                      x2={`${cx+r*Math.cos(rad)}%`} y2={`${cy+r*Math.sin(rad)}%`}
+                      stroke={t.glow} strokeWidth="1" strokeDasharray="3 4" strokeOpacity="0.28"/>;
                   })}
                 </svg>
 
-                {/* Centre hub */}
-                <button
-                  onClick={()=>setShowSettings(false)}
-                  className="absolute flex flex-col items-center justify-center rounded-full transition-all hover:scale-110 active:scale-95"
+                {/* Centre close button */}
+                <button onClick={()=>setShowSettings(false)}
+                  className="absolute flex flex-col items-center justify-center rounded-full transition-all active:scale-90"
                   style={{
-                    width:80,height:80,top:'50%',left:'50%',transform:'translate(-50%,-50%)',
-                    background:`radial-gradient(circle, ${t.glow}30 0%, ${t.glow}10 100%)`,
-                    border:`2px solid ${t.glow}60`,
-                    boxShadow:`0 0 32px ${t.glow}40, 0 0 64px ${t.glow}15`,
-                    zIndex:2,
+                    width:'21%',height:'21%',top:'50%',left:'50%',transform:'translate(-50%,-50%)',
+                    background:`radial-gradient(circle, ${t.glow}35 0%, ${t.glow}12 100%)`,
+                    border:`2px solid ${t.glow}65`,
+                    boxShadow:`0 0 28px ${t.glow}45, 0 0 56px ${t.glow}15`,
                   }}>
-                  <Settings size={20} style={{color:t.glow}}/>
-                  <span className="text-[9px] font-bold mt-0.5" style={{color:t.glow}}>Close</span>
+                  <X size={16} style={{color:t.glow}}/>
                 </button>
 
-                {/* 5 orbit buttons */}
+                {/* 5 orbit buttons — percentage-based so they scale with container */}
                 {([
                   [0,   '🎨','Themes',  'themes'],
                   [72,  '🧠','AI',      'ai'],
                   [144, '💬','Display', 'display'],
-                  [216, '🗄️','Data',   'data'],
-                  [288, 'ℹ️','About',  'about'],
+                  [216, '🗄️','Data',    'data'],
+                  [288, 'ℹ️','About',   'about'],
                 ] as [number,string,string,string][]).map(([deg,ico,lbl,page])=>{
-                  const r=130, cx=190, cy=190;
+                  const r=42, cx=50, cy=50;
                   const rad=(deg-90)*Math.PI/180;
                   const bx=cx+r*Math.cos(rad), by=cy+r*Math.sin(rad);
                   return (
                     <button key={page}
                       onClick={()=>setSettingsTab(page as any)}
-                      className="absolute flex flex-col items-center justify-center rounded-full transition-all hover:scale-110 active:scale-95"
+                      className="absolute flex flex-col items-center justify-center rounded-full transition-all active:scale-90"
                       style={{
-                        width:68,height:68,
-                        left:bx-34,top:by-34,
-                        background:t.isLight?'rgba(255,255,255,0.92)':'rgba(10,12,28,0.92)',
-                        border:`1.5px solid ${t.glow}40`,
-                        boxShadow:`0 4px 20px rgba(0,0,0,0.3), 0 0 16px ${t.glow}15`,
-                        backdropFilter:'blur(12px)',
-                        zIndex:2,
+                        width:'18%',height:'18%',
+                        left:`${bx}%`,top:`${by}%`,transform:'translate(-50%,-50%)',
+                        background:t.isLight?'rgba(255,255,255,0.95)':'rgba(8,10,24,0.95)',
+                        border:`1.5px solid ${t.glow}45`,
+                        boxShadow:`0 4px 18px rgba(0,0,0,0.35), 0 0 12px ${t.glow}18`,
+                        backdropFilter:'blur(14px)',
                       }}>
-                      <span className="text-xl leading-none">{ico}</span>
-                      <span className={`text-[9px] font-bold mt-1 ${t.sSub}`}>{lbl}</span>
+                      <span style={{fontSize:'clamp(14px,3.5vw,22px)',lineHeight:1}}>{ico}</span>
+                      <span className={`font-bold ${t.sSub}`} style={{fontSize:'clamp(7px,1.8vw,10px)',marginTop:3}}>{lbl}</span>
                     </button>
                   );
                 })}
-              </>)}
+              </div>
+            </div>
+          )}
 
-              {/* ── Sub-page panel ── */}
-              {settingsTab!=='main' && (
-                <div
-                  className={`absolute inset-0 rounded-3xl overflow-hidden flex flex-col ${t.settBg}`}
-                  style={{boxShadow:`0 8px 48px rgba(0,0,0,0.5), 0 0 0 1px ${t.glow}20`}}
-                  onClick={e=>e.stopPropagation()}
-                >
-                  {/* Sub-page header */}
-                  <div className={`flex-shrink-0 flex items-center justify-between px-5 py-3.5 border-b`} style={{borderColor:`${t.glow}15`}}>
-                    <button onClick={()=>setSettingsTab('main' as any)}
-                      className={`flex items-center gap-2 ${t.sText} hover:opacity-80`}>
-                      <ChevronDown size={16} style={{transform:'rotate(90deg)'}}/>
-                      <span className="text-[11px] font-semibold">
-                        {settingsTab==='themes'?'🎨 Themes':settingsTab==='ai'?'🧠 AI & Behaviour':settingsTab==='display'?'💬 Display':settingsTab==='data'?'🗄️ Data':'ℹ️ About'}
-                      </span>
-                    </button>
-                    <button onClick={()=>setShowSettings(false)}
-                      className={`w-7 h-7 rounded-xl flex items-center justify-center ${t.isLight?'bg-slate-100 hover:bg-slate-200':'bg-white/[0.07] hover:bg-white/[0.12]'}`}>
-                      <X size={13} className={t.sSub}/>
-                    </button>
+          {/* ── SUB-PAGE BOTTOM SHEET ── */}
+          {settingsTab!=='main' && (
+            <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col rounded-t-[26px] overflow-hidden"
+              style={{
+                maxHeight:'82vh',
+                background:t.isLight?'rgba(255,255,255,0.98)':'rgba(7,9,20,0.98)',
+                borderTop:`1px solid ${t.glow}20`,
+                boxShadow:`0 -6px 48px rgba(0,0,0,0.45), 0 0 0 1px ${t.glow}12`,
+                backdropFilter:'blur(24px)',
+                animation:'slideUpSheet 0.28s cubic-bezier(0.32,0.72,0,1)',
+              }}
+              onClick={e=>e.stopPropagation()}>
+
+              {/* Drag handle */}
+              <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
+                <div className={`w-9 h-1 rounded-full ${t.isLight?'bg-slate-300':'bg-white/20'}`}/>
+              </div>
+
+              {/* Sheet header — back + title + close, all perfectly centered */}
+              <div className="flex-shrink-0 flex items-center px-4 pb-3 pt-1 relative">
+                {/* Back button — left */}
+                <button onClick={()=>setSettingsTab('main' as any)}
+                  className={`flex items-center gap-1.5 ${t.isLight?'text-slate-500':'text-white/45'} active:opacity-60`}>
+                  <ChevronDown size={15} style={{transform:'rotate(90deg)'}}/>
+                  <span className="text-[11px] font-medium">Back</span>
+                </button>
+                {/* Title — absolutely centered */}
+                <span className={`absolute left-1/2 -translate-x-1/2 text-[13px] font-bold ${t.isLight?'text-slate-800':'text-white/90'}`}>
+                  {settingsTab==='themes'?'🎨 Themes':settingsTab==='ai'?'🧠 AI & Behaviour':settingsTab==='display'?'💬 Display':settingsTab==='data'?'🗄️ Data':'ℹ️ About'}
+                </span>
+                {/* Close button — right, always visible */}
+                <button onClick={()=>{setShowSettings(false);setSettingsTab('main' as any);}}
+                  className="ml-auto flex items-center justify-center rounded-full active:scale-90"
+                  style={{width:28,height:28,background:t.isLight?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.09)'}}>
+                  <X size={13} className={t.isLight?'text-slate-600':'text-white/60'}/>
+                </button>
+              </div>
+
+              {/* Divider */}
+              <div className="flex-shrink-0 h-px mx-4" style={{background:`${t.glow}18`}}/>
+
+              {/* Scrollable content */}
+              <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 space-y-4">
+
+                {settingsTab==='themes' && (<>
+                  <div>
+                    <SLabel label="Theme" t={t}/>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {([['dark','🌙','Dark'],['light','☀️','Light'],['cyberpunk','⚡','Cyber'],['ocean','🌊','Ocean'],['sunset','🌅','Sunset'],['pastel','🪻','Pastel'],['sakura','🌸','Sakura'],['ankit','✨',"Ankit's"]] as [Theme,string,string][]).map(([th,ico,lbl])=>(
+                        <button key={th} onClick={()=>setTheme(th)}
+                          className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-[11px] font-medium transition-all ${theme===th?'text-white':t.sCard+' '+t.sSub}`}
+                          style={theme===th?{background:`linear-gradient(135deg,${t.glow}28,${t.glow}12)`,border:`1px solid ${t.glow}35`,color:t.glow}:{}}>
+                          <span>{ico}</span>{lbl}
+                          {theme===th && <Check size={10} className="ml-auto" style={{color:t.glow}}/>}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-
-                  {/* Sub-page content */}
-                  <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 space-y-4">
-
-                    {/* ── THEMES ── */}
-                    {settingsTab==='themes' && (<>
-                      <div>
-                        <SLabel label="Theme" t={t}/>
-                        <div className="grid grid-cols-2 gap-1.5">
-                          {([['dark','🌙','Dark'],['light','☀️','Light'],['cyberpunk','⚡','Cyber'],['ocean','🌊','Ocean'],['sunset','🌅','Sunset'],['pastel','🪻','Pastel'],['sakura','🌸','Sakura'],['ankit','✨',"Ankit's"]] as [Theme,string,string][]).map(([th,ico,lbl])=>(
-                            <button key={th} onClick={()=>setTheme(th)}
-                              className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-[11px] font-medium transition-all ${theme===th?'text-white':t.sCard+' '+t.sSub}`}
-                              style={theme===th?{background:`linear-gradient(135deg,${t.glow}28,${t.glow}12)`,border:`1px solid ${t.glow}35`,color:t.glow}:{}}>
-                              <span>{ico}</span>{lbl}
-                              {theme===th && <Check size={10} className="ml-auto" style={{color:t.glow}}/>}
-                            </button>
-                          ))}
-                        </div>
+                  <Hr cls={t.div}/>
+                  <div>
+                    <SLabel label="Avatar" t={t}/>
+                    <div className={`flex items-center gap-3 p-3 rounded-2xl ${t.sCard}`}>
+                      <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 flex-shrink-0" style={{borderColor:`${t.glow}50`}}>
+                        <img src={avatarSrc} alt="avatar" className="w-full h-full object-cover" onError={e=>{(e.currentTarget as HTMLImageElement).src=AVATARS[0].path}}/>
                       </div>
-                      <Hr cls={t.div}/>
-                      <div>
-                        <SLabel label="Avatar" t={t}/>
-                        <div className={`flex items-center gap-3 p-3 rounded-2xl ${t.sCard}`}>
-                          <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 flex-shrink-0" style={{borderColor:`${t.glow}50`}}>
-                            <img src={avatarSrc} alt="avatar" className="w-full h-full object-cover" onError={e=>{(e.currentTarget as HTMLImageElement).src=AVATARS[0].path}}/>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-[12px] font-bold ${t.sText}`}>{selectedAvatar.emoji} {selectedAvatar.name}</p>
-                            <p className={`text-[9px] ${t.sSub}`}>{selectedAvatar.desc}</p>
-                            <button onClick={()=>setShowAvatarPickerInSettings(true)}
-                              className={`mt-1.5 px-3 py-1 rounded-xl text-[10px] font-semibold transition-all ${t.isLight?'bg-slate-100 hover:bg-slate-200 text-slate-600':'bg-white/[0.07] hover:bg-white/[0.12] text-white/60'}`}>
-                              Change Avatar (10 choices)
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                      <Hr cls={t.div}/>
-                      <div>
-                        <SLabel label="Text Size" t={t}/>
-                        <div className="flex gap-1.5">
-                          {([['sm','Small','aA'],['base','Normal','Aa'],['lg','Large','AA']] as [FontSize,string,string][]).map(([s,lbl,demo])=>(
-                            <button key={s} onClick={()=>setFontSize(s)}
-                              className={`flex-1 py-2.5 rounded-xl text-center transition-all ${fontSize===s?'text-white':t.sCard+' '+t.sSub}`}
-                              style={fontSize===s?{background:`${t.glow}22`,border:`1px solid ${t.glow}35`,color:t.glow}:{}}>
-                              <p className={s==='sm'?'text-[10px]':s==='lg'?'text-[14px]':'text-[12px]'}>{demo}</p>
-                              <p className="text-[8px] mt-0.5 opacity-70">{lbl}</p>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </>)}
-
-                    {/* ── AI ── */}
-                    {settingsTab==='ai' && (<>
-                      <div>
-                        <SLabel label="Response Length" t={t}/>
-                        <div className="flex gap-1.5">
-                          {(['short','medium','long'] as ResponseLength[]).map(l=>(
-                            <button key={l} onClick={()=>setResponseLength(l)}
-                              className={`flex-1 py-2.5 rounded-xl text-[10px] font-bold capitalize transition-all ${responseLength===l?'text-white':t.sCard+' '+t.sSub}`}
-                              style={responseLength===l?{background:`linear-gradient(135deg,${t.glow},${t.glow}88)`,boxShadow:`0 2px 14px ${t.glow}40`}:{}}>
-                              {l}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      <Hr cls={t.div}/>
-                      <div>
-                        <SLabel label="Language" t={t}/>
-                        <div className="grid grid-cols-3 gap-1.5">
-                          {([['en','🇬🇧','English'],['hi','🇮🇳','Hindi'],['hinglish','🤝','Hinglish']] as [Language,string,string][]).map(([l,ico,lbl])=>(
-                            <button key={l} onClick={()=>setLanguage(l)}
-                              className={`py-2.5 rounded-xl text-[10px] font-medium flex flex-col items-center gap-1 transition-all ${language===l?'text-white':t.sCard+' '+t.sSub}`}
-                              style={language===l?{background:`${t.glow}22`,border:`1px solid ${t.glow}35`,color:t.glow}:{}}>
-                              <span className="text-base">{ico}</span>{lbl}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      <Hr cls={t.div}/>
-                      <div>
-                        <SLabel label="Behaviour" t={t}/>
-                        <div className="space-y-2.5">
-                          <Toggle label="Auto Web Search" sub="Fetches current info automatically" checked={autoSearch} onChange={setAutoSearch} color={t.glow} t={t}/>
-                          <Toggle label="Proactive Messages" sub="She'll reach out to check on you" checked={proactiveMode} onChange={setProactiveMode} color={t.glow} t={t}/>
-                          <Toggle label="Auto Memory" sub="Remembers facts from your chats" checked={autoMemory} onChange={setAutoMemory} color={t.glow} t={t}/>
-                          <Toggle label="Typing Animation" sub="Streams response letter by letter" checked={typingEffect} onChange={setTypingEffect} color={t.glow} t={t}/>
-                          <Toggle label="Voice Output" sub="Read responses aloud via TTS" checked={voiceOutput} onChange={setVoiceOutput} color={t.glow} t={t}/>
-                          <Toggle label="Sound Effects" sub="Chime when message is sent" checked={sfx} onChange={setSfx} color={t.glow} t={t}/>
-                        </div>
-                      </div>
-                      <Hr cls={t.div}/>
-                      <div>
-                        <SLabel label="Memory" t={t}/>
-                        <div className={`p-3 rounded-xl ${t.sCard} mb-2`}>
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className={`text-[11px] font-medium ${t.sText}`}>{getAllMemories().length} facts stored</p>
-                              <p className={`text-[9px] mt-0.5 ${t.sSub}`}>From your past conversations</p>
-                            </div>
-                            <Brain size={16} style={{color:t.glow}}/>
-                          </div>
-                        </div>
-                        <button onClick={()=>{if(confirm('Clear all memories? This cannot be undone.')) clearAllMemories();}}
-                          className="w-full py-2 rounded-xl text-[11px] border border-red-500/22 bg-red-500/[0.07] hover:bg-red-500/14 text-red-400 transition-all font-medium">
-                          🗑️ Clear All Memories
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-[12px] font-bold ${t.sText}`}>{selectedAvatar.emoji} {selectedAvatar.name}</p>
+                        <p className={`text-[9px] ${t.sSub}`}>{selectedAvatar.desc}</p>
+                        <button onClick={()=>setShowAvatarPickerInSettings(true)}
+                          className={`mt-1.5 px-3 py-1 rounded-xl text-[10px] font-semibold transition-all ${t.isLight?'bg-slate-100 hover:bg-slate-200 text-slate-600':'bg-white/[0.07] hover:bg-white/[0.12] text-white/60'}`}>
+                          Change Avatar (10 choices)
                         </button>
                       </div>
-                      <Hr cls={t.div}/>
-                      <div>
-                        <SLabel label="Mode" t={t}/>
-                        {!isCreatorMode ? (
-                          <button onClick={()=>{setShowSecretModal(true);setShowSettings(false);}}
-                            className="w-full py-2.5 rounded-xl text-[11px] font-bold border border-pink-500/22 text-pink-400 hover:bg-pink-500/10 transition-all flex items-center justify-center gap-2"
-                            style={{background:'linear-gradient(135deg,rgba(236,72,153,0.06),rgba(168,85,247,0.06))'}}>
-                            <Heart size={12} className="text-pink-400"/>Unlock Creator Mode
-                          </button>
-                        ) : (
-                          <div className="space-y-2">
-                            <div className="px-3 py-2.5 rounded-xl border border-pink-500/20 bg-pink-500/[0.06] flex items-center gap-2">
-                              <Heart size={11} className="text-pink-400 fill-pink-400 animate-pulse"/>
-                              <span className="text-[11px] text-pink-400 font-bold">Creator Mode Active 💝</span>
-                            </div>
-                            <button onClick={()=>{exitCreatorMode();setShowSettings(false);}}
-                              className={`w-full py-2 rounded-xl text-[11px] transition-all ${t.sCard} ${t.sSub}`}>
-                              Exit to Standard Mode
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </>)}
-
-                    {/* ── DISPLAY ── */}
-                    {settingsTab==='display' && (<>
-                      <div>
-                        <SLabel label="Display" t={t}/>
-                        <div className="space-y-2.5">
-                          <Toggle label="Animations & Effects" sub="Glows, particles, transitions" checked={animations} onChange={setAnimations} color={t.glow} t={t}/>
-                          <Toggle label="Compact Messages" sub="Reduces message padding" checked={compactMode} onChange={setCompactMode} color={t.glow} t={t}/>
-                          <Toggle label="Show Timestamps" sub="Time on every message" checked={showTimestamps} onChange={setShowTimestamps} color={t.glow} t={t}/>
-                          <Toggle label="Mood Badge" sub="Shows emotional state in header" checked={showMoodBadge} onChange={setShowMoodBadge} color={t.glow} t={t}/>
-                          <Toggle label="Message Grouping" sub="Groups consecutive messages" checked={messageGrouping} onChange={setMessageGrouping} color={t.glow} t={t}/>
-                          <Toggle label="Send on Enter" sub="Shift+Enter for new line" checked={sendOnEnter} onChange={setSendOnEnter} color={t.glow} t={t}/>
-                          <Toggle label="Word Count" sub="Shows character count while typing" checked={showWordCount} onChange={setShowWordCount} color={t.glow} t={t}/>
-                          <Toggle label="Browser Notifications" sub="Push alerts from Tessa" checked={notifications} onChange={setNotifications} color={t.glow} t={t}/>
-                        </div>
-                      </div>
-                    </>)}
-
-                    {/* ── DATA ── */}
-                    {settingsTab==='data' && (<>
-                      <div>
-                        <SLabel label="Storage" t={t}/>
-                        <Toggle label="Auto-save Chats"
-                          sub={user&&!isGuest?'☁️ Synced to Supabase cloud':'📱 Saved to local storage'}
-                          checked={autoSave} onChange={setAutoSave} color={t.glow} t={t}/>
-                      </div>
-                      <Hr cls={t.div}/>
-                      <div>
-                        <SLabel label="Export / Import" t={t}/>
-                        <div className="space-y-1.5">
-                          <button onClick={()=>{
-                            const data=JSON.stringify(conversations,null,2);
-                            const blob=new Blob([data],{type:'application/json'});
-                            const url=URL.createObjectURL(blob);
-                            const a=document.createElement('a'); a.href=url; a.download='tessa-chats.json'; a.click();
-                          }} className={`w-full py-2 rounded-xl text-[11px] font-medium flex items-center justify-center gap-2 transition-all ${t.btnS}`}>
-                            <Download size={12}/>Export Conversations
-                          </button>
-                          <button onClick={()=>{
-                            const inp=document.createElement('input'); inp.type='file'; inp.accept='.json';
-                            inp.onchange=(e:any)=>{
-                              const file=e.target.files[0]; if(!file) return;
-                              const reader=new FileReader();
-                              reader.onload=(ev)=>{
-                                try{const d=JSON.parse(ev.target?.result as string);if(Array.isArray(d)){setConversations(d);lsSet('tessa-conversations',JSON.stringify(d));alert(`Imported ${d.length} conversations`);}}catch{alert('Invalid file');}
-                              };
-                              reader.readAsText(file);
-                            };
-                            inp.click();
-                          }} className={`w-full py-2 rounded-xl text-[11px] font-medium flex items-center justify-center gap-2 transition-all ${t.btnS}`}>
-                            <Upload size={12}/>Import Conversations
-                          </button>
-                        </div>
-                      </div>
-                      <Hr cls={t.div}/>
-                      <div>
-                        <SLabel label="Danger Zone" t={t}/>
-                        <div className="space-y-1.5">
-                          <button onClick={()=>{if(confirm('Delete ALL conversations? This cannot be undone.')){{setConversations([]);lsRemove('tessa-conversations');}}}}
-                            className="w-full py-2 rounded-xl text-[11px] border border-red-500/22 bg-red-500/[0.07] hover:bg-red-500/14 text-red-400 transition-all">
-                            🗑️ Delete All Conversations
-                          </button>
-                          <button onClick={()=>{if(confirm('Reset ALL settings to defaults?')){{
-                            setTheme('dark');setResponseLength('medium');setAutoSearch(true);
-                            setVoiceOutput(false);setAnimations(true);setSfx(true);setAutoSave(true);
-                            setFontSize('base');setLanguage('en');setCompactMode(false);setTypingEffect(true);
-                            setShowTimestamps(true);setShowMoodBadge(true);setSendOnEnter(true);
-                            setAutoMemory(true);setShowWordCount(false);setMessageGrouping(true);setProactiveMode(true);
-                          }}}}
-                            className={`w-full py-2 rounded-xl text-[11px] font-medium flex items-center justify-center gap-2 transition-all ${t.sCard} ${t.sSub}`}>
-                            <RotateCcw size={11}/>Reset All Settings
-                          </button>
-                        </div>
-                      </div>
-                    </>)}
-
-                    {/* ── ABOUT ── */}
-                    {settingsTab==='about' && (<>
-                      <div className="text-center py-2">
-                        <div className="w-16 h-16 rounded-2xl mx-auto overflow-hidden border-2 mb-3"
-                          style={{borderColor:`${t.glow}40`,boxShadow:`0 0 20px ${t.glow}25`}}>
-                          <img src={avatarSrc} alt="Tessa" className="w-full h-full object-cover"
-                            onError={e=>{(e.currentTarget as HTMLImageElement).src=AVATARS[0].path;}}/>
-                        </div>
-                        <p className="text-xl font-black tracking-[0.25em] uppercase" style={{color:t.glow}}>TESSA</p>
-                        <p className={`text-[10px] mt-1 max-w-[180px] mx-auto ${t.sSub}`}>The Exceptional System, Surpassing All</p>
-                        <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold"
-                          style={{background:`${t.glow}18`,border:`1px solid ${t.glow}28`,color:t.glow}}>
-                          <Sparkles size={9}/>v3.1 · AI-Powered · 10 Avatars
-                        </div>
-                      </div>
-                      <Hr cls={t.div}/>
-                      <div className="space-y-1.5">
-                        {[
-                          ['Model','Claude Sonnet'],
-                          ['Mode', isCreatorMode?'Creator 💝':'Standard'],
-                          ['Storage', user&&!isGuest?'Cloud':'Local'],
-                          ['Conversations',`${shownConvs.length} saved`],
-                          ['Memories',`${getAllMemories().length} facts`],
-                          ['Theme', theme==='ankit'?"Ankit's Special":theme.charAt(0).toUpperCase()+theme.slice(1)],
-                          ['Font Size', fontSize],
-                          ['Language', language],
-                        ].map(([k,v])=>(
-                          <div key={k} className={`flex items-center justify-between px-3 py-2 rounded-lg ${t.sCard}`}>
-                            <span className={`text-[10px] ${t.sSub}`}>{k}</span>
-                            <span className={`text-[10px] font-medium ${t.sText}`}>{v}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </>)}
-
-                    <div className="h-2"/>
+                    </div>
                   </div>
-                </div>
-              )}
+                  <Hr cls={t.div}/>
+                  <div>
+                    <SLabel label="Text Size" t={t}/>
+                    <div className="flex gap-1.5">
+                      {([['sm','Small','aA'],['base','Normal','Aa'],['lg','Large','AA']] as [FontSize,string,string][]).map(([s,lbl,demo])=>(
+                        <button key={s} onClick={()=>setFontSize(s)}
+                          className={`flex-1 py-2.5 rounded-xl text-center transition-all ${fontSize===s?'text-white':t.sCard+' '+t.sSub}`}
+                          style={fontSize===s?{background:`${t.glow}22`,border:`1px solid ${t.glow}35`,color:t.glow}:{}}>
+                          <p className={s==='sm'?'text-[10px]':s==='lg'?'text-[14px]':'text-[12px]'}>{demo}</p>
+                          <p className="text-[8px] mt-0.5 opacity-70">{lbl}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>)}
+
+                {settingsTab==='ai' && (<>
+                  <div>
+                    <SLabel label="Response Length" t={t}/>
+                    <div className="flex gap-1.5">
+                      {(['short','medium','long'] as ResponseLength[]).map(l=>(
+                        <button key={l} onClick={()=>setResponseLength(l)}
+                          className={`flex-1 py-2.5 rounded-xl text-[10px] font-bold capitalize transition-all ${responseLength===l?'text-white':t.sCard+' '+t.sSub}`}
+                          style={responseLength===l?{background:`linear-gradient(135deg,${t.glow},${t.glow}88)`,boxShadow:`0 2px 14px ${t.glow}40`}:{}}>
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <Hr cls={t.div}/>
+                  <div>
+                    <SLabel label="Language" t={t}/>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {([['en','🇬🇧','English'],['hi','🇮🇳','Hindi'],['hinglish','🤝','Hinglish']] as [Language,string,string][]).map(([l,ico,lbl])=>(
+                        <button key={l} onClick={()=>setLanguage(l)}
+                          className={`py-2.5 rounded-xl text-[10px] font-medium flex flex-col items-center gap-1 transition-all ${language===l?'text-white':t.sCard+' '+t.sSub}`}
+                          style={language===l?{background:`${t.glow}22`,border:`1px solid ${t.glow}35`,color:t.glow}:{}}>
+                          <span className="text-base">{ico}</span>{lbl}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <Hr cls={t.div}/>
+                  <div>
+                    <SLabel label="Behaviour" t={t}/>
+                    <div className="space-y-2.5">
+                      <Toggle label="Auto Web Search" sub="Fetches current info automatically" checked={autoSearch} onChange={setAutoSearch} color={t.glow} t={t}/>
+                      <Toggle label="Proactive Messages" sub="She'll reach out to check on you" checked={proactiveMode} onChange={setProactiveMode} color={t.glow} t={t}/>
+                      <Toggle label="Auto Memory" sub="Remembers facts from your chats" checked={autoMemory} onChange={setAutoMemory} color={t.glow} t={t}/>
+                      <Toggle label="Typing Animation" sub="Streams response letter by letter" checked={typingEffect} onChange={setTypingEffect} color={t.glow} t={t}/>
+                      <Toggle label="Voice Output" sub="Read responses aloud via TTS" checked={voiceOutput} onChange={setVoiceOutput} color={t.glow} t={t}/>
+                      <Toggle label="Sound Effects" sub="Chime when message is sent" checked={sfx} onChange={setSfx} color={t.glow} t={t}/>
+                    </div>
+                  </div>
+                  <Hr cls={t.div}/>
+                  <div>
+                    <SLabel label="Memory" t={t}/>
+                    <div className={`p-3 rounded-xl ${t.sCard} mb-2`}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className={`text-[11px] font-medium ${t.sText}`}>{getAllMemories().length} facts stored</p>
+                          <p className={`text-[9px] mt-0.5 ${t.sSub}`}>From your past conversations</p>
+                        </div>
+                        <Brain size={16} style={{color:t.glow}}/>
+                      </div>
+                    </div>
+                    <button onClick={()=>{if(confirm('Clear all memories? This cannot be undone.')) clearAllMemories();}}
+                      className="w-full py-2 rounded-xl text-[11px] border border-red-500/22 bg-red-500/[0.07] hover:bg-red-500/14 text-red-400 transition-all font-medium">
+                      🗑️ Clear All Memories
+                    </button>
+                  </div>
+                  <Hr cls={t.div}/>
+                  <div>
+                    <SLabel label="Mode" t={t}/>
+                    {!isCreatorMode ? (
+                      <button onClick={()=>{setShowSecretModal(true);setShowSettings(false);}}
+                        className="w-full py-2.5 rounded-xl text-[11px] font-bold border border-pink-500/22 text-pink-400 hover:bg-pink-500/10 transition-all flex items-center justify-center gap-2"
+                        style={{background:'linear-gradient(135deg,rgba(236,72,153,0.06),rgba(168,85,247,0.06))'}}>
+                        <Heart size={12} className="text-pink-400"/>Unlock Creator Mode
+                      </button>
+                    ) : (
+                      <div className="space-y-2">
+                        <div className="px-3 py-2.5 rounded-xl border border-pink-500/20 bg-pink-500/[0.06] flex items-center gap-2">
+                          <Heart size={11} className="text-pink-400 fill-pink-400 animate-pulse"/>
+                          <span className="text-[11px] text-pink-400 font-bold">Creator Mode Active 💝</span>
+                        </div>
+                        <button onClick={()=>{exitCreatorMode();setShowSettings(false);}}
+                          className={`w-full py-2 rounded-xl text-[11px] transition-all ${t.sCard} ${t.sSub}`}>
+                          Exit to Standard Mode
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </>)}
+
+                {settingsTab==='display' && (<>
+                  <div>
+                    <SLabel label="Display" t={t}/>
+                    <div className="space-y-2.5">
+                      <Toggle label="Animations & Effects" sub="Glows, particles, transitions" checked={animations} onChange={setAnimations} color={t.glow} t={t}/>
+                      <Toggle label="Compact Messages" sub="Reduces message padding" checked={compactMode} onChange={setCompactMode} color={t.glow} t={t}/>
+                      <Toggle label="Show Timestamps" sub="Time on every message" checked={showTimestamps} onChange={setShowTimestamps} color={t.glow} t={t}/>
+                      <Toggle label="Mood Badge" sub="Shows emotional state in header" checked={showMoodBadge} onChange={setShowMoodBadge} color={t.glow} t={t}/>
+                      <Toggle label="Message Grouping" sub="Groups consecutive messages" checked={messageGrouping} onChange={setMessageGrouping} color={t.glow} t={t}/>
+                      <Toggle label="Send on Enter" sub="Shift+Enter for new line" checked={sendOnEnter} onChange={setSendOnEnter} color={t.glow} t={t}/>
+                      <Toggle label="Word Count" sub="Shows character count while typing" checked={showWordCount} onChange={setShowWordCount} color={t.glow} t={t}/>
+                      <Toggle label="Browser Notifications" sub="Push alerts from Tessa" checked={notifications} onChange={setNotifications} color={t.glow} t={t}/>
+                    </div>
+                  </div>
+                </>)}
+
+                {settingsTab==='data' && (<>
+                  <div>
+                    <SLabel label="Storage" t={t}/>
+                    <Toggle label="Auto-save Chats"
+                      sub={user&&!isGuest?'☁️ Synced to Supabase cloud':'📱 Saved to local storage'}
+                      checked={autoSave} onChange={setAutoSave} color={t.glow} t={t}/>
+                  </div>
+                  <Hr cls={t.div}/>
+                  <div>
+                    <SLabel label="Export / Import" t={t}/>
+                    <div className="space-y-1.5">
+                      <button onClick={()=>{
+                        const data=JSON.stringify(conversations,null,2);
+                        const blob=new Blob([data],{type:'application/json'});
+                        const url=URL.createObjectURL(blob);
+                        const a=document.createElement('a'); a.href=url; a.download='tessa-chats.json'; a.click();
+                      }} className={`w-full py-2 rounded-xl text-[11px] font-medium flex items-center justify-center gap-2 transition-all ${t.btnS}`}>
+                        <Download size={12}/>Export Conversations
+                      </button>
+                      <button onClick={()=>{
+                        const inp=document.createElement('input'); inp.type='file'; inp.accept='.json';
+                        inp.onchange=(e:any)=>{
+                          const file=e.target.files[0]; if(!file) return;
+                          const reader=new FileReader();
+                          reader.onload=(ev)=>{
+                            try{const d=JSON.parse(ev.target?.result as string);if(Array.isArray(d)){setConversations(d);lsSet('tessa-conversations',JSON.stringify(d));alert(`Imported ${d.length} conversations`);}}catch{alert('Invalid file');}
+                          };
+                          reader.readAsText(file);
+                        };
+                        inp.click();
+                      }} className={`w-full py-2 rounded-xl text-[11px] font-medium flex items-center justify-center gap-2 transition-all ${t.btnS}`}>
+                        <Upload size={12}/>Import Conversations
+                      </button>
+                    </div>
+                  </div>
+                  <Hr cls={t.div}/>
+                  <div>
+                    <SLabel label="Danger Zone" t={t}/>
+                    <div className="space-y-1.5">
+                      <button onClick={()=>{if(confirm('Delete ALL conversations? This cannot be undone.')){{setConversations([]);lsRemove('tessa-conversations');}}}}
+                        className="w-full py-2 rounded-xl text-[11px] border border-red-500/22 bg-red-500/[0.07] hover:bg-red-500/14 text-red-400 transition-all">
+                        🗑️ Delete All Conversations
+                      </button>
+                      <button onClick={()=>{if(confirm('Reset ALL settings to defaults?')){{
+                        setTheme('dark');setResponseLength('medium');setAutoSearch(true);
+                        setVoiceOutput(false);setAnimations(true);setSfx(true);setAutoSave(true);
+                        setFontSize('base');setLanguage('en');setCompactMode(false);setTypingEffect(true);
+                        setShowTimestamps(true);setShowMoodBadge(true);setSendOnEnter(true);
+                        setAutoMemory(true);setShowWordCount(false);setMessageGrouping(true);setProactiveMode(true);
+                      }}}}
+                        className={`w-full py-2 rounded-xl text-[11px] font-medium flex items-center justify-center gap-2 transition-all ${t.sCard} ${t.sSub}`}>
+                        <RotateCcw size={11}/>Reset All Settings
+                      </button>
+                    </div>
+                  </div>
+                </>)}
+
+                {settingsTab==='about' && (<>
+                  <div className="text-center py-2">
+                    <div className="w-16 h-16 rounded-2xl mx-auto overflow-hidden border-2 mb-3"
+                      style={{borderColor:`${t.glow}40`,boxShadow:`0 0 20px ${t.glow}25`}}>
+                      <img src={avatarSrc} alt="Tessa" className="w-full h-full object-cover"
+                        onError={e=>{(e.currentTarget as HTMLImageElement).src=AVATARS[0].path;}}/>
+                    </div>
+                    <p className="text-xl font-black tracking-[0.25em] uppercase" style={{color:t.glow}}>TESSA</p>
+                    <p className={`text-[10px] mt-1 max-w-[180px] mx-auto ${t.sSub}`}>The Exceptional System, Surpassing All</p>
+                    <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold"
+                      style={{background:`${t.glow}18`,border:`1px solid ${t.glow}28`,color:t.glow}}>
+                      <Sparkles size={9}/>v3.1 · AI-Powered · 10 Avatars
+                    </div>
+                  </div>
+                  <Hr cls={t.div}/>
+                  <div className="space-y-1.5">
+                    {[
+                      ['Model','Claude Sonnet'],
+                      ['Mode', isCreatorMode?'Creator 💝':'Standard'],
+                      ['Storage', user&&!isGuest?'Cloud':'Local'],
+                      ['Conversations',`${shownConvs.length} saved`],
+                      ['Memories',`${getAllMemories().length} facts`],
+                      ['Theme', theme==='ankit'?"Ankit's Special":theme.charAt(0).toUpperCase()+theme.slice(1)],
+                      ['Font Size', fontSize],
+                      ['Language', language],
+                    ].map(([k,v])=>(
+                      <div key={k} className={`flex items-center justify-between px-3 py-2 rounded-lg ${t.sCard}`}>
+                        <span className={`text-[10px] ${t.sSub}`}>{k}</span>
+                        <span className={`text-[10px] font-medium ${t.sText}`}>{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>)}
+
+                <div className="h-6"/>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Avatar picker */}
           {showAvatarPickerInSettings && (
@@ -1893,40 +1904,6 @@ export default function Home() {
                         </button>
                       ))}
                     </div>
-                  </div>
-                )}
-
-                {/* ── TESSA INSIGHTS RIBBON — shown inline when chat is active ── */}
-                {isCreatorMode && messages.length > 0 && (
-                  <div className={`rounded-2xl overflow-hidden mb-1 transition-all`}
-                    style={{background:`${t.glow}08`,border:`1px solid ${t.glow}16`}}>
-                    {/* Collapsed header — click to expand */}
-                    <button
-                      onClick={()=>setInsightsOpen(p=>!p)}
-                      className="w-full flex items-center justify-between px-3.5 py-2.5 group"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-lg overflow-hidden flex-shrink-0 border"
-                          style={{borderColor:`${t.glow}40`}}>
-                          <img src={selectedAvatar.path} alt={selectedAvatar.name} className="w-full h-full object-cover" onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}}/>
-                        </div>
-                        <span className={`text-[10px] font-black tracking-wide`} style={{color:t.glow}}>
-                          Tessa's Insights
-                        </span>
-                        <span className={`text-[9px] ${t.sub}`}>· {moodEmoji} {moodLabel}</span>
-                      </div>
-                      <div className={`flex items-center gap-1.5 ${t.sub}`}>
-                        <span className="text-[9px]">{insightsOpen?'collapse':'expand'}</span>
-                        {insightsOpen ? <ChevronUp size={10}/> : <ChevronDown size={10}/>}
-                      </div>
-                    </button>
-                    {insightsOpen && (
-                      <div className={`px-3.5 pb-3 border-t ${t.div}`}>
-                        <div className="pt-2.5">
-                          <TessaInsights isCreatorMode={isCreatorMode}/>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 )}
 

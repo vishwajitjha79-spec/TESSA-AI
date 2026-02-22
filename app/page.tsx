@@ -1116,6 +1116,7 @@ export default function Home() {
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <div className={`h-screen ${t.bg} ${t.text} flex overflow-hidden relative transition-colors duration-500 ${fontSizeClass}`}>
+      <style>{`@keyframes popUpFromBottom{from{opacity:0;transform:translateX(-50%) translateY(18px) scale(0.96);}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}}`}</style>
 
       {/* ── BACKGROUNDS ── */}
       {t.isLight ? <LightBg creator={isCreatorMode} theme={theme} /> : <AuroraBg glow={t.glow} glow2={glow2} theme={theme} />}
@@ -1720,43 +1721,38 @@ export default function Home() {
           </div>
         </header>
 
-        {/* ── WELLNESS FLOATING PANEL ── (overlay, doesn't push layout) */}
+        {/* ── WELLNESS FLOATING PANEL — pops up from input bar ── */}
         {showWellness && isCreatorMode && (
-          <>
-            <div className="fixed inset-0 z-40 pointer-events-none" />
-            <div className="fixed top-[68px] left-1/2 z-50 animate-fadeIn shadow-2xl"
-              style={{transform:'translateX(-50%)',width:'min(480px,94vw)'}}>
-              <div className={`rounded-2xl overflow-hidden border ${t.panel}`}
-                style={{boxShadow:`0 8px 40px rgba(0,0,0,0.5), 0 0 32px ${t.glow}18`}}>
-                {/* Header */}
-                <div className={`flex items-center justify-between px-4 py-2.5 border-b ${t.div}`}>
-                  <div className="flex items-center gap-2.5">
-                    <Activity size={12} style={{color:t.glow}}/>
-                    <span className="text-[11px] font-black tracking-wide" style={{color:t.glow}}>Wellness</span>
-                    <span className={`text-[9px] px-2 py-0.5 rounded-full ${t.sub}`}
-                      style={{background:`${t.glow}10`,border:`1px solid ${t.glow}18`}}>
-                      {moodEmoji} {moodLabel}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={()=>{addWater(1);setWellnessVersion(v=>v+1);}}
-                      className={`text-[9px] px-2.5 py-1 rounded-full flex items-center gap-1 transition-all active:scale-90 ${t.btnS}`}
-                      style={{border:`1px solid ${t.glow}20`}}>
-                      <Droplets size={8} className="text-blue-400"/>💧 Log Water
-                    </button>
-                    <button onClick={()=>setShowWellness(false)}
-                      className={`p-1 rounded-lg transition-colors ${t.sub} hover:bg-white/10`}>
-                      <X size={10}/>
-                    </button>
-                  </div>
+          <div className="fixed bottom-[72px] left-1/2 z-50 shadow-2xl"
+            style={{transform:'translateX(-50%)',width:'min(480px,94vw)',animation:'popUpFromBottom 0.25s cubic-bezier(0.34,1.56,0.64,1)'}}>
+            <div className={`rounded-2xl overflow-hidden border ${t.panel}`}
+              style={{boxShadow:`0 -4px 40px rgba(0,0,0,0.5), 0 0 32px ${t.glow}18`}}>
+              <div className={`flex items-center justify-between px-4 py-2.5 border-b ${t.div}`}>
+                <div className="flex items-center gap-2.5">
+                  <Activity size={12} style={{color:t.glow}}/>
+                  <span className="text-[11px] font-black tracking-wide" style={{color:t.glow}}>Wellness</span>
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full ${t.sub}`}
+                    style={{background:`${t.glow}10`,border:`1px solid ${t.glow}18`}}>
+                    {moodEmoji} {moodLabel}
+                  </span>
                 </div>
-                {/* Content — scrollable, max height so it never overflows screen */}
-                <div className={`px-4 pb-3 pt-2.5 border-t ${t.div} overflow-y-auto`} style={{maxHeight:'55vh'}}>
-                  <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion}/>
+                <div className="flex items-center gap-2">
+                  <button onClick={()=>{addWater(1);setWellnessVersion(v=>v+1);}}
+                    className={`text-[9px] px-2.5 py-1 rounded-full flex items-center gap-1 transition-all active:scale-90 ${t.btnS}`}
+                    style={{border:`1px solid ${t.glow}20`}}>
+                    <Droplets size={8} className="text-blue-400"/>💧 Log Water
+                  </button>
+                  <button onClick={()=>setShowWellness(false)}
+                    className={`p-1 rounded-lg transition-colors ${t.sub} hover:bg-white/10`}>
+                    <X size={10}/>
+                  </button>
                 </div>
               </div>
+              <div className={`px-4 pb-3 pt-2.5 overflow-y-auto`} style={{maxHeight:'52vh'}}>
+                <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion}/>
+              </div>
             </div>
-          </>
+          </div>
         )}
 
         {/* ── MESSAGES AREA ──────────────────────────────────────────────── */}
@@ -2137,12 +2133,12 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── FLOATING INSIGHTS PANEL ── */}
+      {/* ── FLOATING INSIGHTS PANEL — pops up from input bar ── */}
       {insightsOpen && isCreatorMode && (
-        <div className="fixed top-[68px] left-1/2 z-50 animate-fadeIn shadow-2xl"
-          style={{transform:'translateX(-50%)',width:'min(420px,94vw)'}}>
+        <div className="fixed bottom-[72px] left-1/2 z-50 shadow-2xl"
+          style={{transform:'translateX(-50%)',width:'min(420px,94vw)',animation:'popUpFromBottom 0.25s cubic-bezier(0.34,1.56,0.64,1)'}}>
           <div className={`rounded-2xl overflow-hidden border ${t.panel}`}
-            style={{boxShadow:`0 8px 40px rgba(0,0,0,0.5), 0 0 28px ${t.glow}18`}}>
+            style={{boxShadow:`0 -4px 40px rgba(0,0,0,0.5), 0 0 28px ${t.glow}18`}}>
             <div className={`flex items-center justify-between px-4 py-2.5 border-b ${t.div}`}>
               <div className="flex items-center gap-2">
                 <Brain size={12} style={{color:t.glow}}/>
@@ -2153,7 +2149,7 @@ export default function Home() {
                 <X size={11}/>
               </button>
             </div>
-            <div className="p-3 overflow-y-auto" style={{maxHeight:'55vh'}}>
+            <div className="p-3 overflow-y-auto" style={{maxHeight:'52vh'}}>
               <TessaInsights isCreatorMode={isCreatorMode}/>
             </div>
           </div>

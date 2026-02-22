@@ -694,15 +694,6 @@ export default function Home() {
   const [showPlanners,    setShowPlanners]    = useState(false);
   const [showFlashcards,  setShowFlashcards]  = useState(false);
   const [showReportCard,  setShowReportCard]  = useState(false);
-  const [showAuthModal, {
-        <AuthModal
-          onClose={() => setShowAuthModal(false)}
-          onSuccess={() => {
-            setShowAuthModal(false);
-            checkAuth();
-          }}
-        />
-}]
   const [notesExpanded,   setNotesExpanded]   = useState(true);
 
   // ── Settings ──────────────────────────────────────────────────────────────
@@ -733,6 +724,7 @@ export default function Home() {
   const [showTimerFloat,  setShowTimerFloat]  = useState(false);
   const [insightsOpen,              setInsightsOpen]             = useState(false);
   const [showMobileMenu,            setShowMobileMenu]           = useState(false);
+  const [showAuthModal,             setShowAuthModal]            = useState(false);
   const [syncStatus,                setSyncStatus]               = useState<'idle'|'syncing'|'synced'|'error'>('idle');
   const [showWellness,              setShowWellness]             = useState(false);
   const [showWellnessFloat,         setShowWellnessFloat]         = useState(false);
@@ -768,7 +760,7 @@ export default function Home() {
     document.documentElement.setAttribute('data-theme', th);
     lsSet('tessa-theme', th);
   }, []);
-const [showAuthModal, setShowAuthModal] = useState(false);
+
   const checkMidnightReset = useCallback(() => {
     const today = new Date().toISOString().split('T')[0];
     const last  = lsGet('tessa-last-date');
@@ -2375,6 +2367,15 @@ const [showAuthModal, setShowAuthModal] = useState(false);
       {showPlanners&&<PlannerHub onClose={()=>setShowPlanners(false)}/>}
       {showFlashcards&&<FlashcardGenerator isCreatorMode={isCreatorMode} onClose={()=>setShowFlashcards(false)}/>}
       {showReportCard&&<ReportCard isCreatorMode={isCreatorMode} onClose={()=>setShowReportCard(false)}/>}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => {
+            setShowAuthModal(false);
+            checkAuth();
+          }}
+        />
+      )}
     </div>
   );
 }

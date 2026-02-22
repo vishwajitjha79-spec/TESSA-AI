@@ -1,13 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl     = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables! Check .env.local');
-}
+// Graceful fallback for build time — real values required at runtime
+const url  = supabaseUrl     ?? 'https://placeholder.supabase.co';
+const key  = supabaseAnonKey ?? 'placeholder-anon-key';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient(url, key, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
@@ -18,7 +18,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 // ═══════════════════════════════════════════════════════════════════════════
 // AUTH HELPERS
 // ═══════════════════════════════════════════════════════════════════════════
-
 export async function getCurrentUser() {
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error) throw error;
@@ -26,10 +25,7 @@ export async function getCurrentUser() {
 }
 
 export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw error;
   return data;
 }
@@ -38,9 +34,7 @@ export async function signUp(email: string, password: string, fullName?: string)
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: {
-      data: { full_name: fullName || 'User' },
-    },
+    options: { data: { full_name: fullName ?? 'User' } },
   });
   if (error) throw error;
   return data;

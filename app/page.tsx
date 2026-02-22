@@ -694,7 +694,7 @@ export default function Home() {
   const [showPlanners,    setShowPlanners]    = useState(false);
   const [showFlashcards,  setShowFlashcards]  = useState(false);
   const [showReportCard,  setShowReportCard]  = useState(false);
-  const [showAuthModal, (
+  const [showAuthModal, {
         <AuthModal
           onClose={() => setShowAuthModal(false)}
           onSuccess={() => {
@@ -702,7 +702,7 @@ export default function Home() {
             checkAuth();
           }}
         />
-      )]
+}]
   const [notesExpanded,   setNotesExpanded]   = useState(true);
 
   // ── Settings ──────────────────────────────────────────────────────────────

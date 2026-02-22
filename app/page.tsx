@@ -1,6 +1,5 @@
 'use client';
 
-import { Star } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -8,7 +7,7 @@ import {
   Trash2, LogOut, User, LayoutDashboard, Sun, Moon,
   Calendar, ChevronDown, ChevronUp, StickyNote, Paperclip,
   Sparkles, Brain, Activity, Clock, MessageSquare,
-  Volume2, Shield, Droplets, BookOpen, Zap, Star,
+  Volume2, Shield, Droplets, BookOpen, Zap,
   Bell, BellOff, Eye, EyeOff, Palette, RotateCcw,
   Languages, Monitor, Smartphone, Download, Upload,
   Lock, Unlock, Cpu, BarChart3, Hash,
@@ -560,25 +559,6 @@ function Toggle({ label, sub, checked, onChange, color, t }: {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AvatarImg — renders avatar image with gradient+emoji fallback
-// ─────────────────────────────────────────────────────────────────────────────
-function AvatarImg({ av, className, style }: { av: AvatarDef; className?: string; style?: React.CSSProperties }) {
-  const [failed, setFailed] = useState(false);
-  if (failed) {
-    return (
-      <div className={`bg-gradient-to-br ${av.grad} flex items-center justify-center ${className ?? ''}`} style={style}>
-        <span style={{fontSize:'45%',lineHeight:1}}>{av.emoji}</span>
-      </div>
-    );
-  }
-  return (
-    <img src={av.path} alt={av.name}
-      className={`object-cover ${className ?? ''}`} style={style}
-      onError={() => setFailed(true)} />
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // AVATAR PICKER MODAL — beautiful 4-col grid sheet
 // ─────────────────────────────────────────────────────────────────────────────
 function AvatarPickerModal({ current, onSelect, onClose, t, glow }: {
@@ -697,7 +677,10 @@ export default function Home() {
   const [isRecording,     setIsRecording]   = useState(false);
   const [settingsTab,     setSettingsTab]   = useState<'appearance'|'ai'|'chat'|'data'|'about'>('appearance');
   const [showTimerFloat,  setShowTimerFloat]  = useState(false);
-  const [insightsOpen,    setInsightsOpen]    = useState(false);
+  const [insightsOpen,              setInsightsOpen]             = useState(false);
+  const [showWellness,              setShowWellness]             = useState(false);
+  const [showWellnessFloat,         setShowWellnessFloat]         = useState(false);
+  const [showAvatarPickerInSettings,setShowAvatarPickerInSettings]= useState(false);
 
   // ── Refs ──────────────────────────────────────────────────────────────────
   const bottomRef      = useRef<HTMLDivElement>(null);
@@ -711,7 +694,6 @@ export default function Home() {
   const t         = useT(theme, isCreatorMode);
   const selectedAvatar = AVATARS.find(a => a.id === avatarId) ?? AVATARS[0];
   const avatarSrc = selectedAvatar.path;
-  const persona   = TESSA;
   const shownConvs = conversations.filter(c => c.mode === (isCreatorMode ? 'creator' : 'standard'));
   const moodLabel  = (MOOD_DESCRIPTIONS as Record<string, string>)[currentMood] ?? currentMood;
   const moodEmoji  = MOOD_EMOJI[currentMood] ?? '✨';
@@ -745,8 +727,6 @@ export default function Home() {
   useEffect(() => {
     const restoreStr = (k: string, set: (v: any) => void) => { const v=lsGet(k); if(v!==null) set(v); };
     const restoreBool = (k: string, set: (v: boolean) => void) => { const v=lsGet(k); if(v!==null) set(v==='true'); };
-    const restoreJson = <T,>(k: string, fb: T, set: (v: T) => void) => { const v=lsGetJson<T>(k, fb); set(v); };
-
     const th = lsGet('tessa-theme') as Theme | null;
     if (th && THEMES[th]) setTheme(th);
     const savedAvId = lsGet('tessa-avatar'); if(savedAvId && AVATARS.find(a=>a.id===savedAvId)) setAvatarId(savedAvId);
@@ -1374,11 +1354,11 @@ export default function Home() {
                         </div>
                         <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 flex items-center justify-center"
                           style={{background:t.glow,borderColor:t.isLight?'white':'rgba(0,0,0,0.8)'}}>
-                          <Star size={7} className="text-white fill-white" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-white" />
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-[12px] font-bold ${t.sText}`}>{selectedAvatar.emoji} {selectedAvatar.label}</p>
+                        <p className={`text-[12px] font-bold ${t.sText}`}>{selectedAvatar.emoji} {selectedAvatar.name}</p>
                         <p className={`text-[9px] ${t.sSub}`}>{selectedAvatar.desc}</p>
                         <button onClick={()=>setShowAvatarPickerInSettings(true)}
                           className={`mt-2 px-3 py-1.5 rounded-xl text-[10px] font-semibold flex items-center gap-1.5 transition-all ${t.isLight?'bg-slate-100 hover:bg-slate-200 text-slate-600':'bg-white/[0.07] hover:bg-white/[0.12] text-white/60'}`}>
@@ -2213,7 +2193,7 @@ export default function Home() {
                       {isCurrent&&(
                         <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white flex items-center justify-center"
                           style={{boxShadow:`0 0 8px ${t.glow}`}}>
-                          <Star size={14} className="fill-current" style={{color:t.glow}}/>
+                          <Check size={12} className="fill-current" style={{color:t.glow}}/>
                         </div>
                       )}
                     </button>

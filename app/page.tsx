@@ -678,6 +678,7 @@ export default function Home() {
   const [settingsTab,     setSettingsTab]   = useState<string>('main');
   const [showTimerFloat,  setShowTimerFloat]  = useState(false);
   const [insightsOpen,              setInsightsOpen]             = useState(false);
+  const [showMobileMenu,            setShowMobileMenu]           = useState(false);
   const [showWellness,              setShowWellness]             = useState(false);
   const [showWellnessFloat,         setShowWellnessFloat]         = useState(false);
   const [showAvatarPickerInSettings,setShowAvatarPickerInSettings]= useState(false);
@@ -1115,8 +1116,21 @@ export default function Home() {
   // RENDER
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className={`h-screen ${t.bg} ${t.text} flex overflow-hidden relative transition-colors duration-500 ${fontSizeClass}`}>
-      <style>{`@keyframes popUpFromBottom{from{opacity:0;transform:translateX(-50%) translateY(18px) scale(0.96);}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}}`}</style>
+    <div className={`h-screen ${t.bg} ${t.text} flex overflow-hidden relative transition-colors duration-500 ${fontSizeClass}`} style={{height:"100dvh"}}>
+      <style>{`
+      @keyframes popUpFromBottom{
+        from{opacity:0;transform:translateX(-50%) translateY(24px) scale(0.94);}
+        to{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}
+      }
+      @keyframes mobileMenuSlideUp{
+        from{opacity:0;transform:translateY(12px) scale(0.96);}
+        to{opacity:1;transform:translateY(0) scale(1);}
+      }
+      @supports(padding-top: env(safe-area-inset-top)){
+        .safe-top{ padding-top: max(12px, env(safe-area-inset-top)); }
+        .safe-bottom{ padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+      }
+    `}</style>
 
       {/* ── BACKGROUNDS ── */}
       {t.isLight ? <LightBg creator={isCreatorMode} theme={theme} /> : <AuroraBg glow={t.glow} glow2={glow2} theme={theme} />}
@@ -1609,10 +1623,10 @@ export default function Home() {
       {/* ═══════════════════════════════════════════════════════════════════
           MAIN COLUMN
       ═══════════════════════════════════════════════════════════════════ */}
-      <main className="flex-1 flex flex-col h-screen overflow-hidden min-w-0 relative z-10">
+      <main className="flex-1 flex flex-col overflow-hidden min-w-0 relative z-10" style={{height:"100dvh"}}>
 
         {/* ── HEADER ─────────────────────────────────────────────────────── */}
-        <header className={`flex-shrink-0 ${t.header} px-3 md:px-5`}>
+        <header className={`flex-shrink-0 ${t.header} px-3 md:px-5 safe-top`}>
           <div className="flex items-center justify-between gap-2 h-[60px]">
 
             {/* Left cluster */}
@@ -1666,65 +1680,132 @@ export default function Home() {
 
             {/* Right cluster */}
             <div className="flex items-center gap-0.5 flex-shrink-0">
-              {/* Mood chip */}
-              {showMoodBadge && (
-                <span className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium mr-1"
-                  style={{background:`${t.glow}12`,border:`1px solid ${t.glow}22`,color:t.glow}}>
-                  {moodEmoji} {moodLabel}
-                </span>
-              )}
 
-              {isCreatorMode&&(
-                <button onClick={()=>setShowPlanners(true)} title="Smart Planners"
+              {/* ── DESKTOP: all buttons visible ── */}
+              <div className="hidden md:flex items-center gap-0.5">
+                {showMoodBadge && (
+                  <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium mr-1"
+                    style={{background:`${t.glow}12`,border:`1px solid ${t.glow}22`,color:t.glow}}>
+                    {moodEmoji} {moodLabel}
+                  </span>
+                )}
+                {isCreatorMode&&(
+                  <button onClick={()=>setShowPlanners(true)} title="Smart Planners"
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-white/[0.07] ${t.sub}`}>
+                    <Calendar size={16}/>
+                  </button>
+                )}
+                {isCreatorMode&&(
+                  <button onClick={()=>setShowWellness(p=>!p)} title="Wellness"
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showWellness?'text-white':'hover:bg-white/[0.07] '+t.sub}`}
+                    style={showWellness?{background:`${t.glow}14`,outline:`1px solid ${t.glow}25`}:{}}>
+                    <Activity size={16}/>
+                  </button>
+                )}
+                <button onClick={()=>setShowTimerFloat(p=>!p)} title="Study Timer"
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showTimerFloat?'text-white':'hover:bg-white/[0.07] '+t.sub}`}
+                  style={showTimerFloat?{background:`${t.glow}14`,outline:`1px solid ${t.glow}25`}:{}}>
+                  <Clock size={16}/>
+                </button>
+                {isCreatorMode&&(
+                  <button onClick={()=>setShowDashboard(p=>!p)} title="Insights Panel"
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showDashboard?'text-pink-300':'hover:bg-white/[0.07] '+t.sub}`}
+                    style={showDashboard?{background:`${t.glow}12`,outline:`1px solid ${t.glow}25`}:{}}>
+                    <LayoutDashboard size={16}/>
+                  </button>
+                )}
+                {isCreatorMode&&(
+                  <button onClick={()=>setInsightsOpen(p=>!p)} title="Tessa Insights"
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${insightsOpen?'text-white':'hover:bg-white/[0.07] '+t.sub}`}
+                    style={insightsOpen?{background:`${t.glow}14`,outline:`1px solid ${t.glow}25`}:{}}>
+                    <Brain size={16}/>
+                  </button>
+                )}
+                <button onClick={()=>setTheme(theme==='light'?'dark':'light')} title="Toggle theme"
                   className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-white/[0.07] ${t.sub}`}>
-                  <Calendar size={16}/>
+                  {theme==='light'?<Moon size={16}/>:<Sun size={16}/>}
                 </button>
-              )}
-              {/* Wellness quick-access — creator mode */}
-              {isCreatorMode&&(
-                <button onClick={()=>setShowWellness(p=>!p)} title="Wellness"
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showWellness?'text-white':'hover:bg-white/[0.07] '+t.sub}`}
-                  style={showWellness?{background:`${t.glow}14`,outline:`1px solid ${t.glow}25`}:{}}>
-                  <Activity size={16}/>
+                <button onClick={()=>{setShowSettings(p=>!p);setSettingsTab('main');}} title="Settings"
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showSettings?'text-white/90':'hover:bg-white/[0.07] '+t.sub}`}
+                  style={showSettings?{background:`${t.glow}12`,outline:`1px solid ${t.glow}22`}:{}}>
+                  <Settings size={16}/>
                 </button>
-              )}
-              {/* Study Timer quick-access — always visible */}
-              <button onClick={()=>setShowTimerFloat(p=>!p)} title="Study Timer"
-                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showTimerFloat?'text-white':'hover:bg-white/[0.07] '+t.sub}`}
-                style={showTimerFloat?{background:`${t.glow}14`,outline:`1px solid ${t.glow}25`}:{}}>
-                <Clock size={16}/>
-              </button>
-              {isCreatorMode&&(
-                <button onClick={()=>setShowDashboard(p=>!p)} title="Insights Panel"
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showDashboard?'text-pink-300':'hover:bg-white/[0.07] '+t.sub}`}
-                  style={showDashboard?{background:`${t.glow}12`,outline:`1px solid ${t.glow}25`}:{}}>
-                  <LayoutDashboard size={16}/>
+              </div>
+
+              {/* ── MOBILE: only theme + settings + ⋯ overflow ── */}
+              <div className="flex md:hidden items-center gap-1">
+                <button onClick={()=>setTheme(theme==='light'?'dark':'light')}
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center ${t.sub}`}>
+                  {theme==='light'?<Moon size={16}/>:<Sun size={16}/>}
                 </button>
-              )}
-              {isCreatorMode&&(
-                <button onClick={()=>setInsightsOpen(p=>!p)} title="Tessa Insights"
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${insightsOpen?'text-white':'hover:bg-white/[0.07] '+t.sub}`}
-                  style={insightsOpen?{background:`${t.glow}14`,outline:`1px solid ${t.glow}25`}:{}}>
-                  <Brain size={16}/>
+                <button onClick={()=>{setShowSettings(p=>!p);setSettingsTab('main');}}
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center ${showSettings?'text-white/90':t.sub}`}
+                  style={showSettings?{background:`${t.glow}12`,outline:`1px solid ${t.glow}22`}:{}}>
+                  <Settings size={16}/>
                 </button>
-              )}
-              <button onClick={()=>setTheme(theme==='light'?'dark':'light')} title="Toggle theme"
-                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-white/[0.07] ${t.sub}`}>
-                {theme==='light'?<Moon size={16}/>:<Sun size={16}/>}
-              </button>
-              <button onClick={()=>{setShowSettings(p=>!p);setSettingsTab('main');}} title="Settings"
-                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showSettings?'text-white/90':'hover:bg-white/[0.07] '+t.sub}`}
-                style={showSettings?{background:`${t.glow}12`,outline:`1px solid ${t.glow}22`}:{}}>
-                <Settings size={16}/>
-              </button>
+                {/* ⋯ overflow menu — all extra actions */}
+                <button onClick={()=>setShowMobileMenu(p=>!p)}
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center ${showMobileMenu?'text-white':t.sub}`}
+                  style={showMobileMenu?{background:`${t.glow}14`,outline:`1px solid ${t.glow}28`}:{}}>
+                  <span className="text-[18px] leading-none font-bold" style={{letterSpacing:'-1px'}}>···</span>
+                </button>
+              </div>
+
             </div>
           </div>
         </header>
 
+        {/* ── MOBILE OVERFLOW MENU ── */}
+        {showMobileMenu && (
+          <>
+            <div className="fixed inset-0 z-40 md:hidden" onClick={()=>setShowMobileMenu(false)}/>
+            <div className="fixed top-[calc(env(safe-area-inset-top,0px)+64px)] right-3 z-50 md:hidden"
+              style={{animation:'mobileMenuSlideUp 0.2s cubic-bezier(0.34,1.4,0.64,1)'}}>
+              <div className={`rounded-2xl overflow-hidden border shadow-2xl`}
+                style={{
+                  minWidth:200,
+                  background:t.isLight?'rgba(255,255,255,0.97)':'rgba(8,10,24,0.97)',
+                  border:`1px solid ${t.glow}28`,
+                  boxShadow:`0 8px 32px rgba(0,0,0,0.45), 0 0 20px ${t.glow}12`,
+                  backdropFilter:'blur(20px)',
+                }}>
+                {isCreatorMode&&(<>
+                  <button onClick={()=>{setShowWellness(p=>!p);setShowMobileMenu(false);}}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium transition-colors ${showWellness?'':'hover:bg-white/5'}`}
+                    style={showWellness?{color:t.glow,background:`${t.glow}12`}:{color:t.isLight?'#374151':'rgba(255,255,255,0.75)'}}>
+                    <Activity size={15} style={{color:t.glow}}/> Wellness
+                  </button>
+                  <button onClick={()=>{setInsightsOpen(p=>!p);setShowMobileMenu(false);}}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium transition-colors ${insightsOpen?'':'hover:bg-white/5'}`}
+                    style={insightsOpen?{color:t.glow,background:`${t.glow}12`}:{color:t.isLight?'#374151':'rgba(255,255,255,0.75)'}}>
+                    <Brain size={15} style={{color:t.glow}}/> Insights
+                  </button>
+                  <button onClick={()=>{setShowPlanners(true);setShowMobileMenu(false);}}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium hover:bg-white/5 transition-colors"
+                    style={{color:t.isLight?'#374151':'rgba(255,255,255,0.75)'}}>
+                    <Calendar size={15} style={{color:t.glow}}/> Planners
+                  </button>
+                  <button onClick={()=>{setShowDashboard(p=>!p);setShowMobileMenu(false);}}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium transition-colors ${showDashboard?'':'hover:bg-white/5'}`}
+                    style={showDashboard?{color:t.glow,background:`${t.glow}12`}:{color:t.isLight?'#374151':'rgba(255,255,255,0.75)'}}>
+                    <LayoutDashboard size={15} style={{color:t.glow}}/> Dashboard
+                  </button>
+                  <div style={{height:1,background:`${t.glow}15`,margin:'0 12px'}}/>
+                </>)}
+                <button onClick={()=>{setShowTimerFloat(p=>!p);setShowMobileMenu(false);}}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium transition-colors ${showTimerFloat?'':'hover:bg-white/5'}`}
+                  style={showTimerFloat?{color:t.glow,background:`${t.glow}12`}:{color:t.isLight?'#374151':'rgba(255,255,255,0.75)'}}>
+                  <Clock size={15} style={{color:t.glow}}/> Study Timer
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
         {/* ── WELLNESS FLOATING PANEL — pops up from input bar ── */}
         {showWellness && isCreatorMode && (
           <div className="fixed bottom-[72px] left-1/2 z-50 shadow-2xl"
-            style={{transform:'translateX(-50%)',width:'min(480px,94vw)',animation:'popUpFromBottom 0.25s cubic-bezier(0.34,1.56,0.64,1)'}}>
+            style={{transform:'translateX(-50%)',width:'min(480px,94vw)',animation:'popUpFromBottom 0.3s cubic-bezier(0.34,1.4,0.64,1)',willChange:'transform,opacity'}}>
             <div className={`rounded-2xl overflow-hidden border ${t.panel}`}
               style={{boxShadow:`0 -4px 40px rgba(0,0,0,0.5), 0 0 32px ${t.glow}18`}}>
               <div className={`flex items-center justify-between px-4 py-2.5 border-b ${t.div}`}>
@@ -1959,7 +2040,7 @@ export default function Home() {
 
         {/* ── INPUT BAR ──────────────────────────────────────────────────── */}
         {!showDashboard&&(
-          <div className={`flex-shrink-0 ${t.bar} px-3 md:px-6 py-3`}>
+          <div className={`flex-shrink-0 ${t.bar} px-3 md:px-6 py-3 safe-bottom`}>
             <div className="max-w-2xl mx-auto w-full">
 
               {/* Image preview */}
@@ -2136,7 +2217,7 @@ export default function Home() {
       {/* ── FLOATING INSIGHTS PANEL — pops up from input bar ── */}
       {insightsOpen && isCreatorMode && (
         <div className="fixed bottom-[72px] left-1/2 z-50 shadow-2xl"
-          style={{transform:'translateX(-50%)',width:'min(420px,94vw)',animation:'popUpFromBottom 0.25s cubic-bezier(0.34,1.56,0.64,1)'}}>
+          style={{transform:'translateX(-50%)',width:'min(420px,94vw)',animation:'popUpFromBottom 0.3s cubic-bezier(0.34,1.4,0.64,1)',willChange:'transform,opacity'}}>
           <div className={`rounded-2xl overflow-hidden border ${t.panel}`}
             style={{boxShadow:`0 -4px 40px rgba(0,0,0,0.5), 0 0 28px ${t.glow}18`}}>
             <div className={`flex items-center justify-between px-4 py-2.5 border-b ${t.div}`}>

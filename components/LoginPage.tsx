@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signInWithGoogle, signInWithEmail, signUpWithEmail } from '@/lib/supabase';
+import { signInWithEmail, signUpWithEmail } from '@/lib/supabase';
 import { Heart, Mail, Lock, User, Sparkles } from 'lucide-react';
 
 interface LoginPageProps {

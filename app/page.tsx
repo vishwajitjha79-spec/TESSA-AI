@@ -49,6 +49,7 @@ import {
 import {
   buildMorningBriefing, shouldDeliverBriefing, markBriefingDelivered,
 } from '@/lib/streaks-water';
+import AuthModal from '@/components/AuthModal';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -693,6 +694,15 @@ export default function Home() {
   const [showPlanners,    setShowPlanners]    = useState(false);
   const [showFlashcards,  setShowFlashcards]  = useState(false);
   const [showReportCard,  setShowReportCard]  = useState(false);
+  const [showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => {
+            setShowAuthModal(false);
+            checkAuth();
+          }}
+        />
+      )]
   const [notesExpanded,   setNotesExpanded]   = useState(true);
 
   // ── Settings ──────────────────────────────────────────────────────────────
@@ -758,7 +768,7 @@ export default function Home() {
     document.documentElement.setAttribute('data-theme', th);
     lsSet('tessa-theme', th);
   }, []);
-
+const [showAuthModal, setShowAuthModal] = useState(false);
   const checkMidnightReset = useCallback(() => {
     const today = new Date().toISOString().split('T')[0];
     const last  = lsGet('tessa-last-date');
@@ -1347,7 +1357,7 @@ export default function Home() {
                 </button>
               </div>
             ) : (
-              <button onClick={()=>alert('Configure Supabase auth!')}
+              <button onClick={()=>setShowAuthModal(true)}
                 className={`w-full py-2 rounded-xl text-[11px] font-medium transition-all ${t.btnS}`}>
                 👤 Sign In
               </button>

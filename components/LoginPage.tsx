@@ -1,207 +1,166 @@
 'use client';
 
 import { useState } from 'react';
-import { signInWithEmail, signUpWithEmail } from '@/lib/supabase';
-import { Heart, Mail, Lock, User, Sparkles } from 'lucide-react';
+import { signIn, signUp } from '@/lib/supabase';
+import { Heart, Mail, Lock, Sparkles, Eye, EyeOff } from 'lucide-react';
 
 interface LoginPageProps {
-  onGuestContinue: () => void;
+  onClose?: () => void;
+  onSuccess?: () => void;
 }
 
-export default function LoginPage({ onGuestContinue }: LoginPageProps) {
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
+export default function LoginPage({ onClose, onSuccess }: LoginPageProps) {
+  const [mode, setMode]         = useState<'signin' | 'signup'>('signin');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+  const [success, setSuccess]   = useState('');
 
-  const handleGoogleSignIn = async () => {
-    setLoading(true);
-    setError('');
-    const { error } = await signInWithGoogle();
-    if (error) {
-      setError(error.message);
+  const handle = async () => {
+    if (!email.trim() || !password.trim()) { setError('Please fill in all fields.'); return; }
+    if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
+    setLoading(true); setError(''); setSuccess('');
+    try {
+      if (mode === 'signin') {
+        await signIn(email.trim(), password);
+        onSuccess?.();
+      } else {
+        await signUp(email.trim(), password);
+        setSuccess('Account created! Check your email to confirm, then sign in.');
+        setMode('signin');
+        setPassword('');
+      }
+    } catch (err: any) {
+      const msg = err?.message ?? 'Something went wrong.';
+      if (msg.includes('Invalid login'))           setError('Incorrect email or password.');
+      else if (msg.includes('already registered')) setError('Account exists — sign in instead.');
+      else if (msg.includes('valid email'))        setError('Please enter a valid email address.');
+      else setError(msg);
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleEmailAuth = async () => {
-    if (!email || !password) {
-      setError('Please fill in all fields');
-      return;
-    }
-
-    if (isSignUp && !displayName) {
-      setError('Please enter your name');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
-    if (isSignUp) {
-      const { error } = await signUpWithEmail(email, password, displayName);
-      if (error) {
-        setError(error.message);
-      } else {
-        setError('Check your email to verify your account!');
-      }
-    } else {
-      const { error } = await signInWithEmail(email, password);
-      if (error) {
-        setError(error.message);
-      }
-    }
-    
-    setLoading(false);
-  };
+  const handleKey = (e: React.KeyboardEvent) => { if (e.key === 'Enter') handle(); };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0d1117] flex items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-8">
-        
-        {/* Logo/Header */}
-        <div className="text-center">
-          <div className="inline-block mb-4">
-            <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-4xl animate-pulse-glow">
-              🌌
+    <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center">
+      <div className="absolute inset-0 bg-black/65 backdrop-blur-md" onClick={onClose} />
+      <div
+        className="relative w-full max-w-sm mx-4 mb-4 sm:mb-0 rounded-3xl overflow-hidden shadow-2xl"
+        style={{
+          background: 'rgba(6,8,20,0.97)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.6), 0 0 40px rgba(6,182,212,0.1)',
+        }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pt-5 pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg,#06b6d4,#6366f1)' }}>
+              <Sparkles size={14} className="text-white" />
+            </div>
+            <div>
+              <p className="text-white font-black text-sm tracking-wide">
+                {mode === 'signin' ? 'Welcome back' : 'Create account'}
+              </p>
+              <p className="text-white/35 text-[9px] mt-0.5">
+                {mode === 'signin' ? 'Sign in to sync your Tessa data' : 'Start syncing across devices'}
+              </p>
             </div>
           </div>
-          <h1 className="text-4xl font-bold holographic-text font-['Orbitron'] mb-2">
-            T.E.S.S.A.
-          </h1>
-          <p className="text-sm text-gray-400 tracking-wider">
-            THOUGHTFUL EMPATHIC SOPHISTICATED SYNTHETIC ASSISTANT
-          </p>
+          {onClose && (
+            <button onClick={onClose}
+              className="w-7 h-7 rounded-full flex items-center justify-center bg-white/[0.06] hover:bg-white/[0.12] transition-colors">
+              <span className="text-white/50 text-sm leading-none">✕</span>
+            </button>
+          )}
         </div>
 
-        {/* Login Card */}
-        <div className="bg-white/5 backdrop-blur-lg border border-primary/20 rounded-2xl p-8 space-y-6">
-          
-          {/* Guest Continue */}
-          <button
-            onClick={onGuestContinue}
-            className="w-full px-6 py-4 bg-gradient-to-r from-primary/20 to-secondary/20 hover:from-primary/30 hover:to-secondary/30 border-2 border-primary/30 rounded-xl font-bold transition-all flex items-center justify-center gap-3 text-lg"
-          >
-            <Sparkles size={24} />
-            Continue as Guest
-          </button>
+        <div className="h-px mx-5 mb-4" style={{ background: 'rgba(255,255,255,0.06)' }} />
 
+        <div className="px-5 pb-5 space-y-3">
+
+          {/* Email */}
           <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-600"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-[#1a1f3a] text-gray-400">OR SIGN IN</span>
-            </div>
+            <Mail size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
+            <input
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              onKeyDown={handleKey}
+              autoComplete="email"
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl text-[12px] outline-none transition-all placeholder:text-white/20"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'white' }}
+              onFocus={e => (e.currentTarget.style.border = '1px solid rgba(6,182,212,0.45)')}
+              onBlur={e  => (e.currentTarget.style.border = '1px solid rgba(255,255,255,0.09)')}
+            />
           </div>
 
-          {/* Google Sign In */}
+          {/* Password */}
+          <div className="relative">
+            <Lock size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
+            <input
+              type={showPass ? 'text' : 'password'}
+              placeholder="Password (min 6 chars)"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              onKeyDown={handleKey}
+              autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+              className="w-full pl-9 pr-10 py-2.5 rounded-xl text-[12px] outline-none transition-all placeholder:text-white/20"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'white' }}
+              onFocus={e => (e.currentTarget.style.border = '1px solid rgba(6,182,212,0.45)')}
+              onBlur={e  => (e.currentTarget.style.border = '1px solid rgba(255,255,255,0.09)')}
+            />
+            <button type="button" onClick={() => setShowPass(p => !p)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
+              {showPass ? <EyeOff size={13} /> : <Eye size={13} />}
+            </button>
+          </div>
+
+          {error && (
+            <p className="text-[11px] text-red-400 px-1 flex items-center gap-1.5">
+              <span className="w-1 h-1 rounded-full bg-red-400 flex-shrink-0" />{error}
+            </p>
+          )}
+          {success && (
+            <p className="text-[11px] text-emerald-400 px-1 flex items-center gap-1.5">
+              <span className="w-1 h-1 rounded-full bg-emerald-400 flex-shrink-0" />{success}
+            </p>
+          )}
+
           <button
-            onClick={handleGoogleSignIn}
+            onClick={handle}
             disabled={loading}
-            className="w-full px-6 py-4 bg-white text-black hover:bg-gray-100 rounded-xl font-bold transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+            className="w-full py-2.5 rounded-xl text-[12px] font-bold text-white transition-all active:scale-[0.98] disabled:opacity-50"
+            style={{
+              background: loading ? 'rgba(6,182,212,0.4)' : 'linear-gradient(135deg,#06b6d4,#6366f1)',
+              boxShadow: '0 4px 16px rgba(6,182,212,0.25)',
+            }}
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-            </svg>
-            Sign in with Google
+            {loading
+              ? <span className="flex items-center justify-center gap-2">
+                  <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  {mode === 'signin' ? 'Signing in…' : 'Creating account…'}
+                </span>
+              : mode === 'signin' ? '✦ Sign In' : '✦ Create Account'
+            }
           </button>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-600"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-[#1a1f3a] text-gray-400">OR USE EMAIL</span>
-            </div>
-          </div>
-
-          {/* Email/Password Form */}
-          <div className="space-y-4">
-            {isSignUp && (
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Name</label>
-                <div className="relative">
-                  <User size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    placeholder="Your name"
-                    className="w-full pl-12 pr-4 py-3 bg-white/5 border border-primary/30 rounded-lg focus:outline-none focus:border-primary transition-all"
-                  />
-                </div>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">Email</label>
-              <div className="relative">
-                <Mail size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  className="w-full pl-12 pr-4 py-3 bg-white/5 border border-primary/30 rounded-lg focus:outline-none focus:border-primary transition-all"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">Password</label>
-              <div className="relative">
-                <Lock size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-12 pr-4 py-3 bg-white/5 border border-primary/30 rounded-lg focus:outline-none focus:border-primary transition-all"
-                />
-              </div>
-            </div>
-
-            {error && (
-              <div className={`text-sm p-3 rounded-lg ${
-                error.includes('Check your email') 
-                  ? 'bg-green-500/10 text-green-400 border border-green-500/30'
-                  : 'bg-red-500/10 text-red-400 border border-red-500/30'
-              }`}>
-                {error}
-              </div>
-            )}
-
+          <p className="text-center text-[11px] text-white/35 pt-1">
+            {mode === 'signin' ? "Don't have an account? " : 'Already have an account? '}
             <button
-              onClick={handleEmailAuth}
-              disabled={loading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-primary to-secondary hover:from-primary/80 hover:to-secondary/80 rounded-lg font-bold transition-all disabled:opacity-50"
+              onClick={() => { setMode(m => m === 'signin' ? 'signup' : 'signin'); setError(''); setSuccess(''); }}
+              className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors"
             >
-              {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
+              {mode === 'signin' ? 'Sign up' : 'Sign in'}
             </button>
+          </p>
 
-            <button
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setError('');
-              }}
-              className="w-full text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
-            </button>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center text-xs text-gray-500">
-          <p>By continuing, you agree to T.E.S.S.A.'s Terms of Service</p>
-          <p className="mt-2">Guest mode: Data stored locally only</p>
-          <p>Signed in: Data synced securely to cloud</p>
         </div>
       </div>
     </div>

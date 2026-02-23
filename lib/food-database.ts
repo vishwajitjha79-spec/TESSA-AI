@@ -823,7 +823,16 @@ const CATEGORY_FALLBACKS: Array<{ keywords: string[]; cal: number; unit: string 
   { keywords: ['protein','whey'],                                    cal: 120, unit: 'per scoop' },
 ];
 
-export function getFoodSuggestions(query: string): Array<{ name: string; calories: number; unit: string }> {
+export function getFoodSuggestions(query: string): string[] {
+  const q = query.toLowerCase().trim();
+  if (!q) return [];
+  return Object.keys(FOOD_DATABASE)
+    .filter(key => key.includes(q) || q.includes(key))
+    .slice(0, 8);
+}
+
+// Richer version for components that want calories + unit in suggestions
+export function getFoodSuggestionsRich(query: string): Array<{ name: string; calories: number; unit: string }> {
   const q = query.toLowerCase().trim();
   if (!q) return [];
   return Object.entries(FOOD_DATABASE)

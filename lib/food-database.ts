@@ -611,7 +611,6 @@ const FOOD_DATABASE: Record<string, { cal: number; unit: string }> = {
   'vegetable rice':          { cal: 230, unit: 'per cup' },
 
   // ═══ MORE KEBABS & TIKKA ═══
-  'fish tikka':              { cal: 220, unit: 'per plate' },
   'prawn tikka':             { cal: 230, unit: 'per plate' },
   'veg seekh kebab':         { cal: 160, unit: 'per piece' },
   'veg tikka':               { cal: 150, unit: 'per plate' },

@@ -438,7 +438,6 @@ const FOOD_DATABASE: Record<string, { cal: number; unit: string }> = {
 
   // ═══ FISH & SEAFOOD ═══
   'fish masala':             { cal: 240, unit: 'per bowl' },
-  'fish fry':                { cal: 230, unit: 'per piece' },
   'fish tikka':              { cal: 200, unit: 'per plate' },
   'rohu curry':              { cal: 200, unit: 'per bowl' },
   'katla curry':             { cal: 210, unit: 'per bowl' },

@@ -77,7 +77,7 @@ const MOOD_EMOJI: Record<string, string> = {
 };
 
 // Fixed persona — always Tessa
-const TESSA = { name: 'Tessa', tagline: 'The Exceptional System, Surpassing All' };
+const TESSA = { name: 'Tessa', tagline: 'The Exceptional System, Surpassing ALL' };
 // ─────────────────────────────────────────────────────────────────────────────
 // AVATAR SYSTEM — 10 avatars (5 existing + 5 new)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1320,7 +1320,7 @@ export default function Home() {
             </button>
             {notesExpanded && (
               <div className={`max-h-40 overflow-y-auto border-t ${t.div}`}>
-                <NotesPanel />
+                <NotesPanel isLight={t.isLight} accentColor={t.glow} />
               </div>
             )}
           </div>
@@ -1687,7 +1687,7 @@ export default function Home() {
                         onError={e=>{(e.currentTarget as HTMLImageElement).src=AVATARS[0].path;}}/>
                     </div>
                     <p className="text-xl font-black tracking-[0.25em] uppercase" style={{color:t.glow}}>TESSA</p>
-                    <p className={`text-[10px] mt-1 max-w-[180px] mx-auto ${t.sSub}`}>The Exceptional System, Surpassing All</p>
+                    <p className={`text-[10px] mt-1 max-w-[180px] mx-auto ${t.sSub}`}>The Exceptional System, Surpassing ALL</p>
                     <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold"
                       style={{background:`${t.glow}18`,border:`1px solid ${t.glow}28`,color:t.glow}}>
                       <Sparkles size={9}/>v3.1 · AI-Powered · 10 Avatars
@@ -2047,7 +2047,7 @@ export default function Home() {
                   return (
                     <div
                       key={msg.id}
-                      className={`flex gap-2.5 animate-fadeIn ${isUser?'justify-end':'justify-start'} ${isGrouped?'mt-0.5':'mt-2.5'}`}
+                      className={`flex gap-2.5 animate-fadeIn ${isUser?'justify-end':'justify-start'} ${isGrouped?'mt-0.5':'mt-2.5'} ${isUser?'pl-8 md:pl-16':'pr-8 md:pr-16'}`}
                     >
                       {/* LEFT: AI avatar (only on first in group) */}
                       {!isUser && (

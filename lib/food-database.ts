@@ -423,7 +423,6 @@ const FOOD_DATABASE: Record<string, { cal: number; unit: string }> = {
   'fried chicken':           { cal: 250, unit: 'per piece' },
 
   // ═══ MUTTON / LAMB ═══
-  'mutton curry':            { cal: 360, unit: 'per bowl' },
   'mutton do pyaza':         { cal: 350, unit: 'per bowl' },
   'mutton handi':            { cal: 370, unit: 'per bowl' },
   'mutton keema':            { cal: 310, unit: 'per bowl' },

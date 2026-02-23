@@ -592,7 +592,6 @@ const FOOD_DATABASE: Record<string, { cal: number; unit: string }> = {
   'kung pao chicken':        { cal: 290, unit: 'per bowl' },
 
   // ═══ RICE DISHES EXPANDED ═══
-  'prawn biryani':           { cal: 460, unit: 'per plate' },
   'fish biryani':            { cal: 440, unit: 'per plate' },
   'soya biryani':            { cal: 380, unit: 'per plate' },
   'paneer biryani':          { cal: 430, unit: 'per plate' },

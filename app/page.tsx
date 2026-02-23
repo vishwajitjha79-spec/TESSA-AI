@@ -1921,38 +1921,56 @@ export default function Home() {
           </>
         )}
 
-        {/* ── WELLNESS FLOATING PANEL — pops up from input bar ── */}
+        {/* ── WELLNESS FLOATING PANEL ── */}
         {showWellness && isCreatorMode && (
-          <div className="fixed bottom-[72px] left-1/2 z-50 shadow-2xl"
-            style={{transform:'translateX(-50%)',width:'min(480px,94vw)',animation:'popUpFromBottom 0.3s cubic-bezier(0.34,1.4,0.64,1)',willChange:'transform,opacity'}}>
-            <div className={`rounded-2xl overflow-hidden border ${t.div} ${getSolidBg(t)}`}
-              style={{boxShadow:`0 -4px 40px rgba(0,0,0,0.7), 0 0 32px ${t.glow}18`}}>
-              <div className={`flex items-center justify-between px-4 py-2.5 border-b ${t.div}`}>
-                <div className="flex items-center gap-2.5">
-                  <Activity size={12} style={{color:t.glow}}/>
-                  <span className="text-[11px] font-black tracking-wide" style={{color:t.glow}}>Wellness</span>
-                  <span className={`text-[9px] px-2 py-0.5 rounded-full ${t.sub}`}
-                    style={{background:`${t.glow}10`,border:`1px solid ${t.glow}18`}}>
-                    {moodEmoji} {moodLabel}
-                  </span>
+          <>
+            {/* Full backdrop — blurs chat completely */}
+            <div className="fixed inset-0 z-[48]"
+              style={{background:'rgba(0,0,0,0.55)',backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)'}}
+              onClick={()=>setShowWellness(false)}/>
+            <div className="fixed bottom-[76px] left-1/2 z-[49]"
+              style={{transform:'translateX(-50%)',width:'min(480px,94vw)',animation:'popUpFromBottom 0.3s cubic-bezier(0.34,1.4,0.64,1)',willChange:'transform,opacity'}}>
+              <div className="rounded-2xl overflow-hidden"
+                style={{
+                  background: t.isLight ? 'rgba(255,255,255,0.99)' : 'rgba(8,10,28,0.99)',
+                  border: `1px solid ${t.glow}35`,
+                  boxShadow: `0 0 0 1px ${t.glow}15, 0 -8px 60px rgba(0,0,0,0.8), 0 0 40px ${t.glow}20`,
+                  backdropFilter: 'blur(32px)',
+                }}>
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-3"
+                  style={{borderBottom:`1px solid ${t.glow}20`,background: t.isLight ? `linear-gradient(135deg, white, ${t.glow}08)` : `linear-gradient(135deg, rgba(255,255,255,0.04), ${t.glow}10)`}}>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{background:`linear-gradient(135deg,${t.glow},${t.glow}88)`}}>
+                      <Activity size={13} className="text-white"/>
+                    </div>
+                    <div>
+                      <span className="text-[12px] font-black tracking-wide" style={{color:t.glow}}>Wellness</span>
+                      <span className={`ml-2 text-[9px] px-2 py-0.5 rounded-full ${t.sub}`}
+                        style={{background:`${t.glow}12`,border:`1px solid ${t.glow}22`}}>
+                        {moodEmoji} {moodLabel}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={()=>{addWater(1);setWellnessVersion(v=>v+1);if(user&&!isGuest)pushCreatorSync(user.id);}}
+                      className="text-[10px] px-3 py-1.5 rounded-xl flex items-center gap-1.5 font-semibold transition-all active:scale-90"
+                      style={{background:`linear-gradient(135deg,rgba(59,130,246,0.18),rgba(6,182,212,0.12))`,border:'1px solid rgba(59,130,246,0.3)',color:'#60a5fa'}}>
+                      <Droplets size={10}/>Log Water
+                    </button>
+                    <button onClick={()=>setShowWellness(false)}
+                      className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-90"
+                      style={{background:'rgba(239,68,68,0.12)',border:'1px solid rgba(239,68,68,0.25)',color:'#f87171'}}>
+                      <X size={12}/>
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button onClick={()=>{addWater(1);setWellnessVersion(v=>v+1);if(user&&!isGuest)pushCreatorSync(user.id);}}
-                    className={`text-[9px] px-2.5 py-1 rounded-full flex items-center gap-1 transition-all active:scale-90 ${t.btnS}`}
-                    style={{border:`1px solid ${t.glow}20`}}>
-                    <Droplets size={8} className="text-blue-400"/>💧 Log Water
-                  </button>
-                  <button onClick={()=>setShowWellness(false)}
-                    className={`p-1 rounded-lg transition-colors ${t.sub} hover:bg-white/10`}>
-                    <X size={10}/>
-                  </button>
+                <div className="px-4 pb-4 pt-3 overflow-y-auto" style={{maxHeight:'55vh'}}>
+                  <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion}/>
                 </div>
-              </div>
-              <div className={`px-4 pb-3 pt-2.5 overflow-y-auto`} style={{maxHeight:'52vh'}}>
-                <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion}/>
               </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* ── MESSAGES AREA ──────────────────────────────────────────────── */}
@@ -2287,27 +2305,46 @@ export default function Home() {
         />
       )}
 
-      {/* ── FLOATING INSIGHTS PANEL — pops up from input bar ── */}
+      {/* ── FLOATING INSIGHTS PANEL ── */}
       {insightsOpen && isCreatorMode && (
-        <div className="fixed bottom-[72px] left-1/2 z-50 shadow-2xl"
-          style={{transform:'translateX(-50%)',width:'min(420px,94vw)',animation:'popUpFromBottom 0.3s cubic-bezier(0.34,1.4,0.64,1)',willChange:'transform,opacity'}}>
-          <div className={`rounded-2xl overflow-hidden border ${t.div} ${getSolidBg(t)}`}
-            style={{boxShadow:`0 -4px 40px rgba(0,0,0,0.7), 0 0 28px ${t.glow}18`}}>
-            <div className={`flex items-center justify-between px-4 py-2.5 border-b ${t.div}`}>
-              <div className="flex items-center gap-2">
-                <Brain size={12} style={{color:t.glow}}/>
-                <span className={`text-[11px] font-bold ${t.accent}`}>Tessa&apos;s Insights</span>
-                <span className={`text-[9px] ${t.sub}`}>{moodEmoji} {moodLabel}</span>
+        <>
+          {/* Full backdrop — blurs chat completely */}
+          <div className="fixed inset-0 z-[48]"
+            style={{background:'rgba(0,0,0,0.55)',backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)'}}
+            onClick={()=>setInsightsOpen(false)}/>
+          <div className="fixed bottom-[76px] left-1/2 z-[49]"
+            style={{transform:'translateX(-50%)',width:'min(420px,94vw)',animation:'popUpFromBottom 0.3s cubic-bezier(0.34,1.4,0.64,1)',willChange:'transform,opacity'}}>
+            <div className="rounded-2xl overflow-hidden"
+              style={{
+                background: t.isLight ? 'rgba(255,255,255,0.99)' : 'rgba(8,10,28,0.99)',
+                border: `1px solid ${t.glow}35`,
+                boxShadow: `0 0 0 1px ${t.glow}15, 0 -8px 60px rgba(0,0,0,0.8), 0 0 36px ${t.glow}20`,
+                backdropFilter: 'blur(32px)',
+              }}>
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3"
+                style={{borderBottom:`1px solid ${t.glow}20`,background: t.isLight ? `linear-gradient(135deg, white, ${t.glow}08)` : `linear-gradient(135deg, rgba(255,255,255,0.04), ${t.glow}10)`}}>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{background:`linear-gradient(135deg,${t.glow},${t.glow}88)`}}>
+                    <Brain size={13} className="text-white"/>
+                  </div>
+                  <div>
+                    <span className="text-[12px] font-black tracking-wide" style={{color:t.glow}}>Tessa&apos;s Insights</span>
+                    <span className={`ml-2 text-[9px] ${t.sub}`}>{moodEmoji} {moodLabel}</span>
+                  </div>
+                </div>
+                <button onClick={()=>setInsightsOpen(false)}
+                  className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-90"
+                  style={{background:'rgba(239,68,68,0.12)',border:'1px solid rgba(239,68,68,0.25)',color:'#f87171'}}>
+                  <X size={12}/>
+                </button>
               </div>
-              <button onClick={()=>setInsightsOpen(false)} className={`p-1 rounded-lg hover:bg-white/10 ${t.sub}`}>
-                <X size={11}/>
-              </button>
-            </div>
-            <div className="p-3 overflow-y-auto" style={{maxHeight:'52vh'}}>
-              <TessaInsights isCreatorMode={isCreatorMode}/>
+              <div className="p-4 overflow-y-auto" style={{maxHeight:'55vh'}}>
+                <TessaInsights isCreatorMode={isCreatorMode}/>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* ── MODALS ── */}

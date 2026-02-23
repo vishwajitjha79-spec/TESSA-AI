@@ -979,12 +979,13 @@ export default function Home() {
         const foods = foodHit.food.split(/,|and|\+|with/i).map(f => f.trim()).filter(Boolean);
         let totalCal = 0; const lines: string[] = [];
         for (const food of foods) {
-          const qm = food.match(/^(\d+)\s+(.+)/);
-          const qty = qm ? parseInt(qm[1]) : 1;
-          const fn  = qm ? qm[2] : food;
-          const res = estimateCalories(fn);
-          const cal = res.calories * qty;
-          totalCal += cal; lines.push(`${qty>1?qty+' ':''}${res.food} (${cal}cal)`);
+          // Match patterns like "3 samosas", "2x roti", "half a pizza"
+          const qm  = food.match(/^(\d+(?:\.\d+)?)\s*[xX×]?\s*(.+)/);
+          const qty  = qm ? parseFloat(qm[1]) : 1;
+          const fn   = qm ? qm[2].trim() : food;
+          const res  = estimateCalories(fn, qty);   // quantity passed into estimateCalories
+          totalCal  += res.calories;
+          lines.push(`${res.food} — ${res.calories}cal (${res.unit})`);
         }
         const h = lsGetJson<HealthSnapshot>('tessa-health', { weight:0, height:0, meals:[], totalCalories:0, date:new Date().toISOString().split('T')[0] });
         h.meals.push({ time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}), meal:lines.join(', '), calories:totalCal, confidence:'medium' });
@@ -1821,11 +1822,6 @@ export default function Home() {
                     <Activity size={16}/>
                   </button>
                 )}
-                <button onClick={()=>setShowTimerFloat(p=>!p)} title="Study Timer"
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showTimerFloat?'text-white':'hover:bg-white/[0.07] '+t.sub}`}
-                  style={showTimerFloat?{background:`${t.glow}14`,outline:`1px solid ${t.glow}25`}:{}}>
-                  <Clock size={16}/>
-                </button>
                 {isCreatorMode&&(
                   <button onClick={()=>setShowDashboard(p=>!p)} title="Insights Panel"
                     className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showDashboard?'text-pink-300':'hover:bg-white/[0.07] '+t.sub}`}
@@ -1911,11 +1907,6 @@ export default function Home() {
                   </button>
                   <div style={{height:1,background:`${t.glow}15`,margin:'0 12px'}}/>
                 </>)}
-                <button onClick={()=>{setShowTimerFloat(p=>!p);setShowMobileMenu(false);}}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium transition-colors ${showTimerFloat?'':'hover:bg-white/5'}`}
-                  style={showTimerFloat?{color:t.glow,background:`${t.glow}12`}:{color:t.isLight?'#374151':'rgba(255,255,255,0.75)'}}>
-                  <Clock size={15} style={{color:t.glow}}/> Study Timer
-                </button>
               </div>
             </div>
           </>
@@ -2267,15 +2258,6 @@ export default function Home() {
             </div>
 
             <div className="flex-1 overflow-y-auto px-2.5 py-2.5 space-y-2">
-              {/* Study Timer */}
-              <div className={`rounded-xl p-2.5 ${t.card}`}>
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Clock size={10} style={{color:t.glow}}/>
-                  <span className={`text-[10px] font-bold ${t.accent}`}>Study Timer</span>
-                </div>
-                <StudyTimer defaultMinutes={25}/>
-              </div>
-
               {/* Memory */}
               <div className={`rounded-xl p-2.5 ${t.card}`}>
                 <div className="flex items-center justify-between mb-1.5">

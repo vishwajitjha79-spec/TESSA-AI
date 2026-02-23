@@ -152,17 +152,18 @@ function parseFormulas(text: string): Segment[] {
 // All colours are theme-aware: dark on light themes, white on dark themes.
 // ══════════════════════════════════════════════════════════════════════════════
 function formatText(text: string, isLight: boolean, accentColor: string): React.ReactNode[] {
-  // ── Colour tokens ─────────────────────────────────────────────────────────
-  const boldColor   = isLight ? '#0f172a' : '#ffffff';          // always visible
-  const italicColor = isLight ? '#1e293b' : 'rgba(255,255,255,0.88)';
-  const codeColor   = isLight ? '#7c3aed' : '#67e8f9';
+  // ── Colour tokens — ZERO white in light themes ───────────────────────────
+  const textColor   = isLight ? '#374151'  : 'rgba(255,255,255,0.88)';
+  const boldColor   = isLight ? '#111827'  : 'rgba(255,255,255,0.96)'; // softened, not pure white
+  const headColor   = isLight ? '#0f172a'  : '#ffffff';
+  const italicColor = isLight ? '#4b5563'  : 'rgba(255,255,255,0.78)';
+  const codeColor   = isLight ? '#7c3aed'  : '#67e8f9';
   const codeBg      = isLight ? 'rgba(124,58,237,0.09)' : 'rgba(103,232,249,0.10)';
-  const subColor    = isLight ? '#64748b' : 'rgba(255,255,255,0.45)';
-  const hrColor     = isLight ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.08)';
-  const blockBg     = isLight ? 'rgba(0,0,0,0.04)'  : 'rgba(255,255,255,0.04)';
-  const blockBorder = isLight ? 'rgba(0,0,0,0.1)'   : 'rgba(255,255,255,0.09)';
+  const subColor    = isLight ? '#6b7280'  : 'rgba(255,255,255,0.40)';
+  const hrColor     = isLight ? 'rgba(0,0,0,0.12)'      : 'rgba(255,255,255,0.08)';
+  const blockBg     = isLight ? 'rgba(0,0,0,0.04)'      : 'rgba(255,255,255,0.04)';
+  const blockBorder = isLight ? 'rgba(0,0,0,0.10)'      : 'rgba(255,255,255,0.09)';
   const quoteBar    = `${accentColor}55`;
-  const textColor   = isLight ? '#1e293b' : 'rgba(255,255,255,0.88)';
 
   const parts : React.ReactNode[] = [];
   const lines  = text.split('\n');
@@ -202,11 +203,11 @@ function formatText(text: string, isLight: boolean, accentColor: string): React.
       parts.push(
         <div key={key++} style={{margin:'14px 0 5px'}}>
           <div style={{
-            fontSize:20, fontWeight:900, color:boldColor,
+            fontSize:20, fontWeight:800, color:headColor,
             letterSpacing:'-0.02em', lineHeight:1.25,
             borderBottom:`2px solid ${accentColor}35`, paddingBottom:5,
           }}>
-            {inlineFormat(t, boldColor, italicColor, codeColor, codeBg, accentColor)}
+            {inlineFormat(t, headColor, italicColor, codeColor, codeBg, accentColor)}
           </div>
         </div>
       );
@@ -219,8 +220,8 @@ function formatText(text: string, isLight: boolean, accentColor: string): React.
       parts.push(
         <div key={key++} style={{margin:'11px 0 4px', display:'flex', alignItems:'center', gap:7}}>
           <span style={{color:accentColor, fontSize:11, flexShrink:0}}>◆</span>
-          <div style={{fontSize:16, fontWeight:800, color:boldColor, letterSpacing:'-0.01em', lineHeight:1.3}}>
-            {inlineFormat(t, boldColor, italicColor, codeColor, codeBg, accentColor)}
+          <div style={{fontSize:16, fontWeight:700, color:headColor, letterSpacing:'-0.01em', lineHeight:1.3}}>
+            {inlineFormat(t, headColor, italicColor, codeColor, codeBg, accentColor)}
           </div>
         </div>
       );
@@ -233,8 +234,8 @@ function formatText(text: string, isLight: boolean, accentColor: string): React.
       parts.push(
         <div key={key++} style={{margin:'9px 0 3px', display:'flex', alignItems:'center', gap:6}}>
           <span style={{color:accentColor, fontSize:9, opacity:0.7, flexShrink:0}}>▸</span>
-          <div style={{fontSize:14, fontWeight:700, color:boldColor, lineHeight:1.35}}>
-            {inlineFormat(t, boldColor, italicColor, codeColor, codeBg, accentColor)}
+          <div style={{fontSize:14, fontWeight:600, color:headColor, lineHeight:1.35}}>
+            {inlineFormat(t, headColor, italicColor, codeColor, codeBg, accentColor)}
           </div>
         </div>
       );
@@ -304,7 +305,7 @@ function formatText(text: string, isLight: boolean, accentColor: string): React.
                 fontSize:9,fontWeight:800,color:accentColor,marginTop:2,
               }}>{j+1}</span>
               <span style={{fontSize:13,lineHeight:1.6,color:textColor}}>
-                {inlineFormat(t, boldColor, italicColor, codeColor, codeBg, accentColor)}
+                {inlineFormat(t, headColor, italicColor, codeColor, codeBg, accentColor)}
               </span>
             </li>
           ))}
@@ -316,6 +317,24 @@ function formatText(text: string, isLight: boolean, accentColor: string): React.
     // ── Blank line ──────────────────────────────────────────────────────────
     if (line.trim() === '') {
       parts.push(<div key={key++} style={{height:5}}/>);
+      i++; continue;
+    }
+
+    // ── Bold-only line = visual section header (larger, accent left bar) ────
+    if (/^\*\*(.+?)\*\*[:\s]*$/.test(line.trim()) || /^\*\*(.+?)\*\*:/.test(line.trim())) {
+      const titleText = line.trim().replace(/^\*\*/, '').replace(/\*\*[:\s]*$/, '').replace(/\*\*:.*/, '');
+      parts.push(
+        <div key={key++} style={{
+          display:'flex', alignItems:'center', gap:8,
+          margin:'12px 0 3px',
+          paddingLeft:10,
+          borderLeft:`3px solid ${accentColor}60`,
+        }}>
+          <span style={{fontSize:14, fontWeight:700, color:headColor, lineHeight:1.3}}>
+            {titleText}
+          </span>
+        </div>
+      );
       i++; continue;
     }
 
@@ -350,7 +369,7 @@ function inlineFormat(
     if (m[0].startsWith('**')) {
       // BOLD — always uses boldColor (dark on light, white on dark)
       parts.push(
-        <strong key={k++} style={{fontWeight:800, color:boldColor}}>
+        <strong key={k++} style={{fontWeight:600, color:boldColor}}>
           {m[2]}
         </strong>
       );

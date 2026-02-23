@@ -3,6 +3,7 @@ import { getChatCompletion } from '@/lib/groq';
 import { getSystemPrompt } from '@/lib/prompts';
 import { detectMoodFromText, detectMoodFromResponse } from '@/lib/mood';
 import { searchWeb, scrapeWebpage } from '@/lib/search';
+import { CREATOR_MODE_PERSONALITY } from '@/lib/personality-prompts';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;

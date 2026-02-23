@@ -772,7 +772,6 @@ const FOOD_DATABASE: Record<string, { cal: number; unit: string }> = {
   'egg sandwich':            { cal: 280, unit: 'per sandwich' },
   'egg paratha':             { cal: 250, unit: 'per piece' },
   'egg dosa':                { cal: 200, unit: 'per piece' },
-  'egg fried rice':          { cal: 360, unit: 'per bowl' },
   'half fry':                { cal: 90,  unit: 'per egg' },
   'double omelette':         { cal: 300, unit: 'per omelette' },
 };

@@ -21,7 +21,7 @@ import PersonalDashboard  from '@/components/PersonalDashboard';
 import AvatarPresets      from '@/components/AvatarPresets';
 import NotesPanel         from '@/components/NotesPanel';
 import ProfileCard        from '@/components/ProfileCard';
-import StudyTimer         from '@/components/StudyTimer';
+import StudyTimer from '@/components/StudyTimer';
 import PlannerHub         from '@/components/PlannerHub';
 import FlashcardGenerator from '@/components/FlashcardGenerator';
 import ReportCard         from '@/components/ReportCard';
@@ -352,37 +352,37 @@ const THEMES = {
   },
   // ── ANKIT'S SPECIAL: warm golden sand + saffron sunrise ────────────────
   ankit: {
-    bg:'bg-[#fffbf0]', bgC:'bg-[#fff8ee]',
-    panel:'bg-white/80 backdrop-blur-xl border-amber-200/60',
-    panelC:'bg-orange-50/85 backdrop-blur-xl border-orange-200/55',
-    header:'bg-white/72 backdrop-blur-2xl border-b border-amber-200/50 shadow-sm shadow-amber-100/40',
-    headerC:'bg-white/72 backdrop-blur-2xl border-b border-orange-200/50 shadow-sm shadow-orange-100/40',
+    bg:'bg-gradient-to-br from-[#fffbf0] to-[#fff4e6]', bgC:'bg-gradient-to-br from-[#fff8ee] to-[#ffe4cc]',
+    panel:'bg-gradient-to-br from-white/85 to-amber-50/90 backdrop-blur-xl border-amber-300/50',
+    panelC:'bg-gradient-to-br from-orange-50/90 to-amber-100/80 backdrop-blur-xl border-orange-300/50',
+    header:'bg-gradient-to-r from-white/75 to-amber-50/80 backdrop-blur-2xl border-b border-amber-300/40 shadow-sm shadow-amber-200/30',
+    headerC:'bg-gradient-to-r from-orange-50/80 to-amber-100/75 backdrop-blur-2xl border-b border-orange-300/40 shadow-sm shadow-orange-100/40',
     bar:'bg-white/78 backdrop-blur-2xl border-t border-amber-200/50 shadow-sm shadow-amber-100/30',
     barC:'bg-white/78 backdrop-blur-2xl border-t border-orange-200/50',
-    msgU:'bg-gradient-to-br from-amber-100/80 to-yellow-50/60 border border-amber-300/55 border-l-[3px] border-l-amber-500',
-    msgUC:'bg-gradient-to-br from-orange-100/80 to-amber-50/60 border border-orange-300/55 border-l-[3px] border-l-orange-500',
-    msgA:'bg-white/85 border border-amber-100/70 border-l-[3px] border-l-amber-300',
-    msgAC:'bg-white/85 border border-orange-100/70 border-l-[3px] border-l-orange-300',
+    msgU:'bg-gradient-to-br from-amber-200/70 to-yellow-100/50 border border-amber-400/60 border-l-[4px] border-l-amber-600',
+    msgUC:'bg-gradient-to-br from-orange-200/70 to-amber-100/50 border border-orange-400/60 border-l-[4px] border-l-orange-600',
+    msgA:'bg-white/90 border border-amber-200/80 border-l-[4px] border-l-amber-500',
+    msgAC:'bg-white/90 border border-orange-200/80 border-l-[4px] border-l-orange-500',
     inp:'bg-white border border-amber-300/60 text-slate-700 placeholder:text-amber-400/60 focus:border-amber-500 focus:ring-2 focus:ring-amber-400/15',
     inpC:'bg-white border border-orange-300/60 text-slate-700 placeholder:text-orange-400/60 focus:border-orange-500 focus:ring-2 focus:ring-orange-400/15',
-    btnP:'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md shadow-amber-400/30',
-    btnPC:'bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white shadow-md shadow-orange-400/30',
-    btnS:'bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 hover:text-amber-900',
-    btnSC:'bg-orange-50 hover:bg-orange-100 border border-orange-200 text-orange-800 hover:text-orange-900',
-    text:'text-slate-700', sub:'text-amber-500', subC:'text-orange-500',
-    accent:'text-amber-600', accentC:'text-orange-600',
+    btnP:'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white shadow-lg shadow-amber-500/40',
+    btnPC:'bg-gradient-to-r from-orange-600 to-rose-600 hover:from-orange-700 hover:to-rose-700 text-white shadow-lg shadow-orange-500/40',
+    btnS:'bg-gradient-to-br from-amber-100 to-yellow-50 hover:from-amber-200 hover:to-yellow-100 border border-amber-300 text-amber-900 hover:text-amber-950',
+    btnSC:'bg-gradient-to-br from-orange-100 to-amber-50 hover:from-orange-200 hover:to-amber-100 border border-orange-300 text-orange-900 hover:text-orange-950',
+    text:'text-slate-900', sub:'text-amber-600', subC:'text-orange-600',
+    accent:'text-amber-700', accentC:'text-orange-700',
     glow:'#d97706', glowC:'#ea580c',
-    card:'bg-white/70 border border-amber-100',
-    cardC:'bg-white/70 border border-orange-100',
-    active:'bg-amber-100 border border-amber-300',
-    activeC:'bg-orange-100 border border-orange-300',
-    div:'border-amber-200/50', divC:'border-orange-200/50',
-    settBg:'bg-white/96 backdrop-blur-2xl border-t border-amber-200',
-    settBgC:'bg-white/96 backdrop-blur-2xl border-t border-orange-200',
-    settText:'text-slate-700', settTextHover:'hover:text-slate-900',
-    settSub:'text-slate-400', settLabel:'text-slate-400',
-    settCard:'bg-amber-50 border border-amber-200',
-    settActive:'bg-amber-100 border border-amber-300',
+    card:'bg-gradient-to-br from-white/80 to-amber-50/60 border border-amber-200/80',
+    cardC:'bg-gradient-to-br from-white/80 to-orange-50/60 border border-orange-200/80',
+    active:'bg-gradient-to-br from-amber-200 to-yellow-100 border-2 border-amber-400',
+    activeC:'bg-gradient-to-br from-orange-200 to-amber-100 border-2 border-orange-400',
+    div:'border-amber-300/60', divC:'border-orange-300/60',
+    settBg:'bg-gradient-to-br from-white/98 to-amber-50/95 backdrop-blur-2xl border-t border-amber-300',
+    settBgC:'bg-gradient-to-br from-white/98 to-orange-50/95 backdrop-blur-2xl border-t border-orange-300',
+    settText:'text-slate-800', settTextHover:'hover:text-slate-950',
+    settSub:'text-amber-600', settLabel:'text-amber-700',
+    settCard:'bg-gradient-to-br from-amber-100/80 to-yellow-50/60 border border-amber-300',
+    settActive:'bg-gradient-to-br from-amber-200 to-yellow-100 border-2 border-amber-400',
     isLight:true,
   },
 } as const;
@@ -410,6 +410,15 @@ function useT(theme: Theme, c: boolean) {
     sCard: T.settCard, sActive: T.settActive,
     isLight: T.isLight,
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SOLID BACKGROUND HELPER — prevents background bleed-through in popups
+// ─────────────────────────────────────────────────────────────────────────────
+function getSolidBg(t: ReturnType<typeof useT>) {
+  return t.isLight
+    ? 'bg-white/98 backdrop-blur-2xl'
+    : 'bg-[#0a0c1d]/98 backdrop-blur-2xl';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1916,8 +1925,8 @@ export default function Home() {
         {showWellness && isCreatorMode && (
           <div className="fixed bottom-[72px] left-1/2 z-50 shadow-2xl"
             style={{transform:'translateX(-50%)',width:'min(480px,94vw)',animation:'popUpFromBottom 0.3s cubic-bezier(0.34,1.4,0.64,1)',willChange:'transform,opacity'}}>
-            <div className={`rounded-2xl overflow-hidden border ${t.panel}`}
-              style={{boxShadow:`0 -4px 40px rgba(0,0,0,0.5), 0 0 32px ${t.glow}18`}}>
+            <div className={`rounded-2xl overflow-hidden border ${t.div} ${getSolidBg(t)}`}
+              style={{boxShadow:`0 -4px 40px rgba(0,0,0,0.7), 0 0 32px ${t.glow}18`}}>
               <div className={`flex items-center justify-between px-4 py-2.5 border-b ${t.div}`}>
                 <div className="flex items-center gap-2.5">
                   <Activity size={12} style={{color:t.glow}}/>
@@ -2246,7 +2255,7 @@ export default function Home() {
                   <Clock size={10} style={{color:t.glow}}/>
                   <span className={`text-[10px] font-bold ${t.accent}`}>Study Timer</span>
                 </div>
-                <StudyTimer/>
+                <StudyTimer defaultMinutes={25}/>
               </div>
 
               {/* Memory */}
@@ -2271,31 +2280,19 @@ export default function Home() {
 
       {/* ── FLOATING STUDY TIMER ── */}
       {showTimerFloat && (
-        <div className="fixed top-16 right-16 z-50 w-64 animate-fadeIn shadow-2xl">
-          <div className={`rounded-2xl overflow-hidden border ${t.panel}`}
-            style={{boxShadow:`0 8px 32px rgba(0,0,0,0.4), 0 0 24px ${t.glow}15`}}>
-            <div className={`flex items-center justify-between px-3.5 py-2.5 border-b ${t.div}`}>
-              <div className="flex items-center gap-2">
-                <Clock size={12} style={{color:t.glow}}/>
-                <span className={`text-[11px] font-bold ${t.accent}`}>Study Timer</span>
-              </div>
-              <button onClick={()=>setShowTimerFloat(false)} className={`p-1 rounded-lg hover:bg-white/10 ${t.sub}`}>
-                <X size={11}/>
-              </button>
-            </div>
-            <div className="p-3">
-              <StudyTimer/>
-            </div>
-          </div>
-        </div>
+        <StudyTimer
+          floating
+          onClose={() => setShowTimerFloat(false)}
+          defaultMinutes={25}
+        />
       )}
 
       {/* ── FLOATING INSIGHTS PANEL — pops up from input bar ── */}
       {insightsOpen && isCreatorMode && (
         <div className="fixed bottom-[72px] left-1/2 z-50 shadow-2xl"
           style={{transform:'translateX(-50%)',width:'min(420px,94vw)',animation:'popUpFromBottom 0.3s cubic-bezier(0.34,1.4,0.64,1)',willChange:'transform,opacity'}}>
-          <div className={`rounded-2xl overflow-hidden border ${t.panel}`}
-            style={{boxShadow:`0 -4px 40px rgba(0,0,0,0.5), 0 0 28px ${t.glow}18`}}>
+          <div className={`rounded-2xl overflow-hidden border ${t.div} ${getSolidBg(t)}`}
+            style={{boxShadow:`0 -4px 40px rgba(0,0,0,0.7), 0 0 28px ${t.glow}18`}}>
             <div className={`flex items-center justify-between px-4 py-2.5 border-b ${t.div}`}>
               <div className="flex items-center gap-2">
                 <Brain size={12} style={{color:t.glow}}/>

@@ -593,7 +593,6 @@ const FOOD_DATABASE: Record<string, { cal: number; unit: string }> = {
 
   // ═══ RICE DISHES EXPANDED ═══
   'fish biryani':            { cal: 440, unit: 'per plate' },
-  'soya biryani':            { cal: 380, unit: 'per plate' },
   'paneer biryani':          { cal: 430, unit: 'per plate' },
   'mushroom biryani':        { cal: 380, unit: 'per plate' },
   'egg biryani full':        { cal: 450, unit: 'per plate' },

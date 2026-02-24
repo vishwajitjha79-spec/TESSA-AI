@@ -1727,7 +1727,7 @@ export default function Home() {
                     <p className={`text-[10px] mt-1 max-w-[180px] mx-auto ${t.sSub}`}>The Exceptional System, Surpassing ALL</p>
                     <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold"
                       style={{background:`${t.glow}18`,border:`1px solid ${t.glow}28`,color:t.glow}}>
-                      <Sparkles size={9}/>v3.1 · AI-Powered · 10 Avatars
+                      <Sparkles size={9}/>v7.0 · AI-Powered · 10 Avatars
                     </div>
                   </div>
                   <Hr cls={t.div}/>
@@ -1993,7 +1993,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="px-4 pb-4 pt-3 overflow-y-auto" style={{maxHeight:'55vh'}}>
-                  <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion}/>
+                  <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion} isLight={t.isLight} accentColor={isCreatorMode ? t.glowC : t.glow}/>
                 </div>
               </div>
             </div>
@@ -2005,7 +2005,7 @@ export default function Home() {
           <div className="max-w-2xl mx-auto w-full">
 
             {showDashboard&&isCreatorMode ? (
-              <PersonalDashboard />
+              <PersonalDashboard isLight={t.isLight} accentColor={isCreatorMode ? t.glowC : t.glow} />
             ) : (
               <div className="space-y-2.5 pb-2">
 

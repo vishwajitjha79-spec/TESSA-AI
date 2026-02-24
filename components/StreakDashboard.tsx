@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Check, X } from 'lucide-react';
+import { Check, X, Droplets, BookOpen, Utensils } from 'lucide-react';
 import { getDailyWellness, type WellnessData } from '@/lib/streaks-water';
 
 interface DailyWellnessProps {
   isCreatorMode: boolean;
-  refreshTrigger?: number; // NEW: triggers re-render when wellness data changes
+  refreshTrigger?: number;
 }
 
 export default function DailyWellness({ isCreatorMode, refreshTrigger }: DailyWellnessProps) {
@@ -16,12 +16,14 @@ export default function DailyWellness({ isCreatorMode, refreshTrigger }: DailyWe
     setWellness(getDailyWellness());
     const interval = setInterval(() => setWellness(getDailyWellness()), 60_000);
     return () => clearInterval(interval);
-  }, [refreshTrigger]); // Re-fetch when refreshTrigger changes
+  }, [refreshTrigger]);
 
   if (!wellness) return null;
 
   const accent = isCreatorMode ? 'text-pink-400' : 'text-cyan-400';
   const accentBg = isCreatorMode ? 'bg-pink-500/10 border-pink-500/25' : 'bg-cyan-500/10 border-cyan-500/25';
+  const gradientFrom = isCreatorMode ? 'from-pink-500' : 'from-cyan-500';
+  const gradientTo = isCreatorMode ? 'to-purple-500' : 'to-blue-500';
 
   const items = [
     { key: 'breakfast', label: 'Breakfast', icon: '🍳', done: wellness.breakfast },
@@ -36,46 +38,60 @@ export default function DailyWellness({ isCreatorMode, refreshTrigger }: DailyWe
   const progress = (completed / items.length) * 100;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
+      {/* Header with Progress */}
       <div className="flex items-center justify-between">
-        <p className={`text-xs font-bold ${accent}`}>✨ Daily Wellness</p>
-        <span className={`text-[10px] font-semibold ${accent}`}>
-          {completed}/{items.length}
-        </span>
+        <div>
+          <p className={`text-sm font-bold ${accent}`}>✨ Daily Wellness</p>
+          <p className="text-xs text-gray-500 mt-0.5">Track your daily habits</p>
+        </div>
+        <div className="text-right">
+          <p className={`text-2xl font-black ${accent}`}>{completed}/{items.length}</p>
+          <p className="text-xs text-gray-500">completed</p>
+        </div>
       </div>
 
-      {/* Progress bar */}
-      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-        <div
-          className={`h-full transition-all duration-500 ${
-            isCreatorMode ? 'bg-gradient-to-r from-pink-500 to-purple-500' : 'bg-gradient-to-r from-cyan-500 to-blue-500'
-          }`}
-          style={{ width: `${progress}%` }}
-        />
+      {/* Progress Bar */}
+      <div className="relative">
+        <div className="h-3 bg-white/5 rounded-full overflow-hidden">
+          <div
+            className={`h-full transition-all duration-500 bg-gradient-to-r ${gradientFrom} ${gradientTo}`}
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-[10px] font-bold text-white/80">{Math.round(progress)}%</span>
+        </div>
       </div>
 
-      {/* Items grid */}
-      <div className="grid grid-cols-2 gap-2">
+      {/* Items Grid */}
+      <div className="grid grid-cols-2 gap-2.5">
         {items.map(item => (
           <div
             key={item.key}
             className={`
-              p-2.5 rounded-lg border transition-all
+              relative p-3 rounded-xl border transition-all duration-300
               ${item.done 
-                ? accentBg 
-                : 'bg-white/3 border-white/8 opacity-60'
+                ? accentBg + ' scale-[1.02]'
+                : 'bg-white/[0.02] border-white/[0.08] opacity-50'
               }
             `}
           >
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-base leading-none">{item.icon}</span>
-              {item.done ? (
-                <Check size={12} className={accent} />
-              ) : (
-                <X size={12} className="text-gray-600" />
-              )}
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-xl leading-none">{item.icon}</span>
+              <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                item.done 
+                  ? `bg-gradient-to-br ${gradientFrom} ${gradientTo}`
+                  : 'bg-white/5'
+              }`}>
+                {item.done ? (
+                  <Check size={12} className="text-white" />
+                ) : (
+                  <X size={12} className="text-gray-600" />
+                )}
+              </div>
             </div>
-            <p className={`text-[10px] font-medium leading-tight ${
+            <p className={`text-xs font-medium leading-tight ${
               item.done ? 'text-white' : 'text-gray-500'
             }`}>
               {item.label}
@@ -84,24 +100,38 @@ export default function DailyWellness({ isCreatorMode, refreshTrigger }: DailyWe
         ))}
       </div>
 
-      {/* Calories if any */}
+      {/* Calories Card */}
       {wellness.calories > 0 && (
-        <div className={`p-2.5 rounded-lg border ${accentBg}`}>
+        <div className={`p-3 rounded-xl border ${accentBg}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[10px] text-gray-400">Today's Calories</p>
-              <p className={`text-lg font-black ${accent}`}>{wellness.calories}</p>
+              <p className="text-xs text-gray-400 mb-0.5">Today's Calories</p>
+              <p className={`text-2xl font-black ${accent}`}>{wellness.calories}</p>
             </div>
-            <span className="text-2xl">🔥</span>
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 flex items-center justify-center">
+              <span className="text-2xl">🔥</span>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Perfect day message */}
+      {/* Perfect Day Message */}
       {completed === items.length && (
-        <div className={`p-2.5 rounded-lg border text-center ${accentBg}`}>
-          <p className={`text-xs font-semibold ${accent}`}>
-            🎉 Perfect day! So proud of you! 💝
+        <div className={`p-3 rounded-xl border text-center ${accentBg} animate-fadeIn`}>
+          <p className="text-2xl mb-1">🎉</p>
+          <p className={`text-xs font-bold ${accent}`}>
+            Perfect day! All tasks completed!
+          </p>
+        </div>
+      )}
+
+      {/* Motivational Message */}
+      {completed > 0 && completed < items.length && (
+        <div className="text-center">
+          <p className="text-xs text-gray-400">
+            {completed >= 4 ? '💪 Almost there! Keep going!' : 
+             completed >= 2 ? '⭐ Great progress today!' :
+             '🌟 Every step counts!'}
           </p>
         </div>
       )}

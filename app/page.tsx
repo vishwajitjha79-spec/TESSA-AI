@@ -1841,14 +1841,14 @@ export default function Home() {
                   <img src={selectedAvatar.path} alt={selectedAvatar.name} className="w-full h-full object-cover"
                     onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}} />
                 </div>
-               <div 
+               </div>
   className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-[2.5px]"
   style={{
     background: t.glow,
     borderColor: t.isLight ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.7)',
     boxShadow: `0 0 8px ${t.glow}`
   }}
-                 <div 
+                 </div>
     className="absolute inset-0 rounded-full animate-ping" 
     style={{ background: t.glow, opacity: 0.4 }} 
   />

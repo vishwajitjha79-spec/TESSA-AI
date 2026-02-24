@@ -1842,14 +1842,14 @@ export default function Home() {
                     onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}} />
                 </div>
                 <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-[2.5px]"
-                  style={{background:t.glow,borderColor:'rgba(0,0,0,0.7)',boxShadow:`0 0 8px ${t.glow}`}}>
+                  style={{background:t.glow,borderColor: t.isLight ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.7)'',boxShadow:`0 0 8px ${t.glow}`}}>
                   <div className="absolute inset-0 rounded-full animate-ping" style={{background:t.glow,opacity:0.4}} />
                 </div>
               </div>
 
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <h1 className={`font-black text-[13px] leading-none tracking-[0.12em] uppercase ${t.accent}`}>TESSA</h1>
+                  <h1 className="font-black text-[13px] leading-none tracking-[0.12em] uppercase" style={{color:t.glow}}>TESSA</h1>
                   {isCreatorMode && <Heart size={11} className="text-pink-400 fill-pink-400 flex-shrink-0 animate-pulse" />}
                   {isCreatorMode && user && !isGuest && (
                     <span title={syncStatus==='syncing'?'Syncing…':syncStatus==='synced'?'Synced ✓':'Live sync'}
@@ -1881,33 +1881,33 @@ export default function Home() {
                 )}
                 {isCreatorMode&&(
                   <button onClick={()=>setShowPlanners(true)} title="Smart Planners"
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-white/[0.07] ${t.sub}`}>
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-black/[0.06] ${t.sub}`}>
                     <Calendar size={16}/>
                   </button>
                 )}
                 {isCreatorMode&&(
                   <button onClick={()=>setShowWellness(p=>!p)} title="Wellness"
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showWellness?'text-white':'hover:bg-white/[0.07] '+t.sub}`}
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showWellness?'text-white':'hover:bg-black/[0.06] '+t.sub}`}
                     style={showWellness?{background:`${t.glow}14`,outline:`1px solid ${t.glow}25`}:{}}>
                     <Activity size={16}/>
                   </button>
                 )}
                 {isCreatorMode&&(
                   <button onClick={()=>setShowDashboard(p=>!p)} title="Insights Panel"
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showDashboard?'text-pink-300':'hover:bg-white/[0.07] '+t.sub}`}
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showDashboard?'text-pink-300':'hover:bg-black/[0.06] '+t.sub}`}
                     style={showDashboard?{background:`${t.glow}12`,outline:`1px solid ${t.glow}25`}:{}}>
                     <LayoutDashboard size={16}/>
                   </button>
                 )}
                 {isCreatorMode&&(
                   <button onClick={()=>setInsightsOpen(p=>!p)} title="Tessa Insights"
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${insightsOpen?'text-white':'hover:bg-white/[0.07] '+t.sub}`}
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${insightsOpen?'text-white':'hover:bg-black/[0.06] '+t.sub}`}
                     style={insightsOpen?{background:`${t.glow}14`,outline:`1px solid ${t.glow}25`}:{}}>
                     <Brain size={16}/>
                   </button>
                 )}
                 <button onClick={()=>setTheme(theme==='light'?'dark':'light')} title="Toggle theme"
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-white/[0.07] ${t.sub}`}>
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-black/[0.06] ${t.sub}`}>
                   {theme==='light'?<Moon size={16}/>:<Sun size={16}/>}
                 </button>
                 <button onClick={()=>{setShowSettings(p=>!p);setSettingsTab('main');}} title="Settings"

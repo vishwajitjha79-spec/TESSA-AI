@@ -970,25 +970,61 @@ export default function Home() {
   };
 
   // ── Dashboard / food parsing ───────────────────────────────────────────────
-  const parseDashboardUpdates = (responseText: string): string => {
+  // Strategy: extract calorie numbers Tessa already stated in her response.
+  // If she wrote "786 cal" or "3 × 262 = 786", trust that number — it came
+  // from web data or her knowledge and is the most accurate figure.
+  // Only fall back to the local database if no calorie figure found in response.
+  const parseDashboardUpdates = (responseText: string, userText: string = ''): string => {
     if (!isCreatorMode) return '';
     let extra = '';
     try {
-      const foodHit = detectMealInResponse(responseText);
+      // Detect food mention from EITHER user message or Tessa's response
+      const foodHit = detectMealInResponse(userText) || detectMealInResponse(responseText);
       if (foodHit) {
-        const foods = foodHit.food.split(/,|and|\+|with/i).map(f => f.trim()).filter(Boolean);
-        let totalCal = 0; const lines: string[] = [];
-        for (const food of foods) {
-          // Match patterns like "3 samosas", "2x roti", "half a pizza"
-          const qm  = food.match(/^(\d+(?:\.\d+)?)\s*[xX×]?\s*(.+)/);
-          const qty  = qm ? parseFloat(qm[1]) : 1;
-          const fn   = qm ? qm[2].trim() : food;
-          const res  = estimateCalories(fn, qty);   // quantity passed into estimateCalories
-          totalCal  += res.calories;
-          lines.push(`${res.food} — ${res.calories}cal (${res.unit})`);
+
+        // ── Step 1: Try to extract total calories Tessa already stated ─────────
+        // Patterns: "786 cal", "= 786 calories", "total: 786", "~450 cal"
+        let tessaTotal: number | null = null;
+
+        // "X × Y = Z cal" or "= Z cal" (final sum pattern — most reliable)
+        const sumMatch = responseText.match(/[=≈~]\s*\*{0,2}(\d{3,5})\*{0,2}\s*cal/i)
+          ?? responseText.match(/total[^\d]*(\d{3,5})\s*cal/i)
+          ?? responseText.match(/logged[^\d]*(\d{3,5})\s*cal/i);
+        if (sumMatch?.[1]) tessaTotal = parseInt(sumMatch[1], 10);
+
+        // If no sum, collect all "NNN cal" mentions and sum them
+        if (!tessaTotal) {
+          const allCalMatches = [...responseText.matchAll(/(\d{2,5})\s*cal(?:ories)?/gi)];
+          if (allCalMatches.length > 0) {
+            // Take the largest single number — likely the total
+            const nums = allCalMatches.map(m => parseInt(m[1], 10)).filter(n => n >= 30 && n <= 5000);
+            if (nums.length > 0) tessaTotal = Math.max(...nums);
+          }
         }
+
+        // ── Step 2: If Tessa stated calories, trust that number ────────────────
+        let totalCal: number;
+        let lines: string[];
+
+        if (tessaTotal && tessaTotal >= 30 && tessaTotal <= 5000) {
+          totalCal = tessaTotal;
+          lines = [`${foodHit.food} — ${totalCal}cal (from Tessa's response)`];
+        } else {
+          // ── Step 3: Fall back to local database ───────────────────────────────
+          const foods = foodHit.food.split(/,|and|\+|with/i).map(f => f.trim()).filter(Boolean);
+          totalCal = 0; lines = [];
+          for (const food of foods) {
+            const qm  = food.match(/^(\d+(?:\.\d+)?)\s*[xX×]?\s*(.+)/);
+            const qty  = qm ? parseFloat(qm[1]) : 1;
+            const fn   = qm ? qm[2].trim() : food;
+            const res  = estimateCalories(fn, qty);
+            totalCal  += res.calories;
+            lines.push(`${res.food} — ${res.calories}cal (${res.unit})`);
+          }
+        }
+
         const h = lsGetJson<HealthSnapshot>('tessa-health', { weight:0, height:0, meals:[], totalCalories:0, date:new Date().toISOString().split('T')[0] });
-        h.meals.push({ time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}), meal:lines.join(', '), calories:totalCal, confidence:'medium' });
+        h.meals.push({ time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}), meal:lines.join(', '), calories:totalCal, confidence: tessaTotal ? 'high' : 'medium' });
         h.totalCalories=(h.totalCalories??0)+totalCal;
         lsSet('tessa-health', JSON.stringify(h));
         const mw = getCurrentMealWindow(); if (mw) markMeal(mw.name);
@@ -1064,7 +1100,7 @@ export default function Home() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
-      const extra = parseDashboardUpdates(data.content);
+      const extra = parseDashboardUpdates(data.content, text);
       const assistantMsg: Message = {
         id:uuidv4(), role:'assistant',
         content:data.content+extra,

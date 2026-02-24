@@ -78,20 +78,21 @@ const MOOD_EMOJI: Record<string, string> = {
 
 // Fixed persona — always Tessa
 const TESSA = { name: 'Tessa', tagline: 'The Exceptional System, Surpassing ALL' };
-
 // ─────────────────────────────────────────────────────────────────────────────
-// AVATAR SYSTEM — 10 avatars
+// AVATAR SYSTEM — 10 avatars (5 existing + 5 new)
 // ─────────────────────────────────────────────────────────────────────────────
 interface AvatarDef {
   id: string; path: string; name: string; emoji: string; desc: string;
 }
 
 const AVATARS: AvatarDef[] = [
+  // Existing 5
   {id:'cosmic',   name:'Cosmic',   emoji:'🌌', desc:'Space explorer',   path:'/avatars/cosmic.png'},
   {id:'sunset',   name:'Sunset',   emoji:'🌅', desc:'Golden hour',      path:'/avatars/sunset.png'},
   {id:'galaxy',   name:'Galaxy',   emoji:'✨', desc:'Star cluster',     path:'/avatars/galaxy.png'},
   {id:'forest',   name:'Forest',   emoji:'🌲', desc:'Nature spirit',    path:'/avatars/forest.png'},
   {id:'ocean',    name:'Ocean',    emoji:'🌊', desc:'Deep waters',      path:'/avatars/ocean.png'},
+  // New 5
   {id:'aurora',   name:'Aurora',   emoji:'🌈', desc:'Northern lights',  path:'/avatars/aurora.png'},
   {id:'sakura',   name:'Sakura',   emoji:'🌸', desc:'Cherry blossom',   path:'/avatars/sakura.png'},
   {id:'midnight', name:'Midnight', emoji:'🌙', desc:'Deep night',       path:'/avatars/midnight.png'},
@@ -99,8 +100,11 @@ const AVATARS: AvatarDef[] = [
   {id:'crystal',  name:'Crystal',  emoji:'💎', desc:'Ice gem',          path:'/avatars/crystal.png'},
 ];
 
+
+
 // ─────────────────────────────────────────────────────────────────────────────
 // THEME SYSTEM
+// Key fix: every theme has BOTH isLight-aware text colours for settings panel
 // ─────────────────────────────────────────────────────────────────────────────
 const THEMES = {
   dark: {
@@ -129,8 +133,10 @@ const THEMES = {
     active:'bg-cyan-500/[0.09] border border-cyan-500/[0.18]',
     activeC:'bg-pink-500/[0.09] border border-pink-500/[0.18]',
     div:'border-white/[0.05]', divC:'border-pink-500/[0.07]',
+    // Settings panel — uses CSS vars via isLight flag
     settBg:'bg-[#07091a]/96 backdrop-blur-2xl border-t border-white/[0.07]',
     settBgC:'bg-[#0d0320]/96 backdrop-blur-2xl border-t border-pink-500/[0.09]',
+    // Settings text (dark mode is always white-ish)
     settText:'text-white/75', settTextHover:'hover:text-white',
     settSub:'text-white/28', settLabel:'text-white/20',
     settCard:'bg-white/[0.04] border border-white/[0.07]',
@@ -165,6 +171,7 @@ const THEMES = {
     div:'border-slate-200/60', divC:'border-pink-200/50',
     settBg:'bg-white/97 backdrop-blur-2xl border-t border-slate-200',
     settBgC:'bg-white/97 backdrop-blur-2xl border-t border-pink-200',
+    // Settings text (light mode — must use dark colours!)
     settText:'text-slate-700', settTextHover:'hover:text-slate-900',
     settSub:'text-slate-400', settLabel:'text-slate-400',
     settCard:'bg-slate-50 border border-slate-200',
@@ -273,6 +280,7 @@ const THEMES = {
     settActive:'bg-orange-500/[0.12] border border-orange-500/[0.26]',
     isLight:false,
   },
+  // ── PASTEL: dreamy soft lavender light theme ──────────────────────────────
   pastel: {
     bg:'bg-[#f3efff]', bgC:'bg-[#fdf0ff]',
     panel:'bg-white/80 backdrop-blur-xl border-violet-200/60',
@@ -307,6 +315,7 @@ const THEMES = {
     settActive:'bg-violet-100 border border-violet-300',
     isLight:true,
   },
+  // ── SAKURA: cherry-blossom pink light theme ──────────────────────────────
   sakura: {
     bg:'bg-[#fff2f5]', bgC:'bg-[#fff0f8]',
     panel:'bg-white/80 backdrop-blur-xl border-rose-200/55',
@@ -341,52 +350,43 @@ const THEMES = {
     settActive:'bg-rose-100 border border-rose-300',
     isLight:true,
   },
-  // ── ANKIT'S SPECIAL — deep saffron, marigold & gold — like a royal Indian sunrise ─────
+  // ── ANKIT'S SPECIAL ──────────────────────────────────────────────────────
+  // Deep saffron night sky · earthy terracotta · midnight indigo
+  // Completely distinct dark theme — warm amber foregrounds on near-black background
+  // Inspired by Delhi twilight, Mughal gold lantern light, chai steam
   ankit: {
-    // Background: warm parchment with a deep golden sunrise glow bleeding in from top-left
-    bg:'bg-[#fef9ee]',
-    bgC:'bg-[#fff5e6]',
-    // Panels: ivory with a strong saffron-gold shimmer edge
-    panel:'bg-white/92 backdrop-blur-xl border-amber-500/50 shadow-lg shadow-amber-200/40',
-    panelC:'bg-orange-50/95 backdrop-blur-xl border-orange-500/50 shadow-lg shadow-orange-200/40',
-    // Header: deep marigold-gold gradient, rich and warm — distinctly royal
-    header:'bg-gradient-to-r from-amber-100/95 via-yellow-50/90 to-orange-50/85 backdrop-blur-2xl border-b-2 border-amber-500/40 shadow-lg shadow-amber-400/20',
-    headerC:'bg-gradient-to-r from-orange-200/90 via-amber-100/95 to-yellow-100/85 backdrop-blur-2xl border-b-2 border-orange-500/40 shadow-lg shadow-orange-400/25',
-    // Input bar: warm ivory, strong shadow like a stone ledge in warm light
-    bar:'bg-gradient-to-r from-amber-50/98 to-yellow-50/95 backdrop-blur-2xl border-t-2 border-amber-400/50 shadow-[0_-4px_24px_rgba(217,119,6,0.18)]',
-    barC:'bg-gradient-to-r from-orange-50/98 to-amber-50/95 backdrop-blur-2xl border-t-2 border-orange-400/50 shadow-[0_-4px_24px_rgba(234,88,12,0.18)]',
-    // Messages: user has rich marigold warmth, AI has clean ivory with gold left-bar
-    msgU:'bg-gradient-to-br from-amber-200/80 via-yellow-100/70 to-amber-100/60 border border-amber-500/50 border-l-[5px] border-l-amber-600 shadow-md shadow-amber-300/35',
-    msgUC:'bg-gradient-to-br from-orange-200/80 via-amber-100/70 to-yellow-100/60 border border-orange-500/50 border-l-[5px] border-l-orange-600 shadow-md shadow-orange-300/35',
-    msgA:'bg-white/97 border border-amber-300/60 border-l-[5px] border-l-amber-500 shadow-md shadow-amber-100/60',
-    msgAC:'bg-white/97 border border-orange-300/60 border-l-[5px] border-l-orange-500 shadow-md shadow-orange-100/60',
-    // Input: clean white with rich saffron focus ring
-    inp:'bg-white border-2 border-amber-400/60 text-amber-950 placeholder:text-amber-400/50 focus:border-amber-600 focus:ring-4 focus:ring-amber-400/15 shadow-sm shadow-amber-100/80',
-    inpC:'bg-white border-2 border-orange-400/60 text-orange-950 placeholder:text-orange-400/50 focus:border-orange-600 focus:ring-4 focus:ring-orange-400/15 shadow-sm shadow-orange-100/80',
-    // Buttons: deep saffron-to-amber gradient, very rich, almost like a button carved in gold
-    btnP:'bg-gradient-to-r from-amber-600 via-orange-500 to-amber-600 hover:from-amber-700 hover:via-orange-600 hover:to-amber-700 text-white shadow-xl shadow-amber-500/50 border border-amber-500/40 font-bold',
-    btnPC:'bg-gradient-to-r from-orange-600 via-rose-500 to-orange-600 hover:from-orange-700 hover:via-rose-600 hover:to-orange-700 text-white shadow-xl shadow-orange-500/50 border border-orange-500/40 font-bold',
-    btnS:'bg-gradient-to-br from-amber-100 to-yellow-50 hover:from-amber-200 hover:to-yellow-100 border-2 border-amber-400/70 text-amber-900 font-semibold hover:text-amber-950 shadow-md shadow-amber-200/60 hover:shadow-amber-300/50',
-    btnSC:'bg-gradient-to-br from-orange-100 to-amber-50 hover:from-orange-200 hover:to-amber-100 border-2 border-orange-400/70 text-orange-900 font-semibold hover:text-orange-950 shadow-md shadow-orange-200/60',
-    text:'text-amber-950', sub:'text-amber-700/75', subC:'text-orange-700/75',
-    accent:'text-amber-800', accentC:'text-orange-800',
-    // Glow: pure saffron + deep orange — vivid, warm
-    glow:'#b45309', glowC:'#c2410c',
-    // Cards: parchment with gold shimmer
-    card:'bg-gradient-to-br from-white to-amber-50/80 border border-amber-400/55 shadow-md shadow-amber-200/50',
-    cardC:'bg-gradient-to-br from-white to-orange-50/80 border border-orange-400/55 shadow-md shadow-orange-200/50',
-    // Active states: rich golden fill
-    active:'bg-gradient-to-br from-amber-300/80 to-yellow-200/70 border-2 border-amber-600/55 shadow-lg shadow-amber-400/45',
-    activeC:'bg-gradient-to-br from-orange-300/80 to-amber-200/70 border-2 border-orange-600/55 shadow-lg shadow-orange-400/45',
-    div:'border-amber-400/45', divC:'border-orange-400/45',
-    // Settings: warm ivory, feels like reading on cream paper in sunlight
-    settBg:'bg-gradient-to-br from-white via-amber-50/80 to-yellow-50/60 backdrop-blur-2xl border-t-2 border-amber-400/55',
-    settBgC:'bg-gradient-to-br from-white via-orange-50/80 to-amber-50/60 backdrop-blur-2xl border-t-2 border-orange-400/55',
-    settText:'text-amber-950', settTextHover:'hover:text-amber-950',
-    settSub:'text-amber-700', settLabel:'text-amber-800',
-    settCard:'bg-gradient-to-br from-amber-50 to-yellow-50/80 border border-amber-400/60 shadow-sm shadow-amber-200/40',
-    settActive:'bg-gradient-to-br from-amber-200 to-yellow-100 border-2 border-amber-500/65 shadow-md shadow-amber-300/40',
-    isLight:true,
+    bg:'bg-neutral-950', bgC:'bg-stone-950',
+    panel:'bg-amber-950/20 backdrop-blur-xl border-amber-700/[0.22]',
+    panelC:'bg-orange-950/20 backdrop-blur-xl border-orange-700/[0.22]',
+    header:'bg-black/55 backdrop-blur-2xl border-b border-amber-600/[0.18]',
+    headerC:'bg-black/55 backdrop-blur-2xl border-b border-orange-600/[0.18]',
+    bar:'bg-black/50 backdrop-blur-2xl border-t border-amber-600/[0.16]',
+    barC:'bg-black/50 backdrop-blur-2xl border-t border-orange-600/[0.16]',
+    msgU:'bg-gradient-to-br from-amber-950/65 to-yellow-950/30 border border-amber-500/[0.20] border-l-[3px] border-l-amber-400',
+    msgUC:'bg-gradient-to-br from-orange-950/65 to-red-950/30 border border-orange-500/[0.20] border-l-[3px] border-l-orange-400',
+    msgA:'bg-gradient-to-br from-stone-950/75 to-amber-950/20 border border-amber-800/[0.16] border-l-[3px] border-l-amber-700/55',
+    msgAC:'bg-gradient-to-br from-stone-950/75 to-orange-950/20 border border-orange-800/[0.16] border-l-[3px] border-l-orange-700/55',
+    inp:'bg-amber-950/40 border border-amber-600/[0.26] text-amber-50 placeholder:text-amber-500/38 focus:border-amber-400/55 focus:ring-2 focus:ring-amber-500/10',
+    inpC:'bg-orange-950/40 border border-orange-600/[0.26] text-orange-50 placeholder:text-orange-500/38 focus:border-orange-400/55 focus:ring-2 focus:ring-orange-500/10',
+    btnP:'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-stone-900 font-bold shadow-lg shadow-amber-500/[0.28]',
+    btnPC:'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 text-white shadow-lg shadow-orange-500/[0.28]',
+    btnS:'bg-amber-900/30 hover:bg-amber-800/45 border border-amber-600/[0.26] text-amber-300 hover:text-amber-100',
+    btnSC:'bg-orange-900/30 hover:bg-orange-800/45 border border-orange-600/[0.26] text-orange-300 hover:text-orange-100',
+    text:'text-amber-50', sub:'text-amber-400/65', subC:'text-orange-400/65',
+    accent:'text-amber-300', accentC:'text-orange-300',
+    glow:'#f59e0b', glowC:'#f97316',
+    card:'bg-amber-950/25 border border-amber-700/[0.18]',
+    cardC:'bg-orange-950/25 border border-orange-700/[0.18]',
+    active:'bg-amber-500/[0.13] border border-amber-400/[0.32]',
+    activeC:'bg-orange-500/[0.13] border border-orange-400/[0.32]',
+    div:'border-amber-700/[0.16]', divC:'border-orange-700/[0.16]',
+    settBg:'bg-neutral-950/98 backdrop-blur-2xl border-t border-amber-700/[0.20]',
+    settBgC:'bg-stone-950/98 backdrop-blur-2xl border-t border-orange-700/[0.20]',
+    settText:'text-amber-100/80', settTextHover:'hover:text-amber-50',
+    settSub:'text-amber-400/50', settLabel:'text-amber-500/40',
+    settCard:'bg-amber-950/35 border border-amber-700/[0.20]',
+    settActive:'bg-amber-500/[0.15] border border-amber-400/[0.35]',
+    isLight:false,
   },
 } as const;
 
@@ -407,6 +407,7 @@ function useT(theme: Theme, c: boolean) {
     active: c ? T.activeC : T.active,
     div: c ? T.divC : T.div,
     settBg: c ? T.settBgC : T.settBg,
+    // Settings-specific text tokens — THEME-AWARE (fixes light mode white text bug)
     sText: T.settText, sTextH: T.settTextHover,
     sSub: T.settSub, sLabel: T.settLabel,
     sCard: T.settCard, sActive: T.settActive,
@@ -414,11 +415,26 @@ function useT(theme: Theme, c: boolean) {
   };
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SOLID BACKGROUND HELPER — prevents background bleed-through in popups
+// ─────────────────────────────────────────────────────────────────────────────
 function getSolidBg(t: ReturnType<typeof useT>) {
   return t.isLight
     ? 'bg-white/98 backdrop-blur-2xl'
-    : 'bg-[#0a0c1d]/98 backdrop-blur-2xl';
+    : 'bg-[#080510]/98 backdrop-blur-2xl';
 }
+
+// Per-theme solid popup background color (used inline for heavy popups)
+const THEME_POPUP_BG: Record<string, string> = {
+  dark:      'rgba(4,5,18,0.98)',
+  cyberpunk: 'rgba(3,2,18,0.98)',
+  ocean:     'rgba(2,8,28,0.98)',
+  sunset:    'rgba(12,6,3,0.98)',
+  ankit:     'rgba(14,8,0,0.98)',
+  light:     'rgba(255,255,255,0.99)',
+  pastel:    'rgba(255,255,255,0.99)',
+  sakura:    'rgba(255,255,255,0.99)',
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // UTILS
@@ -434,7 +450,8 @@ function lsGetJson<T>(k: string, fb: T): T {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CREATOR SYNC
+// CREATOR SYNC  ·  One Supabase row per user keeps all creator data live
+// Table DDL is in creator_sync_migration.sql — run it once in Supabase SQL editor
 // ─────────────────────────────────────────────────────────────────────────────
 function buildCreatorPayload() {
   return {
@@ -464,7 +481,7 @@ async function pullCreatorSync(userId: string): Promise<boolean> {
     const p   = data.payload as Record<string, any>;
     const rem = new Date(data.updated_at).getTime();
     const loc = new Date(lsGet('tessa-last-sync') ?? 0).getTime();
-    if (rem <= loc) return false;
+    if (rem <= loc) return false;               // local is already up-to-date
     if (p.health)   lsSet('tessa-health',   JSON.stringify(p.health));
     if (p.memories) lsSet('tessa-memories', JSON.stringify(p.memories));
     if (p.streaks)  lsSet('tessa-streaks',  JSON.stringify(p.streaks));
@@ -480,7 +497,37 @@ async function pullCreatorSync(userId: string): Promise<boolean> {
 // SHARED MICRO-COMPONENTS
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Beautiful animated background — works for all dark themes
 function AuroraBg({ glow, glow2, theme }: { glow: string; glow2: string; theme: Theme }) {
+  // Ankit theme gets its own earthy saffron–indigo aurora
+  if (theme === 'ankit') {
+    return (
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
+        {/* Deep earthy base layer */}
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(ellipse 85% 65% at 15% 10%, #92400e40 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 80%, #7c2d1240 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 50% 40%, #78350f25 0%, transparent 65%)',
+        }} />
+        {/* Saffron glow — top left */}
+        <div className="absolute rounded-full blur-[200px] animate-aurora-a"
+          style={{ width:700, height:700, background:'#f59e0b', opacity:0.10, top:'-20%', left:'-10%' }} />
+        {/* Terracotta — right */}
+        <div className="absolute rounded-full blur-[160px] animate-aurora-b"
+          style={{ width:500, height:500, background:'#f97316', opacity:0.07, top:'25%', right:'-12%' }} />
+        {/* Deep indigo base glow */}
+        <div className="absolute rounded-full blur-[180px] animate-aurora-c"
+          style={{ width:450, height:300, background:'#4338ca', opacity:0.06, bottom:'0%', left:'30%' }} />
+        {/* Subtle gold sparkle grid */}
+        <div className="absolute inset-0" style={{
+          backgroundImage:`radial-gradient(circle, #f59e0b18 1px, transparent 1px)`,
+          backgroundSize:'44px 44px', opacity:0.55,
+        }} />
+        {/* Vignette */}
+        <div className="absolute inset-0" style={{
+          background:`radial-gradient(ellipse at 50% 0%, transparent 35%, rgba(0,0,0,0.65) 100%)`,
+        }} />
+      </div>
+    );
+  }
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
       <div className="absolute rounded-full blur-[180px] animate-aurora-a"
@@ -502,7 +549,9 @@ function AuroraBg({ glow, glow2, theme }: { glow: string; glow2: string; theme: 
   );
 }
 
+// Light theme: beautiful soft gradient mesh — unique per theme
 function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
+  // Each light theme gets its own colour palette + soft blob shapes
   const configs: Record<string, { grad: string; blob1: string; blob2: string; blob3: string }> = {
     light: {
       grad: creator
@@ -520,36 +569,20 @@ function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
       grad: 'radial-gradient(ellipse 90% 70% at 15% 5%, #ffe4e6 0%, transparent 50%), radial-gradient(ellipse 70% 60% at 88% 82%, #fce7f3 0%, transparent 50%), radial-gradient(ellipse 60% 50% at 50% 50%, #fff2f5 0%, transparent 65%)',
       blob1: '#fecdd3', blob2: '#f9a8d4', blob3: '#fda4af',
     },
-    // Ankit: deep royal saffron — like dawn light on a marigold field
-    ankit: {
-      grad: creator
-        ? 'radial-gradient(ellipse 95% 70% at 5% 0%, #fbbf24 0%, transparent 45%), radial-gradient(ellipse 75% 60% at 92% 88%, #fb923c 0%, transparent 45%), radial-gradient(ellipse 60% 50% at 50% 50%, #fef9ee 0%, transparent 55%), radial-gradient(ellipse 45% 40% at 70% 15%, #f97316 0%, transparent 40%)'
-        : 'radial-gradient(ellipse 95% 70% at 5% 0%, #fde68a 0%, transparent 45%), radial-gradient(ellipse 75% 60% at 92% 88%, #fed7aa 0%, transparent 45%), radial-gradient(ellipse 60% 50% at 50% 50%, #fef9ee 0%, transparent 55%), radial-gradient(ellipse 45% 40% at 72% 16%, #fbbf24 0%, transparent 40%)',
-      blob1: creator ? '#f59e0b' : '#fbbf24',
-      blob2: creator ? '#ea580c' : '#f97316',
-      blob3: creator ? '#d97706' : '#f59e0b',
-    },
   };
   const cfg = configs[theme] ?? configs.light;
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
+      {/* Main gradient mesh */}
       <div className="absolute inset-0" style={{ background: cfg.grad }} />
+      {/* Animated soft blobs — distinct per theme */}
       <div className="absolute rounded-full blur-[160px] animate-aurora-a"
-        style={{ width:500, height:500, background:cfg.blob1, opacity:theme==='ankit'?0.55:0.35, top:'-10%', left:'-5%' }} />
+        style={{ width:500, height:500, background:cfg.blob1, opacity:0.35, top:'-10%', left:'-5%' }} />
       <div className="absolute rounded-full blur-[130px] animate-aurora-b"
-        style={{ width:380, height:380, background:cfg.blob2, opacity:theme==='ankit'?0.38:0.22, bottom:'-8%', right:'-5%' }} />
+        style={{ width:380, height:380, background:cfg.blob2, opacity:0.22, bottom:'-8%', right:'-5%' }} />
       <div className="absolute rounded-full blur-[100px] animate-aurora-c"
-        style={{ width:260, height:260, background:cfg.blob3, opacity:theme==='ankit'?0.32:0.18, top:'45%', left:'55%' }} />
-      {/* Ankit-only: extra warm glow blob in top-right */}
-      {theme==='ankit' && (
-        <div className="absolute rounded-full blur-[120px] animate-aurora-b"
-          style={{ width:350, height:350, background:'#f97316', opacity:0.28, top:'2%', right:'5%' }} />
-      )}
-      {/* Ankit-only: second gold flare bottom-center */}
-      {theme==='ankit' && (
-        <div className="absolute rounded-full blur-[140px]"
-          style={{ width:280, height:200, background:'#d97706', opacity:0.22, bottom:'10%', left:'30%' }} />
-      )}
+        style={{ width:260, height:260, background:cfg.blob3, opacity:0.18, top:'45%', left:'55%' }} />
+      {/* Very subtle petal / noise texture */}
       <div className="absolute inset-0 opacity-[0.012]" style={{
         backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
       }} />
@@ -557,6 +590,7 @@ function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
   );
 }
 
+// Floating hearts (creator mode)
 function Hearts({ on }: { on: boolean }) {
   if (!on) return null;
   return (
@@ -571,6 +605,7 @@ function Hearts({ on }: { on: boolean }) {
   );
 }
 
+// Typing indicator dots
 function TypingDots({ glow }: { glow: string }) {
   return (
     <div className="flex items-center gap-1.5 py-0.5">
@@ -582,6 +617,7 @@ function TypingDots({ glow }: { glow: string }) {
   );
 }
 
+// Settings section label — theme-aware text
 function SLabel({ label, t }: { label: string; t: ReturnType<typeof useT> }) {
   return (
     <p className={`text-[9px] font-black tracking-[0.22em] uppercase mb-2.5 ${t.sLabel}`}>
@@ -594,6 +630,7 @@ function Hr({ cls }: { cls: string }) {
   return <div className={`h-px border-t w-full ${cls}`} />;
 }
 
+// Universal toggle — fixes light mode by using theme-aware text classes
 function Toggle({ label, sub, checked, onChange, color, t }: {
   label: string; sub?: string; checked: boolean;
   onChange: (v: boolean) => void; color: string;
@@ -614,96 +651,9 @@ function Toggle({ label, sub, checked, onChange, color, t }: {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DELETE CONFIRM MODAL — standard vs creator mode variants
-// ─────────────────────────────────────────────────────────────────────────────
-function DeleteConfirmModal({ title, onConfirm, onCancel, isCreator, glow, t }: {
-  title: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-  isCreator: boolean;
-  glow: string;
-  t: ReturnType<typeof useT>;
-}) {
-  return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
-      <div className="relative w-full max-w-xs rounded-3xl overflow-hidden shadow-2xl"
-        style={{
-          background: t.isLight ? 'rgba(255,255,255,0.99)' : 'rgba(10,12,28,0.99)',
-          border: `1px solid ${glow}30`,
-          boxShadow: `0 24px 64px rgba(0,0,0,0.5), 0 0 40px ${glow}15`,
-          backdropFilter: 'blur(24px)',
-        }}>
-        {/* Icon */}
-        <div className="flex flex-col items-center pt-8 pb-4 px-6">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
-            style={{
-              background: isCreator
-                ? 'linear-gradient(135deg, rgba(236,72,153,0.15), rgba(168,85,247,0.10))'
-                : 'rgba(239,68,68,0.10)',
-              border: isCreator ? '1px solid rgba(236,72,153,0.25)' : '1px solid rgba(239,68,68,0.22)',
-            }}>
-            {isCreator
-              ? <Heart size={24} className="text-pink-400" />
-              : <Trash2 size={24} className="text-red-400" />}
-          </div>
-
-          {/* Title & message */}
-          {isCreator ? (
-            <>
-              <p className={`text-[15px] font-black text-center mb-1 ${t.isLight ? 'text-slate-800' : 'text-white'}`}>
-                Delete this chat? 💔
-              </p>
-              <p className={`text-[11px] text-center leading-relaxed mb-1 ${t.sSub}`}>
-                <span className="font-semibold" style={{color:glow}}>"{title}"</span>
-              </p>
-              <p className={`text-[11px] text-center leading-relaxed ${t.sSub}`}>
-                Our memories in this chat will be gone forever. Are you sure?
-              </p>
-            </>
-          ) : (
-            <>
-              <p className={`text-[15px] font-black text-center mb-1 ${t.isLight ? 'text-slate-800' : 'text-white'}`}>
-                Delete conversation?
-              </p>
-              <p className={`text-[11px] text-center leading-relaxed mb-1 ${t.sSub}`}>
-                <span className="font-semibold" style={{color:glow}}>"{title}"</span>
-              </p>
-              <p className={`text-[11px] text-center leading-relaxed ${t.sSub}`}>
-                This cannot be undone.
-              </p>
-            </>
-          )}
-        </div>
-
-        {/* Buttons */}
-        <div className="flex gap-2.5 px-6 pb-7 pt-2">
-          <button onClick={onCancel}
-            className={`flex-1 py-2.5 rounded-xl text-[12px] font-semibold transition-all active:scale-95 ${t.isLight ? 'bg-slate-100 hover:bg-slate-200 text-slate-600' : 'bg-white/[0.07] hover:bg-white/[0.12] text-white/60'}`}>
-            {isCreator ? 'Keep it 🥺' : 'Cancel'}
-          </button>
-          <button onClick={onConfirm}
-            className="flex-1 py-2.5 rounded-xl text-[12px] font-bold transition-all active:scale-95"
-            style={{
-              background: isCreator
-                ? 'linear-gradient(135deg, #ec4899, #a855f7)'
-                : 'linear-gradient(135deg, #ef4444, #dc2626)',
-              color: 'white',
-              boxShadow: isCreator
-                ? '0 4px 16px rgba(236,72,153,0.35)'
-                : '0 4px 16px rgba(239,68,68,0.35)',
-            }}>
-            {isCreator ? 'Delete 💔' : 'Delete'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AVATAR PICKER MODAL
+// AVATAR PICKER MODAL — beautiful 4-col grid sheet
 // ─────────────────────────────────────────────────────────────────────────────
 function AvatarPickerModal({ current, onSelect, onClose, t, glow }: {
   current: string; onSelect: (id: string) => void; onClose: () => void;
@@ -757,7 +707,12 @@ function AvatarPickerModal({ current, onSelect, onClose, t, glow }: {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SETTINGS BOTTOM SHEET — slides up from bottom, not left sidebar
+// Left pill-nav + right scrollable content
+// ─────────────────────────────────────────────────────────────────────────────
 type SettingsSection = 'appearance' | 'ai' | 'chat' | 'data' | 'about';
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN COMPONENT
@@ -789,9 +744,6 @@ export default function Home() {
   const [showFlashcards,  setShowFlashcards]  = useState(false);
   const [showReportCard,  setShowReportCard]  = useState(false);
   const [notesExpanded,   setNotesExpanded]   = useState(true);
-
-  // ── Delete confirm state ───────────────────────────────────────────────────
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   // ── Settings ──────────────────────────────────────────────────────────────
   const [theme,           setThemeState]    = useState<Theme>('dark');
@@ -826,6 +778,7 @@ export default function Home() {
   const [showWellness,              setShowWellness]             = useState(false);
   const [showWellnessFloat,         setShowWellnessFloat]         = useState(false);
   const [showAvatarPickerInSettings,setShowAvatarPickerInSettings]= useState(false);
+  const [pendingDeleteId,           setPendingDeleteId]           = useState<string|null>(null);
 
   // ── Refs ──────────────────────────────────────────────────────────────────
   const bottomRef      = useRef<HTMLDivElement>(null);
@@ -917,12 +870,14 @@ export default function Home() {
       if (u) {
         setIsGuest(false);
         fetchCloudConversations(u.id);
+        // Pull creator data when auth fires
         if (isCreatorModePersistent()) {
           pullCreatorSync(u.id).then(changed => { if (changed) setWellnessVersion(v=>v+1); });
         }
       }
     });
 
+    // Real-time subscription — updates when another device pushes
     const setupRealtimeSync = (uid: string) => {
       if (syncChannel.current) supabase.removeChannel(syncChannel.current);
       syncChannel.current = supabase
@@ -931,6 +886,7 @@ export default function Home() {
           event: 'UPDATE', schema: 'public', table: 'creator_sync',
           filter: `user_id=eq.${uid}`,
         }, () => {
+          // Another device pushed — pull the latest
           pullCreatorSync(uid).then(changed => {
             if (changed) { setWellnessVersion(v=>v+1); setSyncStatus('synced'); }
           });
@@ -1037,16 +993,7 @@ export default function Home() {
     setMessages(conv.messages); setCurrentConvId(conv.id);
     setCurrentMood(safeMood(conv.moodHistory?.at(-1))); setShowSidebar(false);
   };
-
-  // ── Delete with confirmation modal ────────────────────────────────────────
-  const requestDeleteConversation = (e: React.MouseEvent, conv: Conversation) => {
-    e.stopPropagation();
-    setDeleteTarget({ id: conv.id, title: conv.title });
-  };
-  const confirmDeleteConversation = async () => {
-    if (!deleteTarget) return;
-    const id = deleteTarget.id;
-    setDeleteTarget(null);
+  const removeConversation = async (id: string) => {
     if (user && !isGuest) {
       try { await supabase.from('conversations').delete().eq('conversation_id',id).eq('user_id',user.id); fetchCloudConversations(user.id); }
       catch {}
@@ -1054,6 +1001,7 @@ export default function Home() {
       const next = conversations.filter(c => c.id !== id);
       setConversations(next); lsSet('tessa-conversations', JSON.stringify(next));
     }
+    setPendingDeleteId(null);
   };
 
   // ── Proactive ─────────────────────────────────────────────────────────────
@@ -1064,30 +1012,47 @@ export default function Home() {
   };
 
   // ── Dashboard / food parsing ───────────────────────────────────────────────
+  // Strategy: extract calorie numbers Tessa already stated in her response.
+  // If she wrote "786 cal" or "3 × 262 = 786", trust that number — it came
+  // from web data or her knowledge and is the most accurate figure.
+  // Only fall back to the local database if no calorie figure found in response.
   const parseDashboardUpdates = (responseText: string, userText: string = ''): string => {
     if (!isCreatorMode) return '';
     let extra = '';
     try {
+      // Detect food mention from EITHER user message or Tessa's response
       const foodHit = detectMealInResponse(userText) || detectMealInResponse(responseText);
       if (foodHit) {
+
+        // ── Step 1: Try to extract total calories Tessa already stated ─────────
+        // Patterns: "786 cal", "= 786 calories", "total: 786", "~450 cal"
         let tessaTotal: number | null = null;
+
+        // "X × Y = Z cal" or "= Z cal" (final sum pattern — most reliable)
         const sumMatch = responseText.match(/[=≈~]\s*\*{0,2}(\d{3,5})\*{0,2}\s*cal/i)
           ?? responseText.match(/total[^\d]*(\d{3,5})\s*cal/i)
           ?? responseText.match(/logged[^\d]*(\d{3,5})\s*cal/i);
         if (sumMatch?.[1]) tessaTotal = parseInt(sumMatch[1], 10);
+
+        // If no sum, collect all "NNN cal" mentions and sum them
         if (!tessaTotal) {
           const allCalMatches = [...responseText.matchAll(/(\d{2,5})\s*cal(?:ories)?/gi)];
           if (allCalMatches.length > 0) {
+            // Take the largest single number — likely the total
             const nums = allCalMatches.map(m => parseInt(m[1], 10)).filter(n => n >= 30 && n <= 5000);
             if (nums.length > 0) tessaTotal = Math.max(...nums);
           }
         }
+
+        // ── Step 2: If Tessa stated calories, trust that number ────────────────
         let totalCal: number;
         let lines: string[];
+
         if (tessaTotal && tessaTotal >= 30 && tessaTotal <= 5000) {
           totalCal = tessaTotal;
           lines = [`${foodHit.food} — ${totalCal}cal (from Tessa's response)`];
         } else {
+          // ── Step 3: Fall back to local database ───────────────────────────────
           const foods = foodHit.food.split(/,|and|\+|with/i).map(f => f.trim()).filter(Boolean);
           totalCal = 0; lines = [];
           for (const food of foods) {
@@ -1099,6 +1064,7 @@ export default function Home() {
             lines.push(`${res.food} — ${res.calories}cal (${res.unit})`);
           }
         }
+
         const h = lsGetJson<HealthSnapshot>('tessa-health', { weight:0, height:0, meals:[], totalCalories:0, date:new Date().toISOString().split('T')[0] });
         h.meals.push({ time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}), meal:lines.join(', '), calories:totalCal, confidence: tessaTotal ? 'high' : 'medium' });
         h.totalCalories=(h.totalCalories??0)+totalCal;
@@ -1138,11 +1104,14 @@ export default function Home() {
     const userMsg: Message = { id:uuidv4(), role:'user', content:text||'📷 [Image]', timestamp:new Date() };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
+
+    // Declare BEFORE needsSearch
     const imageCopy = selectedImage;
     const hasImage  = !!imageCopy;
     removeSelectedImage();
     if (textareaRef.current) textareaRef.current.style.height='48px';
     setIsLoading(true);
+
     try {
       const needsSearch =
         autoSearch && !!text && !hasImage && !isCreatorMode &&
@@ -1187,6 +1156,7 @@ export default function Home() {
       if (voiceOutput) speakText(data.content);
       if (sfx) playChime();
       if (autoSave) setTimeout(persistConversation, 1_000);
+      // Debounced creator sync push
       if (isCreatorMode && user && !isGuest) {
         setSyncStatus('syncing');
         if (syncTimer.current) clearTimeout(syncTimer.current);
@@ -1196,6 +1166,7 @@ export default function Home() {
           setTimeout(()=>setSyncStatus('idle'), 3000);
         }, 3000);
       }
+
     } catch (err: any) {
       let msg = err?.message || 'Something went wrong.';
       if (msg.includes('429')||msg.includes('rate limit')) msg='⏱️ Rate limit — please wait a moment.';
@@ -1296,11 +1267,13 @@ export default function Home() {
         </div>
         <div className="relative text-center space-y-5">
           <div className="relative inline-flex">
+            {/* Avatar ring */}
             <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-cyan-500/40 shadow-2xl shadow-cyan-500/25 animate-pulse">
               <img src={selectedAvatar.path} alt={selectedAvatar.name} className="w-full h-full object-cover"
                 onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}}/>
             </div>
             <div className="absolute inset-0 rounded-2xl border border-cyan-400/20 animate-ping" />
+            {/* Orbit dot */}
             <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 border-2 border-[#050816] shadow-lg shadow-emerald-400/50" />
           </div>
           <div>
@@ -1320,20 +1293,73 @@ export default function Home() {
   // ─────────────────────────────────────────────────────────────────────────
   // RENDER
   // ─────────────────────────────────────────────────────────────────────────
+  // Inline background colours — driven via style so CSS transition works
+  const THEME_BG: Record<string, [string, string]> = {
+    dark:      ['#05060f','#060412'],
+    cyberpunk: ['#020108','#030112'],
+    ocean:     ['#020c1a','#030616'],
+    sunset:    ['#110805','#17080f'],
+    ankit:     ['#100a00','#120600'],
+    light:     ['#f0f4ff','#fdf0ff'],
+    pastel:    ['#f3efff','#fdf0ff'],
+    sakura:    ['#fff2f5','#fff0f8'],
+  };
+  const [bgA, bgB] = THEME_BG[theme] ?? THEME_BG.dark;
+  const bgStyle = isCreatorMode ? bgB : bgA;
+
   return (
-    <div className={`h-screen ${t.bg} ${t.text} flex overflow-hidden relative transition-colors duration-500 ${fontSizeClass}`} style={{height:"100dvh"}}>
+    <div className={`h-screen ${t.text} flex overflow-hidden relative ${fontSizeClass}`}
+      style={{height:"100dvh", backgroundColor: bgStyle, transition:'background-color 0.45s ease, color 0.25s ease'}}>
       <style>{`
-      @keyframes popUpFromBottom{
-        from{opacity:0;transform:translateX(-50%) translateY(24px) scale(0.94);}
-        to{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}
+      /* ── Floating panel entrance ── */
+      @keyframes floatIn {
+        from { opacity:0; transform: translateX(-50%) translateY(18px) scale(0.94); }
+        to   { opacity:1; transform: translateX(-50%) translateY(0)    scale(1);    }
       }
-      @keyframes mobileMenuSlideUp{
-        from{opacity:0;transform:translateY(12px) scale(0.96);}
-        to{opacity:1;transform:translateY(0) scale(1);}
+      @keyframes popUpFromBottom {
+        from { opacity:0; transform: translateX(-50%) translateY(18px) scale(0.94); }
+        to   { opacity:1; transform: translateX(-50%) translateY(0)    scale(1);    }
       }
+      @keyframes mobileMenuSlideUp {
+        from { opacity:0; transform: translateY(8px) scale(0.97); }
+        to   { opacity:1; transform: translateY(0)   scale(1);    }
+      }
+      @keyframes slideUpSheet {
+        from { opacity:0; transform: translateY(22px); }
+        to   { opacity:1; transform: translateY(0);    }
+      }
+      /* ── Delete confirm expand ── */
+      @keyframes expandConfirm {
+        from { opacity:0; transform: scaleY(0.7); }
+        to   { opacity:1; transform: scaleY(1);   }
+      }
+      .confirm-expand {
+        animation: expandConfirm 0.18s cubic-bezier(0.34,1.4,0.64,1) forwards;
+        transform-origin: top;
+      }
+      /* ── Sidebar ── */
+      .sidebar-slide {
+        transition: transform 0.28s cubic-bezier(0.32,0.72,0,1),
+                    opacity 0.22s ease;
+      }
+      /* ── All interactive buttons ── */
+      button {
+        transition: opacity 0.12s ease, transform 0.12s ease,
+                    background-color 0.18s ease, box-shadow 0.18s ease,
+                    border-color 0.18s ease, color 0.18s ease;
+      }
+      button:active:not(:disabled) { transform: scale(0.92); opacity: 0.85; }
+      /* ── Tab/panel switching ── */
+      .panel-fade {
+        animation: slideUpSheet 0.22s ease forwards;
+      }
+      /* ── Theme change cross-fade on header/aside/input ── */
+      header, aside { transition: background 0.38s ease, border-color 0.38s ease; }
+      input, textarea { transition: background 0.25s ease, border-color 0.22s ease; }
+
       @supports(padding-top: env(safe-area-inset-top)){
-        .safe-top{ padding-top: max(12px, env(safe-area-inset-top)); }
-        .safe-bottom{ padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+        .safe-top    { padding-top:    max(12px, env(safe-area-inset-top));    }
+        .safe-bottom { padding-bottom: max(8px,  env(safe-area-inset-bottom)); }
       }
     `}</style>
 
@@ -1360,6 +1386,7 @@ export default function Home() {
           {/* Sidebar header */}
           <div className={`flex-shrink-0 flex items-center justify-between px-4 py-3.5 border-b ${t.div}`}>
             <div className="flex items-center gap-2.5">
+              {/* Mini avatar */}
               <div className="relative w-8 h-8 rounded-xl overflow-hidden border flex-shrink-0"
                 style={{borderColor:`${t.glow}50`}}>
                 <img src={selectedAvatar.path} alt={selectedAvatar.name} className="w-full h-full object-cover"
@@ -1376,7 +1403,7 @@ export default function Home() {
             </button>
           </div>
 
-          {/* ── NEW CHAT ── */}
+          {/* ── NEW CHAT at the very top ── */}
           <div className="flex-shrink-0 px-3 pt-2 pb-1">
             <button onClick={startNewChat}
               className={`w-full py-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-2 transition-all active:scale-98 ${t.btnP}`}>
@@ -1398,27 +1425,67 @@ export default function Home() {
                   <p className={`text-[10px] ${t.sub}`}>No conversations yet</p>
                 </div>
               )}
-              {shownConvs.map(conv=>(
-                <div key={conv.id} onClick={()=>openConversation(conv)}
-                  className={`group relative px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${conv.id===currentConvId?t.active:`${t.card} hover:bg-white/[0.04]`}`}>
-                  <p className="text-[11px] font-medium truncate pr-6 leading-snug">{conv.title}</p>
-                  <div className={`flex items-center gap-1.5 mt-0.5 ${t.sub}`} style={{fontSize:9}}>
-                    <Clock size={8} /><span>{conv.messages.length} msgs</span>
-                    <span>·</span>
-                    <span>{new Date(conv.updated).toLocaleDateString('en-IN',{month:'short',day:'numeric'})}</span>
-                  </div>
-                  {/* ── DELETE BUTTON — now triggers confirmation modal ── */}
-                  <button
-                    onClick={e => requestDeleteConversation(e, conv)}
-                    className="absolute right-2 top-2.5 p-1 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-500/20 text-red-400 transition-all">
-                    <Trash2 size={10} />
-                  </button>
+              {shownConvs.map(conv=>{
+                const isPendingDelete = pendingDeleteId === conv.id;
+                return (
+                <div key={conv.id}
+                  className={`group relative px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${conv.id===currentConvId?t.active:`${t.card} hover:bg-white/[0.04]`}`}
+                  onClick={()=>{ if(!isPendingDelete) openConversation(conv); }}>
+
+                  {isPendingDelete ? (
+                    /* ── Inline delete confirm ── */
+                    <div className="flex flex-col gap-2 confirm-expand" onClick={e=>e.stopPropagation()}>
+                      {isCreatorMode ? (
+                        <div>
+                          <p className="text-[11px] font-semibold leading-snug" style={{color:'#fca5a5'}}>
+                            Delete this chat? 💔
+                          </p>
+                          <p className="text-[9px] mt-0.5" style={{color:'rgba(255,255,255,0.35)'}}>
+                            This can't be recovered.
+                          </p>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-[11px] font-semibold leading-snug" style={{color:t.isLight?'#374151':'rgba(255,255,255,0.80)'}}>
+                            Delete this conversation?
+                          </p>
+                          <p className="text-[9px] mt-0.5" style={{color:t.isLight?'#9ca3af':'rgba(255,255,255,0.30)'}}>
+                            Can't be undone.
+                          </p>
+                        </div>
+                      )}
+                      <div className="flex gap-1.5">
+                        <button onClick={()=>removeConversation(conv.id)}
+                          className="flex-1 py-1.5 rounded-lg text-[10px] font-bold bg-red-500/75 hover:bg-red-500/90 text-white">
+                          Yes, delete
+                        </button>
+                        <button onClick={()=>setPendingDeleteId(null)}
+                          className={`flex-1 py-1.5 rounded-lg text-[10px] font-semibold ${t.isLight?'bg-slate-100 hover:bg-slate-200 text-slate-600':'bg-white/[0.07] hover:bg-white/[0.13] text-white/55'}`}>
+                          Keep it
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-[11px] font-medium truncate pr-6 leading-snug">{conv.title}</p>
+                      <div className={`flex items-center gap-1.5 mt-0.5 ${t.sub}`} style={{fontSize:9}}>
+                        <Clock size={8} /><span>{conv.messages.length} msgs</span>
+                        <span>·</span>
+                        <span>{new Date(conv.updated).toLocaleDateString('en-IN',{month:'short',day:'numeric'})}</span>
+                      </div>
+                      <button onClick={e=>{e.stopPropagation(); setPendingDeleteId(conv.id);}}
+                        className="absolute right-2 top-2.5 p-1 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-500/20 text-red-400 transition-all duration-150">
+                        <Trash2 size={10} />
+                      </button>
+                    </>
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
-          {/* Notes */}
+          {/* Notes — collapsible at bottom of sidebar */}
           <div className="flex-shrink-0 border-t" style={{borderColor:`${t.glow}15`}}>
             <button onClick={()=>setNotesExpanded(p=>!p)}
               className={`w-full flex items-center justify-between px-4 py-2 text-[10px] font-semibold transition-colors ${t.accent} hover:bg-white/[0.03]`}>
@@ -1479,11 +1546,15 @@ export default function Home() {
       ═══════════════════════════════════════════════════════════════════ */}
       {showSettings && (
         <>
+          {/* Backdrop */}
           <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={()=>{setShowSettings(false);setSettingsTab('main');}} />
 
+          {/* ── RADIAL HUB (main) ── */}
           {settingsTab==='main' && (
             <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
               <div className="relative pointer-events-auto" style={{width:'min(340px,88vw)',height:'min(340px,88vw)'}} onClick={e=>e.stopPropagation()}>
+
+                {/* SVG connector lines */}
                 <svg className="absolute inset-0 w-full h-full pointer-events-none">
                   {[0,72,144,216,288].map((deg,i)=>{
                     const r=42, cx=50, cy=50;
@@ -1494,6 +1565,8 @@ export default function Home() {
                       stroke={t.glow} strokeWidth="1" strokeDasharray="3 4" strokeOpacity="0.28"/>;
                   })}
                 </svg>
+
+                {/* Centre close button */}
                 <button onClick={()=>setShowSettings(false)}
                   className="absolute flex flex-col items-center justify-center rounded-full transition-all active:scale-90"
                   style={{
@@ -1504,6 +1577,8 @@ export default function Home() {
                   }}>
                   <X size={16} style={{color:t.glow}}/>
                 </button>
+
+                {/* 5 orbit buttons — percentage-based so they scale with container */}
                 {([
                   [0,   '🎨','Themes',  'themes'],
                   [72,  '🧠','AI',      'ai'],
@@ -1535,6 +1610,7 @@ export default function Home() {
             </div>
           )}
 
+          {/* ── SUB-PAGE BOTTOM SHEET ── */}
           {settingsTab!=='main' && (
             <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col rounded-t-[26px] overflow-hidden"
               style={{
@@ -1547,19 +1623,24 @@ export default function Home() {
               }}
               onClick={e=>e.stopPropagation()}>
 
+              {/* Drag handle */}
               <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
                 <div className={`w-9 h-1 rounded-full ${t.isLight?'bg-slate-300':'bg-white/20'}`}/>
               </div>
 
+              {/* Sheet header — back + title + close, all perfectly centered */}
               <div className="flex-shrink-0 flex items-center px-4 pb-3 pt-1 relative">
+                {/* Back button — left */}
                 <button onClick={()=>setSettingsTab('main' as any)}
                   className={`flex items-center gap-1.5 ${t.isLight?'text-slate-500':'text-white/45'} active:opacity-60`}>
                   <ChevronDown size={15} style={{transform:'rotate(90deg)'}}/>
                   <span className="text-[11px] font-medium">Back</span>
                 </button>
+                {/* Title — absolutely centered */}
                 <span className={`absolute left-1/2 -translate-x-1/2 text-[13px] font-bold ${t.isLight?'text-slate-800':'text-white/90'}`}>
                   {settingsTab==='themes'?'🎨 Themes':settingsTab==='ai'?'🧠 AI & Behaviour':settingsTab==='display'?'💬 Display':settingsTab==='data'?'🗄️ Data':'ℹ️ About'}
                 </span>
+                {/* Close button — right, always visible */}
                 <button onClick={()=>{setShowSettings(false);setSettingsTab('main' as any);}}
                   className="ml-auto flex items-center justify-center rounded-full active:scale-90"
                   style={{width:28,height:28,background:t.isLight?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.09)'}}>
@@ -1567,8 +1648,10 @@ export default function Home() {
                 </button>
               </div>
 
+              {/* Divider */}
               <div className="flex-shrink-0 h-px mx-4" style={{background:`${t.glow}18`}}/>
 
+              {/* Scrollable content */}
               <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 space-y-4">
 
                 {settingsTab==='themes' && (<>
@@ -1809,6 +1892,7 @@ export default function Home() {
             </div>
           )}
 
+          {/* Avatar picker */}
           {showAvatarPickerInSettings && (
             <AvatarPickerModal
               current={avatarId}
@@ -1829,36 +1913,46 @@ export default function Home() {
         <header className={`flex-shrink-0 ${t.header} px-3 md:px-5 safe-top`}>
           <div className="flex items-center justify-between gap-2 h-[60px]">
 
+            {/* Left cluster */}
             <div className="flex items-center gap-3 min-w-0">
               <button onClick={()=>setShowSidebar(p=>!p)}
                 className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-white/[0.08] active:scale-90 ${showSidebar?'bg-white/[0.08]':''}`}>
                 {showSidebar?<X size={18}/>:<Menu size={18}/>}
               </button>
 
+              {/* Avatar — clickable opens avatar picker */}
               <div className="relative flex-shrink-0 cursor-pointer" onClick={() => setShowAvatarModal(true)}>
-                <div className="w-11 h-11 rounded-2xl overflow-hidden border-2 transition-all duration-500 hover:scale-105"
-                  style={{ borderColor:`${t.glow}65`, boxShadow:animations?`0 0 20px ${t.glow}35,0 0 40px ${t.glow}12`:'none' }}>
-                  <img src={selectedAvatar.path} alt={selectedAvatar.name} className="w-full h-full object-cover"
-                    onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}} />
+                <div
+                  className="w-11 h-11 rounded-2xl overflow-hidden border-2 transition-all duration-500 hover:scale-105"
+                  style={{
+                    borderColor:`${t.glow}65`,
+                    boxShadow:animations?`0 0 20px ${t.glow}35,0 0 40px ${t.glow}12`:'none',
+                  }}
+                >
+                  <img
+                    src={selectedAvatar.path}
+                    alt={selectedAvatar.name}
+                    className="w-full h-full object-cover"
+                    onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}}
+                  />
                 </div>
-               </div>
-  className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-[2.5px]"
-  style={{
-    background: t.glow,
-    borderColor: t.isLight ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.7)',
-    boxShadow: `0 0 8px ${t.glow}`
-  }}
-                 </div>
-    className="absolute inset-0 rounded-full animate-ping" 
-    style={{ background: t.glow, opacity: 0.4 }} 
-  />
+                {/* Pulsing status dot */}
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-[2.5px]"
+                  style={{background:t.glow,borderColor:'rgba(0,0,0,0.7)',boxShadow:`0 0 8px ${t.glow}`}}>
+                  <div className="absolute inset-0 rounded-full animate-ping" style={{background:t.glow,opacity:0.4}} />
                 </div>
               </div>
 
+              {/* Name block */}
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <h1 className="font-black text-[13px] leading-none tracking-[0.12em] uppercase" style={{color:t.glow}}>TESSA</h1>
-                  {isCreatorMode && <Heart size={11} className="text-pink-400 fill-pink-400 flex-shrink-0 animate-pulse" />}
+                  <h1 className={`font-black text-[13px] leading-none tracking-[0.12em] uppercase ${t.accent}`}>
+                    TESSA
+                  </h1>
+                  {isCreatorMode && (
+                    <Heart size={11} className="text-pink-400 fill-pink-400 flex-shrink-0 animate-pulse" />
+                  )}
+                  {/* Sync dot — only in creator mode, signed in */}
                   {isCreatorMode && user && !isGuest && (
                     <span title={syncStatus==='syncing'?'Syncing…':syncStatus==='synced'?'Synced ✓':'Live sync'}
                       className="flex-shrink-0 w-1.5 h-1.5 rounded-full transition-all duration-500"
@@ -1877,9 +1971,10 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Right cluster */}
             <div className="flex items-center gap-0.5 flex-shrink-0">
 
-              {/* ── DESKTOP ── */}
+              {/* ── DESKTOP: all buttons visible ── */}
               <div className="hidden md:flex items-center gap-0.5">
                 {showMoodBadge && (
                   <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium mr-1"
@@ -1889,33 +1984,33 @@ export default function Home() {
                 )}
                 {isCreatorMode&&(
                   <button onClick={()=>setShowPlanners(true)} title="Smart Planners"
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-black/[0.06] ${t.sub}`}>
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-white/[0.07] ${t.sub}`}>
                     <Calendar size={16}/>
                   </button>
                 )}
                 {isCreatorMode&&(
                   <button onClick={()=>setShowWellness(p=>!p)} title="Wellness"
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showWellness?'text-white':'hover:bg-black/[0.06] '+t.sub}`}
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showWellness?'text-white':'hover:bg-white/[0.07] '+t.sub}`}
                     style={showWellness?{background:`${t.glow}14`,outline:`1px solid ${t.glow}25`}:{}}>
                     <Activity size={16}/>
                   </button>
                 )}
                 {isCreatorMode&&(
                   <button onClick={()=>setShowDashboard(p=>!p)} title="Insights Panel"
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showDashboard?'text-pink-300':'hover:bg-black/[0.06] '+t.sub}`}
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showDashboard?'text-pink-300':'hover:bg-white/[0.07] '+t.sub}`}
                     style={showDashboard?{background:`${t.glow}12`,outline:`1px solid ${t.glow}25`}:{}}>
                     <LayoutDashboard size={16}/>
                   </button>
                 )}
                 {isCreatorMode&&(
                   <button onClick={()=>setInsightsOpen(p=>!p)} title="Tessa Insights"
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${insightsOpen?'text-white':'hover:bg-black/[0.06] '+t.sub}`}
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${insightsOpen?'text-white':'hover:bg-white/[0.07] '+t.sub}`}
                     style={insightsOpen?{background:`${t.glow}14`,outline:`1px solid ${t.glow}25`}:{}}>
                     <Brain size={16}/>
                   </button>
                 )}
                 <button onClick={()=>setTheme(theme==='light'?'dark':'light')} title="Toggle theme"
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-black/[0.06] ${t.sub}`}>
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-white/[0.07] ${t.sub}`}>
                   {theme==='light'?<Moon size={16}/>:<Sun size={16}/>}
                 </button>
                 <button onClick={()=>{setShowSettings(p=>!p);setSettingsTab('main');}} title="Settings"
@@ -1925,7 +2020,7 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* ── MOBILE ── */}
+              {/* ── MOBILE: only theme + settings + ⋯ overflow ── */}
               <div className="flex md:hidden items-center gap-1">
                 <button onClick={()=>setTheme(theme==='light'?'dark':'light')}
                   className={`w-9 h-9 rounded-xl flex items-center justify-center ${t.sub}`}>
@@ -1936,6 +2031,7 @@ export default function Home() {
                   style={showSettings?{background:`${t.glow}12`,outline:`1px solid ${t.glow}22`}:{}}>
                   <Settings size={16}/>
                 </button>
+                {/* ⋯ overflow menu — all extra actions */}
                 <button onClick={()=>setShowMobileMenu(p=>!p)}
                   className={`w-9 h-9 rounded-xl flex items-center justify-center ${showMobileMenu?'text-white':t.sub}`}
                   style={showMobileMenu?{background:`${t.glow}14`,outline:`1px solid ${t.glow}28`}:{}}>
@@ -1953,7 +2049,7 @@ export default function Home() {
             <div className="fixed inset-0 z-40 md:hidden" onClick={()=>setShowMobileMenu(false)}/>
             <div className="fixed top-[calc(env(safe-area-inset-top,0px)+64px)] right-3 z-50 md:hidden"
               style={{animation:'mobileMenuSlideUp 0.2s cubic-bezier(0.34,1.4,0.64,1)'}}>
-              <div className="rounded-2xl overflow-hidden border shadow-2xl"
+              <div className={`rounded-2xl overflow-hidden border shadow-2xl`}
                 style={{
                   minWidth:200,
                   background:t.isLight?'rgba(255,255,255,0.97)':'rgba(8,10,24,0.97)',
@@ -1977,11 +2073,6 @@ export default function Home() {
                     style={{color:t.isLight?'#374151':'rgba(255,255,255,0.75)'}}>
                     <Calendar size={15} style={{color:t.glow}}/> Planners
                   </button>
-                  <button onClick={()=>{setShowDashboard(p=>!p);setShowMobileMenu(false);}}
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium transition-colors ${showDashboard?'':'hover:bg-white/5'}`}
-                    style={showDashboard?{color:t.glow,background:`${t.glow}12`}:{color:t.isLight?'#374151':'rgba(255,255,255,0.75)'}}>
-                    <LayoutDashboard size={15} style={{color:t.glow}}/> Dashboard
-                  </button>
                   <div style={{height:1,background:`${t.glow}15`,margin:'0 12px'}}/>
                 </>)}
               </div>
@@ -1992,11 +2083,12 @@ export default function Home() {
         {/* ── WELLNESS FLOATING PANEL ── */}
         {showWellness && isCreatorMode && (
           <>
+            {/* Full backdrop — blurs chat completely */}
             <div className="fixed inset-0 z-[48]"
               style={{background:'rgba(0,0,0,0.55)',backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)'}}
               onClick={()=>setShowWellness(false)}/>
             <div className="fixed bottom-[76px] left-1/2 z-[49]"
-              style={{transform:'translateX(-50%)',width:'min(480px,94vw)',animation:'popUpFromBottom 0.3s cubic-bezier(0.34,1.4,0.64,1)',willChange:'transform,opacity'}}>
+              style={{transform:'translateX(-50%)',width:'min(480px,94vw)',animation:'floatIn 0.28s cubic-bezier(0.22,1,0.36,1)',willChange:'transform,opacity'}}>
               <div className="rounded-2xl overflow-hidden"
                 style={{
                   background: t.isLight ? 'rgba(255,255,255,0.99)' : 'rgba(8,10,28,0.99)',
@@ -2004,6 +2096,7 @@ export default function Home() {
                   boxShadow: `0 0 0 1px ${t.glow}15, 0 -8px 60px rgba(0,0,0,0.8), 0 0 40px ${t.glow}20`,
                   backdropFilter: 'blur(32px)',
                 }}>
+                {/* Header */}
                 <div className="flex items-center justify-between px-4 py-3"
                   style={{borderBottom:`1px solid ${t.glow}20`,background: t.isLight ? `linear-gradient(135deg, white, ${t.glow}08)` : `linear-gradient(135deg, rgba(255,255,255,0.04), ${t.glow}10)`}}>
                   <div className="flex items-center gap-2.5">
@@ -2032,7 +2125,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="px-4 pb-4 pt-3 overflow-y-auto" style={{maxHeight:'55vh'}}>
-                  <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion} isLight={t.isLight} accentColor={t.glow}/>
+                  <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion} isLight={t.isLight} accentColor={isCreatorMode ? t.glowC : t.glow}/>
                 </div>
               </div>
             </div>
@@ -2044,15 +2137,24 @@ export default function Home() {
           <div className="max-w-2xl mx-auto w-full">
 
             {showDashboard&&isCreatorMode ? (
-              <PersonalDashboard isLight={t.isLight} accentColor={t.glow} />
+              <div className="panel-fade">
+                <PersonalDashboard isLight={t.isLight} accentColor={isCreatorMode ? t.glowC : t.glow} />
+              </div>
             ) : (
               <div className="space-y-2.5 pb-2">
 
+                {/* ── EMPTY STATE — beautiful and inviting ── */}
                 {messages.length===0 && (
                   <div className="flex flex-col items-center justify-center min-h-[60vh] select-none">
+                    {/* Big avatar */}
                     <div className="relative mb-6">
-                      <div className="w-28 h-28 rounded-[2rem] overflow-hidden border-2 transition-all duration-500"
-                        style={{ borderColor:`${t.glow}50`, boxShadow:animations?`0 0 0 8px ${t.glow}08, 0 0 40px ${t.glow}25, 0 0 80px ${t.glow}10`:'none' }}>
+                      <div
+                        className="w-28 h-28 rounded-[2rem] overflow-hidden border-2 transition-all duration-500"
+                        style={{
+                          borderColor:`${t.glow}50`,
+                          boxShadow:animations?`0 0 0 8px ${t.glow}08, 0 0 40px ${t.glow}25, 0 0 80px ${t.glow}10`:'none',
+                        }}
+                      >
                         <img src={selectedAvatar.path} alt={selectedAvatar.name} className="w-full h-full object-cover"
                           onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}} />
                       </div>
@@ -2063,14 +2165,20 @@ export default function Home() {
                         <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                       </div>
                     </div>
+
+                    {/* Greeting */}
                     <h2 className={`text-2xl font-black mb-1 text-center`}>
-                      {isCreatorMode ? `Hey Ankit! 💝` : `Hi, I'm Tessa 👋`}
+                      {isCreatorMode
+                        ? `Hey Ankit! 💝`
+                        : `Hi, I'm Tessa 👋`}
                     </h2>
                     <p className={`text-sm ${t.sub} text-center max-w-xs leading-relaxed mb-6`}>
                       {isCreatorMode
                         ? "I'm always here for you, ready to talk about anything. What's on your mind?"
                         : `${TESSA.tagline.split(',')[0]}. Ask me anything — I'm here to help!`}
                     </p>
+
+                    {/* Quick start chips */}
                     <div className="flex flex-wrap gap-2 justify-center max-w-sm">
                       {(isCreatorMode
                         ? ['How are you today? 💕','Help me plan my day 📅','I need motivation 💪','Tell me something nice ✨','Study with me 📚','Play a game with me 🎮']
@@ -2086,18 +2194,23 @@ export default function Home() {
                   </div>
                 )}
 
+                {/* ── MESSAGE BUBBLES ── */}
                 {messages.map((msg,idx)=>{
                   const isUser  = msg.role==='user';
                   const isLatest = msg.id===latestMsgId;
                   const time    = new Date(msg.timestamp).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
                   const emoji   = msg.mood?MOOD_EMOJI[msg.mood]:null;
                   const padY    = compactMode ? 'py-2.5' : 'py-3.5';
+                  // Group: hide avatar/name for consecutive same-role messages
                   const prevMsg = messages[idx-1];
                   const isGrouped = messageGrouping && prevMsg && prevMsg.role===msg.role;
 
                   return (
-                    <div key={msg.id}
-                      className={`flex gap-2.5 animate-fadeIn ${isUser?'justify-end':'justify-start'} ${isGrouped?'mt-0.5':'mt-2.5'} ${isUser?'pl-8 md:pl-16':'pr-8 md:pr-16'}`}>
+                    <div
+                      key={msg.id}
+                      className={`flex gap-2.5 animate-fadeIn ${isUser?'justify-end':'justify-start'} ${isGrouped?'mt-0.5':'mt-2.5'} ${isUser?'pl-8 md:pl-16':'pr-8 md:pr-16'}`}
+                    >
+                      {/* LEFT: AI avatar (only on first in group) */}
                       {!isUser && (
                         <div className="flex-shrink-0 flex flex-col justify-end" style={{width:32}}>
                           {!isGrouped && (
@@ -2109,18 +2222,29 @@ export default function Home() {
                           )}
                         </div>
                       )}
+
+                      {/* BUBBLE */}
                       <div className={`max-w-[82%] md:max-w-[74%] flex flex-col ${isUser?'items-end':'items-start'}`}>
+
+                        {/* Sender label row */}
                         {!isGrouped && (
                           <div className={`flex items-center gap-1.5 mb-1 px-0.5 ${isUser?'flex-row-reverse':''}`}>
-                            <span className={`text-[10px] font-semibold ${isUser ? t.sub : ''}`} style={!isUser?{color:t.glow}:{}}>
+                            <span className={`text-[10px] font-semibold ${isUser ? t.sub : ''}`}
+                              style={!isUser?{color:t.glow}:{}}>
                               {isUser ? 'You' : 'Tessa'}
                             </span>
                             {!isUser && emoji && <span className="text-[10px]">{emoji}</span>}
-                            {showTimestamps && <span className={`text-[9px] ${t.sub}`}>{time}</span>}
+                            {showTimestamps && (
+                              <span className={`text-[9px] ${t.sub}`}>{time}</span>
+                            )}
                           </div>
                         )}
-                        <div className={`rounded-2xl overflow-hidden transition-all duration-300 ${isUser?t.msgU:t.msgA}`}
-                          style={isLatest&&!isUser&&animations?{boxShadow:`0 4px 24px ${t.glow}15`}:{}}>
+
+                        {/* Message card */}
+                        <div
+                          className={`rounded-2xl overflow-hidden transition-all duration-300 ${isUser?t.msgU:t.msgA}`}
+                          style={isLatest&&!isUser&&animations?{boxShadow:`0 4px 24px ${t.glow}15`}:{}}
+                        >
                           <div className={`px-4 ${padY}`}>
                             <MessageRenderer
                               content={msg.content}
@@ -2130,10 +2254,14 @@ export default function Home() {
                             />
                           </div>
                         </div>
+
+                        {/* Timestamp below if no header */}
                         {isGrouped && showTimestamps && (
                           <span className={`text-[9px] mt-0.5 px-1 ${t.sub}`}>{time}</span>
                         )}
                       </div>
+
+                      {/* RIGHT: User avatar spacer */}
                       {isUser && (
                         <div className="flex-shrink-0 flex flex-col justify-end" style={{width:32}}>
                           {!isGrouped && (
@@ -2148,6 +2276,7 @@ export default function Home() {
                   );
                 })}
 
+                {/* Typing indicator */}
                 {isLoading&&(
                   <div className="flex gap-2.5 justify-start mt-2.5 animate-fadeIn">
                     <div className="flex-shrink-0 flex flex-col justify-end" style={{width:32}}>
@@ -2177,6 +2306,8 @@ export default function Home() {
         {!showDashboard&&(
           <div className={`flex-shrink-0 ${t.bar} px-3 md:px-6 py-3 safe-bottom`}>
             <div className="max-w-2xl mx-auto w-full">
+
+              {/* Image preview */}
               {selectedImage&&(
                 <div className="mb-2.5 flex items-start gap-2">
                   <div className="relative">
@@ -2191,13 +2322,19 @@ export default function Home() {
                   <p className={`text-[10px] mt-1 ${t.sub}`}>📎 Image attached</p>
                 </div>
               )}
+
+              {/* Row */}
               <div className="flex items-end gap-2">
+
+                {/* Attach */}
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
                 <button onClick={()=>fileInputRef.current?.click()} disabled={isLoading} title="Attach image"
                   className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all disabled:opacity-40 active:scale-90 ${selectedImage?'text-white':''+t.btnS}`}
                   style={selectedImage?{background:`${t.glow}18`,outline:`1px solid ${t.glow}35`}:{}}>
                   <Paperclip size={16}/>
                 </button>
+
+                {/* Voice */}
                 <button
                   onMouseDown={startRecording} onMouseUp={stopRecording}
                   onTouchStart={e=>{e.preventDefault();startRecording();}}
@@ -2206,6 +2343,8 @@ export default function Home() {
                   className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all disabled:opacity-40 active:scale-90 ${isRecording?'bg-red-500/80 border border-red-400/50 text-white shadow-lg shadow-red-500/25 animate-pulse':t.btnS}`}>
                   {isRecording?<MicOff size={16}/>:<Mic size={16}/>}
                 </button>
+
+                {/* Textarea */}
                 <div className="flex-1 relative">
                   <textarea
                     ref={textareaRef}
@@ -2223,6 +2362,8 @@ export default function Home() {
                     <span className={`absolute right-3 bottom-2 text-[9px] ${t.sub}`}>{input.length}</span>
                   )}
                 </div>
+
+                {/* Send */}
                 <button onClick={()=>sendMessage()}
                   disabled={(!input.trim()&&!selectedImage)||isLoading}
                   title={sendOnEnter?'Send (Enter)':'Send'}
@@ -2232,13 +2373,17 @@ export default function Home() {
                     :<Send size={16}/>}
                 </button>
               </div>
+
+              {/* Hint bar */}
               <div className="flex items-center justify-between mt-1.5 px-1">
                 <p className={`text-[9px] ${t.sub}`}>
                   {isRecording?'🎤 Listening…':sendOnEnter?'Enter to send · Shift+Enter new line':'Click ➤ to send'}
                 </p>
                 <div className="flex items-center gap-3">
                   {autoSearch&&!isCreatorMode&&(
-                    <span className={`text-[9px] ${t.sub} flex items-center gap-1`}><span>🔍</span>Web search on</span>
+                    <span className={`text-[9px] ${t.sub} flex items-center gap-1`}>
+                      <span>🔍</span>Web search on
+                    </span>
                   )}
                   {isCreatorMode&&(
                     <span className="text-[9px] text-pink-400/60 flex items-center gap-1">
@@ -2253,39 +2398,42 @@ export default function Home() {
       </main>
 
       {/* ═══════════════════════════════════════════════════════════════════
-          RIGHT DASHBOARD PANEL — desktop only, no mobile sidebar
+          RIGHT WELLNESS PANEL — desktop only, no mobile overlay
       ═══════════════════════════════════════════════════════════════════ */}
-      {showDashboard && isCreatorMode && (
-        <aside className={`hidden md:flex flex-shrink-0 flex-col h-screen overflow-hidden border-l w-[210px] ${t.panel}`}>
+      {showDashboard&&isCreatorMode&&(
+        <aside className={`hidden md:flex flex-col flex-shrink-0 h-screen overflow-hidden border-l w-[210px] transition-all duration-300 ${t.panel}`}>
           {/* Header */}
           <div className={`flex-shrink-0 flex items-center justify-between px-3 py-2.5 border-b ${t.div}`}>
             <div className="flex items-center gap-1.5">
               <Sparkles size={11} style={{color:t.glow}}/>
               <span className={`text-[11px] font-black tracking-wide ${t.accent}`}>Focus</span>
             </div>
+            <button onClick={()=>setShowDashboard(false)} className="p-1 rounded-lg hover:bg-white/8 transition-colors">
+              <X size={12} className={t.sub}/>
+            </button>
           </div>
 
           {/* Mood strip */}
           <div className={`flex-shrink-0 mx-2.5 mt-2 mb-0 px-2.5 py-2 rounded-xl flex items-center gap-2 ${t.card}`}
             style={{border:`1px solid ${t.glow}18`}}>
             <div className="w-6 h-6 rounded-lg overflow-hidden flex-shrink-0 border" style={{borderColor:`${t.glow}35`}}>
-              <img src={selectedAvatar.path} alt={selectedAvatar.name} className="w-full h-full object-cover"
-                onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}}/>
+              <img src={selectedAvatar.path} alt={selectedAvatar.name} className="w-full h-full object-cover" onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}}/>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[9px] font-bold truncate" style={{color:t.glow}}>TESSA 💝</p>
+              <p className="text-[9px] font-bold truncate" style={{color:t.glow}}>TESSA {isCreatorMode&&'💝'}</p>
               <p className={`text-[8px] truncate ${t.sub}`}>{moodEmoji} {moodLabel}</p>
             </div>
           </div>
 
           <div className="flex-1 overflow-y-auto px-2.5 py-2.5 space-y-2">
+            {/* Memory */}
             <div className={`rounded-xl p-2.5 ${t.card}`}>
               <div className="flex items-center justify-between mb-1.5">
                 <div className="flex items-center gap-1.5">
                   <Brain size={10} style={{color:t.glow}}/>
                   <span className={`text-[10px] font-bold ${t.accent}`}>Memory</span>
                 </div>
-                <span className="text-[8px] font-semibold px-1.5 py-0.5 rounded-full"
+                <span className={`text-[8px] font-semibold px-1.5 py-0.5 rounded-full`}
                   style={{background:`${t.glow}15`,color:t.glow}}>{getAllMemories().length}</span>
               </div>
               <button onClick={()=>{if(confirm('Clear all memories?')) clearAllMemories();}}
@@ -2299,17 +2447,22 @@ export default function Home() {
 
       {/* ── FLOATING STUDY TIMER ── */}
       {showTimerFloat && (
-        <StudyTimer floating onClose={() => setShowTimerFloat(false)} defaultMinutes={25} />
+        <StudyTimer
+          floating
+          onClose={() => setShowTimerFloat(false)}
+          defaultMinutes={25}
+        />
       )}
 
       {/* ── FLOATING INSIGHTS PANEL ── */}
       {insightsOpen && isCreatorMode && (
         <>
+          {/* Full backdrop — blurs chat completely */}
           <div className="fixed inset-0 z-[48]"
             style={{background:'rgba(0,0,0,0.55)',backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)'}}
             onClick={()=>setInsightsOpen(false)}/>
           <div className="fixed bottom-[76px] left-1/2 z-[49]"
-            style={{transform:'translateX(-50%)',width:'min(420px,94vw)',animation:'popUpFromBottom 0.3s cubic-bezier(0.34,1.4,0.64,1)',willChange:'transform,opacity'}}>
+            style={{transform:'translateX(-50%)',width:'min(420px,94vw)',animation:'floatIn 0.28s cubic-bezier(0.22,1,0.36,1)',willChange:'transform,opacity'}}>
             <div className="rounded-2xl overflow-hidden"
               style={{
                 background: t.isLight ? 'rgba(255,255,255,0.99)' : 'rgba(8,10,28,0.99)',
@@ -2317,6 +2470,7 @@ export default function Home() {
                 boxShadow: `0 0 0 1px ${t.glow}15, 0 -8px 60px rgba(0,0,0,0.8), 0 0 36px ${t.glow}20`,
                 backdropFilter: 'blur(32px)',
               }}>
+              {/* Header */}
               <div className="flex items-center justify-between px-4 py-3"
                 style={{borderBottom:`1px solid ${t.glow}20`,background: t.isLight ? `linear-gradient(135deg, white, ${t.glow}08)` : `linear-gradient(135deg, rgba(255,255,255,0.04), ${t.glow}10)`}}>
                 <div className="flex items-center gap-2.5">
@@ -2342,18 +2496,6 @@ export default function Home() {
         </>
       )}
 
-      {/* ── DELETE CONFIRMATION MODAL ── */}
-      {deleteTarget && (
-        <DeleteConfirmModal
-          title={deleteTarget.title}
-          onConfirm={confirmDeleteConversation}
-          onCancel={() => setDeleteTarget(null)}
-          isCreator={isCreatorMode}
-          glow={t.glow}
-          t={t}
-        />
-      )}
-
       {/* ── MODALS ── */}
       {showSecretModal&&<SecretVerification onSuccess={unlockCreatorModeAction} onClose={()=>setShowSecretModal(false)}/>}
       {showAvatarModal&&(
@@ -2368,7 +2510,8 @@ export default function Home() {
                   <h3 className={`font-bold text-xl ${t.text}`}>Choose Avatar</h3>
                   <p className={`text-sm mt-0.5 ${t.sub}`}>Select Tessa's visual style — 10 unique avatars</p>
                 </div>
-                <button onClick={()=>setShowAvatarModal(false)} className={`p-2 rounded-xl hover:bg-white/10 ${t.sub}`}>
+                <button onClick={()=>setShowAvatarModal(false)}
+                  className={`p-2 rounded-xl hover:bg-white/10 ${t.sub}`}>
                   <X size={20}/>
                 </button>
               </div>
@@ -2378,7 +2521,7 @@ export default function Home() {
                   return (
                     <button key={av.id}
                       onClick={()=>{setAvatarId(av.id);lsSet('tessa-avatar',av.id);setShowAvatarModal(false);}}
-                      className="group relative aspect-square rounded-2xl overflow-hidden transition-all hover:scale-105 active:scale-95"
+                      className={`group relative aspect-square rounded-2xl overflow-hidden transition-all hover:scale-105 active:scale-95`}
                       style={{boxShadow:isCurrent?`0 0 0 3px ${t.glow}, 0 0 24px ${t.glow}40`:'0 2px 12px rgba(0,0,0,0.2)'}}>
                       <img src={av.path} alt={av.name} className="absolute inset-0 w-full h-full object-cover"
                         onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}}/>
@@ -2410,7 +2553,10 @@ export default function Home() {
       {showAuthModal && (
         <AuthModal
           onClose={() => setShowAuthModal(false)}
-          onSuccess={() => { setShowAuthModal(false); checkAuth(); }}
+          onSuccess={() => {
+            setShowAuthModal(false);
+            checkAuth();
+          }}
         />
       )}
     </div>

@@ -1993,7 +1993,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="px-4 pb-4 pt-3 overflow-y-auto" style={{maxHeight:'55vh'}}>
-                  <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion} isLight={t.isLight} accentColor={isCreatorMode ? t.glowC : t.glow}/>
+                  <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion} isLight={t.isLight} accentColor={t.glow}/>
                 </div>
               </div>
             </div>

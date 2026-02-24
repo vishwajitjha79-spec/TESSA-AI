@@ -109,12 +109,12 @@ const AVATARS: AvatarDef[] = [
 const THEMES = {
   dark: {
     bg:'bg-[#050816]', bgC:'bg-[#0b0418]',
-    panel:'bg-[#090c1d]/85 backdrop-blur-xl border-white/[0.05]',
-    panelC:'bg-[#0e0420]/85 backdrop-blur-xl border-pink-500/[0.08]',
-    header:'bg-black/45 backdrop-blur-2xl border-b border-white/[0.06]',
-    headerC:'bg-black/55 backdrop-blur-2xl border-b border-pink-500/[0.10]',
-    bar:'bg-black/40 backdrop-blur-2xl border-t border-white/[0.06]',
-    barC:'bg-black/50 backdrop-blur-2xl border-t border-pink-500/[0.10]',
+    panel:'bg-[#090c1d]/85 backdrop-blur-md border-white/[0.05]',
+    panelC:'bg-[#0e0420]/85 backdrop-blur-md border-pink-500/[0.08]',
+    header:'bg-black/45 backdrop-blur-md border-b border-white/[0.06]',
+    headerC:'bg-black/55 backdrop-blur-md border-b border-pink-500/[0.10]',
+    bar:'bg-black/40 backdrop-blur-md border-t border-white/[0.06]',
+    barC:'bg-black/50 backdrop-blur-md border-t border-pink-500/[0.10]',
     msgU:'bg-gradient-to-br from-[#0d2040] to-[#08152a] border border-cyan-500/[0.14] border-l-[3px] border-l-cyan-500',
     msgUC:'bg-gradient-to-br from-[#1e0635] to-[#120418] border border-pink-500/[0.14] border-l-[3px] border-l-pink-500',
     msgA:'bg-gradient-to-br from-[#07101e] to-[#050b16] border border-violet-500/[0.09] border-l-[3px] border-l-violet-500/60',
@@ -134,8 +134,8 @@ const THEMES = {
     activeC:'bg-pink-500/[0.09] border border-pink-500/[0.18]',
     div:'border-white/[0.05]', divC:'border-pink-500/[0.07]',
     // Settings panel — uses CSS vars via isLight flag
-    settBg:'bg-[#07091a]/96 backdrop-blur-2xl border-t border-white/[0.07]',
-    settBgC:'bg-[#0d0320]/96 backdrop-blur-2xl border-t border-pink-500/[0.09]',
+    settBg:'bg-[#07091a]/96 backdrop-blur-md border-t border-white/[0.07]',
+    settBgC:'bg-[#0d0320]/96 backdrop-blur-md border-t border-pink-500/[0.09]',
     // Settings text (dark mode is always white-ish)
     settText:'text-white/75', settTextHover:'hover:text-white',
     settSub:'text-white/28', settLabel:'text-white/20',
@@ -145,12 +145,12 @@ const THEMES = {
   },
   light: {
     bg:'bg-[#f0f4ff]', bgC:'bg-[#fff0f5]',
-    panel:'bg-white/85 backdrop-blur-xl border-slate-200/70',
-    panelC:'bg-rose-50/90 backdrop-blur-xl border-pink-200/60',
-    header:'bg-white/80 backdrop-blur-2xl border-b border-slate-200/60 shadow-sm shadow-slate-900/[0.04]',
-    headerC:'bg-white/80 backdrop-blur-2xl border-b border-pink-200/50 shadow-sm shadow-pink-500/[0.04]',
-    bar:'bg-white/88 backdrop-blur-2xl border-t border-slate-200/60 shadow-sm shadow-slate-900/[0.03]',
-    barC:'bg-white/88 backdrop-blur-2xl border-t border-pink-200/50',
+    panel:'bg-white/85 backdrop-blur-md border-slate-200/70',
+    panelC:'bg-rose-50/90 backdrop-blur-md border-pink-200/60',
+    header:'bg-white/80 backdrop-blur-md border-b border-slate-200/60 shadow-sm shadow-slate-900/[0.04]',
+    headerC:'bg-white/80 backdrop-blur-md border-b border-pink-200/50 shadow-sm shadow-pink-500/[0.04]',
+    bar:'bg-white/88 backdrop-blur-md border-t border-slate-200/60 shadow-sm shadow-slate-900/[0.03]',
+    barC:'bg-white/88 backdrop-blur-md border-t border-pink-200/50',
     msgU:'bg-gradient-to-br from-sky-50 to-cyan-50/50 border border-cyan-200/55 border-l-[3px] border-l-cyan-400',
     msgUC:'bg-gradient-to-br from-pink-50 to-rose-50/50 border border-pink-200/55 border-l-[3px] border-l-pink-400',
     msgA:'bg-white/80 border border-slate-200/60 border-l-[3px] border-l-violet-400',
@@ -169,8 +169,8 @@ const THEMES = {
     active:'bg-cyan-50 border border-cyan-300',
     activeC:'bg-pink-50 border border-pink-300',
     div:'border-slate-200/60', divC:'border-pink-200/50',
-    settBg:'bg-white/97 backdrop-blur-2xl border-t border-slate-200',
-    settBgC:'bg-white/97 backdrop-blur-2xl border-t border-pink-200',
+    settBg:'bg-white/97 backdrop-blur-md border-t border-slate-200',
+    settBgC:'bg-white/97 backdrop-blur-md border-t border-pink-200',
     // Settings text (light mode — must use dark colours!)
     settText:'text-slate-700', settTextHover:'hover:text-slate-900',
     settSub:'text-slate-400', settLabel:'text-slate-400',
@@ -180,12 +180,12 @@ const THEMES = {
   },
   cyberpunk: {
     bg:'bg-[#06000f]', bgC:'bg-[#0f0018]',
-    panel:'bg-purple-950/30 backdrop-blur-xl border-purple-500/[0.11]',
-    panelC:'bg-pink-950/30 backdrop-blur-xl border-pink-500/[0.11]',
-    header:'bg-black/70 backdrop-blur-2xl border-b border-purple-500/[0.16]',
-    headerC:'bg-black/70 backdrop-blur-2xl border-b border-pink-500/[0.16]',
-    bar:'bg-black/60 backdrop-blur-2xl border-t border-purple-500/[0.16]',
-    barC:'bg-black/60 backdrop-blur-2xl border-t border-pink-500/[0.16]',
+    panel:'bg-purple-950/30 backdrop-blur-md border-purple-500/[0.11]',
+    panelC:'bg-pink-950/30 backdrop-blur-md border-pink-500/[0.11]',
+    header:'bg-black/70 backdrop-blur-md border-b border-purple-500/[0.16]',
+    headerC:'bg-black/70 backdrop-blur-md border-b border-pink-500/[0.16]',
+    bar:'bg-black/60 backdrop-blur-md border-t border-purple-500/[0.16]',
+    barC:'bg-black/60 backdrop-blur-md border-t border-pink-500/[0.16]',
     msgU:'bg-gradient-to-br from-purple-950/55 to-violet-950/28 border border-purple-500/[0.16] border-l-[3px] border-l-purple-400',
     msgUC:'bg-gradient-to-br from-pink-950/55 to-rose-950/28 border border-pink-500/[0.16] border-l-[3px] border-l-pink-400',
     msgA:'bg-gradient-to-br from-black/65 to-purple-950/18 border border-cyan-500/[0.09] border-l-[3px] border-l-cyan-400/70',
@@ -204,8 +204,8 @@ const THEMES = {
     active:'bg-purple-500/[0.11] border border-purple-500/[0.22]',
     activeC:'bg-pink-500/[0.11] border border-pink-500/[0.22]',
     div:'border-purple-500/[0.07]', divC:'border-pink-500/[0.07]',
-    settBg:'bg-[#09001a]/96 backdrop-blur-2xl border-t border-purple-500/[0.11]',
-    settBgC:'bg-[#140010]/96 backdrop-blur-2xl border-t border-pink-500/[0.11]',
+    settBg:'bg-[#09001a]/96 backdrop-blur-md border-t border-purple-500/[0.11]',
+    settBgC:'bg-[#140010]/96 backdrop-blur-md border-t border-pink-500/[0.11]',
     settText:'text-purple-100/75', settTextHover:'hover:text-purple-50',
     settSub:'text-purple-300/30', settLabel:'text-purple-300/20',
     settCard:'bg-purple-950/[0.25] border border-purple-500/[0.12]',
@@ -214,12 +214,12 @@ const THEMES = {
   },
   ocean: {
     bg:'bg-[#020d1a]', bgC:'bg-[#070820]',
-    panel:'bg-blue-950/28 backdrop-blur-xl border-blue-500/[0.11]',
-    panelC:'bg-indigo-950/28 backdrop-blur-xl border-indigo-500/[0.11]',
-    header:'bg-black/50 backdrop-blur-2xl border-b border-teal-500/[0.13]',
-    headerC:'bg-black/50 backdrop-blur-2xl border-b border-purple-500/[0.13]',
-    bar:'bg-black/46 backdrop-blur-2xl border-t border-teal-500/[0.13]',
-    barC:'bg-black/46 backdrop-blur-2xl border-t border-purple-500/[0.13]',
+    panel:'bg-blue-950/28 backdrop-blur-md border-blue-500/[0.11]',
+    panelC:'bg-indigo-950/28 backdrop-blur-md border-indigo-500/[0.11]',
+    header:'bg-black/50 backdrop-blur-md border-b border-teal-500/[0.13]',
+    headerC:'bg-black/50 backdrop-blur-md border-b border-purple-500/[0.13]',
+    bar:'bg-black/46 backdrop-blur-md border-t border-teal-500/[0.13]',
+    barC:'bg-black/46 backdrop-blur-md border-t border-purple-500/[0.13]',
     msgU:'bg-gradient-to-br from-blue-950/65 to-teal-950/38 border border-teal-500/[0.14] border-l-[3px] border-l-teal-400',
     msgUC:'bg-gradient-to-br from-indigo-950/65 to-purple-950/38 border border-purple-500/[0.14] border-l-[3px] border-l-purple-400',
     msgA:'bg-gradient-to-br from-slate-950/65 to-blue-950/22 border border-blue-500/[0.09] border-l-[3px] border-l-blue-400/70',
@@ -238,8 +238,8 @@ const THEMES = {
     active:'bg-teal-500/[0.09] border border-teal-500/[0.20]',
     activeC:'bg-purple-500/[0.09] border border-purple-500/[0.20]',
     div:'border-blue-500/[0.06]', divC:'border-purple-500/[0.06]',
-    settBg:'bg-[#030e1c]/96 backdrop-blur-2xl border-t border-teal-500/[0.09]',
-    settBgC:'bg-[#070820]/96 backdrop-blur-2xl border-t border-purple-500/[0.09]',
+    settBg:'bg-[#030e1c]/96 backdrop-blur-md border-t border-teal-500/[0.09]',
+    settBgC:'bg-[#070820]/96 backdrop-blur-md border-t border-purple-500/[0.09]',
     settText:'text-blue-100/75', settTextHover:'hover:text-blue-50',
     settSub:'text-blue-300/30', settLabel:'text-blue-300/20',
     settCard:'bg-blue-950/[0.28] border border-blue-500/[0.12]',
@@ -248,12 +248,12 @@ const THEMES = {
   },
   sunset: {
     bg:'bg-[#110805]', bgC:'bg-[#17080f]',
-    panel:'bg-orange-950/24 backdrop-blur-xl border-orange-500/[0.11]',
-    panelC:'bg-rose-950/24 backdrop-blur-xl border-rose-500/[0.11]',
-    header:'bg-black/50 backdrop-blur-2xl border-b border-orange-500/[0.13]',
-    headerC:'bg-black/50 backdrop-blur-2xl border-b border-rose-500/[0.13]',
-    bar:'bg-black/46 backdrop-blur-2xl border-t border-orange-500/[0.13]',
-    barC:'bg-black/46 backdrop-blur-2xl border-t border-rose-500/[0.13]',
+    panel:'bg-orange-950/24 backdrop-blur-md border-orange-500/[0.11]',
+    panelC:'bg-rose-950/24 backdrop-blur-md border-rose-500/[0.11]',
+    header:'bg-black/50 backdrop-blur-md border-b border-orange-500/[0.13]',
+    headerC:'bg-black/50 backdrop-blur-md border-b border-rose-500/[0.13]',
+    bar:'bg-black/46 backdrop-blur-md border-t border-orange-500/[0.13]',
+    barC:'bg-black/46 backdrop-blur-md border-t border-rose-500/[0.13]',
     msgU:'bg-gradient-to-br from-orange-950/65 to-amber-950/28 border border-orange-500/[0.14] border-l-[3px] border-l-orange-400',
     msgUC:'bg-gradient-to-br from-rose-950/65 to-pink-950/28 border border-rose-500/[0.14] border-l-[3px] border-l-rose-400',
     msgA:'bg-gradient-to-br from-stone-950/65 to-orange-950/14 border border-amber-500/[0.09] border-l-[3px] border-l-amber-400/70',
@@ -272,8 +272,8 @@ const THEMES = {
     active:'bg-orange-500/[0.09] border border-orange-500/[0.20]',
     activeC:'bg-rose-500/[0.09] border border-rose-500/[0.20]',
     div:'border-orange-500/[0.06]', divC:'border-rose-500/[0.06]',
-    settBg:'bg-[#120905]/96 backdrop-blur-2xl border-t border-orange-500/[0.09]',
-    settBgC:'bg-[#180810]/96 backdrop-blur-2xl border-t border-rose-500/[0.09]',
+    settBg:'bg-[#120905]/96 backdrop-blur-md border-t border-orange-500/[0.09]',
+    settBgC:'bg-[#180810]/96 backdrop-blur-md border-t border-rose-500/[0.09]',
     settText:'text-orange-100/75', settTextHover:'hover:text-orange-50',
     settSub:'text-orange-300/30', settLabel:'text-orange-300/20',
     settCard:'bg-orange-950/[0.26] border border-orange-500/[0.12]',
@@ -283,12 +283,12 @@ const THEMES = {
   // ── PASTEL: dreamy soft lavender light theme ──────────────────────────────
   pastel: {
     bg:'bg-[#f3efff]', bgC:'bg-[#fdf0ff]',
-    panel:'bg-white/80 backdrop-blur-xl border-violet-200/60',
-    panelC:'bg-fuchsia-50/85 backdrop-blur-xl border-fuchsia-200/55',
-    header:'bg-white/72 backdrop-blur-2xl border-b border-violet-200/50 shadow-sm shadow-violet-100/40',
-    headerC:'bg-white/72 backdrop-blur-2xl border-b border-fuchsia-200/50 shadow-sm shadow-fuchsia-100/40',
-    bar:'bg-white/78 backdrop-blur-2xl border-t border-violet-200/50 shadow-sm shadow-violet-100/30',
-    barC:'bg-white/78 backdrop-blur-2xl border-t border-fuchsia-200/50',
+    panel:'bg-white/80 backdrop-blur-md border-violet-200/60',
+    panelC:'bg-fuchsia-50/85 backdrop-blur-md border-fuchsia-200/55',
+    header:'bg-white/72 backdrop-blur-md border-b border-violet-200/50 shadow-sm shadow-violet-100/40',
+    headerC:'bg-white/72 backdrop-blur-md border-b border-fuchsia-200/50 shadow-sm shadow-fuchsia-100/40',
+    bar:'bg-white/78 backdrop-blur-md border-t border-violet-200/50 shadow-sm shadow-violet-100/30',
+    barC:'bg-white/78 backdrop-blur-md border-t border-fuchsia-200/50',
     msgU:'bg-gradient-to-br from-violet-100/80 to-purple-50/60 border border-violet-300/50 border-l-[3px] border-l-violet-500',
     msgUC:'bg-gradient-to-br from-fuchsia-100/80 to-pink-50/60 border border-fuchsia-300/50 border-l-[3px] border-l-fuchsia-500',
     msgA:'bg-white/85 border border-violet-100/70 border-l-[3px] border-l-purple-300',
@@ -307,8 +307,8 @@ const THEMES = {
     active:'bg-violet-100 border border-violet-300',
     activeC:'bg-fuchsia-100 border border-fuchsia-300',
     div:'border-violet-200/50', divC:'border-fuchsia-200/50',
-    settBg:'bg-white/96 backdrop-blur-2xl border-t border-violet-200',
-    settBgC:'bg-white/96 backdrop-blur-2xl border-t border-fuchsia-200',
+    settBg:'bg-white/96 backdrop-blur-md border-t border-violet-200',
+    settBgC:'bg-white/96 backdrop-blur-md border-t border-fuchsia-200',
     settText:'text-slate-700', settTextHover:'hover:text-slate-900',
     settSub:'text-slate-400', settLabel:'text-slate-400',
     settCard:'bg-violet-50 border border-violet-200',
@@ -318,12 +318,12 @@ const THEMES = {
   // ── SAKURA: cherry-blossom pink light theme ──────────────────────────────
   sakura: {
     bg:'bg-[#fff2f5]', bgC:'bg-[#fff0f8]',
-    panel:'bg-white/80 backdrop-blur-xl border-rose-200/55',
-    panelC:'bg-pink-50/85 backdrop-blur-xl border-pink-200/55',
-    header:'bg-white/72 backdrop-blur-2xl border-b border-rose-200/45 shadow-sm shadow-rose-100/40',
-    headerC:'bg-white/72 backdrop-blur-2xl border-b border-pink-200/45 shadow-sm shadow-pink-100/40',
-    bar:'bg-white/78 backdrop-blur-2xl border-t border-rose-200/45 shadow-sm shadow-rose-100/30',
-    barC:'bg-white/78 backdrop-blur-2xl border-t border-pink-200/45',
+    panel:'bg-white/80 backdrop-blur-md border-rose-200/55',
+    panelC:'bg-pink-50/85 backdrop-blur-md border-pink-200/55',
+    header:'bg-white/72 backdrop-blur-md border-b border-rose-200/45 shadow-sm shadow-rose-100/40',
+    headerC:'bg-white/72 backdrop-blur-md border-b border-pink-200/45 shadow-sm shadow-pink-100/40',
+    bar:'bg-white/78 backdrop-blur-md border-t border-rose-200/45 shadow-sm shadow-rose-100/30',
+    barC:'bg-white/78 backdrop-blur-md border-t border-pink-200/45',
     msgU:'bg-gradient-to-br from-rose-100/80 to-pink-50/60 border border-rose-300/50 border-l-[3px] border-l-rose-500',
     msgUC:'bg-gradient-to-br from-pink-100/80 to-fuchsia-50/60 border border-pink-300/50 border-l-[3px] border-l-pink-500',
     msgA:'bg-white/85 border border-rose-100/70 border-l-[3px] border-l-rose-300',
@@ -342,8 +342,8 @@ const THEMES = {
     active:'bg-rose-100 border border-rose-300',
     activeC:'bg-pink-100 border border-pink-300',
     div:'border-rose-200/50', divC:'border-pink-200/50',
-    settBg:'bg-white/96 backdrop-blur-2xl border-t border-rose-200',
-    settBgC:'bg-white/96 backdrop-blur-2xl border-t border-pink-200',
+    settBg:'bg-white/96 backdrop-blur-md border-t border-rose-200',
+    settBgC:'bg-white/96 backdrop-blur-md border-t border-pink-200',
     settText:'text-slate-700', settTextHover:'hover:text-slate-900',
     settSub:'text-slate-400', settLabel:'text-slate-400',
     settCard:'bg-rose-50 border border-rose-200',
@@ -351,42 +351,44 @@ const THEMES = {
     isLight:true,
   },
   // ── ANKIT'S SPECIAL ──────────────────────────────────────────────────────
-  // Deep saffron night sky · earthy terracotta · midnight indigo
-  // Completely distinct dark theme — warm amber foregrounds on near-black background
-  // Inspired by Delhi twilight, Mughal gold lantern light, chai steam
+  // Warm aged parchment · saffron marigold · deep terracotta ink
+  // Light theme but nothing like pastel/sakura/light — those are cool whites.
+  // This is warm: think Rajasthani manuscript, marigold garlands, chai in clay cups,
+  // old Delhi evening light. Foreground is deep terracotta/brown, not slate-700.
+  // Background is warm ivory-cream, not white.
   ankit: {
-    bg:'bg-neutral-950', bgC:'bg-stone-950',
-    panel:'bg-amber-950/20 backdrop-blur-xl border-amber-700/[0.22]',
-    panelC:'bg-orange-950/20 backdrop-blur-xl border-orange-700/[0.22]',
-    header:'bg-black/55 backdrop-blur-2xl border-b border-amber-600/[0.18]',
-    headerC:'bg-black/55 backdrop-blur-2xl border-b border-orange-600/[0.18]',
-    bar:'bg-black/50 backdrop-blur-2xl border-t border-amber-600/[0.16]',
-    barC:'bg-black/50 backdrop-blur-2xl border-t border-orange-600/[0.16]',
-    msgU:'bg-gradient-to-br from-amber-950/65 to-yellow-950/30 border border-amber-500/[0.20] border-l-[3px] border-l-amber-400',
-    msgUC:'bg-gradient-to-br from-orange-950/65 to-red-950/30 border border-orange-500/[0.20] border-l-[3px] border-l-orange-400',
-    msgA:'bg-gradient-to-br from-stone-950/75 to-amber-950/20 border border-amber-800/[0.16] border-l-[3px] border-l-amber-700/55',
-    msgAC:'bg-gradient-to-br from-stone-950/75 to-orange-950/20 border border-orange-800/[0.16] border-l-[3px] border-l-orange-700/55',
-    inp:'bg-amber-950/40 border border-amber-600/[0.26] text-amber-50 placeholder:text-amber-500/38 focus:border-amber-400/55 focus:ring-2 focus:ring-amber-500/10',
-    inpC:'bg-orange-950/40 border border-orange-600/[0.26] text-orange-50 placeholder:text-orange-500/38 focus:border-orange-400/55 focus:ring-2 focus:ring-orange-500/10',
-    btnP:'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-stone-900 font-bold shadow-lg shadow-amber-500/[0.28]',
-    btnPC:'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 text-white shadow-lg shadow-orange-500/[0.28]',
-    btnS:'bg-amber-900/30 hover:bg-amber-800/45 border border-amber-600/[0.26] text-amber-300 hover:text-amber-100',
-    btnSC:'bg-orange-900/30 hover:bg-orange-800/45 border border-orange-600/[0.26] text-orange-300 hover:text-orange-100',
-    text:'text-amber-50', sub:'text-amber-400/65', subC:'text-orange-400/65',
-    accent:'text-amber-300', accentC:'text-orange-300',
-    glow:'#f59e0b', glowC:'#f97316',
-    card:'bg-amber-950/25 border border-amber-700/[0.18]',
-    cardC:'bg-orange-950/25 border border-orange-700/[0.18]',
-    active:'bg-amber-500/[0.13] border border-amber-400/[0.32]',
-    activeC:'bg-orange-500/[0.13] border border-orange-400/[0.32]',
-    div:'border-amber-700/[0.16]', divC:'border-orange-700/[0.16]',
-    settBg:'bg-neutral-950/98 backdrop-blur-2xl border-t border-amber-700/[0.20]',
-    settBgC:'bg-stone-950/98 backdrop-blur-2xl border-t border-orange-700/[0.20]',
-    settText:'text-amber-100/80', settTextHover:'hover:text-amber-50',
-    settSub:'text-amber-400/50', settLabel:'text-amber-500/40',
-    settCard:'bg-amber-950/35 border border-amber-700/[0.20]',
-    settActive:'bg-amber-500/[0.15] border border-amber-400/[0.35]',
-    isLight:false,
+    bg:'bg-[#fdf6e8]', bgC:'bg-[#fef0dc]',
+    panel:'bg-[#fef3d0]/90 backdrop-blur-md border-amber-400/40',
+    panelC:'bg-[#fff0d8]/90 backdrop-blur-md border-orange-400/38',
+    header:'bg-[#fdf6e8]/85 backdrop-blur-md border-b border-amber-400/35',
+    headerC:'bg-[#fef0dc]/85 backdrop-blur-md border-b border-orange-400/32',
+    bar:'bg-[#fdf6e8]/88 backdrop-blur-md border-t border-amber-400/30',
+    barC:'bg-[#fef0dc]/88 backdrop-blur-md border-t border-orange-400/28',
+    msgU:'bg-gradient-to-br from-amber-100/90 to-yellow-50/70 border border-amber-400/45 border-l-[3px] border-l-amber-600',
+    msgUC:'bg-gradient-to-br from-orange-100/90 to-amber-50/70 border border-orange-400/45 border-l-[3px] border-l-orange-600',
+    msgA:'bg-white/75 border border-amber-200/60 border-l-[3px] border-l-amber-400/70',
+    msgAC:'bg-white/75 border border-orange-200/60 border-l-[3px] border-l-orange-400/70',
+    inp:'bg-white/80 border border-amber-400/40 text-amber-950 placeholder:text-amber-500/55 focus:border-amber-500/70 focus:ring-2 focus:ring-amber-400/18',
+    inpC:'bg-white/80 border border-orange-400/40 text-orange-950 placeholder:text-orange-500/55 focus:border-orange-500/70 focus:ring-2 focus:ring-orange-400/18',
+    btnP:'bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white shadow-md shadow-amber-500/35',
+    btnPC:'bg-gradient-to-r from-orange-600 to-amber-700 hover:from-orange-700 hover:to-amber-800 text-white shadow-md shadow-orange-500/35',
+    btnS:'bg-amber-100 hover:bg-amber-200 border border-amber-400/50 text-amber-900 hover:text-amber-950',
+    btnSC:'bg-orange-100 hover:bg-orange-200 border border-orange-400/50 text-orange-900 hover:text-orange-950',
+    text:'text-amber-950', sub:'text-amber-700/70', subC:'text-orange-700/70',
+    accent:'text-amber-800', accentC:'text-orange-800',
+    glow:'#b45309', glowC:'#c2410c',
+    card:'bg-amber-50/80 border border-amber-300/55',
+    cardC:'bg-orange-50/80 border border-orange-300/55',
+    active:'bg-amber-200/70 border border-amber-500/55',
+    activeC:'bg-orange-200/70 border border-orange-500/55',
+    div:'border-amber-300/45', divC:'border-orange-300/45',
+    settBg:'bg-[#fdf6e8]/97 backdrop-blur-md border-t border-amber-400/35',
+    settBgC:'bg-[#fef0dc]/97 backdrop-blur-md border-t border-orange-400/32',
+    settText:'text-amber-950', settTextHover:'hover:text-amber-900',
+    settSub:'text-amber-700/60', settLabel:'text-amber-600/55',
+    settCard:'bg-amber-100/70 border border-amber-300/55',
+    settActive:'bg-amber-200/80 border border-amber-500/55',
+    isLight:true,
   },
 } as const;
 
@@ -420,8 +422,8 @@ function useT(theme: Theme, c: boolean) {
 // ─────────────────────────────────────────────────────────────────────────────
 function getSolidBg(t: ReturnType<typeof useT>) {
   return t.isLight
-    ? 'bg-white/98 backdrop-blur-2xl'
-    : 'bg-[#080510]/98 backdrop-blur-2xl';
+    ? 'bg-white/98 backdrop-blur-md'
+    : 'bg-[#080510]/98 backdrop-blur-md';
 }
 
 // Per-theme solid popup background color (used inline for heavy popups)
@@ -430,7 +432,7 @@ const THEME_POPUP_BG: Record<string, string> = {
   cyberpunk: 'rgba(3,2,18,0.98)',
   ocean:     'rgba(2,8,28,0.98)',
   sunset:    'rgba(12,6,3,0.98)',
-  ankit:     'rgba(14,8,0,0.98)',
+  ankit:     'rgba(253,246,232,0.99)',
   light:     'rgba(255,255,255,0.99)',
   pastel:    'rgba(255,255,255,0.99)',
   sakura:    'rgba(255,255,255,0.99)',
@@ -498,94 +500,77 @@ async function pullCreatorSync(userId: string): Promise<boolean> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Beautiful animated background — works for all dark themes
-function AuroraBg({ glow, glow2, theme }: { glow: string; glow2: string; theme: Theme }) {
-  // Ankit theme gets its own earthy saffron–indigo aurora
-  if (theme === 'ankit') {
-    return (
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-        {/* Deep earthy base layer */}
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse 85% 65% at 15% 10%, #92400e40 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 80%, #7c2d1240 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 50% 40%, #78350f25 0%, transparent 65%)',
-        }} />
-        {/* Saffron glow — top left */}
-        <div className="absolute rounded-full blur-[200px] animate-aurora-a"
-          style={{ width:700, height:700, background:'#f59e0b', opacity:0.10, top:'-20%', left:'-10%' }} />
-        {/* Terracotta — right */}
-        <div className="absolute rounded-full blur-[160px] animate-aurora-b"
-          style={{ width:500, height:500, background:'#f97316', opacity:0.07, top:'25%', right:'-12%' }} />
-        {/* Deep indigo base glow */}
-        <div className="absolute rounded-full blur-[180px] animate-aurora-c"
-          style={{ width:450, height:300, background:'#4338ca', opacity:0.06, bottom:'0%', left:'30%' }} />
-        {/* Subtle gold sparkle grid */}
-        <div className="absolute inset-0" style={{
-          backgroundImage:`radial-gradient(circle, #f59e0b18 1px, transparent 1px)`,
-          backgroundSize:'44px 44px', opacity:0.55,
-        }} />
-        {/* Vignette */}
-        <div className="absolute inset-0" style={{
-          background:`radial-gradient(ellipse at 50% 0%, transparent 35%, rgba(0,0,0,0.65) 100%)`,
-        }} />
-      </div>
-    );
-  }
+// On mobile: static gradient only (no animated blobs = no GPU thrash)
+// On desktop: full animated aurora
+function AuroraBg({ glow, glow2 }: { glow: string; glow2: string; theme: Theme }) {
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-      <div className="absolute rounded-full blur-[180px] animate-aurora-a"
-        style={{ width:800, height:800, background:glow, opacity:0.07, top:'-25%', left:'-10%' }} />
-      <div className="absolute rounded-full blur-[140px] animate-aurora-b"
-        style={{ width:600, height:600, background:glow2, opacity:0.055, top:'30%', right:'-12%' }} />
-      <div className="absolute rounded-full blur-[120px] animate-aurora-c"
-        style={{ width:400, height:400, background:glow, opacity:0.045, bottom:'-8%', left:'40%' }} />
-      <div className="absolute rounded-full blur-[200px]"
-        style={{ width:500, height:300, background:glow2, opacity:0.03, top:'55%', left:'15%' }} />
+      {/* Static base gradient — rendered on ALL devices */}
       <div className="absolute inset-0" style={{
-        backgroundImage:`radial-gradient(circle, ${glow}16 1px, transparent 1px)`,
-        backgroundSize:'36px 36px', opacity:0.45,
+        background: `radial-gradient(ellipse 90% 70% at 15% 10%, ${glow}12 0%, transparent 55%),
+                     radial-gradient(ellipse 70% 60% at 82% 78%, ${glow2}0e 0%, transparent 55%),
+                     radial-gradient(ellipse 50% 40% at 50% 50%, ${glow}07 0%, transparent 70%)`,
+      }}/>
+      {/* Animated blobs — desktop only via CSS media query class */}
+      <div className="hidden md:block absolute rounded-full blur-[180px] animate-aurora-a"
+        style={{ width:800, height:800, background:glow, opacity:0.07, top:'-25%', left:'-10%', willChange:'transform' }} />
+      <div className="hidden md:block absolute rounded-full blur-[140px] animate-aurora-b"
+        style={{ width:600, height:600, background:glow2, opacity:0.055, top:'30%', right:'-12%', willChange:'transform' }} />
+      <div className="hidden md:block absolute rounded-full blur-[120px] animate-aurora-c"
+        style={{ width:400, height:400, background:glow, opacity:0.045, bottom:'-8%', left:'40%', willChange:'transform' }} />
+      {/* Dot grid — light enough for both */}
+      <div className="absolute inset-0" style={{
+        backgroundImage:`radial-gradient(circle, ${glow}14 1px, transparent 1px)`,
+        backgroundSize:'40px 40px', opacity:0.40,
       }} />
+      {/* Bottom vignette */}
       <div className="absolute inset-0" style={{
-        background:`radial-gradient(ellipse at 50% 0%, transparent 40%, rgba(0,0,0,0.55) 100%)`,
+        background:`radial-gradient(ellipse at 50% 0%, transparent 40%, rgba(0,0,0,0.50) 100%)`,
       }} />
     </div>
   );
 }
 
-// Light theme: beautiful soft gradient mesh — unique per theme
+// Light theme background — mobile: pure CSS gradient; desktop: animated blobs
 function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
-  // Each light theme gets its own colour palette + soft blob shapes
   const configs: Record<string, { grad: string; blob1: string; blob2: string; blob3: string }> = {
     light: {
       grad: creator
-        ? 'radial-gradient(ellipse 80% 60% at 20% 10%, #fce7f3 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, #f3e8ff 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 50% 50%, #fff1f5 0%, transparent 70%)'
-        : 'radial-gradient(ellipse 80% 60% at 20% 10%, #dbeafe 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, #ede9fe 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 50% 50%, #f0f9ff 0%, transparent 70%)',
+        ? 'radial-gradient(ellipse 80% 60% at 20% 10%, #fce7f3 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, #f3e8ff 0%, transparent 55%)'
+        : 'radial-gradient(ellipse 80% 60% at 20% 10%, #dbeafe 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, #ede9fe 0%, transparent 55%)',
       blob1: creator ? '#fce7f3' : '#dbeafe',
       blob2: creator ? '#f3e8ff' : '#ede9fe',
       blob3: creator ? '#fdf4ff' : '#e0f2fe',
     },
     pastel: {
-      grad: 'radial-gradient(ellipse 90% 70% at 15% 5%, #ede9fe 0%, transparent 50%), radial-gradient(ellipse 70% 60% at 85% 85%, #fae8ff 0%, transparent 50%), radial-gradient(ellipse 60% 50% at 50% 50%, #f3efff 0%, transparent 65%)',
+      grad: 'radial-gradient(ellipse 90% 70% at 15% 5%, #ede9fe 0%, transparent 50%), radial-gradient(ellipse 70% 60% at 85% 85%, #fae8ff 0%, transparent 50%)',
       blob1: '#ddd6fe', blob2: '#e879f9', blob3: '#c4b5fd',
     },
     sakura: {
-      grad: 'radial-gradient(ellipse 90% 70% at 15% 5%, #ffe4e6 0%, transparent 50%), radial-gradient(ellipse 70% 60% at 88% 82%, #fce7f3 0%, transparent 50%), radial-gradient(ellipse 60% 50% at 50% 50%, #fff2f5 0%, transparent 65%)',
+      grad: 'radial-gradient(ellipse 90% 70% at 15% 5%, #ffe4e6 0%, transparent 50%), radial-gradient(ellipse 70% 60% at 88% 82%, #fce7f3 0%, transparent 50%)',
       blob1: '#fecdd3', blob2: '#f9a8d4', blob3: '#fda4af',
+    },
+    ankit: {
+      grad: creator
+        ? 'radial-gradient(ellipse 85% 65% at 12% 8%, #fde68a60 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 82%, #fed7aa50 0%, transparent 50%)'
+        : 'radial-gradient(ellipse 85% 65% at 12% 8%, #fde68a50 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 82%, #fdba7440 0%, transparent 50%)',
+      blob1: creator ? '#fcd34d' : '#fde68a',
+      blob2: creator ? '#fb923c' : '#fdba74',
+      blob3: creator ? '#fbbf24' : '#fcd34d',
     },
   };
   const cfg = configs[theme] ?? configs.light;
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-      {/* Main gradient mesh */}
+      {/* Static gradient — all devices */}
       <div className="absolute inset-0" style={{ background: cfg.grad }} />
-      {/* Animated soft blobs — distinct per theme */}
-      <div className="absolute rounded-full blur-[160px] animate-aurora-a"
-        style={{ width:500, height:500, background:cfg.blob1, opacity:0.35, top:'-10%', left:'-5%' }} />
-      <div className="absolute rounded-full blur-[130px] animate-aurora-b"
-        style={{ width:380, height:380, background:cfg.blob2, opacity:0.22, bottom:'-8%', right:'-5%' }} />
-      <div className="absolute rounded-full blur-[100px] animate-aurora-c"
-        style={{ width:260, height:260, background:cfg.blob3, opacity:0.18, top:'45%', left:'55%' }} />
-      {/* Very subtle petal / noise texture */}
-      <div className="absolute inset-0 opacity-[0.012]" style={{
-        backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-      }} />
+      {/* Animated blobs — desktop only */}
+      <div className="hidden md:block absolute rounded-full blur-[160px] animate-aurora-a"
+        style={{ width:500, height:500, background:cfg.blob1, opacity:0.30, top:'-10%', left:'-5%', willChange:'transform' }} />
+      <div className="hidden md:block absolute rounded-full blur-[130px] animate-aurora-b"
+        style={{ width:380, height:380, background:cfg.blob2, opacity:0.18, bottom:'-8%', right:'-5%', willChange:'transform' }} />
+      <div className="hidden md:block absolute rounded-full blur-[100px] animate-aurora-c"
+        style={{ width:260, height:260, background:cfg.blob3, opacity:0.14, top:'45%', left:'55%', willChange:'transform' }} />
     </div>
   );
 }
@@ -596,7 +581,7 @@ function Hearts({ on }: { on: boolean }) {
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden>
       {['5%','17%','31%','48%','62%','76%','91%'].map((left, i) => (
-        <span key={i} className="absolute text-sm opacity-0 select-none animate-float-heart"
+        <span key={i} className="float-heart absolute text-sm opacity-0 select-none animate-float-heart"
           style={{ left, bottom:'-10px', animationDelay:`${i*1.3}s`, animationDuration:`${8+i}s` }}>
           {['❤️','💕','✨','💗','🌸','💖','⭐'][i]}
         </span>
@@ -801,7 +786,7 @@ export default function Home() {
     : theme==='dark' ? '#6366f1' : theme==='cyberpunk' ? '#ec4899'
     : theme==='ocean' ? '#3b82f6' : theme==='sunset' ? '#f59e0b'
     : theme==='pastel' ? '#a855f7' : theme==='sakura' ? '#f43f5e'
-    : theme==='ankit' ? '#ea580c' : '#818cf8';
+    : theme==='ankit' ? '#d97706' : '#818cf8';
 
   const fontSizeClass = fontSize==='sm' ? 'text-xs' : fontSize==='lg' ? 'text-base' : 'text-sm';
 
@@ -1299,7 +1284,7 @@ export default function Home() {
     cyberpunk: ['#020108','#030112'],
     ocean:     ['#020c1a','#030616'],
     sunset:    ['#110805','#17080f'],
-    ankit:     ['#100a00','#120600'],
+    ankit:     ['#fdf6e8','#fef0dc'],
     light:     ['#f0f4ff','#fdf0ff'],
     pastel:    ['#f3efff','#fdf0ff'],
     sakura:    ['#fff2f5','#fff0f8'],
@@ -1361,6 +1346,22 @@ export default function Home() {
         .safe-top    { padding-top:    max(12px, env(safe-area-inset-top));    }
         .safe-bottom { padding-bottom: max(8px,  env(safe-area-inset-bottom)); }
       }
+
+      /* MOBILE PERFORMANCE */
+      @media (max-width: 767px) {
+        /* Kill backdrop blur — biggest GPU win on mobile */
+        * { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+        /* Contain each message row layout */
+        .msg-row { contain: layout style; }
+        /* No glow shadows on bubbles */
+        .msg-bubble { box-shadow: none !important; }
+        /* Snap all transitions */
+        button, input, textarea { transition-duration: 0.06s !important; }
+        /* Kill floating hearts */
+        .float-heart { display: none !important; }
+        /* No pulse on status dot */
+        .status-ping { animation: none !important; opacity: 1 !important; }
+      }
     `}</style>
 
       {/* ── BACKGROUNDS ── */}
@@ -1378,7 +1379,7 @@ export default function Home() {
       ═══════════════════════════════════════════════════════════════════ */}
       <aside
         className={`fixed md:relative inset-y-0 left-0 z-30 md:z-10 flex-shrink-0 flex flex-col h-screen border-r transition-all duration-300 ease-in-out ${t.panel} ${showSidebar ? 'w-[270px] translate-x-0' : 'w-[270px] -translate-x-full md:w-0 md:translate-x-0 overflow-hidden'}`}
-        style={{backdropFilter:'blur(24px)'}}
+        
         aria-label="Navigation"
       >
         <div className="flex flex-col h-full w-[270px]">
@@ -1599,7 +1600,7 @@ export default function Home() {
                         background:t.isLight?'rgba(255,255,255,0.95)':'rgba(8,10,24,0.95)',
                         border:`1.5px solid ${t.glow}45`,
                         boxShadow:`0 4px 18px rgba(0,0,0,0.35), 0 0 12px ${t.glow}18`,
-                        backdropFilter:'blur(14px)',
+                        backdropFilter:'blur(8px)',
                       }}>
                       <span style={{fontSize:'clamp(14px,3.5vw,22px)',lineHeight:1}}>{ico}</span>
                       <span className={`font-bold ${t.sSub}`} style={{fontSize:'clamp(7px,1.8vw,10px)',marginTop:3}}>{lbl}</span>
@@ -1618,7 +1619,7 @@ export default function Home() {
                 background:t.isLight?'rgba(255,255,255,0.98)':'rgba(7,9,20,0.98)',
                 borderTop:`1px solid ${t.glow}20`,
                 boxShadow:`0 -6px 48px rgba(0,0,0,0.45), 0 0 0 1px ${t.glow}12`,
-                backdropFilter:'blur(24px)',
+                backdropFilter:'blur(12px)',
                 animation:'slideUpSheet 0.28s cubic-bezier(0.32,0.72,0,1)',
               }}
               onClick={e=>e.stopPropagation()}>
@@ -1939,7 +1940,7 @@ export default function Home() {
                 {/* Pulsing status dot */}
                 <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-[2.5px]"
                   style={{background:t.glow,borderColor:'rgba(0,0,0,0.7)',boxShadow:`0 0 8px ${t.glow}`}}>
-                  <div className="absolute inset-0 rounded-full animate-ping" style={{background:t.glow,opacity:0.4}} />
+                  <div className="status-ping absolute inset-0 rounded-full animate-ping" style={{background:t.glow,opacity:0.4}} />
                 </div>
               </div>
 
@@ -2072,6 +2073,11 @@ export default function Home() {
                     className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium hover:bg-white/5 transition-colors"
                     style={{color:t.isLight?'#374151':'rgba(255,255,255,0.75)'}}>
                     <Calendar size={15} style={{color:t.glow}}/> Planners
+                  </button>
+                  <button onClick={()=>{setShowDashboard(p=>!p);setShowMobileMenu(false);}}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium transition-colors ${showDashboard?'':'hover:bg-white/5'}`}
+                    style={showDashboard?{color:t.glow,background:`${t.glow}12`}:{color:t.isLight?'#374151':'rgba(255,255,255,0.75)'}}>
+                    <LayoutDashboard size={15} style={{color:t.glow}}/> My Dashboard
                   </button>
                   <div style={{height:1,background:`${t.glow}15`,margin:'0 12px'}}/>
                 </>)}
@@ -2208,16 +2214,26 @@ export default function Home() {
                   return (
                     <div
                       key={msg.id}
-                      className={`flex gap-2.5 animate-fadeIn ${isUser?'justify-end':'justify-start'} ${isGrouped?'mt-0.5':'mt-2.5'} ${isUser?'pl-8 md:pl-16':'pr-8 md:pr-16'}`}
+                      className={`msg-row flex gap-2.5 ${isUser?'justify-end':'justify-start'} ${isGrouped?'mt-0.5':'mt-2.5'} ${isUser?'pl-8 md:pl-16':'pr-8 md:pr-16'}`}
                     >
-                      {/* LEFT: AI avatar (only on first in group) */}
+                      {/* LEFT: Tessa icon — clean glowing T, fits every theme */}
                       {!isUser && (
-                        <div className="flex-shrink-0 flex flex-col justify-end" style={{width:32}}>
+                        <div className="flex-shrink-0 flex flex-col justify-end" style={{width:30}}>
                           {!isGrouped && (
-                            <div className="w-8 h-8 rounded-xl overflow-hidden border flex-shrink-0 mb-0.5"
-                              style={{borderColor:`${t.glow}35`,boxShadow:animations?`0 2px 8px ${t.glow}20`:'none'}}>
-                              <img src={selectedAvatar.path} alt={selectedAvatar.name} className="w-full h-full object-cover"
-                                onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}} />
+                            <div className="w-[30px] h-[30px] rounded-xl flex-shrink-0 mb-0.5 flex items-center justify-center"
+                              style={{
+                                background:`linear-gradient(135deg,${t.glow}22,${t.glow}0a)`,
+                                border:`1.5px solid ${t.glow}38`,
+                                boxShadow:animations?`0 1px 8px ${t.glow}20`:'none',
+                              }}>
+                              <span style={{
+                                color:t.glow,
+                                fontSize:14,
+                                fontWeight:900,
+                                letterSpacing:'-0.5px',
+                                lineHeight:1,
+                                fontFamily:'inherit',
+                              }}>T</span>
                             </div>
                           )}
                         </div>
@@ -2242,7 +2258,7 @@ export default function Home() {
 
                         {/* Message card */}
                         <div
-                          className={`rounded-2xl overflow-hidden transition-all duration-300 ${isUser?t.msgU:t.msgA}`}
+                          className={`msg-bubble rounded-2xl overflow-hidden transition-all duration-300 ${isUser?t.msgU:t.msgA}`}
                           style={isLatest&&!isUser&&animations?{boxShadow:`0 4px 24px ${t.glow}15`}:{}}
                         >
                           <div className={`px-4 ${padY}`}>
@@ -2500,48 +2516,88 @@ export default function Home() {
       {showSecretModal&&<SecretVerification onSuccess={unlockCreatorModeAction} onClose={()=>setShowSecretModal(false)}/>}
       {showAvatarModal&&(
         <>
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md animate-fadeIn"
+          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
             onClick={()=>setShowAvatarModal(false)}/>
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className={`w-full max-w-3xl rounded-3xl overflow-hidden ${t.panel}`}
-              style={{boxShadow:`0 8px 48px rgba(0,0,0,0.4), 0 0 40px ${t.glow}15`}}>
-              <div className={`flex items-center justify-between px-6 py-5 border-b ${t.div}`}>
+
+          {/* Bottom sheet on mobile, centered card on desktop */}
+          <div className="fixed inset-x-0 bottom-0 z-50 md:inset-0 md:flex md:items-center md:justify-center md:p-6"
+            style={{animation:'slideUpSheet 0.28s cubic-bezier(0.32,0.72,0,1)'}}>
+
+            <div className="relative w-full md:max-w-lg rounded-t-[32px] md:rounded-3xl overflow-hidden"
+              style={{
+                background: t.isLight ? '#fafafa' : '#0d0f1e',
+                border: `1px solid ${t.glow}20`,
+                boxShadow:`0 -4px 32px rgba(0,0,0,0.45), 0 0 40px ${t.glow}08`,
+                maxHeight: '92dvh',
+                display: 'flex',
+                flexDirection: 'column',
+              }}>
+
+              {/* Drag pill */}
+              <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
+                <div className="w-9 h-1 rounded-full" style={{background:`${t.glow}35`}}/>
+              </div>
+
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-3 flex-shrink-0">
                 <div>
-                  <h3 className={`font-bold text-xl ${t.text}`}>Choose Avatar</h3>
-                  <p className={`text-sm mt-0.5 ${t.sub}`}>Select Tessa's visual style — 10 unique avatars</p>
+                  <p className="font-black text-[15px]" style={{color: t.isLight?'#111827':'rgba(255,255,255,0.92)'}}>
+                    Choose Avatar
+                  </p>
+                  <p className="text-[11px] mt-0.5" style={{color: t.isLight?'#9ca3af':'rgba(255,255,255,0.35)'}}>
+                    {AVATARS.length} styles · tap to apply
+                  </p>
                 </div>
                 <button onClick={()=>setShowAvatarModal(false)}
-                  className={`p-2 rounded-xl hover:bg-white/10 ${t.sub}`}>
-                  <X size={20}/>
+                  className="w-8 h-8 rounded-full flex items-center justify-center active:scale-90"
+                  style={{background:`${t.glow}12`, border:`1px solid ${t.glow}22`}}>
+                  <X size={14} style={{color:t.glow}}/>
                 </button>
               </div>
-              <div className="p-6 grid grid-cols-5 gap-4">
+
+              {/* Grid — scrollable, 2 cols mobile / 5 desktop */}
+              <div className="overflow-y-auto flex-1 px-4 pb-3 grid grid-cols-2 md:grid-cols-5 gap-3"
+                style={{gridAutoRows:'1fr'}}>
                 {AVATARS.map(av=>{
                   const isCurrent = avatarId===av.id;
                   return (
                     <button key={av.id}
                       onClick={()=>{setAvatarId(av.id);lsSet('tessa-avatar',av.id);setShowAvatarModal(false);}}
-                      className={`group relative aspect-square rounded-2xl overflow-hidden transition-all hover:scale-105 active:scale-95`}
-                      style={{boxShadow:isCurrent?`0 0 0 3px ${t.glow}, 0 0 24px ${t.glow}40`:'0 2px 12px rgba(0,0,0,0.2)'}}>
-                      <img src={av.path} alt={av.name} className="absolute inset-0 w-full h-full object-cover"
+                      className="group relative rounded-2xl overflow-hidden active:scale-95"
+                      style={{
+                        aspectRatio:'1',
+                        minHeight: 130,
+                        boxShadow: isCurrent ? `0 0 0 3px ${t.glow}` : 'none',
+                        border: `1.5px solid ${isCurrent ? t.glow : (t.isLight?'rgba(0,0,0,0.08)':'rgba(255,255,255,0.08)')}`,
+                        transition: 'transform 0.1s ease, border-color 0.15s ease',
+                      }}>
+                      <img src={av.path} alt={av.name}
+                        className="absolute inset-0 w-full h-full object-cover"
                         onError={e=>{(e.currentTarget as HTMLImageElement).src='/avatars/cosmic.png';}}/>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col items-center justify-end pb-3">
-                        <span className="text-2xl mb-1">{av.emoji}</span>
-                        <p className="text-xs font-bold text-white drop-shadow-lg">{av.name}</p>
-                        <p className="text-[10px] text-white/80 drop-shadow">{av.desc}</p>
+                      {/* Gradient name overlay */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-end pb-3"
+                        style={{background:'linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%)'}}>
+                        <span className="text-xl mb-0.5">{av.emoji}</span>
+                        <p className="text-[12px] font-bold text-white drop-shadow-md leading-none">{av.name}</p>
+                        <p className="text-[10px] text-white/70 mt-0.5">{av.desc}</p>
                       </div>
                       {isCurrent&&(
-                        <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white flex items-center justify-center"
-                          style={{boxShadow:`0 0 8px ${t.glow}`}}>
-                          <Check size={12} className="fill-current" style={{color:t.glow}}/>
+                        <div className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full flex items-center justify-center"
+                          style={{background:t.glow, boxShadow:`0 2px 8px ${t.glow}60`}}>
+                          <Check size={12} className="text-white"/>
                         </div>
                       )}
                     </button>
                   );
                 })}
               </div>
-              <div className={`px-6 py-3 border-t ${t.div}`}>
-                <p className={`text-[9px] text-center ${t.sub}`}>Add avatars by placing PNG files in <span className="font-mono">/public/avatars/</span></p>
+
+              {/* Safe-area bottom padding */}
+              <div className="pb-safe-bottom pb-6 md:pb-4 px-5 pt-3 border-t"
+                style={{borderColor:`${t.glow}15`}}>
+                <p className="text-[10px] text-center" style={{color:t.isLight?'#9ca3af':'rgba(255,255,255,0.25)'}}>
+                  Place PNG files in <span className="font-mono">/public/avatars/</span> to add more
+                </p>
               </div>
             </div>
           </div>

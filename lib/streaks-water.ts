@@ -196,7 +196,7 @@ export function shouldAskAboutWater(): string | null {
 
   const messages = [
     `Hey! 💧 Have you drunk any water? You're at ${wellness.water}/${wellness.waterGoal} glasses!`,
-    `Ankit... ${remaining} more glasses of water today, okay? 💦`,
+    `Time for water! ${remaining} more glasses today 💦`,
     `Water check! You've had ${wellness.water} glasses — keep going! 💙`,
     `Don't forget water! You need ${remaining} more glasses today 🥤`,
   ];
@@ -275,7 +275,7 @@ export function buildMorningBriefing(): string {
 
   const lines: string[] = [];
 
-  lines.push(`${greeting}, Ankit! 💝 Here's your daily briefing:\n`);
+  lines.push(`${greeting}, Ankit! Here's your daily briefing:\n`);
 
   if (upcomingExams.length > 0) {
     lines.push('📚 **Upcoming Exams:**');
@@ -301,10 +301,10 @@ export function buildMorningBriefing(): string {
   }
 
   const closers = [
-    "\nYou've got this today! I believe in you 💪",
-    "\nMake today count — I'm cheering for you! 🌟",
-    "\nLet's have an amazing day! I'm right here with you 💕",
-    "\nSmall steps every day — you're doing great! ✨",
+    "\nYou've got this today!",
+    "\nLet's make today count!",
+    "\nReady to have a great day!",
+    "\nLet's tackle today together!",
   ];
   lines.push(closers[Math.floor(Math.random() * closers.length)]);
 

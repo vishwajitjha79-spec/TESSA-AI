@@ -2005,7 +2005,7 @@ export default function Home() {
           <div className="max-w-2xl mx-auto w-full">
 
             {showDashboard&&isCreatorMode ? (
-              <PersonalDashboard isLight={t.isLight} accentColor={isCreatorMode ? t.glowC : t.glow} />
+              <PersonalDashboard isLight={t.isLight} accentColor={t.glow} />
             ) : (
               <div className="space-y-2.5 pb-2">
 

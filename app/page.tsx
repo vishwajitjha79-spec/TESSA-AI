@@ -2125,7 +2125,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="px-4 pb-4 pt-3 overflow-y-auto" style={{maxHeight:'55vh'}}>
-                  <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion} isLight={t.isLight} accentColor={isCreatorMode ? t.glowC : t.glow}/>
+                  <DailyWellness isCreatorMode={isCreatorMode} refreshTrigger={wellnessVersion} isLight={t.isLight} accentColor={t.glow}/>
                 </div>
               </div>
             </div>
@@ -2138,7 +2138,7 @@ export default function Home() {
 
             {showDashboard&&isCreatorMode ? (
               <div className="panel-fade">
-                <PersonalDashboard isLight={t.isLight} accentColor={isCreatorMode ? t.glowC : t.glow} />
+                <PersonalDashboard isLight={t.isLight} accentColor={t.glow} />
               </div>
             ) : (
               <div className="space-y-2.5 pb-2">

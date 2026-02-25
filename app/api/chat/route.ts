@@ -3,7 +3,6 @@ import { getChatCompletion } from '@/lib/groq';
 import { getSystemPrompt } from '@/lib/prompts';
 import { detectMoodFromText, detectMoodFromResponse } from '@/lib/mood';
 import { searchWeb, scrapeWebpage } from '@/lib/search';
-import { CREATOR_MODE_PERSONALITY } from '@/lib/personality-prompts';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -20,7 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
     }
 
-    const { messages, isCreatorMode, currentMood, needsSearch, maxTokens = 600 } = body;
+    const { messages, isCreatorMode, currentMood, needsSearch, maxTokens = 600, _systemOverride } = body;
 
     // Validation
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -36,8 +35,10 @@ export async function POST(request: NextRequest) {
       if (typeof lastMessage.content === 'string') {
         userMessage = lastMessage.content;
       } else if (Array.isArray(lastMessage.content)) {
+        // Multi-modal content (image + text)
         const textContent = lastMessage.content.find((c: any) => c.type === 'text');
         userMessage = textContent?.text || '';
+        console.log('📷 Image message detected');
       }
     } catch (contentError) {
       console.error('Error extracting user message:', contentError);
@@ -84,13 +85,15 @@ export async function POST(request: NextRequest) {
     // Prepare system prompt
     let systemPrompt;
     try {
-      systemPrompt = getSystemPrompt(isCreatorMode || false, userMessage);
+      systemPrompt = _systemOverride
+        ? String(_systemOverride)
+        : getSystemPrompt(isCreatorMode || false, userMessage);
     } catch (promptError) {
       console.error('Error generating system prompt:', promptError);
       systemPrompt = 'You are T.E.S.S.A., a helpful AI assistant.';
     }
 
-    // Prepare conversation messages
+    // Prepare conversation messages - PRESERVE multi-modal content
     const conversationMessages: Message[] = [...messages];
     if (searchContext && typeof conversationMessages[conversationMessages.length - 1].content === 'string') {
       const last = conversationMessages[conversationMessages.length - 1];
@@ -102,7 +105,7 @@ export async function POST(request: NextRequest) {
 
     const fullMessages: Message[] = [
       { role: 'system', content: systemPrompt },
-      ...conversationMessages.slice(-20),
+      ...conversationMessages.slice(-20), // Pass messages as-is to preserve image data
     ];
 
     // Call Groq API with comprehensive error handling
@@ -110,12 +113,11 @@ export async function POST(request: NextRequest) {
     try {
       groqResponse = await getChatCompletion(fullMessages, {
         temperature: 0.85 + Math.random() * 0.25,
-        maxTokens: Math.min(maxTokens, 1400), // Cap at 1400 to avoid token issues
+        maxTokens: Math.min(maxTokens, 1400),
       });
     } catch (groqError: any) {
       console.error('Groq API error:', groqError);
       
-      // More specific error messages
       if (groqError.message?.includes('rate limit')) {
         return NextResponse.json({ 
           error: 'Too many requests. Please wait a moment and try again.' 
@@ -134,13 +136,11 @@ export async function POST(request: NextRequest) {
         }, { status: 500 });
       }
 
-      // Generic Groq error
       return NextResponse.json({ 
         error: `AI service error: ${groqError.message || 'Unknown error'}` 
       }, { status: 500 });
     }
 
-    // Extract response
     const { content, usage } = groqResponse;
 
     if (!content || typeof content !== 'string') {

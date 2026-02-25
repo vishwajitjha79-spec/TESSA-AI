@@ -12,6 +12,7 @@ import {
   Languages, Monitor, Smartphone, Download, Upload,
   Lock, Unlock, Cpu, BarChart3, Hash,
   Check, Database, Info, Globe, Image as ImageIcon,
+  Salad, Flame, ChevronRight, Stethoscope, TrendingUp,
 } from 'lucide-react';
 
 import type { Message, MoodType, Conversation } from '@/types';
@@ -212,39 +213,41 @@ const THEMES = {
     settActive:'bg-purple-500/[0.14] border border-purple-500/[0.28]',
     isLight:false,
   },
+  // ── OCEAN: light seafoam · sky · aqua — bright airy coastal feel ─────────────
+  // NOT dark navy. Soft sky-blue base, teal/cyan accents, sea-glass panels.
   ocean: {
-    bg:'bg-[#020d1a]', bgC:'bg-[#070820]',
-    panel:'bg-blue-950/28 backdrop-blur-md border-blue-500/[0.11]',
-    panelC:'bg-indigo-950/28 backdrop-blur-md border-indigo-500/[0.11]',
-    header:'bg-black/50 backdrop-blur-md border-b border-teal-500/[0.13]',
-    headerC:'bg-black/50 backdrop-blur-md border-b border-purple-500/[0.13]',
-    bar:'bg-black/46 backdrop-blur-md border-t border-teal-500/[0.13]',
-    barC:'bg-black/46 backdrop-blur-md border-t border-purple-500/[0.13]',
-    msgU:'bg-gradient-to-br from-blue-950/65 to-teal-950/38 border border-teal-500/[0.14] border-l-[3px] border-l-teal-400',
-    msgUC:'bg-gradient-to-br from-indigo-950/65 to-purple-950/38 border border-purple-500/[0.14] border-l-[3px] border-l-purple-400',
-    msgA:'bg-gradient-to-br from-slate-950/65 to-blue-950/22 border border-blue-500/[0.09] border-l-[3px] border-l-blue-400/70',
-    msgAC:'bg-gradient-to-br from-slate-950/65 to-indigo-950/22 border border-indigo-500/[0.09] border-l-[3px] border-l-indigo-400/70',
-    inp:'bg-blue-950/[0.32] border border-teal-500/[0.16] text-blue-50 placeholder:text-blue-300/28 focus:border-teal-400/55 focus:ring-2 focus:ring-teal-500/10',
-    inpC:'bg-indigo-950/[0.32] border border-purple-500/[0.16] text-indigo-50 placeholder:text-purple-300/28 focus:border-purple-400/55 focus:ring-2 focus:ring-purple-500/10',
-    btnP:'bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-400 hover:to-cyan-500 text-white shadow-lg shadow-teal-500/[0.23]',
-    btnPC:'bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white shadow-lg shadow-purple-500/[0.23]',
-    btnS:'bg-teal-500/[0.07] hover:bg-teal-500/[0.14] border border-teal-500/[0.14] text-teal-300 hover:text-teal-100',
-    btnSC:'bg-purple-500/[0.07] hover:bg-purple-500/[0.14] border border-purple-500/[0.14] text-purple-300 hover:text-purple-100',
-    text:'text-blue-50', sub:'text-blue-300/40', subC:'text-purple-300/40',
-    accent:'text-teal-400', accentC:'text-purple-400',
-    glow:'#14b8a6', glowC:'#a855f7',
-    card:'bg-blue-950/[0.18] border border-blue-500/[0.09]',
-    cardC:'bg-indigo-950/[0.18] border border-indigo-500/[0.09]',
-    active:'bg-teal-500/[0.09] border border-teal-500/[0.20]',
-    activeC:'bg-purple-500/[0.09] border border-purple-500/[0.20]',
-    div:'border-blue-500/[0.06]', divC:'border-purple-500/[0.06]',
-    settBg:'bg-[#030e1c]/96 backdrop-blur-md border-t border-teal-500/[0.09]',
-    settBgC:'bg-[#070820]/96 backdrop-blur-md border-t border-purple-500/[0.09]',
-    settText:'text-blue-100/75', settTextHover:'hover:text-blue-50',
-    settSub:'text-blue-300/30', settLabel:'text-blue-300/20',
-    settCard:'bg-blue-950/[0.28] border border-blue-500/[0.12]',
-    settActive:'bg-teal-500/[0.12] border border-teal-500/[0.26]',
-    isLight:false,
+    bg:'bg-cyan-50', bgC:'bg-sky-50',
+    panel:'bg-white/85 backdrop-blur-md border-cyan-300/50',
+    panelC:'bg-sky-50/90 backdrop-blur-md border-sky-300/50',
+    header:'bg-white/80 backdrop-blur-md border-b border-cyan-300/45 shadow-sm shadow-cyan-100/40',
+    headerC:'bg-white/80 backdrop-blur-md border-b border-sky-300/45 shadow-sm shadow-sky-100/40',
+    bar:'bg-white/82 backdrop-blur-md border-t border-cyan-200/50',
+    barC:'bg-white/82 backdrop-blur-md border-t border-sky-200/50',
+    msgU:'bg-gradient-to-br from-cyan-100/85 to-teal-50/65 border border-cyan-300/50 border-l-[3px] border-l-teal-500',
+    msgUC:'bg-gradient-to-br from-sky-100/85 to-blue-50/65 border border-sky-300/50 border-l-[3px] border-l-blue-500',
+    msgA:'bg-white/80 border border-cyan-200/60 border-l-[3px] border-l-cyan-400/70',
+    msgAC:'bg-white/80 border border-sky-200/60 border-l-[3px] border-l-sky-400/70',
+    inp:'bg-white border border-cyan-300/55 text-slate-700 placeholder:text-cyan-400/60 focus:border-teal-500/70 focus:ring-2 focus:ring-cyan-400/18',
+    inpC:'bg-white border border-sky-300/55 text-slate-700 placeholder:text-sky-400/60 focus:border-sky-500/70 focus:ring-2 focus:ring-sky-400/18',
+    btnP:'bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white shadow-md shadow-teal-400/30',
+    btnPC:'bg-gradient-to-r from-blue-500 to-sky-500 hover:from-blue-600 hover:to-sky-600 text-white shadow-md shadow-blue-400/30',
+    btnS:'bg-cyan-50 hover:bg-cyan-100 border border-cyan-300/60 text-teal-700 hover:text-teal-900',
+    btnSC:'bg-sky-50 hover:bg-sky-100 border border-sky-300/60 text-blue-700 hover:text-blue-900',
+    text:'text-slate-700', sub:'text-teal-500/70', subC:'text-blue-500/70',
+    accent:'text-teal-600', accentC:'text-blue-600',
+    glow:'#0d9488', glowC:'#0284c7',
+    card:'bg-white/70 border border-cyan-200/60',
+    cardC:'bg-white/70 border border-sky-200/60',
+    active:'bg-cyan-100 border border-cyan-400/55',
+    activeC:'bg-sky-100 border border-sky-400/55',
+    div:'border-cyan-200/50', divC:'border-sky-200/50',
+    settBg:'bg-white/97 backdrop-blur-md border-t border-cyan-200/55',
+    settBgC:'bg-white/97 backdrop-blur-md border-t border-sky-200/55',
+    settText:'text-slate-700', settTextHover:'hover:text-slate-900',
+    settSub:'text-slate-400', settLabel:'text-slate-400',
+    settCard:'bg-cyan-50 border border-cyan-200/60',
+    settActive:'bg-cyan-100 border border-cyan-400/55',
+    isLight:true,
   },
   sunset: {
     bg:'bg-[#110805]', bgC:'bg-[#17080f]',
@@ -350,44 +353,42 @@ const THEMES = {
     settActive:'bg-rose-100 border border-rose-300',
     isLight:true,
   },
-  // ── ANKIT'S SPECIAL ──────────────────────────────────────────────────────
-  // Warm aged parchment · saffron marigold · deep terracotta ink
-  // Light theme but nothing like pastel/sakura/light — those are cool whites.
-  // This is warm: think Rajasthani manuscript, marigold garlands, chai in clay cups,
-  // old Delhi evening light. Foreground is deep terracotta/brown, not slate-700.
-  // Background is warm ivory-cream, not white.
+  // ── ANKIT'S SPECIAL — Spider-Man light ──────────────────────────────────────
+  // Crisp white base · bold red panels · electric blue accents
+  // Light but high-energy — like a comic book page, not pastel fluff
+  // Red = action/energy, Blue = cool precision, White = clean canvas
   ankit: {
-    bg:'bg-[#fdf6e8]', bgC:'bg-[#fef0dc]',
-    panel:'bg-[#fef3d0]/90 backdrop-blur-md border-amber-400/40',
-    panelC:'bg-[#fff0d8]/90 backdrop-blur-md border-orange-400/38',
-    header:'bg-[#fdf6e8]/85 backdrop-blur-md border-b border-amber-400/35',
-    headerC:'bg-[#fef0dc]/85 backdrop-blur-md border-b border-orange-400/32',
-    bar:'bg-[#fdf6e8]/88 backdrop-blur-md border-t border-amber-400/30',
-    barC:'bg-[#fef0dc]/88 backdrop-blur-md border-t border-orange-400/28',
-    msgU:'bg-gradient-to-br from-amber-100/90 to-yellow-50/70 border border-amber-400/45 border-l-[3px] border-l-amber-600',
-    msgUC:'bg-gradient-to-br from-orange-100/90 to-amber-50/70 border border-orange-400/45 border-l-[3px] border-l-orange-600',
-    msgA:'bg-white/75 border border-amber-200/60 border-l-[3px] border-l-amber-400/70',
-    msgAC:'bg-white/75 border border-orange-200/60 border-l-[3px] border-l-orange-400/70',
-    inp:'bg-white/80 border border-amber-400/40 text-amber-950 placeholder:text-amber-500/55 focus:border-amber-500/70 focus:ring-2 focus:ring-amber-400/18',
-    inpC:'bg-white/80 border border-orange-400/40 text-orange-950 placeholder:text-orange-500/55 focus:border-orange-500/70 focus:ring-2 focus:ring-orange-400/18',
-    btnP:'bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white shadow-md shadow-amber-500/35',
-    btnPC:'bg-gradient-to-r from-orange-600 to-amber-700 hover:from-orange-700 hover:to-amber-800 text-white shadow-md shadow-orange-500/35',
-    btnS:'bg-amber-100 hover:bg-amber-200 border border-amber-400/50 text-amber-900 hover:text-amber-950',
-    btnSC:'bg-orange-100 hover:bg-orange-200 border border-orange-400/50 text-orange-900 hover:text-orange-950',
-    text:'text-amber-950', sub:'text-amber-700/70', subC:'text-orange-700/70',
-    accent:'text-amber-800', accentC:'text-orange-800',
-    glow:'#b45309', glowC:'#c2410c',
-    card:'bg-amber-50/80 border border-amber-300/55',
-    cardC:'bg-orange-50/80 border border-orange-300/55',
-    active:'bg-amber-200/70 border border-amber-500/55',
-    activeC:'bg-orange-200/70 border border-orange-500/55',
-    div:'border-amber-300/45', divC:'border-orange-300/45',
-    settBg:'bg-[#fdf6e8]/97 backdrop-blur-md border-t border-amber-400/35',
-    settBgC:'bg-[#fef0dc]/97 backdrop-blur-md border-t border-orange-400/32',
-    settText:'text-amber-950', settTextHover:'hover:text-amber-900',
-    settSub:'text-amber-700/60', settLabel:'text-amber-600/55',
-    settCard:'bg-amber-100/70 border border-amber-300/55',
-    settActive:'bg-amber-200/80 border border-amber-500/55',
+    bg:'bg-white', bgC:'bg-red-50',
+    panel:'bg-white/90 backdrop-blur-md border-red-300/55',
+    panelC:'bg-red-50/90 backdrop-blur-md border-blue-300/50',
+    header:'bg-white/85 backdrop-blur-md border-b border-red-300/45 shadow-sm shadow-red-100/40',
+    headerC:'bg-red-50/85 backdrop-blur-md border-b border-blue-300/45 shadow-sm shadow-blue-100/30',
+    bar:'bg-white/88 backdrop-blur-md border-t border-red-200/50',
+    barC:'bg-red-50/88 backdrop-blur-md border-t border-blue-200/50',
+    msgU:'bg-gradient-to-br from-red-100/85 to-rose-50/60 border border-red-300/50 border-l-[3px] border-l-red-600',
+    msgUC:'bg-gradient-to-br from-blue-100/85 to-sky-50/60 border border-blue-300/50 border-l-[3px] border-l-blue-600',
+    msgA:'bg-white/85 border border-red-100/60 border-l-[3px] border-l-blue-400/60',
+    msgAC:'bg-white/85 border border-blue-100/60 border-l-[3px] border-l-red-400/60',
+    inp:'bg-white border border-red-300/50 text-slate-800 placeholder:text-red-400/55 focus:border-red-500/65 focus:ring-2 focus:ring-red-400/15',
+    inpC:'bg-white border border-blue-300/50 text-slate-800 placeholder:text-blue-400/55 focus:border-blue-500/65 focus:ring-2 focus:ring-blue-400/15',
+    btnP:'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-md shadow-red-500/35',
+    btnPC:'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/35',
+    btnS:'bg-red-50 hover:bg-red-100 border border-red-300/55 text-red-800 hover:text-red-950',
+    btnSC:'bg-blue-50 hover:bg-blue-100 border border-blue-300/55 text-blue-800 hover:text-blue-950',
+    text:'text-slate-800', sub:'text-red-500/65', subC:'text-blue-500/65',
+    accent:'text-red-700', accentC:'text-blue-700',
+    glow:'#dc2626', glowC:'#1d4ed8',
+    card:'bg-white/80 border border-red-100/70',
+    cardC:'bg-white/80 border border-blue-100/70',
+    active:'bg-red-100 border border-red-400/55',
+    activeC:'bg-blue-100 border border-blue-400/55',
+    div:'border-red-200/45', divC:'border-blue-200/45',
+    settBg:'bg-white/97 backdrop-blur-md border-t border-red-200/55',
+    settBgC:'bg-white/97 backdrop-blur-md border-t border-blue-200/55',
+    settText:'text-slate-800', settTextHover:'hover:text-slate-900',
+    settSub:'text-slate-400', settLabel:'text-slate-400',
+    settCard:'bg-red-50 border border-red-200/60',
+    settActive:'bg-red-100 border border-red-400/55',
     isLight:true,
   },
 } as const;
@@ -550,13 +551,19 @@ function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
       grad: 'radial-gradient(ellipse 90% 70% at 15% 5%, #ffe4e6 0%, transparent 50%), radial-gradient(ellipse 70% 60% at 88% 82%, #fce7f3 0%, transparent 50%)',
       blob1: '#fecdd3', blob2: '#f9a8d4', blob3: '#fda4af',
     },
+    // Ocean: sky-blue + aqua coastal
+    ocean: {
+      grad: 'radial-gradient(ellipse 85% 65% at 15% 8%, #a5f3fc60 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 80%, #bae6fd50 0%, transparent 55%)',
+      blob1: '#67e8f9', blob2: '#7dd3fc', blob3: '#a5f3fc',
+    },
+    // Ankit Spider-Man: bold red + electric blue on white
     ankit: {
       grad: creator
-        ? 'radial-gradient(ellipse 85% 65% at 12% 8%, #fde68a60 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 82%, #fed7aa50 0%, transparent 50%)'
-        : 'radial-gradient(ellipse 85% 65% at 12% 8%, #fde68a50 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 82%, #fdba7440 0%, transparent 50%)',
-      blob1: creator ? '#fcd34d' : '#fde68a',
-      blob2: creator ? '#fb923c' : '#fdba74',
-      blob3: creator ? '#fbbf24' : '#fcd34d',
+        ? 'radial-gradient(ellipse 80% 60% at 18% 10%, #fca5a555 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 80% 82%, #bfdbfe50 0%, transparent 55%)'
+        : 'radial-gradient(ellipse 80% 60% at 18% 10%, #fca5a540 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 80% 82%, #bfdbfe40 0%, transparent 55%)',
+      blob1: creator ? '#f87171' : '#fca5a5',
+      blob2: creator ? '#60a5fa' : '#93c5fd',
+      blob3: creator ? '#fb923c' : '#fca5a5',
     },
   };
   const cfg = configs[theme] ?? configs.light;
@@ -693,6 +700,262 @@ function AvatarPickerModal({ current, onSelect, onClose, t, glow }: {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// HEALTH PULSE — floating mini-chat for calories + health tips
+// Completely separate from main chat — not stored in sidebar history
+// Works in creator mode only, floats bottom-right
+// ─────────────────────────────────────────────────────────────────────────────
+interface HPMsg { id: string; role: 'user'|'assistant'; text: string; ts: Date }
+
+function HealthPulse({ glow, isLight }: { glow: string; isLight: boolean }) {
+  const [open,    setOpen]    = useState(false);
+  const [msgs,    setMsgs]    = useState<HPMsg[]>([]);
+  const [input,   setInput]   = useState('');
+  const [loading, setLoading] = useState(false);
+  const [cals,    setCals]    = useState(0);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef  = useRef<HTMLInputElement>(null);
+
+  // Load today's calories from health localStorage
+  useEffect(() => {
+    if (!open) return;
+    try {
+      const h = JSON.parse(localStorage.getItem('tessa-health') || '{}');
+      const today = new Date().toISOString().split('T')[0];
+      if (h.date === today) setCals(h.totalCalories || 0);
+    } catch {}
+    if (msgs.length === 0) {
+      setMsgs([{
+        id: 'init',
+        role: 'assistant',
+        text: `Hey! 🌱 I'm your Health Pulse — log meals, get calorie counts, or ask health + study tips. What did you eat?`,
+        ts: new Date(),
+      }]);
+    }
+    setTimeout(() => inputRef.current?.focus(), 100);
+  }, [open]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [msgs]);
+
+  const HEALTH_SYSTEM = `You are Tessa's Health Pulse — a compact, sharp health + study assistant built into Tessa.
+You have ONE focus: help Ankit (17, male, Delhi, Class 12 CBSE 2026) with:
+1. CALORIE LOGGING — when he says what he ate, calculate calories clearly. Format: "X cal" in bold markdown.
+   Example: "2 rotis + dal = **~300 cal** logged 🍛"
+   After every calorie log, update his daily total (read from context below).
+2. HEALTH TIPS — quick, practical, India-context (dal, roti, chai, street food — not avocado toast).
+3. STUDY/EXAM HEALTH — tips for energy, sleep, focus for board exams.
+4. WATER reminders if asked.
+
+RULES:
+• Be SHORT. Max 3 lines per response unless explaining a meal in detail.
+• No fluff. No "Great question!" No filler. Just the data + one-liner tip if relevant.
+• Always show calories as bold: **X cal**
+• If asked for non-health topics, redirect warmly: "This is your health channel — ask Tessa for that!"
+• You are NOT the main Tessa. You are a specialist sub-agent.`;
+
+  const send = async () => {
+    const text = input.trim();
+    if (!text || loading) return;
+    const userMsg: HPMsg = { id: uuidv4(), role: 'user', text, ts: new Date() };
+    setMsgs(p => [...p, userMsg]);
+    setInput('');
+    setLoading(true);
+
+    // Build health context
+    let healthCtx = '';
+    try {
+      const h = JSON.parse(localStorage.getItem('tessa-health') || '{}');
+      const today = new Date().toISOString().split('T')[0];
+      if (h.date === today) {
+        healthCtx = `\n\nANKIT'S HEALTH TODAY:\n• Calories so far: ${h.totalCalories || 0} / 2200 cal\n• Meals logged: ${h.meals?.length || 0}\n• Weight: ${h.weight || '?'} kg · Height: ${h.height || '?'} cm`;
+        setCals(h.totalCalories || 0);
+      }
+    } catch {}
+
+    try {
+      const history = msgs.slice(-6).map(m => ({ role: m.role, content: m.text }));
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [...history, { role: 'user', content: text + healthCtx }],
+          isCreatorMode: false,
+          maxTokens: 200,
+          _healthPulse: true,
+          _systemOverride: HEALTH_SYSTEM,
+        }),
+      });
+      const data = await res.json();
+      const reply = data.content || 'Something went wrong — try again.';
+      setMsgs(p => [...p, { id: uuidv4(), role: 'assistant', text: reply, ts: new Date() }]);
+
+      // Parse calories from reply and update localStorage
+      const calMatch = reply.match(/\*\*[~≈]?\s*(\d{2,4})\s*cal\*\*/i);
+      if (calMatch) {
+        try {
+          const h = JSON.parse(localStorage.getItem('tessa-health') || '{}');
+          const today = new Date().toISOString().split('T')[0];
+          if (h.date !== today) { h.date = today; h.totalCalories = 0; h.meals = []; }
+          const added = parseInt(calMatch[1]);
+          h.totalCalories = (h.totalCalories || 0) + added;
+          h.meals = [...(h.meals || []), { time: new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}), meal: text, calories: added, confidence: 'auto' }];
+          localStorage.setItem('tessa-health', JSON.stringify(h));
+          setCals(h.totalCalories);
+        } catch {}
+      }
+    } catch {
+      setMsgs(p => [...p, { id: uuidv4(), role: 'assistant', text: 'Network hiccup — try again!', ts: new Date() }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calPct = Math.min(100, Math.round((cals / 2200) * 100));
+  const calColor = calPct > 90 ? '#ef4444' : calPct > 65 ? '#f97316' : '#22c55e';
+
+  return (
+    <>
+      {/* ── FAB button ── */}
+      <button
+        onClick={() => setOpen(p => !p)}
+        className="fixed bottom-24 right-4 z-[60] w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all active:scale-90"
+        style={{
+          background: open ? glow : `linear-gradient(135deg, ${glow}, ${glow}cc)`,
+          boxShadow: `0 4px 20px ${glow}50`,
+          border: `1.5px solid ${glow}60`,
+        }}
+        title="Health Pulse"
+      >
+        {open
+          ? <X size={18} className="text-white" />
+          : <Salad size={18} className="text-white" />
+        }
+        {!open && cals > 0 && (
+          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[8px] font-black flex items-center justify-center text-white"
+            style={{ background: calColor, fontSize: 7 }}>
+            {calPct}%
+          </span>
+        )}
+      </button>
+
+      {/* ── Panel ── */}
+      {open && (
+        <div
+          className="fixed bottom-40 right-4 z-[59] rounded-2xl overflow-hidden flex flex-col"
+          style={{
+            width: 'min(340px, calc(100vw - 32px))',
+            height: 440,
+            background: isLight ? '#ffffff' : '#0d0f1e',
+            border: `1px solid ${glow}30`,
+            boxShadow: `0 8px 40px rgba(0,0,0,0.35), 0 0 30px ${glow}15`,
+            animation: 'slideUpSheet 0.25s cubic-bezier(0.32,0.72,0,1)',
+          }}
+        >
+          {/* Header */}
+          <div className="flex-shrink-0 flex items-center justify-between px-3.5 py-3"
+            style={{ borderBottom: `1px solid ${glow}18`, background: `linear-gradient(135deg, ${glow}10, ${glow}05)` }}>
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: glow }}>
+                <Salad size={13} className="text-white" />
+              </div>
+              <div>
+                <p className="text-[12px] font-black" style={{ color: glow }}>Health Pulse</p>
+                <p className="text-[9px]" style={{ color: isLight ? '#6b7280' : 'rgba(255,255,255,0.4)' }}>private · not in history</p>
+              </div>
+            </div>
+            {/* Calorie ring */}
+            <div className="flex items-center gap-1.5">
+              <div className="flex flex-col items-end">
+                <span className="text-[11px] font-bold" style={{ color: calColor }}>{cals}</span>
+                <span className="text-[8px]" style={{ color: isLight ? '#9ca3af' : 'rgba(255,255,255,0.3)' }}>/ 2200 cal</span>
+              </div>
+              <div className="relative w-8 h-8">
+                <svg viewBox="0 0 32 32" className="w-full h-full -rotate-90">
+                  <circle cx="16" cy="16" r="12" fill="none" stroke={isLight?'#e5e7eb':'rgba(255,255,255,0.1)'} strokeWidth="3"/>
+                  <circle cx="16" cy="16" r="12" fill="none" stroke={calColor} strokeWidth="3"
+                    strokeDasharray={`${calPct * 0.754} 75.4`} strokeLinecap="round"/>
+                </svg>
+                <Flame size={9} className="absolute inset-0 m-auto" style={{ color: calColor }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Quick-tap chips */}
+          <div className="flex-shrink-0 flex gap-1.5 px-3 py-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+            {['Log a meal', 'Water intake', 'Exam energy tips', 'Sleep advice'].map(chip => (
+              <button key={chip} onClick={() => { setInput(chip); setTimeout(() => inputRef.current?.focus(), 50); }}
+                className="flex-shrink-0 px-2.5 py-1 rounded-full text-[9px] font-semibold whitespace-nowrap transition-all active:scale-95"
+                style={{ background: `${glow}12`, border: `1px solid ${glow}25`, color: glow }}>
+                {chip}
+              </button>
+            ))}
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto px-3 py-1 space-y-2" style={{ scrollbarWidth: 'thin' }}>
+            {msgs.map(m => (
+              <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className="max-w-[86%] rounded-xl px-3 py-2 text-[11px] leading-relaxed"
+                  style={{
+                    background: m.role === 'user'
+                      ? `linear-gradient(135deg, ${glow}22, ${glow}12)`
+                      : isLight ? '#f9fafb' : 'rgba(255,255,255,0.06)',
+                    border: `1px solid ${m.role === 'user' ? glow+'30' : isLight ? '#e5e7eb' : 'rgba(255,255,255,0.08)'}`,
+                    color: isLight ? '#1e293b' : 'rgba(255,255,255,0.88)',
+                  }}>
+                  {/* Bold markdown for calories */}
+                  {m.text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+                    part.startsWith('**') && part.endsWith('**')
+                      ? <strong key={i} style={{ color: glow }}>{part.slice(2, -2)}</strong>
+                      : <span key={i}>{part}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+            {loading && (
+              <div className="flex justify-start">
+                <div className="rounded-xl px-3 py-2 flex items-center gap-1"
+                  style={{ background: isLight ? '#f3f4f6' : 'rgba(255,255,255,0.06)', border: `1px solid ${isLight?'#e5e7eb':'rgba(255,255,255,0.08)'}` }}>
+                  {[0,150,300].map(d => (
+                    <div key={d} className="w-1.5 h-1.5 rounded-full animate-bounce"
+                      style={{ background: glow, animationDelay: `${d}ms` }} />
+                  ))}
+                </div>
+              </div>
+            )}
+            <div ref={bottomRef} />
+          </div>
+
+          {/* Input */}
+          <div className="flex-shrink-0 flex items-center gap-2 px-3 py-2.5"
+            style={{ borderTop: `1px solid ${glow}12` }}>
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && send()}
+              placeholder="ate 2 rotis + sabzi…"
+              className="flex-1 text-[11px] px-3 py-2 rounded-xl outline-none"
+              style={{
+                background: isLight ? '#f9fafb' : 'rgba(255,255,255,0.06)',
+                border: `1px solid ${glow}25`,
+                color: isLight ? '#1e293b' : 'rgba(255,255,255,0.88)',
+              }}
+            />
+            <button onClick={send} disabled={!input.trim() || loading}
+              className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all active:scale-90 disabled:opacity-40"
+              style={{ background: glow }}>
+              <Send size={13} className="text-white" />
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // SETTINGS BOTTOM SHEET — slides up from bottom, not left sidebar
 // Left pill-nav + right scrollable content
 // ─────────────────────────────────────────────────────────────────────────────
@@ -764,6 +1027,7 @@ export default function Home() {
   const [showWellnessFloat,         setShowWellnessFloat]         = useState(false);
   const [showAvatarPickerInSettings,setShowAvatarPickerInSettings]= useState(false);
   const [pendingDeleteId,           setPendingDeleteId]           = useState<string|null>(null);
+  const [tessaAnalysing,            setTessaAnalysing]             = useState(false);
 
   // ── Refs ──────────────────────────────────────────────────────────────────
   const bottomRef      = useRef<HTMLDivElement>(null);
@@ -784,9 +1048,9 @@ export default function Home() {
   const moodEmoji  = MOOD_EMOJI[currentMood] ?? '✨';
   const glow2 = isCreatorMode ? '#a855f7'
     : theme==='dark' ? '#6366f1' : theme==='cyberpunk' ? '#ec4899'
-    : theme==='ocean' ? '#3b82f6' : theme==='sunset' ? '#f59e0b'
+    : theme==='ocean' ? '#0ea5e9' : theme==='sunset' ? '#f59e0b'
     : theme==='pastel' ? '#a855f7' : theme==='sakura' ? '#f43f5e'
-    : theme==='ankit' ? '#d97706' : '#818cf8';
+    : theme==='ankit' ? '#1d4ed8' : '#818cf8';
 
   const fontSizeClass = fontSize==='sm' ? 'text-xs' : fontSize==='lg' ? 'text-base' : 'text-sm';
 
@@ -990,6 +1254,135 @@ export default function Home() {
   };
 
   // ── Proactive ─────────────────────────────────────────────────────────────
+  // ── Tessa Autonomous Analysis ─────────────────────────────────────────────
+  // Tessa reads ALL live data — dashboard, chat history, wellness, memories —
+  // and sends an independent assessment directly into the chat
+  const tessaAutoAnalyse = async () => {
+    if (tessaAnalysing || isLoading) return;
+    setTessaAnalysing(true);
+
+    // ── Gather all context ────────────────────────────────────────────────────
+    let fullCtx = '══ FULL SYSTEM STATE (live snapshot) ══\n\n';
+
+    // Health / Dashboard
+    try {
+      const h = JSON.parse(localStorage.getItem('tessa-health') || '{}');
+      const today = new Date().toISOString().split('T')[0];
+      fullCtx += '[HEALTH]\n';
+      if (h.weight) fullCtx += `• Weight: ${h.weight}kg, Height: ${h.height}cm, BMI: ${(h.weight/((h.height/100)**2)).toFixed(1)}\n`;
+      if (h.date === today) {
+        fullCtx += `• Calories today: ${h.totalCalories||0}/2200 cal\n`;
+        (h.meals||[]).forEach((m:any) => { fullCtx += `  - ${m.time}: ${m.meal} (${m.calories} cal)\n`; });
+        if (h.sleepHours) fullCtx += `• Sleep: ${h.sleepHours}h last night\n`;
+      }
+    } catch {}
+
+    // Exams
+    try {
+      const exams = JSON.parse(localStorage.getItem('tessa-exams') || '[]');
+      const today = new Date();
+      const upcoming = exams.filter((e:any) => !e.completed && new Date(e.date) >= today);
+      const completed = exams.filter((e:any) => e.completed);
+      fullCtx += '\n[EXAMS]\n';
+      upcoming.sort((a:any,b:any) => new Date(a.date).getTime()-new Date(b.date).getTime())
+        .forEach((e:any) => {
+          const days = Math.ceil((new Date(e.date).getTime()-today.getTime())/86400000);
+          fullCtx += `• ${e.subject}: in ${days} day${days===1?'':'s'} (${e.date})\n`;
+        });
+      if (completed.length) fullCtx += `• Done: ${completed.map((e:any)=>e.subject).join(', ')}\n`;
+    } catch {}
+
+    // Forms / deadlines
+    try {
+      const forms = JSON.parse(localStorage.getItem('tessa-forms') || '[]');
+      const today = new Date();
+      const pending = forms.filter((f:any) => f.status==='pending' && new Date(f.deadline)>=today);
+      fullCtx += '\n[DEADLINES]\n';
+      pending.forEach((f:any) => {
+        const days = Math.ceil((new Date(f.deadline).getTime()-today.getTime())/86400000);
+        fullCtx += `• ${f.name}: ${days}d left (priority: ${f.priority})\n`;
+      });
+    } catch {}
+
+    // Memories
+    try {
+      const mems = getAllMemories();
+      if (mems.length > 0) {
+        fullCtx += '\n[MEMORIES/FACTS TESSA KNOWS]\n';
+        mems.slice(0,15).forEach((m:any) => { fullCtx += `• ${typeof m==='string'?m:m.content||JSON.stringify(m)}\n`; });
+      }
+    } catch {}
+
+    // Recent chat (last 10 messages summary)
+    try {
+      const recent = messages.slice(-10);
+      if (recent.length > 0) {
+        fullCtx += '\n[RECENT CHAT — last 10 msgs]\n';
+        recent.forEach(m => {
+          const prefix = m.role==='user'?'Ankit':'Tessa';
+          fullCtx += `${prefix}: ${m.content.slice(0,120)}${m.content.length>120?'…':''}\n`;
+        });
+      }
+    } catch {}
+
+    // Wellness streaks
+    try {
+      const water = parseInt(localStorage.getItem('tessa-water-today')||'0');
+      const streak = parseInt(localStorage.getItem('tessa-streak')||'0');
+      fullCtx += `\n[WELLNESS]\n• Water today: ${water} glasses\n• Study streak: ${streak} days\n`;
+    } catch {}
+
+    fullCtx += '\n══ END STATE ══\n';
+
+    const ANALYSIS_PROMPT = `${fullCtx}
+
+You are Tessa doing a FULL AUTONOMOUS ASSESSMENT of Ankit's current state. 
+This was triggered by him pressing "Analyse Everything" — he wants your real, independent read.
+
+DO THIS (in order):
+1. **Health check** — calories vs goal, meal pattern, sleep if known. One concrete suggestion.
+2. **Exam readiness** — which exam is most urgent? Is he on track? One targeted advice.
+3. **Deadline flag** — any deadline needing immediate attention?
+4. **Pattern observation** — from the chat history and memories, what pattern do you notice? (study habits, stress, mood, food). Be specific and honest.
+5. **One priority action** — if he could do ONE thing right now based on all this data, what is it?
+
+Style: Direct, warm, specific. No generic advice. Use actual numbers from his data. Max 200 words total. No fluff.`;
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: ANALYSIS_PROMPT }],
+          isCreatorMode: true,
+          maxTokens: 450,
+        }),
+      });
+      const data = await res.json();
+      const analysisMsg: Message = {
+        id: uuidv4(),
+        role: 'assistant',
+        content: `🔍 **Full Analysis** *(auto-generated)*\n\n${data.content}`,
+        timestamp: new Date(),
+        mood: 'focused' as MoodType,
+      };
+      setMessages(prev => [...prev, analysisMsg]);
+      setLatestMsgId(analysisMsg.id);
+      // Close dashboard if open, scroll to bottom
+      setShowDashboard(false);
+      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 200);
+    } catch {
+      const errMsg: Message = {
+        id: uuidv4(), role: 'assistant',
+        content: 'Analysis failed — check your connection and try again.',
+        timestamp: new Date(), mood: 'calm' as MoodType,
+      };
+      setMessages(prev => [...prev, errMsg]);
+    } finally {
+      setTessaAnalysing(false);
+    }
+  };
+
   const maybeSendProactive = () => {
     if (!shouldBeProactive()) return;
     const q = getProactiveQuestion(); if (!q) return;
@@ -1282,9 +1675,9 @@ export default function Home() {
   const THEME_BG: Record<string, [string, string]> = {
     dark:      ['#05060f','#060412'],
     cyberpunk: ['#020108','#030112'],
-    ocean:     ['#020c1a','#030616'],
+    ocean:     ['#ecfeff','#f0f9ff'],
     sunset:    ['#110805','#17080f'],
-    ankit:     ['#fdf6e8','#fef0dc'],
+    ankit:     ['#ffffff','#fff1f2'],
     light:     ['#f0f4ff','#fdf0ff'],
     pastel:    ['#f3efff','#fdf0ff'],
     sakura:    ['#fff2f5','#fff0f8'],
@@ -2010,6 +2403,17 @@ export default function Home() {
                     <Brain size={16}/>
                   </button>
                 )}
+                {isCreatorMode&&(
+                  <button onClick={tessaAutoAnalyse} disabled={tessaAnalysing}
+                    title="Analyse Everything — Tessa reads all your data"
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-50 ${tessaAnalysing?'text-white':'hover:bg-white/[0.07] '+t.sub}`}
+                    style={tessaAnalysing?{background:`${t.glow}18`,outline:`1px solid ${t.glow}30`}:{}}>
+                    {tessaAnalysing
+                      ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin opacity-70"/>
+                      : <Zap size={16}/>
+                    }
+                  </button>
+                )}
                 <button onClick={()=>setTheme(theme==='light'?'dark':'light')} title="Toggle theme"
                   className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-white/[0.07] ${t.sub}`}>
                   {theme==='light'?<Moon size={16}/>:<Sun size={16}/>}
@@ -2078,6 +2482,12 @@ export default function Home() {
                     className={`w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium transition-colors ${showDashboard?'':'hover:bg-white/5'}`}
                     style={showDashboard?{color:t.glow,background:`${t.glow}12`}:{color:t.isLight?'#374151':'rgba(255,255,255,0.75)'}}>
                     <LayoutDashboard size={15} style={{color:t.glow}}/> My Dashboard
+                  </button>
+                  <button onClick={()=>{tessaAutoAnalyse();setShowMobileMenu(false);}} disabled={tessaAnalysing}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-bold transition-colors disabled:opacity-60"
+                    style={{color: t.glow, background:`${t.glow}10`}}>
+                    <Zap size={15} style={{color:t.glow}}/>
+                    {tessaAnalysing ? 'Analysing…' : 'Analyse Everything'}
                   </button>
                   <div style={{height:1,background:`${t.glow}15`,margin:'0 12px'}}/>
                 </>)}
@@ -2442,6 +2852,19 @@ export default function Home() {
           </div>
 
           <div className="flex-1 overflow-y-auto px-2.5 py-2.5 space-y-2">
+            {/* ── ANALYSE EVERYTHING button ── */}
+            <button onClick={tessaAutoAnalyse} disabled={tessaAnalysing}
+              className="w-full py-2.5 rounded-xl text-[10px] font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 disabled:opacity-60"
+              style={{
+                background:`linear-gradient(135deg,${t.glow},${glow2})`,
+                color:'white',
+                boxShadow:`0 3px 14px ${t.glow}35`,
+              }}>
+              {tessaAnalysing
+                ? <><div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin"/><span>Analysing…</span></>
+                : <><Zap size={11}/><span>Analyse Everything</span></>
+              }
+            </button>
             {/* Memory */}
             <div className={`rounded-xl p-2.5 ${t.card}`}>
               <div className="flex items-center justify-between mb-1.5">
@@ -2468,6 +2891,11 @@ export default function Home() {
           onClose={() => setShowTimerFloat(false)}
           defaultMinutes={25}
         />
+      )}
+
+      {/* ── HEALTH PULSE — floating calorie/health mini-chat (creator mode) ── */}
+      {isCreatorMode && (
+        <HealthPulse glow={t.glow} isLight={t.isLight} />
       )}
 
       {/* ── FLOATING INSIGHTS PANEL ── */}

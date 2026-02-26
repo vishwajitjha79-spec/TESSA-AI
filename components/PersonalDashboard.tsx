@@ -366,7 +366,7 @@ export default function PersonalDashboard({ isLight = false, accentColor = '#ec4
           {([
             { lbl: 'Exams left',   val: upExams.length,          clr: '#818cf8' },
             { lbl: 'Forms due',    val: pendForms.length,        clr: '#f472b6' },
-            { lbl: 'Cal today',    val: health.totalCalories,    clr: '#fb923c' },
+            { lbl: 'Sleep',        val: health.sleepHours ? `${health.sleepHours}h` : '—', clr: '#a78bfa' },
             { lbl: 'BMI',          val: bmiRaw?.toFixed(1) ?? '—', clr: bmiClr },
           ] as { lbl: string; val: string | number; clr: string }[]).map(s => (
             <div key={s.lbl} style={{ ...crd() }}>
@@ -378,25 +378,6 @@ export default function PersonalDashboard({ isLight = false, accentColor = '#ec4
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Calorie progress */}
-        <div style={{ ...crd() }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: text }}>Calories</span>
-            <span style={{ fontSize: 12, fontWeight: 900, color: calPct > 100 ? '#ef4444' : acc }}>
-              {health.totalCalories} / {CAL_GOAL}
-            </span>
-          </div>
-          <div style={{ height: 9, background: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)', borderRadius: 99, overflow: 'hidden' }}>
-            <div style={{
-              height: '100%', width: `${Math.min(100, calPct)}%`, borderRadius: 99, transition: 'width 0.6s',
-              background: calPct > 100 ? '#ef4444' : calPct > 90 ? '#f97316' : `linear-gradient(90deg,${acc},${acc}99)`,
-            }} />
-          </div>
-          <div style={{ fontSize: 9, color: sub, marginTop: 5 }}>
-            {calRemaining > 0 ? `${calRemaining} cal remaining` : `${-calRemaining} cal over goal`}
-          </div>
         </div>
 
         {/* Next exam card */}
@@ -443,33 +424,6 @@ export default function PersonalDashboard({ isLight = false, accentColor = '#ec4
           </div>
         )}
 
-        {/* Recent meals */}
-        {health.meals.length > 0 && (
-          <div style={{ ...crd() }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: text, marginBottom: 8 }}>
-              Today's meals
-            </div>
-            {health.meals.slice(-3).map((m, i) => (
-              <div key={i} style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '4px 0',
-                borderBottom: i < Math.min(health.meals.length, 3) - 1 ? `1px solid ${div}` : 'none',
-              }}>
-                <span style={{ fontSize: 11, color: textMid, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 8 }}>
-                  {m.meal}
-                </span>
-                <span style={{ fontSize: 11, fontWeight: 800, color: acc, flexShrink: 0 }}>
-                  {m.calories} cal
-                </span>
-              </div>
-            ))}
-            {health.meals.length > 3 && (
-              <div style={{ fontSize: 9, color: subSoft, marginTop: 5 }}>
-                +{health.meals.length - 3} more in Health tab
-              </div>
-            )}
-          </div>
-        )}
       </div>
     );
   };
@@ -681,33 +635,13 @@ export default function PersonalDashboard({ isLight = false, accentColor = '#ec4
             </div>
           )}
 
-          {/* Calorie bar in health tab */}
-          <div style={{ ...crd() }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: text }}>Calories</span>
-              <span style={{ fontSize: 12, fontWeight: 900, color: calPct > 100 ? '#ef4444' : acc }}>
-                {health.totalCalories} / {CAL_GOAL}
-              </span>
-            </div>
-            <div style={{ height: 10, background: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)', borderRadius: 99, overflow: 'hidden' }}>
-              <div style={{
-                height: '100%', width: `${Math.min(100, calPct)}%`, borderRadius: 99, transition: 'width 0.6s',
-                background: calPct > 100 ? '#ef4444' : calPct > 90 ? '#f97316' : `linear-gradient(90deg,${acc},${acc}99)`,
-              }} />
-            </div>
-            <div style={{ fontSize: 9, color: sub, marginTop: 5 }}>
-              {CAL_GOAL - health.totalCalories > 0
-                ? `${CAL_GOAL - health.totalCalories} cal remaining`
-                : `${health.totalCalories - CAL_GOAL} cal over goal`}
-            </div>
-          </div>
         </div>
 
         {/* Paperdoll */}
         <Paperdoll bmiRaw={bmiRaw} weight={health.weight} height={health.height} acc={acc} isLight={isLight} />
       </div>
 
-      {/* Meal logger */}
+      {/* Meal log — read-only, synced from Health Pulse */}
       <div style={{ ...crd() }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <span style={{ fontSize: 12, fontWeight: 700, color: text }}>Meals logged today</span>
@@ -720,40 +654,24 @@ export default function PersonalDashboard({ isLight = false, accentColor = '#ec4
                 <RotateCcw size={12} />
               </button>
             )}
-            <button
-              onClick={() => { setShowAdd(p => !p); setTimeout(() => inputRef.current?.focus(), 80); }}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 8,
-                background: accSurf, border: `1px solid ${accBord}`, color: acc,
-                fontSize: 10, fontWeight: 700, cursor: 'pointer',
-              }}>
-              <Plus size={11} /> Add
-            </button>
+            <span style={{ fontSize: 9, color: sub, padding: '4px 8px', borderRadius: 7, background: accSurf, border: `1px solid ${accBord}` }}>
+              🥗 via Health Pulse
+            </span>
           </div>
         </div>
 
-        {/* Add meal form */}
-        {showAdd && (
-          <div style={{
-            background: isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.035)',
-            border: `1px solid ${inpB}`, borderRadius: 10, padding: 10, marginBottom: 10,
-          }}>
-            {/* Food input with suggestions */}
-            <div style={{ position: 'relative', marginBottom: 6 }}>
-              <input
-                ref={inputRef}
-                type="text"
-                value={foodInput}
-                onChange={e => setFoodInput(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && addMeal()}
-                placeholder="Food name (e.g. samosa, dal roti)"
-                style={{
-                  width: '100%', padding: '7px 10px', borderRadius: 8,
-                  background: inp, border: `1px solid ${inpB}`,
-                  color: isLight ? '#1f2937' : 'rgba(255,255,255,0.90)',
-                  fontSize: 11, outline: 'none', boxSizing: 'border-box',
-                }}
-              />
+        {/* dummy block to appease TypeScript — suggestions/inputs removed */}
+        {false && (
+          <div style={{ position: 'relative', marginBottom: 6 }}>
+            <input
+              ref={inputRef}
+              type="text"
+              value={foodInput}
+              onChange={e => setFoodInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter'}
+              placeholder=""
+              style={{ display: 'none' }}
+            />
               {suggestions.length > 0 && (
                 <div style={{
                   position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50, marginTop: 2,
@@ -865,7 +783,7 @@ export default function PersonalDashboard({ isLight = false, accentColor = '#ec4
           </>
         ) : (
           <div style={{ textAlign: 'center', padding: '14px 0', color: sub, fontSize: 11 }}>
-            No meals yet — add above or just tell me in chat 💬
+            No meals logged yet — use the 🥗 Health Pulse button to log food
           </div>
         )}
       </div>

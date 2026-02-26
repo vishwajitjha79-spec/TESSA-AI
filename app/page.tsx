@@ -700,34 +700,134 @@ function AvatarPickerModal({ current, onSelect, onClose, t, glow }: {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HEALTH PULSE — floating mini-chat for calories + health tips
-// Completely separate from main chat — not stored in sidebar history
-// Works in creator mode only, floats bottom-right
+// HEALTH PULSE — draggable floating mini-chat: calories + water + health tips
+// Private — never in sidebar history · creator mode only
+// Dragging: expanded panel is draggable, FAB stays fixed at bottom-right
 // ─────────────────────────────────────────────────────────────────────────────
 interface HPMsg { id: string; role: 'user'|'assistant'; text: string; ts: Date }
 
-function HealthPulse({ glow, isLight }: { glow: string; isLight: boolean }) {
+// Accurate India food calorie database (extended)
+const FOOD_CAL: Record<string, number> = {
+  // Breads
+  'roti':60,'chapati':60,'phulka':55,'paratha':180,'stuffed paratha':250,'puri':120,
+  'bhatura':200,'naan':270,'kulcha':220,'bread slice':70,'white bread':70,
+  // Rice
+  'rice':130,'cooked rice':130,'steamed rice':130,'jeera rice':180,'biryani':380,
+  'pulao':200,'fried rice':250,'khichdi':180,'dal khichdi':200,
+  // Lentils / Dal
+  'dal':120,'dal tadka':150,'dal fry':160,'dal makhani':200,'rajma':180,
+  'chole':200,'chana masala':200,'moong dal':110,'masoor dal':120,'sambar':80,
+  // Vegetables
+  'sabzi':100,'paneer':260,'paneer butter masala':320,'palak paneer':250,
+  'aloo sabzi':150,'aloo gobi':120,'baingan bharta':100,'bhindi':80,
+  'mixed veg':100,'kadhi':120,'mutter paneer':280,
+  // Snacks
+  'samosa':262,'kachori':200,'pakora':180,'bhajiya':180,'vada':180,
+  'vada pav':280,'pav bhaji':400,'misal pav':350,
+  'namkeen':120,'biscuit':50,'glucose biscuit':50,'marie biscuit':40,
+  // Drinks
+  'chai':60,'tea with milk':60,'milk':150,'coffee':80,'lassi':180,
+  'nimbu pani':45,'juice':120,'cold drink':140,'coke':140,'pepsi':140,
+  'protein shake':200,'buttermilk':40,'chaas':40,
+  // Eggs / Meat
+  'egg':78,'boiled egg':78,'omelette':150,'scrambled egg':170,'fried egg':120,
+  'chicken':200,'chicken breast':165,'chicken curry':250,'mutton':280,
+  'fish curry':200,'fish fry':230,
+  // Fruits
+  'banana':89,'apple':95,'mango':60,'orange':62,'papaya':43,'guava':68,
+  'grapes':70,'watermelon':30,'pomegranate':83,
+  // Sweets
+  'gulab jamun':175,'rasgulla':130,'kheer':180,'halwa':250,'ladoo':150,
+  'barfi':200,'jalebi':150,'gajar halwa':250,'ice cream':200,
+  // Fast food
+  'pizza slice':285,'burger':350,'sandwich':300,'maggi':350,'pasta':350,
+  'momos':200,'dumplings':200,
+  // Common quantities
+  'plate':1,'bowl':1,
+};
+
+function estimateHP(text: string): { calories: number; water: number; items: string[] } {
+  const lower = text.toLowerCase();
+  let calories = 0;
+  let water = 0;
+  const items: string[] = [];
+
+  // Water detection
+  const waterPatterns = [
+    /(\d+)\s*glass(?:es)?\s*(?:of\s*)?water/i,
+    /water\s*[—\-:]?\s*(\d+)\s*glass/i,
+    /drank\s*(\d+)\s*glass/i,
+    /had\s*(\d+)\s*glass/i,
+  ];
+  for (const p of waterPatterns) {
+    const m = lower.match(p);
+    if (m) { water = parseInt(m[1]); break; }
+  }
+  if (!water && (lower.includes('a glass') || lower.includes('one glass') || lower.includes('1 glass'))) water = 1;
+  if (!water && (lower.includes('2 glass') || lower.includes('two glass'))) water = 2;
+  if (lower.includes('water bottle') || lower.includes('water botl')) water = (water || 0) + 2;
+
+  // Food parsing — handle "qty × item" patterns
+  const segments = text.split(/,|and|\+|with/i);
+  for (const seg of segments) {
+    const s = seg.trim().toLowerCase();
+    if (!s) continue;
+
+    // Pattern: "N roti", "N × samosa", "2 plate rice"
+    const qtyMatch = s.match(/^(\d+(?:\.\d+)?)\s*[x×]?\s*(.+)/);
+    const qty = qtyMatch ? parseFloat(qtyMatch[1]) : 1;
+    const food = (qtyMatch ? qtyMatch[2] : s).trim().replace(/^of\s+/, '');
+
+    // Try exact match first, then partial
+    let cal = 0;
+    let matched = '';
+    for (const [key, val] of Object.entries(FOOD_CAL)) {
+      if (food === key || food.includes(key) || key.includes(food)) {
+        if (!matched || key.length > matched.length) { cal = val; matched = key; }
+      }
+    }
+    if (cal > 0) {
+      const total = Math.round(cal * qty);
+      calories += total;
+      items.push(`${qty > 1 ? qty + '× ' : ''}${matched} (${total} cal)`);
+    }
+  }
+
+  return { calories, water, items };
+}
+
+function HealthPulse({ glow, isLight, hidden, onSync }: { glow: string; isLight: boolean; hidden?: boolean; onSync?: () => void }) {
   const [open,    setOpen]    = useState(false);
   const [msgs,    setMsgs]    = useState<HPMsg[]>([]);
   const [input,   setInput]   = useState('');
   const [loading, setLoading] = useState(false);
   const [cals,    setCals]    = useState(0);
+  const [water,   setWater]   = useState(0);
+
+  // Draggable panel position
+  const [pos,     setPos]     = useState<{x:number;y:number}|null>(null);
+  const dragging  = useRef(false);
+  const dragStart = useRef({mx:0,my:0,px:0,py:0});
+  const panelRef  = useRef<HTMLDivElement>(null);
+
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef  = useRef<HTMLInputElement>(null);
 
-  // Load today's calories from health localStorage
+  // Sync from localStorage on open
   useEffect(() => {
     if (!open) return;
     try {
       const h = JSON.parse(localStorage.getItem('tessa-health') || '{}');
       const today = new Date().toISOString().split('T')[0];
       if (h.date === today) setCals(h.totalCalories || 0);
+      // Water from wellness
+      const w = JSON.parse(localStorage.getItem('tessa-wellness') || '{}');
+      if (w.date === today) setWater(w.water || 0);
     } catch {}
     if (msgs.length === 0) {
       setMsgs([{
-        id: 'init',
-        role: 'assistant',
-        text: `Hey! 🌱 I'm your Health Pulse — log meals, get calorie counts, or ask health + study tips. What did you eat?`,
+        id: 'init', role: 'assistant',
+        text: `Hey! 🌱 **Health Pulse** here.\nLog meals → I'll track calories. Log water → I'll update your intake. Ask health/study tips too. What's up?`,
         ts: new Date(),
       }]);
     }
@@ -738,21 +838,52 @@ function HealthPulse({ glow, isLight }: { glow: string; isLight: boolean }) {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [msgs]);
 
-  const HEALTH_SYSTEM = `You are Tessa's Health Pulse — a compact, sharp health + study assistant built into Tessa.
-You have ONE focus: help Ankit (17, male, Delhi, Class 12 CBSE 2026) with:
-1. CALORIE LOGGING — when he says what he ate, calculate calories clearly. Format: "X cal" in bold markdown.
-   Example: "2 rotis + dal = **~300 cal** logged 🍛"
-   After every calorie log, update his daily total (read from context below).
-2. HEALTH TIPS — quick, practical, India-context (dal, roti, chai, street food — not avocado toast).
-3. STUDY/EXAM HEALTH — tips for energy, sleep, focus for board exams.
-4. WATER reminders if asked.
+  // Drag handlers
+  const onDragStart = (e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).closest('button,input')) return;
+    dragging.current = true;
+    const rect = panelRef.current?.getBoundingClientRect();
+    dragStart.current = {
+      mx: e.clientX, my: e.clientY,
+      px: pos?.x ?? (window.innerWidth - 356),
+      py: pos?.y ?? (window.innerHeight - 500),
+    };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+  const onDragMove = (e: React.PointerEvent) => {
+    if (!dragging.current) return;
+    const dx = e.clientX - dragStart.current.mx;
+    const dy = e.clientY - dragStart.current.my;
+    const nx = Math.max(0, Math.min(window.innerWidth - 340, dragStart.current.px + dx));
+    const ny = Math.max(0, Math.min(window.innerHeight - 440, dragStart.current.py + dy));
+    setPos({ x: nx, y: ny });
+  };
+  const onDragEnd = () => { dragging.current = false; };
 
-RULES:
-• Be SHORT. Max 3 lines per response unless explaining a meal in detail.
-• No fluff. No "Great question!" No filler. Just the data + one-liner tip if relevant.
-• Always show calories as bold: **X cal**
-• If asked for non-health topics, redirect warmly: "This is your health channel — ask Tessa for that!"
-• You are NOT the main Tessa. You are a specialist sub-agent.`;
+  const HEALTH_SYSTEM = `You are Tessa's Health Pulse — a compact, specialist health sub-agent.
+Focus: calorie logging and water tracking for Ankit (17, male, Delhi, Class 12 CBSE 2026).
+
+CALORIE LOGGING RULES:
+- When user mentions food, calculate and confirm calories precisely
+- Always end calorie-containing replies with EXACTLY this pattern: **TOTAL: X cal**
+  Example: "2 rotis (120 cal) + dal (120 cal) = **TOTAL: 240 cal**"
+- Include breakdown for multi-item meals
+- Use India-specific portion sizes (roti=60cal, dal=120cal, rice bowl=130cal, samosa=262cal)
+
+WATER LOGGING RULES:
+- When user says they drank water, confirm with: **WATER: X glasses**
+  Example: "Noted! **WATER: 2 glasses** logged 💧"
+- If they say "a bottle" = 2 glasses
+
+HEALTH TIPS:
+- India-specific, practical, exam-focused
+- Max 3 lines per response
+
+STRICT RULES:
+- Always use **TOTAL: X cal** format for meals (never just "X cal logged")
+- Always use **WATER: X glasses** format for water
+- Be short — no fluff, no filler
+- If non-health topic: "This is your health channel — ask Tessa directly!"`;
 
   const send = async () => {
     const text = input.trim();
@@ -762,46 +893,67 @@ RULES:
     setInput('');
     setLoading(true);
 
-    // Build health context
+    // Build live health context for the AI
     let healthCtx = '';
     try {
       const h = JSON.parse(localStorage.getItem('tessa-health') || '{}');
+      const w = JSON.parse(localStorage.getItem('tessa-wellness') || '{}');
       const today = new Date().toISOString().split('T')[0];
-      if (h.date === today) {
-        healthCtx = `\n\nANKIT'S HEALTH TODAY:\n• Calories so far: ${h.totalCalories || 0} / 2200 cal\n• Meals logged: ${h.meals?.length || 0}\n• Weight: ${h.weight || '?'} kg · Height: ${h.height || '?'} cm`;
-        setCals(h.totalCalories || 0);
-      }
+      const curCal = h.date === today ? (h.totalCalories || 0) : 0;
+      const curWater = w.date === today ? (w.water || 0) : 0;
+      healthCtx = `\n\n[CURRENT STATE]\nCalories so far: ${curCal}/2200 cal\nWater: ${curWater}/${w.waterGoal||8} glasses\nWeight: ${h.weight||'?'}kg · Height: ${h.height||'?'}cm`;
     } catch {}
 
     try {
       const history = msgs.slice(-6).map(m => ({ role: m.role, content: m.text }));
       const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [...history, { role: 'user', content: text + healthCtx }],
-          isCreatorMode: false,
-          maxTokens: 200,
-          _healthPulse: true,
+          isCreatorMode: false, maxTokens: 220,
           _systemOverride: HEALTH_SYSTEM,
         }),
       });
       const data = await res.json();
-      const reply = data.content || 'Something went wrong — try again.';
+      const reply = data.content || 'Network error — try again.';
       setMsgs(p => [...p, { id: uuidv4(), role: 'assistant', text: reply, ts: new Date() }]);
 
-      // Parse calories from reply and update localStorage
-      const calMatch = reply.match(/\*\*[~≈]?\s*(\d{2,4})\s*cal\*\*/i);
+      // Parse TOTAL: X cal → update health localStorage + wellness
+      const calMatch = reply.match(/\*\*TOTAL:\s*(\d+)\s*cal\*\*/i);
       if (calMatch) {
+        const added = parseInt(calMatch[1]);
         try {
           const h = JSON.parse(localStorage.getItem('tessa-health') || '{}');
           const today = new Date().toISOString().split('T')[0];
           if (h.date !== today) { h.date = today; h.totalCalories = 0; h.meals = []; }
-          const added = parseInt(calMatch[1]);
           h.totalCalories = (h.totalCalories || 0) + added;
-          h.meals = [...(h.meals || []), { time: new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}), meal: text, calories: added, confidence: 'auto' }];
+          h.meals = [...(h.meals || []), {
+            time: new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}),
+            meal: text, calories: added, confidence: 'high',
+          }];
           localStorage.setItem('tessa-health', JSON.stringify(h));
           setCals(h.totalCalories);
+          // Also sync to wellness
+          const w = JSON.parse(localStorage.getItem('tessa-wellness') || '{}');
+          if (w.date !== today) { w.date = today; w.calories = 0; }
+          w.calories = (w.calories || 0) + added;
+          localStorage.setItem('tessa-wellness', JSON.stringify(w));
+          onSync?.();
+        } catch {}
+      }
+
+      // Parse WATER: X glasses → update wellness localStorage
+      const waterMatch = reply.match(/\*\*WATER:\s*(\d+)\s*glasses?\*\*/i);
+      if (waterMatch) {
+        const added = parseInt(waterMatch[1]);
+        try {
+          const w = JSON.parse(localStorage.getItem('tessa-wellness') || '{}');
+          const today = new Date().toISOString().split('T')[0];
+          if (w.date !== today) { w.date = today; w.water = 0; w.waterGoal = 8; }
+          w.water = Math.min((w.water || 0) + added, (w.waterGoal || 8) + 4);
+          localStorage.setItem('tessa-wellness', JSON.stringify(w));
+          setWater(w.water);
+          onSync?.();
         } catch {}
       }
     } catch {
@@ -813,48 +965,71 @@ RULES:
 
   const calPct = Math.min(100, Math.round((cals / 2200) * 100));
   const calColor = calPct > 90 ? '#ef4444' : calPct > 65 ? '#f97316' : '#22c55e';
+  const waterPct = Math.min(100, Math.round((water / 8) * 100));
+
+  // Panel position — draggable or default bottom-right
+  const panelStyle: React.CSSProperties = pos
+    ? { position: 'fixed', left: pos.x, top: pos.y, zIndex: 59 }
+    : { position: 'fixed', bottom: 160, right: 16, zIndex: 59 };
+
+  if (hidden) return null;
 
   return (
     <>
-      {/* ── FAB button ── */}
+      {/* ── FAB — always fixed bottom-right ── */}
       <button
         onClick={() => setOpen(p => !p)}
-        className="fixed bottom-24 right-4 z-[60] w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all active:scale-90"
+        className="fixed z-[60] w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all active:scale-90"
         style={{
+          bottom: 88, right: 16,
           background: open ? glow : `linear-gradient(135deg, ${glow}, ${glow}cc)`,
           boxShadow: `0 4px 20px ${glow}50`,
           border: `1.5px solid ${glow}60`,
         }}
         title="Health Pulse"
       >
-        {open
-          ? <X size={18} className="text-white" />
-          : <Salad size={18} className="text-white" />
-        }
-        {!open && cals > 0 && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[8px] font-black flex items-center justify-center text-white"
-            style={{ background: calColor, fontSize: 7 }}>
+        {open ? <X size={18} className="text-white" /> : <Salad size={18} className="text-white" />}
+        {!open && (cals > 0 || water > 0) && (
+          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-white"
+            style={{ background: calColor, fontSize: 7, fontWeight: 900 }}>
             {calPct}%
           </span>
         )}
       </button>
 
-      {/* ── Panel ── */}
+      {/* ── Expanded panel — draggable ── */}
       {open && (
         <div
-          className="fixed bottom-40 right-4 z-[59] rounded-2xl overflow-hidden flex flex-col"
+          ref={panelRef}
           style={{
+            ...panelStyle,
             width: 'min(340px, calc(100vw - 32px))',
             height: 440,
             background: isLight ? '#ffffff' : '#0d0f1e',
             border: `1px solid ${glow}30`,
             boxShadow: `0 8px 40px rgba(0,0,0,0.35), 0 0 30px ${glow}15`,
+            borderRadius: 20,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
             animation: 'slideUpSheet 0.25s cubic-bezier(0.32,0.72,0,1)',
           }}
+          onPointerDown={onDragStart}
+          onPointerMove={onDragMove}
+          onPointerUp={onDragEnd}
+          onPointerCancel={onDragEnd}
         >
-          {/* Header */}
-          <div className="flex-shrink-0 flex items-center justify-between px-3.5 py-3"
-            style={{ borderBottom: `1px solid ${glow}18`, background: `linear-gradient(135deg, ${glow}10, ${glow}05)` }}>
+          {/* Drag handle */}
+          <div className="flex-shrink-0 flex justify-center items-center gap-2 pt-2.5 pb-1.5 cursor-grab active:cursor-grabbing select-none"
+            style={{ borderBottom: `1px solid ${glow}12` }}>
+            <div className="w-8 h-1 rounded-full" style={{ background: `${glow}35` }}/>
+            <span className="text-[8px] font-semibold" style={{ color: isLight?'#9ca3af':'rgba(255,255,255,0.28)' }}>drag</span>
+            <div className="w-8 h-1 rounded-full" style={{ background: `${glow}35` }}/>
+          </div>
+
+          {/* Header with dual ring: calories + water */}
+          <div className="flex-shrink-0 flex items-center justify-between px-3.5 py-2.5"
+            style={{ background: `linear-gradient(135deg, ${glow}10, ${glow}05)` }}>
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: glow }}>
                 <Salad size={13} className="text-white" />
@@ -864,29 +1039,41 @@ RULES:
                 <p className="text-[9px]" style={{ color: isLight ? '#6b7280' : 'rgba(255,255,255,0.4)' }}>private · not in history</p>
               </div>
             </div>
-            {/* Calorie ring */}
-            <div className="flex items-center gap-1.5">
-              <div className="flex flex-col items-end">
-                <span className="text-[11px] font-bold" style={{ color: calColor }}>{cals}</span>
-                <span className="text-[8px]" style={{ color: isLight ? '#9ca3af' : 'rgba(255,255,255,0.3)' }}>/ 2200 cal</span>
+            {/* Calorie + water rings */}
+            <div className="flex items-center gap-3">
+              {/* Calorie ring */}
+              <div className="flex flex-col items-center gap-0.5">
+                <div className="relative w-9 h-9">
+                  <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                    <circle cx="18" cy="18" r="14" fill="none" stroke={isLight?'#e5e7eb':'rgba(255,255,255,0.1)'} strokeWidth="3"/>
+                    <circle cx="18" cy="18" r="14" fill="none" stroke={calColor} strokeWidth="3"
+                      strokeDasharray={`${calPct * 0.879} 87.9`} strokeLinecap="round"/>
+                  </svg>
+                  <Flame size={9} className="absolute inset-0 m-auto" style={{ color: calColor }} />
+                </div>
+                <span className="text-[8px] font-bold" style={{ color: calColor }}>{cals} cal</span>
               </div>
-              <div className="relative w-8 h-8">
-                <svg viewBox="0 0 32 32" className="w-full h-full -rotate-90">
-                  <circle cx="16" cy="16" r="12" fill="none" stroke={isLight?'#e5e7eb':'rgba(255,255,255,0.1)'} strokeWidth="3"/>
-                  <circle cx="16" cy="16" r="12" fill="none" stroke={calColor} strokeWidth="3"
-                    strokeDasharray={`${calPct * 0.754} 75.4`} strokeLinecap="round"/>
-                </svg>
-                <Flame size={9} className="absolute inset-0 m-auto" style={{ color: calColor }} />
+              {/* Water ring */}
+              <div className="flex flex-col items-center gap-0.5">
+                <div className="relative w-9 h-9">
+                  <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                    <circle cx="18" cy="18" r="14" fill="none" stroke={isLight?'#e5e7eb':'rgba(255,255,255,0.1)'} strokeWidth="3"/>
+                    <circle cx="18" cy="18" r="14" fill="none" stroke="#3b82f6" strokeWidth="3"
+                      strokeDasharray={`${waterPct * 0.879} 87.9`} strokeLinecap="round"/>
+                  </svg>
+                  <Droplets size={9} className="absolute inset-0 m-auto" style={{ color: '#3b82f6' }} />
+                </div>
+                <span className="text-[8px] font-bold" style={{ color: '#3b82f6' }}>{water}/8</span>
               </div>
             </div>
           </div>
 
-          {/* Quick-tap chips */}
+          {/* Quick chips */}
           <div className="flex-shrink-0 flex gap-1.5 px-3 py-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-            {['Log a meal', 'Water intake', 'Exam energy tips', 'Sleep advice'].map(chip => (
+            {['Log meal', '1 glass water', 'Exam energy', 'Sleep tips', 'Water bottle'].map(chip => (
               <button key={chip} onClick={() => { setInput(chip); setTimeout(() => inputRef.current?.focus(), 50); }}
-                className="flex-shrink-0 px-2.5 py-1 rounded-full text-[9px] font-semibold whitespace-nowrap transition-all active:scale-95"
-                style={{ background: `${glow}12`, border: `1px solid ${glow}25`, color: glow }}>
+                className="flex-shrink-0 px-2.5 py-1 rounded-full text-[9px] font-semibold whitespace-nowrap active:scale-95"
+                style={{ background: `${glow}12`, border: `1px solid ${glow}22`, color: glow }}>
                 {chip}
               </button>
             ))}
@@ -896,18 +1083,17 @@ RULES:
           <div className="flex-1 overflow-y-auto px-3 py-1 space-y-2" style={{ scrollbarWidth: 'thin' }}>
             {msgs.map(m => (
               <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className="max-w-[86%] rounded-xl px-3 py-2 text-[11px] leading-relaxed"
+                <div className="max-w-[88%] rounded-xl px-3 py-2 text-[11px] leading-relaxed"
                   style={{
                     background: m.role === 'user'
                       ? `linear-gradient(135deg, ${glow}22, ${glow}12)`
                       : isLight ? '#f9fafb' : 'rgba(255,255,255,0.06)',
-                    border: `1px solid ${m.role === 'user' ? glow+'30' : isLight ? '#e5e7eb' : 'rgba(255,255,255,0.08)'}`,
+                    border: `1px solid ${m.role==='user' ? glow+'30' : isLight?'#e5e7eb':'rgba(255,255,255,0.08)'}`,
                     color: isLight ? '#1e293b' : 'rgba(255,255,255,0.88)',
                   }}>
-                  {/* Bold markdown for calories */}
                   {m.text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
                     part.startsWith('**') && part.endsWith('**')
-                      ? <strong key={i} style={{ color: glow }}>{part.slice(2, -2)}</strong>
+                      ? <strong key={i} style={{ color: part.includes('WATER') ? '#3b82f6' : glow }}>{part.slice(2,-2)}</strong>
                       : <span key={i}>{part}</span>
                   )}
                 </div>
@@ -916,15 +1102,15 @@ RULES:
             {loading && (
               <div className="flex justify-start">
                 <div className="rounded-xl px-3 py-2 flex items-center gap-1"
-                  style={{ background: isLight ? '#f3f4f6' : 'rgba(255,255,255,0.06)', border: `1px solid ${isLight?'#e5e7eb':'rgba(255,255,255,0.08)'}` }}>
+                  style={{ background: isLight?'#f3f4f6':'rgba(255,255,255,0.06)', border:`1px solid ${isLight?'#e5e7eb':'rgba(255,255,255,0.08)'}` }}>
                   {[0,150,300].map(d => (
                     <div key={d} className="w-1.5 h-1.5 rounded-full animate-bounce"
-                      style={{ background: glow, animationDelay: `${d}ms` }} />
+                      style={{ background: glow, animationDelay:`${d}ms` }}/>
                   ))}
                 </div>
               </div>
             )}
-            <div ref={bottomRef} />
+            <div ref={bottomRef}/>
           </div>
 
           {/* Input */}
@@ -934,19 +1120,19 @@ RULES:
               ref={inputRef}
               value={input}
               onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && send()}
-              placeholder="ate 2 rotis + sabzi…"
+              onKeyDown={e => e.key==='Enter' && send()}
+              placeholder="2 rotis + dal · 2 glasses water…"
               className="flex-1 text-[11px] px-3 py-2 rounded-xl outline-none"
               style={{
-                background: isLight ? '#f9fafb' : 'rgba(255,255,255,0.06)',
+                background: isLight?'#f9fafb':'rgba(255,255,255,0.06)',
                 border: `1px solid ${glow}25`,
-                color: isLight ? '#1e293b' : 'rgba(255,255,255,0.88)',
+                color: isLight?'#1e293b':'rgba(255,255,255,0.88)',
               }}
             />
-            <button onClick={send} disabled={!input.trim() || loading}
-              className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all active:scale-90 disabled:opacity-40"
+            <button onClick={send} disabled={!input.trim()||loading}
+              className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 active:scale-90 disabled:opacity-40"
               style={{ background: glow }}>
-              <Send size={13} className="text-white" />
+              <Send size={13} className="text-white"/>
             </button>
           </div>
         </div>
@@ -955,7 +1141,6 @@ RULES:
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // SETTINGS BOTTOM SHEET — slides up from bottom, not left sidebar
 // Left pill-nav + right scrollable content
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1392,73 +1577,19 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
   // ── Dashboard / food parsing ───────────────────────────────────────────────
   // Strategy: extract calorie numbers Tessa already stated in her response.
   // If she wrote "786 cal" or "3 × 262 = 786", trust that number — it came
-  // from web data or her knowledge and is the most accurate figure.
-  // Only fall back to the local database if no calorie figure found in response.
-  const parseDashboardUpdates = (responseText: string, userText: string = ''): string => {
+  // parseDashboardUpdates — calorie tracking REMOVED from main chat.
+  // Calories are tracked exclusively via Health Pulse for accuracy.
+  // Only sleep detection remains here (non-calorie, just a note).
+  const parseDashboardUpdates = (responseText: string, _userText: string = ''): string => {
     if (!isCreatorMode) return '';
     let extra = '';
     try {
-      // Detect food mention from EITHER user message or Tessa's response
-      const foodHit = detectMealInResponse(userText) || detectMealInResponse(responseText);
-      if (foodHit) {
-
-        // ── Step 1: Try to extract total calories Tessa already stated ─────────
-        // Patterns: "786 cal", "= 786 calories", "total: 786", "~450 cal"
-        let tessaTotal: number | null = null;
-
-        // "X × Y = Z cal" or "= Z cal" (final sum pattern — most reliable)
-        const sumMatch = responseText.match(/[=≈~]\s*\*{0,2}(\d{3,5})\*{0,2}\s*cal/i)
-          ?? responseText.match(/total[^\d]*(\d{3,5})\s*cal/i)
-          ?? responseText.match(/logged[^\d]*(\d{3,5})\s*cal/i);
-        if (sumMatch?.[1]) tessaTotal = parseInt(sumMatch[1], 10);
-
-        // If no sum, collect all "NNN cal" mentions and sum them
-        if (!tessaTotal) {
-          const allCalMatches = [...responseText.matchAll(/(\d{2,5})\s*cal(?:ories)?/gi)];
-          if (allCalMatches.length > 0) {
-            // Take the largest single number — likely the total
-            const nums = allCalMatches.map(m => parseInt(m[1], 10)).filter(n => n >= 30 && n <= 5000);
-            if (nums.length > 0) tessaTotal = Math.max(...nums);
-          }
-        }
-
-        // ── Step 2: If Tessa stated calories, trust that number ────────────────
-        let totalCal: number;
-        let lines: string[];
-
-        if (tessaTotal && tessaTotal >= 30 && tessaTotal <= 5000) {
-          totalCal = tessaTotal;
-          lines = [`${foodHit.food} — ${totalCal}cal (from Tessa's response)`];
-        } else {
-          // ── Step 3: Fall back to local database ───────────────────────────────
-          const foods = foodHit.food.split(/,|and|\+|with/i).map(f => f.trim()).filter(Boolean);
-          totalCal = 0; lines = [];
-          for (const food of foods) {
-            const qm  = food.match(/^(\d+(?:\.\d+)?)\s*[xX×]?\s*(.+)/);
-            const qty  = qm ? parseFloat(qm[1]) : 1;
-            const fn   = qm ? qm[2].trim() : food;
-            const res  = estimateCalories(fn, qty);
-            totalCal  += res.calories;
-            lines.push(`${res.food} — ${res.calories}cal (${res.unit})`);
-          }
-        }
-
-        const h = lsGetJson<HealthSnapshot>('tessa-health', { weight:0, height:0, meals:[], totalCalories:0, date:new Date().toISOString().split('T')[0] });
-        h.meals.push({ time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}), meal:lines.join(', '), calories:totalCal, confidence: tessaTotal ? 'high' : 'medium' });
-        h.totalCalories=(h.totalCalories??0)+totalCal;
-        lsSet('tessa-health', JSON.stringify(h));
-        const mw = getCurrentMealWindow(); if (mw) markMeal(mw.name);
-        addCalories(totalCal); setWellnessVersion(v => v+1);
-        if (isCreatorMode && user && !isGuest) {
-          if (syncTimer.current) clearTimeout(syncTimer.current);
-          syncTimer.current = setTimeout(() => pushCreatorSync(user.id), 3000);
-        }
-      }
       const sleepHit = detectSleepInResponse(responseText);
       if (sleepHit) {
         const h = lsGetJson<HealthSnapshot>('tessa-health', { weight:0, height:0, meals:[], totalCalories:0, date:new Date().toISOString().split('T')[0] });
-        h.sleepHours=sleepHit.hours; lsSet('tessa-health', JSON.stringify(h));
-        extra = '\n\n'+getSleepReaction(sleepHit.hours);
+        h.sleepHours = sleepHit.hours;
+        lsSet('tessa-health', JSON.stringify(h));
+        extra = '\n\n' + getSleepReaction(sleepHit.hours);
       }
     } catch {}
     return extra;
@@ -2895,7 +3026,8 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
 
       {/* ── HEALTH PULSE — floating calorie/health mini-chat (creator mode) ── */}
       {isCreatorMode && (
-        <HealthPulse glow={t.glow} isLight={t.isLight} />
+        <HealthPulse glow={t.glow} isLight={t.isLight} hidden={showSettings || showDashboard}
+          onSync={() => setWellnessVersion(v => v + 1)} />
       )}
 
       {/* ── FLOATING INSIGHTS PANEL ── */}

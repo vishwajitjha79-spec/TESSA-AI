@@ -660,87 +660,8 @@ export default function PersonalDashboard({ isLight = false, accentColor = '#ec4
           </div>
         </div>
 
-        {/* dummy block to appease TypeScript — suggestions/inputs removed */}
-        {false && (
-          <div style={{ position: 'relative', marginBottom: 6 }}>
-            <input
-              ref={inputRef}
-              type="text"
-              value={foodInput}
-              onChange={e => setFoodInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter'}
-              placeholder=""
-              style={{ display: 'none' }}
-            />
-              {suggestions.length > 0 && (
-                <div style={{
-                  position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50, marginTop: 2,
-                  background: drop, border: `1px solid ${acc}30`, borderRadius: 8, overflow: 'hidden',
-                  boxShadow: '0 8px 20px rgba(0,0,0,0.22)',
-                }}>
-                  {suggestions.map((s, i) => {
-                    const info = estimateCalories(s);
-                    return (
-                      <button
-                        key={i}
-                        onClick={() => { setFoodInput(s); setSuggestions([]); inputRef.current?.focus(); }}
-                        style={{
-                          width: '100%', padding: '7px 12px', textAlign: 'left',
-                          background: 'none', border: 'none', cursor: 'pointer',
-                          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                          borderBottom: i < suggestions.length - 1 ? `1px solid ${dropB}` : 'none',
-                          color: isLight ? '#1f2937' : 'rgba(255,255,255,0.85)',
-                          fontSize: 11,
-                        }}
-                        onMouseEnter={e => (e.currentTarget.style.background = `${acc}12`)}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'none')}>
-                        <span>{s}</span>
-                        <span style={{ color: acc, fontWeight: 700 }}>{info.calories} cal</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Qty + live preview */}
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
-              <span style={{ fontSize: 10, color: sub, flexShrink: 0 }}>Qty:</span>
-              <input
-                type="number" value={qtyInput} min="0.5" step="0.5"
-                onChange={e => setQtyInput(e.target.value)}
-                style={{
-                  width: 56, padding: '5px 8px', borderRadius: 7,
-                  background: inp, border: `1px solid ${inpB}`,
-                  color: isLight ? '#1f2937' : 'rgba(255,255,255,0.90)',
-                  fontSize: 11, outline: 'none',
-                }} />
-              {foodInput && liveCal > 0 && (
-                <div style={{
-                  flex: 1, background: accSurf, border: `1px solid ${accBord}`,
-                  borderRadius: 7, padding: '4px 9px', textAlign: 'center',
-                }}>
-                  <span style={{ fontSize: 13, fontWeight: 900, color: acc }}>{liveCal} cal</span>
-                </div>
-              )}
-            </div>
-
-            <div style={{ display: 'flex', gap: 6 }}>
-              <button onClick={() => addMeal()} style={{
-                flex: 1, padding: '7px 0', borderRadius: 8, background: acc,
-                border: 'none', color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer',
-              }}>Log Meal</button>
-              <button onClick={() => { setShowAdd(false); setFoodInput(''); setQtyInput('1'); setSuggestions([]); }}
-                style={{
-                  padding: '7px 10px', borderRadius: 8, background: card,
-                  border: `1px solid ${cardB}`, color: sub, cursor: 'pointer',
-                  display: 'flex', alignItems: 'center',
-                }}>
-                <X size={12} />
-              </button>
-            </div>
-          </div>
-        )}
+        {/* refs kept alive — meal logging moved to Health Pulse */}
+        {false && <input ref={inputRef} value={foodInput} onChange={e=>setFoodInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addMeal()} style={{display:'none'}}/>}
 
         {/* Meal list */}
         {health.meals.length > 0 ? (

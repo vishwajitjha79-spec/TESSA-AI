@@ -353,10 +353,10 @@ const THEMES = {
     settActive:'bg-rose-100 border border-rose-300',
     isLight:true,
   },
-  // ── ANKIT'S SPECIAL — Spider-Man ────────────────────────────────────────────
-  // Normal: warm cream canvas (#f5f0e8) + cute Spidey heart-web illustration
-  // Creator: parchment (#f0ebe0) + sketch/ink Spidey mask aesthetic
-  // Both light → ALL text stays dark slate for max readability
+  // ── ANKIT'S SPECIAL — Creator-mode only theme ───────────────────────────────
+  // Only appears in creator mode settings. Standard mode doesn't show this.
+  // Background: parchment (#f0ebe0) + sketch lines + Spidey mask corner art
+  // All text stays dark slate — fully readable over the light parchment
   ankit: {
     bg:'bg-[#f5f0e8]', bgC:'bg-[#f0ebe0]',
     panel:'bg-white/80 backdrop-blur-md border-red-200/40 shadow-sm shadow-red-100/20',
@@ -536,186 +536,85 @@ function AuroraBg({ glow, glow2 }: { glow: string; glow2: string; theme: Theme }
 // Light theme background — mobile: pure CSS gradient; desktop: animated blobs
 // Ankit: pure white/rose with subtle SVG web corners only
 function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
-  // Ankit Spider-Man wallpaper
-  // Normal: image 2 style — warm cream canvas, cute Spidey hanging from heart web (centre)
-  // Creator: image 4 style — parchment, sketch ink lines, Spidey mask corner art
-  if (theme === 'ankit') {
-    // ── NORMAL MODE — Image 2: warm cream + cute Spidey heart-web ─────────────
-    if (!creator) return (
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-        {/* Warm cream base — exactly like Image 2 */}
-        <div className="absolute inset-0" style={{ background: '#f5f0e8' }}/>
-
-        {/* Very subtle warm vignette edges */}
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse 80% 70% at 50% 50%, transparent 55%, rgba(210,185,155,0.15) 100%)',
-        }}/>
-
-        {/* ── CENTRE PIECE: Cute Spidey hanging from heart web ── */}
-        <svg className="absolute" style={{ width: 220, left: '50%', top: '18%', transform: 'translateX(-50%)' }}
-          viewBox="0 0 220 320">
-
-          {/* Thread from top */}
-          <line x1="110" y1="0" x2="110" y2="28" stroke="#c0392b" strokeWidth="1.2" strokeLinecap="round"/>
-
-          {/* Heart-shaped web */}
-          {/* Left lobe spokes */}
-          {[200,215,230,245,260,275].map((deg,i)=>{
-            const cx=80, cy=68, r=46;
-            const rad=deg*Math.PI/180;
-            return <line key={'ls'+i} x1={cx} y1={cy} x2={cx+r*Math.cos(rad)} y2={cy+r*Math.sin(rad)}
-              stroke="#c0392b" strokeWidth="1.1" strokeLinecap="round"/>;
-          })}
-          {/* Right lobe spokes */}
-          {[290,305,320,335,350,5].map((deg,i)=>{
-            const cx=140, cy=68, r=46;
-            const rad=deg*Math.PI/180;
-            return <line key={'rs'+i} x1={cx} y1={cy} x2={cx+r*Math.cos(rad)} y2={cy+r*Math.sin(rad)}
-              stroke="#c0392b" strokeWidth="1.1" strokeLinecap="round"/>;
-          })}
-          {/* Concentric heart arcs — left lobe */}
-          {[16,30,44].map((r,i)=>(
-            <path key={'la'+i} d={`M ${80-r},68 A ${r},${r} 0 1,1 ${80+r},68`}
-              fill="none" stroke="#c0392b" strokeWidth="0.9" strokeOpacity={0.85-i*0.15}/>
-          ))}
-          {/* Concentric heart arcs — right lobe */}
-          {[16,30,44].map((r,i)=>(
-            <path key={'ra'+i} d={`M ${140-r},68 A ${r},${r} 0 1,1 ${140+r},68`}
-              fill="none" stroke="#c0392b" strokeWidth="0.9" strokeOpacity={0.85-i*0.15}/>
-          ))}
-          {/* Heart outline */}
-          <path d="M 110,108 C 90,98 34,82 34,60 C 34,44 46,32 62,32 C 76,32 90,42 110,58 C 130,42 144,32 158,32 C 174,32 186,44 186,60 C 186,82 130,98 110,108 Z"
-            fill="none" stroke="#c0392b" strokeWidth="1.5"/>
-          {/* Heart centre */}
-          <path d="M 110,72 C 106,68 100,64 100,60 C 100,56 104,54 108,57 C 109,58 110,59 110,59 C 110,59 111,58 112,57 C 116,54 120,56 120,60 C 120,64 114,68 110,72 Z"
-            fill="#c0392b" opacity="0.9"/>
-
-          {/* Thread from heart bottom to Spidey */}
-          <line x1="110" y1="110" x2="110" y2="138" stroke="#c0392b" strokeWidth="1" strokeLinecap="round"/>
-
-          {/* ── Cute Spidey body (hanging upside-down, arms crossed, holding flowers) ── */}
-          {/* Head */}
-          <ellipse cx="110" cy="155" rx="18" ry="20" fill="#e53935"/>
-          {/* Web pattern on head */}
-          {[145,160,175,190,205,220].map((deg,i)=>{
-            const rad=deg*Math.PI/180;
-            return <line key={'hd'+i} x1="110" y1="155" x2={110+22*Math.cos(rad)} y2={155+22*Math.sin(rad)}
-              stroke="#b71c1c" strokeWidth="0.6" opacity="0.6"/>;
-          })}
-          {[6,12,18].map((r,i)=>(
-            <ellipse key={'hc'+i} cx="110" cy="155" rx={r} ry={r*1.1}
-              fill="none" stroke="#b71c1c" strokeWidth="0.5" opacity="0.5"/>
-          ))}
-          {/* Eyes */}
-          <ellipse cx="104" cy="150" rx="6" ry="7" fill="white" transform="rotate(-8 104 150)"/>
-          <ellipse cx="116" cy="150" rx="6" ry="7" fill="white" transform="rotate(8 116 150)"/>
-          <ellipse cx="104" cy="150" rx="4" ry="5" fill="#b0bec5" opacity="0.6" transform="rotate(-8 104 150)"/>
-          <ellipse cx="116" cy="150" rx="4" ry="5" fill="#b0bec5" opacity="0.6" transform="rotate(8 116 150)"/>
-          {/* Body — blue suit */}
-          <ellipse cx="110" cy="195" rx="16" ry="22" fill="#1565c0"/>
-          {/* Red chest patch */}
-          <ellipse cx="110" cy="188" rx="10" ry="8" fill="#e53935"/>
-          {/* Spider logo on chest */}
-          <ellipse cx="110" cy="187" rx="3" ry="4" fill="#1a1a1a"/>
-          {[-35,35].flatMap((a,i)=>[
-            <line key={'sl'+i} x1="110" y1="187" x2={110+9*Math.cos((90+a)*Math.PI/180)} y2={187+9*Math.sin((90+a)*Math.PI/180)}
-              stroke="#1a1a1a" strokeWidth="1.2"/>,
-            <line key={'sr'+i} x1="110" y1="187" x2={110+9*Math.cos((90-a)*Math.PI/180)} y2={187+9*Math.sin((90-a)*Math.PI/180)}
-              stroke="#1a1a1a" strokeWidth="1.2"/>,
-          ])}
-          {/* Arms crossed */}
-          <path d="M 98,190 C 90,195 86,202 84,208" fill="none" stroke="#1565c0" strokeWidth="8" strokeLinecap="round"/>
-          <path d="M 122,190 C 130,195 134,202 136,208" fill="none" stroke="#1565c0" strokeWidth="8" strokeLinecap="round"/>
-          {/* Hands holding flowers */}
-          <circle cx="82" cy="210" r="5" fill="#e53935"/>
-          <circle cx="138" cy="210" r="5" fill="#e53935"/>
-          {/* Flower bouquet */}
-          {[[-10,0],[0,-8],[10,0],[0,8]].map(([dx,dy],i)=>(
-            <circle key={'f'+i} cx={82+dx} cy={220+dy} r="4"
-              fill={['#f48fb1','#fff176','#a5d6a7','#80cbc4'][i]} opacity="0.9"/>
-          ))}
-          {/* Legs dangling up */}
-          <path d="M 102,215 C 96,226 94,235 90,242" fill="none" stroke="#1565c0" strokeWidth="9" strokeLinecap="round"/>
-          <path d="M 118,215 C 124,226 126,235 130,242" fill="none" stroke="#1565c0" strokeWidth="9" strokeLinecap="round"/>
-          {/* Shoes */}
-          <ellipse cx="88" cy="244" rx="7" ry="4" fill="#e53935" transform="rotate(-20 88 244)"/>
-          <ellipse cx="132" cy="244" rx="7" ry="4" fill="#e53935" transform="rotate(20 132 244)"/>
-        </svg>
-
-        {/* Very faint dot texture — like paper grain */}
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'radial-gradient(circle, rgba(160,130,100,0.08) 1px, transparent 1px)',
-          backgroundSize: '20px 20px',
-        }}/>
-      </div>
-    );
-
-    // ── CREATOR MODE — Image 4: parchment + sketch aesthetic ──────────────────
+  // Ankit theme: only active in creator mode. Standard mode falls through to configs below.
+  if (theme === 'ankit' && creator) {
+    // Parchment + sketch/ink aesthetic (Image 4 inspired)
+    // No spider figure in centre — just texture, sketch lines, mask corner art
     return (
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
         {/* Parchment base */}
         <div className="absolute inset-0" style={{ background: '#f0ebe0' }}/>
 
-        {/* Speed/sketch lines — like Image 4 background */}
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" style={{ opacity: 0.08 }}>
-          {Array.from({length:40},(_,i)=>(
-            <line key={i}
-              x1={-50 + i*15} y1="0"
-              x2={-50 + i*15 + 200} y2="800"
-              stroke="#2c2c2c" strokeWidth={i%5===0?0.8:0.4}/>
-          ))}
-        </svg>
-
-        {/* Red paint splatter dots — like Image 4 */}
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" style={{ opacity: 0.45 }}>
-          {[[40,120],[60,280],[80,400],[30,550],[90,670],
-            [280,80],[310,200],[260,360],[320,480],[290,600],[350,720],
-            [150,150],[170,320],[130,480],[160,630],
-            [220,100],[200,260],[240,420],[210,580]].map(([x,y],i)=>(
-            <circle key={i} cx={x} cy={y} r={i%4===0?3.5:i%3===0?2.5:1.5}
-              fill={i%3===0?'#c0392b':i%4===0?'#1a1a2e':'#c0392b'} opacity={0.7-i%3*0.15}/>
-          ))}
-        </svg>
-
-        {/* Large Spidey mask — bottom-right corner, like Image 4 */}
-        <svg className="absolute bottom-0 right-0" style={{ width: '75%', maxWidth: 380, opacity: 0.09 }}
-          viewBox="0 0 300 420" preserveAspectRatio="xMaxYMax meet">
-          {/* Head shape */}
-          <ellipse cx="200" cy="160" rx="130" ry="160" fill="#c0392b"/>
-          {/* Eye — left (huge, angular like Spidey) */}
-          <path d="M 110,100 C 120,80 160,75 180,90 C 200,105 205,130 190,140 C 165,155 110,145 100,125 C 95,115 100,108 110,100 Z"
-            fill="white"/>
-          <path d="M 112,103 C 122,85 158,80 178,93 C 196,106 200,127 187,136 C 163,150 113,142 104,123 C 100,114 104,109 112,103 Z"
-            fill="#b0bec5" opacity="0.5"/>
-          {/* Web lines on mask */}
-          {[0,20,40,60,80,100,120,140,160,180].map((deg,i)=>{
-            const rad=deg*Math.PI/180;
-            return <line key={i} x1="200" y1="160" x2={200+200*Math.cos(rad)} y2={160+200*Math.sin(rad)}
-              stroke="#8b0000" strokeWidth="0.8" opacity="0.4"/>;
-          })}
-          {[40,80,120,160,200].map((r,i)=>(
-            <ellipse key={i} cx="200" cy="160" rx={r} ry={r*1.2}
-              fill="none" stroke="#8b0000" strokeWidth="0.6" opacity={0.35-i*0.05}/>
-          ))}
-          {/* Dark body shoulder */}
-          <ellipse cx="250" cy="380" rx="160" ry="120" fill="#1a1a2e" opacity="0.9"/>
-        </svg>
-
-        {/* Ink splatter bottom-left */}
-        <svg className="absolute bottom-0 left-0" style={{ width: '40%', maxWidth: 160, opacity: 0.07 }}
-          viewBox="0 0 160 200">
-          <ellipse cx="60" cy="180" rx="80" ry="60" fill="#1a1a2e"/>
-          <ellipse cx="30" cy="160" rx="30" ry="50" fill="#c0392b"/>
-        </svg>
-
-        {/* Paper grain texture */}
+        {/* Warm vignette — very subtle */}
         <div className="absolute inset-0" style={{
-          backgroundImage: 'radial-gradient(circle, rgba(100,80,60,0.07) 1px, transparent 1px)',
+          background: 'radial-gradient(ellipse 80% 70% at 50% 50%, transparent 50%, rgba(180,150,110,0.12) 100%)',
+        }}/>
+
+        {/* Diagonal speed / sketch lines — Image 4 style */}
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 800"
+          preserveAspectRatio="xMidYMid slice" style={{ opacity: 0.07 }}>
+          {Array.from({length:50},(_,i)=>(
+            <line key={i}
+              x1={-80 + i*12} y1="0"
+              x2={-80 + i*12 + 220} y2="800"
+              stroke="#2c2c2c" strokeWidth={i%6===0?0.9:i%3===0?0.55:0.35}/>
+          ))}
+        </svg>
+
+        {/* Red + dark ink splatter dots scattered across — Image 4 style */}
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 800"
+          preserveAspectRatio="xMidYMid slice" style={{ opacity: 0.40 }}>
+          {[
+            [38,115,'#c0392b',3],[62,275,'#c0392b',2],[78,395,'#1a1a2e',2.5],[28,548,'#c0392b',1.8],[88,665,'#1a1a2e',1.5],
+            [285,78,'#c0392b',2.2],[312,198,'#1a1a2e',3],[258,362,'#c0392b',1.8],[322,478,'#c0392b',2],[288,598,'#1a1a2e',1.5],[348,718,'#c0392b',1.2],
+            [148,148,'#1a1a2e',2],[168,318,'#c0392b',1.5],[128,478,'#1a1a2e',2.5],[158,628,'#c0392b',1],
+            [218,98,'#c0392b',1.5],[198,258,'#1a1a2e',2],[238,418,'#c0392b',1.8],[208,578,'#1a1a2e',1.2],
+            [55,35,'#c0392b',1.2],[320,35,'#1a1a2e',1],[180,22,'#c0392b',0.8],
+          ].map(([x,y,fill,r],i)=>(
+            <circle key={i} cx={x as number} cy={y as number} r={r as number} fill={fill as string}/>
+          ))}
+        </svg>
+
+        {/* Spidey mask — bottom-right corner only, large, artistic */}
+        <svg className="absolute bottom-0 right-0" style={{ width: '72%', maxWidth: 340, opacity: 0.10 }}
+          viewBox="0 0 300 400" preserveAspectRatio="xMaxYMax meet">
+          {/* Head */}
+          <ellipse cx="195" cy="155" rx="125" ry="155" fill="#c0392b"/>
+          {/* Web lines radiating from eye area */}
+          {[0,18,36,54,72,90,108,126,144,162,180].map((deg,i)=>{
+            const rad=deg*Math.PI/180;
+            return <line key={i} x1="195" y1="155" x2={195+210*Math.cos(rad)} y2={155+210*Math.sin(rad)}
+              stroke="#8b0000" strokeWidth="0.7" opacity="0.5"/>;
+          })}
+          {[38,76,114,152,190].map((r,i)=>(
+            <ellipse key={i} cx="195" cy="155" rx={r} ry={r*1.22}
+              fill="none" stroke="#8b0000" strokeWidth="0.55" opacity={0.38-i*0.05}/>
+          ))}
+          {/* Big angular eye lens — top left */}
+          <path d="M 108,96 C 118,74 162,68 184,84 C 206,100 212,128 196,139 C 170,155 110,143 100,120 C 96,110 100,104 108,96 Z"
+            fill="white" opacity="0.92"/>
+          <path d="M 111,99 C 121,79 160,74 181,88 C 201,103 206,125 191,135 C 166,150 113,139 105,118 C 101,109 104,105 111,99 Z"
+            fill="#b0bec5" opacity="0.4"/>
+          {/* Dark body/shoulder at bottom */}
+          <ellipse cx="240" cy="370" rx="155" ry="115" fill="#1a1a2e" opacity="0.88"/>
+        </svg>
+
+        {/* Small ink blot — bottom-left corner accent */}
+        <svg className="absolute bottom-0 left-0" style={{ width: '32%', maxWidth: 130, opacity: 0.08 }}
+          viewBox="0 0 130 180">
+          <ellipse cx="50" cy="165" rx="70" ry="55" fill="#1a1a2e"/>
+          <ellipse cx="22" cy="148" rx="26" ry="44" fill="#c0392b"/>
+        </svg>
+
+        {/* Paper grain */}
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(circle, rgba(100,80,60,0.065) 1px, transparent 1px)',
           backgroundSize: '18px 18px',
         }}/>
       </div>
     );
   }
+
   const configs: Record<string, { grad: string; blob1: string; blob2: string; blob3: string }> = {
     light: {
       grad: creator
@@ -2086,6 +1985,8 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
   };
   const exitCreatorMode = () => {
     persistConversation(); setIsCreatorMode(false); unlockCreatorMode();
+    // ankit theme is creator-only — switch back to dark on exit
+    if (theme === 'ankit') setTheme('dark');
     setCurrentConvId(uuidv4()); setCurrentMood('calm'); setMessages([]); setShowDashboard(false);
   };
 
@@ -2721,7 +2622,10 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                   <div>
                     <SLabel label="Theme" t={t}/>
                     <div className="grid grid-cols-2 gap-1.5">
-                      {([['dark','🌙','Dark'],['light','☀️','Light'],['cyberpunk','⚡','Cyber'],['ocean','🌊','Ocean'],['sunset','🌅','Sunset'],['pastel','🪻','Pastel'],['sakura','🌸','Sakura'],['ankit','✨',"Ankit's"]] as [Theme,string,string][]).map(([th,ico,lbl])=>(
+                      {(isCreatorMode
+                        ? [['dark','🌙','Dark'],['light','☀️','Light'],['cyberpunk','⚡','Cyber'],['ocean','🌊','Ocean'],['sunset','🌅','Sunset'],['pastel','🪻','Pastel'],['sakura','🌸','Sakura'],['ankit','🕷️',"Ankit's Special"]]
+                        : [['dark','🌙','Dark'],['light','☀️','Light'],['cyberpunk','⚡','Cyber'],['ocean','🌊','Ocean'],['sunset','🌅','Sunset'],['pastel','🪻','Pastel'],['sakura','🌸','Sakura']]
+                      as [Theme,string,string][]).map(([th,ico,lbl])=>(
                         <button key={th} onClick={()=>setTheme(th)}
                           className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-[11px] font-medium transition-all ${theme===th?'text-white':t.sCard+' '+t.sSub}`}
                           style={theme===th?{background:`linear-gradient(135deg,${t.glow}28,${t.glow}12)`,border:`1px solid ${t.glow}35`,color:t.glow}:{}}>
@@ -2946,7 +2850,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                       ['Storage', user&&!isGuest?'Cloud':'Local'],
                       ['Conversations',`${shownConvs.length} saved`],
                       ['Memories',`${getAllMemories().length} facts`],
-                      ['Theme', theme==='ankit'?"Ankit's Special":theme.charAt(0).toUpperCase()+theme.slice(1)],
+                      ['Theme', theme==='ankit'?"Ankit's Special (Creator)":theme.charAt(0).toUpperCase()+theme.slice(1)],
                       ['Font Size', fontSize],
                       ['Language', language],
                     ].map(([k,v])=>(

@@ -534,58 +534,110 @@ function AuroraBg({ glow, glow2 }: { glow: string; glow2: string; theme: Theme }
 // Light theme background — mobile: pure CSS gradient; desktop: animated blobs
 // Ankit: pure white/rose with subtle SVG web corners only
 function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
-  // Ankit Spider-Man: original light style + subtle web corner decorations
+  // Ankit Spider-Man — full wallpaper: NYC skyline + spider webs + logo
   if (theme === 'ankit') {
+    const webC  = '#dc2626';
+    const cityC = creator ? '#1e3a5f' : '#1e3a5f';
+    const skyC  = creator
+      ? 'linear-gradient(180deg,#0a1628 0%,#1a2744 40%,#2d1b1b 80%,#3d1515 100%)'
+      : 'linear-gradient(180deg,#e8f4f8 0%,#d0e8f0 30%,#f0d4d4 70%,#ffe8e8 100%)';
+    const webOp  = creator ? 0.28 : 0.14;
+    const cityOp = creator ? 0.80 : 0.10;
+    const logoOp = creator ? 0.07 : 0.04;
     return (
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-        {/* Original gradient — white base, very light red/blue tint */}
-        <div className="absolute inset-0" style={{
-          background: creator
-            ? 'radial-gradient(ellipse 80% 60% at 18% 10%, #fca5a530 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 80% 82%, #bfdbfe30 0%, transparent 55%)'
-            : 'radial-gradient(ellipse 80% 60% at 18% 10%, #fca5a520 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 80% 82%, #bfdbfe20 0%, transparent 55%)',
-        }}/>
+        <div className="absolute inset-0" style={{ background: skyC }}/>
 
-        {/* Top-left corner spider web — very light red */}
-        <svg className="absolute top-0 left-0" width="180" height="180" viewBox="0 0 180 180"
-          style={{ opacity: 0.12 }}>
-          {[0,12,24,36,48,60,72,84].map((deg, i) => {
-            const rad = deg * Math.PI / 180;
-            return <line key={i} x1="0" y1="0"
-              x2={180 * Math.cos(rad)} y2={180 * Math.sin(rad)}
-              stroke="#ef4444" strokeWidth="1.2" strokeLinecap="round"/>;
+        {/* Full spider-web SVG wallpaper */}
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 700"
+          preserveAspectRatio="xMidYMid slice" style={{ opacity: webOp }}>
+          {[0,15,30,45,60,75,90,105,120].map((deg,i)=>{
+            const rad=deg*Math.PI/180;
+            return <line key={'tl'+i} x1="0" y1="0" x2={420*Math.cos(rad)} y2={420*Math.sin(rad)}
+              stroke={webC} strokeWidth="0.7"/>;
           })}
-          {[40,80,120,160].map((r, i) => (
-            <path key={i} d={`M ${r},0 A ${r},${r} 0 0,1 0,${r}`}
-              fill="none" stroke="#ef4444" strokeWidth="0.9" strokeOpacity={0.9 - i * 0.18}/>
+          {[60,120,180,240,300,360].map((r,i)=>(
+            <path key={'tlc'+i} d={`M ${r},0 A ${r},${r} 0 0,1 0,${r}`}
+              fill="none" stroke={webC} strokeWidth="0.5"/>
+          ))}
+          {[90,105,120,135,150,165,180].map((deg,i)=>{
+            const rad=deg*Math.PI/180;
+            return <line key={'tr'+i} x1="400" y1="0" x2={400+360*Math.cos(rad)} y2={360*Math.sin(rad)}
+              stroke={webC} strokeWidth="0.7"/>;
+          })}
+          {[55,110,165,220].map((r,i)=>(
+            <path key={'trc'+i} d={`M ${400-r},0 A ${r},${r} 0 0,0 400,${r}`}
+              fill="none" stroke={webC} strokeWidth="0.5"/>
+          ))}
+          <path d="M 50,80 Q 200,180 380,60" fill="none" stroke={webC} strokeWidth="1.2"/>
+          <path d="M 0,150 Q 180,260 400,140" fill="none" stroke={webC} strokeWidth="0.9"/>
+          <path d="M 80,0 Q 200,120 400,30"   fill="none" stroke={webC} strokeWidth="0.8"/>
+          {[60,120,180,240,300,360].map((x,i)=>(
+            <g key={'h'+i}>
+              <line x1={x} y1="0" x2={x+20} y2="90" stroke={webC} strokeWidth="0.5"/>
+              {[25,50,75].map((y,j)=>(
+                <line key={j} x1={x+(j*7)} y1={y} x2={x+20+(j*7)} y2={y}
+                  stroke={webC} strokeWidth="0.35"/>
+              ))}
+            </g>
           ))}
         </svg>
 
-        {/* Bottom-right corner web — light blue */}
-        <svg className="absolute bottom-0 right-0" width="180" height="180" viewBox="0 0 180 180"
-          style={{ opacity: 0.12, transform: 'rotate(180deg)' }}>
-          {[0,12,24,36,48,60,72,84].map((deg, i) => {
-            const rad = deg * Math.PI / 180;
-            return <line key={i} x1="0" y1="0"
-              x2={180 * Math.cos(rad)} y2={180 * Math.sin(rad)}
-              stroke="#3b82f6" strokeWidth="1.2" strokeLinecap="round"/>;
-          })}
-          {[40,80,120,160].map((r, i) => (
-            <path key={i} d={`M ${r},0 A ${r},${r} 0 0,1 0,${r}`}
-              fill="none" stroke="#3b82f6" strokeWidth="0.9" strokeOpacity={0.9 - i * 0.18}/>
-          ))}
+        {/* NYC city silhouette */}
+        <svg className="absolute bottom-0 w-full" viewBox="0 0 400 220"
+          style={{ opacity: cityOp }} preserveAspectRatio="xMidYMax meet">
+          <g fill={cityC}>
+            <rect x="0"   y="100" width="18"  height="120"/>
+            <rect x="20"  y="70"  width="22"  height="150"/>
+            <rect x="44"  y="90"  width="15"  height="130"/>
+            <rect x="60"  y="60"  width="25"  height="160"/>
+            <rect x="87"  y="80"  width="18"  height="140"/>
+            <rect x="107" y="50"  width="30"  height="170"/>
+            <rect x="140" y="75"  width="20"  height="145"/>
+            <rect x="162" y="40"  width="35"  height="180"/>
+            <rect x="199" y="65"  width="22"  height="155"/>
+            <rect x="223" y="45"  width="28"  height="175"/>
+            <rect x="253" y="80"  width="18"  height="140"/>
+            <rect x="273" y="55"  width="32"  height="165"/>
+            <rect x="307" y="85"  width="20"  height="135"/>
+            <rect x="329" y="60"  width="28"  height="160"/>
+            <rect x="359" y="75"  width="20"  height="145"/>
+            <rect x="381" y="95"  width="19"  height="125"/>
+            <rect x="168" y="20"  width="3"   height="22"/>
+            <rect x="230" y="28"  width="2"   height="18"/>
+            <rect x="115" y="35"  width="2"   height="16"/>
+          </g>
+          <g fill={creator ? '#fbbf24' : '#60a5fa'} opacity={creator ? 0.5 : 0.4}>
+            {[[25,75],[25,85],[30,75],[30,85],[65,65],[65,75],[70,65],[70,75],
+              [112,55],[112,65],[118,55],[118,65],[167,45],[167,55],[173,45],[173,55],
+              [228,50],[228,60],[234,50],[234,60],[278,60],[278,70],[284,60],[284,70],
+              [334,65],[334,75],[340,65],[340,75],
+            ].map(([x,y],i)=><rect key={i} x={x} y={y} width="3.5" height="2.5" rx="0.5"/>)}
+          </g>
         </svg>
 
-        {/* Original blobs — desktop only, same as before */}
-        <div className="hidden md:block absolute rounded-full blur-[160px] animate-aurora-a"
-          style={{ width:500, height:500, background:'#fca5a5', opacity:0.30, top:'-10%', left:'-5%', willChange:'transform' }}/>
-        <div className="hidden md:block absolute rounded-full blur-[130px] animate-aurora-b"
-          style={{ width:380, height:380, background:'#93c5fd', opacity:0.18, bottom:'-8%', right:'-5%', willChange:'transform' }}/>
-        <div className="hidden md:block absolute rounded-full blur-[100px] animate-aurora-c"
-          style={{ width:260, height:260, background:'#fca5a5', opacity:0.14, top:'45%', left:'55%', willChange:'transform' }}/>
+        {/* Giant spider watermark */}
+        <svg className="absolute" style={{ opacity: logoOp, width:200, height:200, left:'50%', top:'40%', transform:'translate(-50%,-50%)' }}
+          viewBox="0 0 100 100">
+          <ellipse cx="50" cy="52" rx="10" ry="14" fill={creator?'#dc2626':'#1e3a5f'}/>
+          <circle  cx="50" cy="36" r="9"           fill={creator?'#dc2626':'#1e3a5f'}/>
+          <ellipse cx="47" cy="34" rx="3.5" ry="2.5" fill="white" transform="rotate(-15 47 34)"/>
+          <ellipse cx="53" cy="34" rx="3.5" ry="2.5" fill="white" transform="rotate(15 53 34)"/>
+          {[[-1,-1],[1,-1],[-1,1],[1,1]].flatMap(([sx,sy],i)=>[
+            <line key={'a'+i} x1={50+sx*8} y1={52+sy*5} x2={50+sx*28} y2={52+sy*18}
+              stroke={creator?'#dc2626':'#1e3a5f'} strokeWidth="2.5" strokeLinecap="round"/>,
+            <line key={'b'+i} x1={50+sx*28} y1={52+sy*18} x2={50+sx*38} y2={52+sy*8}
+              stroke={creator?'#dc2626':'#1e3a5f'} strokeWidth="1.8" strokeLinecap="round"/>,
+          ])}
+        </svg>
+
+        <div className="hidden md:block absolute rounded-full blur-[200px]"
+          style={{ width:400, height:400, background:creator?'#dc2626':'#ef4444', opacity:0.07, top:'-10%', left:'-5%' }}/>
+        <div className="hidden md:block absolute rounded-full blur-[180px]"
+          style={{ width:350, height:350, background:'#3b82f6', opacity:0.06, bottom:'10%', right:'-5%' }}/>
       </div>
     );
   }
-
   const configs: Record<string, { grad: string; blob1: string; blob2: string; blob3: string }> = {
     light: {
       grad: creator
@@ -878,27 +930,36 @@ function HealthPulse({ glow, isLight, hidden, onSync }: { glow: string; isLight:
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [msgs]);
 
-  // Drag handlers
+  // Drag handlers — GPU-accelerated via direct DOM transform mutation (60fps)
   const onDragStart = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest('button,input')) return;
     dragging.current = true;
-    const rect = panelRef.current?.getBoundingClientRect();
     dragStart.current = {
       mx: e.clientX, my: e.clientY,
       px: pos?.x ?? (window.innerWidth - 356),
       py: pos?.y ?? (window.innerHeight - 500),
     };
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    if (panelRef.current) panelRef.current.style.transition = 'none';
   };
   const onDragMove = (e: React.PointerEvent) => {
-    if (!dragging.current) return;
-    const dx = e.clientX - dragStart.current.mx;
-    const dy = e.clientY - dragStart.current.my;
-    const nx = Math.max(0, Math.min(window.innerWidth - 340, dragStart.current.px + dx));
-    const ny = Math.max(0, Math.min(window.innerHeight - 440, dragStart.current.py + dy));
-    setPos({ x: nx, y: ny });
+    if (!dragging.current || !panelRef.current) return;
+    const nx = Math.max(8, Math.min(window.innerWidth - 348, dragStart.current.px + e.clientX - dragStart.current.mx));
+    const ny = Math.max(8, Math.min(window.innerHeight - 448, dragStart.current.py + e.clientY - dragStart.current.my));
+    // Direct DOM write — no setState during drag = buttery 60fps
+    panelRef.current.style.left   = `${nx}px`;
+    panelRef.current.style.top    = `${ny}px`;
+    panelRef.current.style.bottom = 'unset';
+    panelRef.current.style.right  = 'unset';
   };
-  const onDragEnd = () => { dragging.current = false; };
+  const onDragEnd = (e: React.PointerEvent) => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    const nx = Math.max(8, Math.min(window.innerWidth - 348, dragStart.current.px + e.clientX - dragStart.current.mx));
+    const ny = Math.max(8, Math.min(window.innerHeight - 448, dragStart.current.py + e.clientY - dragStart.current.my));
+    setPos({ x: nx, y: ny }); // commit position to React state
+    if (panelRef.current) panelRef.current.style.transition = '';
+  };
 
   const HEALTH_SYSTEM = `You are Tessa's Health Pulse — a compact, specialist health sub-agent.
 Focus: calorie logging and water tracking for Ankit (17, male, Delhi, Class 12 CBSE 2026).
@@ -1053,6 +1114,9 @@ STRICT RULES:
             display: 'flex',
             flexDirection: 'column',
             animation: 'slideUpSheet 0.25s cubic-bezier(0.32,0.72,0,1)',
+            touchAction: 'none',
+            willChange: 'transform',
+            userSelect: 'none',
           }}
           onPointerDown={onDragStart}
           onPointerMove={onDragMove}
@@ -1738,15 +1802,35 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
   };
 
   // ── TTS ───────────────────────────────────────────────────────────────────
+  // Pick the best available female voice — prioritise warm/bright ones
+  const getBestVoice = (lang: string): SpeechSynthesisVoice | null => {
+    const vs = window.speechSynthesis.getVoices();
+    // Tier 1 — best sounding warm female voices
+    const t1 = vs.find(v => /google uk english female/i.test(v.name));
+    if (t1) return t1;
+    const t2 = vs.find(v => /samantha|karen|moira|victoria/i.test(v.name));
+    if (t2) return t2;
+    // Hindi voices for hi mode
+    if (lang === 'hi-IN') {
+      const hi = vs.find(v => /lekha|sunita|veena|google.*hindi/i.test(v.name));
+      if (hi) return hi;
+    }
+    // Tier 3 — any female
+    const t3 = vs.find(v => /zira|hazel|nicky|tessa|aria|jenny|siri.*female|female/i.test(v.name) && v.lang.startsWith('en'));
+    if (t3) return t3;
+    return null;
+  };
+
   const speakText = (raw: string) => {
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
     const clean = raw.replace(/\*\*/g,'').replace(/#{1,6}\s/g,'').replace(/[*_~`]/g,'').slice(0,600);
-    const u = new SpeechSynthesisUtterance(clean); u.pitch=1.45; u.rate=1.1; u.lang='en-IN';
+    const lang = language === 'hi' ? 'hi-IN' : 'en-IN';
+    const u = new SpeechSynthesisUtterance(clean);
+    u.pitch = 1.62; u.rate = 1.18; u.lang = lang; // Hot, quick, bright
     const speak = () => {
-      const vs = window.speechSynthesis.getVoices();
-      const f = vs.find(v=>/samantha|victoria|karen|moira|veena|zira|google.*english.*female/i.test(v.name))??vs.find(v=>/female|woman/i.test(v.name));
-      if (f) u.voice=f; window.speechSynthesis.speak(u);
+      const v = getBestVoice(lang); if (v) u.voice = v;
+      window.speechSynthesis.speak(u);
     };
     if (voicesReady.current) speak(); else window.speechSynthesis.onvoiceschanged=()=>{voicesReady.current=true;speak();};
   };
@@ -1766,20 +1850,21 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
   // No stop button. Tessa listens → you speak → silence detected → she replies
   // verbally → she listens again. Continues until you press End Call.
   
+  const callMessagesRef = useRef<{role:'user'|'assistant';content:string}[]>([]);
+
   const callSpeakTessa = (text: string, onDone: () => void) => {
     if (!('speechSynthesis' in window)) { onDone(); return; }
     window.speechSynthesis.cancel();
     isSpeakingRef.current = true;
     setCallStatus('speaking');
-    const clean = text.replace(/\*\*/g,'').replace(/#{1,6}\s/g,'').replace(/[*_~`]/g,'').slice(0, 800);
+    const clean = text.replace(/\*\*/g,'').replace(/#{1,6}\s/g,'').replace(/[*_~`]/g,'')
+                      .replace(/\bTESSA\b/gi,'').slice(0, 500); // shorter = snappier
+    const lang = language === 'hi' ? 'hi-IN' : 'en-IN';
     const u = new SpeechSynthesisUtterance(clean);
-    u.pitch = 1.4; u.rate = 1.08; u.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
+    u.pitch = 1.65; u.rate = 1.22; u.lang = lang; // Hotter + quicker voice
     const trySpeak = () => {
-      const vs = window.speechSynthesis.getVoices();
-      const f = vs.find(v => /samantha|victoria|karen|moira|veena|zira|google.*english.*female/i.test(v.name))
-             ?? vs.find(v => /female|woman/i.test(v.name));
-      if (f) u.voice = f;
-      u.onend = () => { isSpeakingRef.current = false; onDone(); };
+      const v = getBestVoice(lang); if (v) u.voice = v;
+      u.onend  = () => { isSpeakingRef.current = false; onDone(); };
       u.onerror = () => { isSpeakingRef.current = false; onDone(); };
       window.speechSynthesis.speak(u);
     };
@@ -1787,13 +1872,16 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
     else window.speechSynthesis.onvoiceschanged = () => { voicesReady.current = true; trySpeak(); };
   };
 
+  const [callDuration, setCallDuration] = useState(0);
+  const callTimerRef = useRef<ReturnType<typeof setInterval>|null>(null);
+
   const startCallListening = () => {
     if (!callLoopRef.current) return;
     const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
     if (!SR) return;
     const r = new SR();
     r.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
-    r.continuous = false; // single utterance — auto-detects silence
+    r.continuous = false;
     r.interimResults = true;
     r.maxAlternatives = 1;
     let final = '';
@@ -1810,28 +1898,32 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
       setIsRecording(false); setInterimText('');
       if (!callLoopRef.current) return;
       const said = final.trim();
-      if (!said) { startCallListening(); return; } // silence — listen again
+      if (!said) { setTimeout(startCallListening, 300); return; }
       setCallTranscript(p => [...p, { role: 'user', text: said }]);
       setCallStatus('thinking');
-      // Send to Tessa API
+      callMessagesRef.current.push({ role: 'user', content: said });
+      if (callMessagesRef.current.length > 16) callMessagesRef.current = callMessagesRef.current.slice(-16);
       try {
         const res = await fetch('/api/chat', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            messages: [{ role: 'user', content: said }],
-            isCreatorMode, language, maxTokens: 220,
+            messages: callMessagesRef.current,
+            isCreatorMode, language,
+            maxTokens: 130,
+            _systemOverride: `You are Tessa in a live voice call. Be VERY brief (1-2 sentences max). Conversational, warm, quick. No formatting. No bullet points. Speak naturally.${isCreatorMode ? " You're talking to Ankit — be warm and caring." : ''}`,
           }),
         });
         const data = await res.json();
-        const reply = (data.content || 'Sorry, I could not process that.').slice(0, 400);
+        const reply = (data.content || 'Hmm, say that again?')
+          .replace(/\*\*/g,'').replace(/#{1,6}\s/g,'').replace(/[*_~`]/g,'').slice(0, 300);
+        callMessagesRef.current.push({ role: 'assistant', content: reply });
         setCallTranscript(p => [...p, { role: 'tessa', text: reply }]);
-        // Speak reply, then listen again
         callSpeakTessa(reply, () => {
-          if (callLoopRef.current) setTimeout(startCallListening, 400);
+          if (callLoopRef.current) setTimeout(startCallListening, 250);
         });
       } catch {
-        callSpeakTessa('Sorry, network error. Try again.', () => {
-          if (callLoopRef.current) setTimeout(startCallListening, 400);
+        callSpeakTessa('Oops, lost connection for a sec!', () => {
+          if (callLoopRef.current) setTimeout(startCallListening, 500);
         });
       }
     };
@@ -1839,28 +1931,46 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
       setIsRecording(false);
       if (e.error === 'not-allowed') { endVoiceCall(); alert('Mic permission denied.'); return; }
       if (e.error === 'audio-capture') { endVoiceCall(); alert('Microphone not found.'); return; }
-      // For no-speech or aborted, just restart listening
-      if (callLoopRef.current) setTimeout(startCallListening, 600);
+      if (callLoopRef.current) setTimeout(startCallListening, 450);
     };
     recognitionRef.current = r;
-    try { r.start(); } catch { if (callLoopRef.current) setTimeout(startCallListening, 800); }
+    try { r.start(); } catch { if (callLoopRef.current) setTimeout(startCallListening, 600); }
+  };
+
+  const playRingTone = () => {
+    try {
+      const ctx = new AudioContext();
+      [0, 0.2].forEach(delay => {
+        const osc = ctx.createOscillator(); const g = ctx.createGain();
+        osc.connect(g); g.connect(ctx.destination);
+        osc.type = 'sine'; osc.frequency.value = 1046.5;
+        g.gain.setValueAtTime(0, ctx.currentTime + delay);
+        g.gain.linearRampToValueAtTime(0.1, ctx.currentTime + delay + 0.04);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.2);
+        osc.start(ctx.currentTime + delay); osc.stop(ctx.currentTime + delay + 0.22);
+        const osc2 = ctx.createOscillator(); osc2.connect(g);
+        osc2.type = 'sine'; osc2.frequency.value = 1318.5;
+        osc2.start(ctx.currentTime + delay); osc2.stop(ctx.currentTime + delay + 0.22);
+      });
+    } catch {}
   };
 
   const startVoiceCall = () => {
     const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
-    if (!SR) { alert('Speech recognition not supported. Use Chrome or Edge.'); return; }
+    if (!SR) { alert('Voice calls need Chrome or Edge browser.'); return; }
     navigator.mediaDevices?.getUserMedia({ audio: true }).then(() => {
+      playRingTone();
       setVoiceCallOpen(true);
       setCallTranscript([]);
-      setCallStatus('listening');
+      setCallDuration(0);
       callLoopRef.current = true;
-      // Tessa greets first, then listens
-      const greet = isCreatorMode
-        ? "Hey! I'm listening. What's on your mind?"
-        : "Hi! Voice call connected. How can I help?";
+      callMessagesRef.current = [];
+      callTimerRef.current = setInterval(() => setCallDuration(d => d + 1), 1000);
+      const greet = isCreatorMode ? "Hey Ankit! Miss me? What's up?" : "Hey! I'm here. What's on your mind?";
+      callMessagesRef.current.push({ role: 'assistant', content: greet });
       callSpeakTessa(greet, () => { if (callLoopRef.current) startCallListening(); });
     }).catch(() => {
-      alert('Mic access denied. Please allow microphone access in browser settings.');
+      alert('Mic access denied. Go to Chrome → address bar lock icon → Microphone → Allow.');
     });
   };
 
@@ -1869,10 +1979,13 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
     if (recognitionRef.current) { try { recognitionRef.current.stop(); } catch {} recognitionRef.current = null; }
     window.speechSynthesis?.cancel();
     isSpeakingRef.current = false;
+    if (callTimerRef.current) { clearInterval(callTimerRef.current); callTimerRef.current = null; }
+    callMessagesRef.current = [];
     setVoiceCallOpen(false);
     setIsRecording(false);
     setInterimText('');
     setCallStatus('idle');
+    setCallDuration(0);
   };
 
   // Legacy toggleMic — kept for compatibility (just starts call now)
@@ -1914,155 +2027,193 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
     }
   }, [notifications]);
 
-  // ── Voice Call Window — draggable floating card, phone-call style ─────────
+  // ── Voice Call Window — GPU-accelerated drag, phone-call style ────────────
   const VoiceCallWindow = () => {
     if (!voiceCallOpen) return null;
 
-    // Drag handlers
+    // GPU-accelerated drag using transform instead of left/top
     const onPtrDown = (e: React.PointerEvent<HTMLDivElement>) => {
       if ((e.target as HTMLElement).closest('button')) return;
       callDragging.current = true;
-      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
       callDragStart.current = {
         mx: e.clientX, my: e.clientY,
-        px: callPos?.x ?? (window.innerWidth / 2 - 140),
-        py: callPos?.y ?? 80,
+        px: callPos?.x ?? (window.innerWidth / 2 - 150),
+        py: callPos?.y ?? 60,
       };
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      (e.currentTarget as HTMLElement).style.transition = 'none';
     };
     const onPtrMove = (e: React.PointerEvent<HTMLDivElement>) => {
       if (!callDragging.current) return;
-      const nx = Math.max(0, Math.min(window.innerWidth  - 280, callDragStart.current.px + e.clientX - callDragStart.current.mx));
-      const ny = Math.max(0, Math.min(window.innerHeight - 420, callDragStart.current.py + e.clientY - callDragStart.current.my));
-      setCallPos({ x: nx, y: ny });
+      const nx = Math.max(8, Math.min(window.innerWidth - 308, callDragStart.current.px + e.clientX - callDragStart.current.mx));
+      const ny = Math.max(8, Math.min(window.innerHeight - 500, callDragStart.current.py + e.clientY - callDragStart.current.my));
+      // Direct DOM mutation for 60fps — no React re-render during drag
+      const el = e.currentTarget as HTMLDivElement;
+      el.style.transform = `translate(${nx}px, ${ny}px)`;
     };
-    const onPtrUp = () => { callDragging.current = false; };
+    const onPtrUp = (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!callDragging.current) return;
+      callDragging.current = false;
+      const nx = Math.max(8, Math.min(window.innerWidth - 308, callDragStart.current.px + e.clientX - callDragStart.current.mx));
+      const ny = Math.max(8, Math.min(window.innerHeight - 500, callDragStart.current.py + e.clientY - callDragStart.current.my));
+      setCallPos({ x: nx, y: ny });
+      (e.currentTarget as HTMLElement).style.transition = '';
+    };
 
-    const panelX = callPos?.x ?? (typeof window !== 'undefined' ? window.innerWidth / 2 - 140 : 100);
-    const panelY = callPos?.y ?? 80;
+    const px = callPos?.x ?? (typeof window !== 'undefined' ? window.innerWidth / 2 - 150 : 100);
+    const py = callPos?.y ?? 60;
+    const fmt = (s: number) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
 
-    const statusLabel = callStatus === 'listening' ? 'Listening…' : callStatus === 'thinking' ? 'Thinking…' : callStatus === 'speaking' ? 'Speaking…' : '';
-    const statusColor = callStatus === 'listening' ? '#22c55e' : callStatus === 'thinking' ? t.glow : callStatus === 'speaking' ? '#f59e0b' : '#6b7280';
+    const statusColor = callStatus==='listening' ? '#22c55e' : callStatus==='thinking' ? '#a78bfa' : callStatus==='speaking' ? '#f59e0b' : '#64748b';
+    const statusLabel = callStatus==='listening' ? 'Listening…' : callStatus==='thinking' ? 'Thinking…' : callStatus==='speaking' ? 'Speaking…' : 'Connected';
+    const isActive    = callStatus === 'speaking' || callStatus === 'listening';
 
     return (
       <div
-        className="fixed z-[90] select-none"
-        style={{ left: panelX, top: panelY, width: 280 }}
+        style={{
+          position: 'fixed', top: 0, left: 0, zIndex: 90,
+          transform: `translate(${px}px, ${py}px)`,
+          width: 300, touchAction: 'none',
+          willChange: 'transform',
+          filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.6))',
+        }}
         onPointerDown={onPtrDown} onPointerMove={onPtrMove}
         onPointerUp={onPtrUp} onPointerCancel={onPtrUp}
       >
-        <div className="rounded-3xl overflow-hidden cursor-grab active:cursor-grabbing"
-          style={{
-            background: t.isLight
-              ? 'linear-gradient(160deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)'
-              : 'linear-gradient(160deg,#0d0d1a 0%,#0a1628 50%,#0d2137 100%)',
-            boxShadow: `0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px ${t.glow}30, 0 0 40px ${t.glow}15`,
-            border: `1px solid ${t.glow}25`,
-          }}>
+        <div style={{
+          borderRadius: 28,
+          overflow: 'hidden',
+          background: 'linear-gradient(160deg, #0f0c24 0%, #1a1035 40%, #0c1a3a 100%)',
+          border: `1px solid ${statusColor}30`,
+          boxShadow: `0 0 0 1px ${statusColor}18, inset 0 1px 0 rgba(255,255,255,0.06)`,
+          transition: 'border-color 0.5s, box-shadow 0.5s',
+        }}>
 
-          {/* Drag handle bar */}
-          <div className="flex justify-center pt-2.5 pb-1">
-            <div className="w-8 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.2)' }}/>
+          {/* Ambient glow behind avatar — colour shifts with status */}
+          <div style={{
+            position: 'absolute', top: -40, left: '50%', transform: 'translateX(-50%)',
+            width: 200, height: 200, borderRadius: '50%',
+            background: statusColor, filter: 'blur(60px)',
+            opacity: 0.12, transition: 'background 0.5s, opacity 0.5s',
+            pointerEvents: 'none',
+          }}/>
+
+          {/* Drag pill */}
+          <div style={{ display:'flex', justifyContent:'center', padding:'10px 0 4px', cursor:'grab' }}>
+            <div style={{ width:32, height:4, borderRadius:2, background:'rgba(255,255,255,0.18)' }}/>
           </div>
 
-          {/* Avatar + status section */}
-          <div className="flex flex-col items-center px-4 pt-2 pb-4">
-            {/* Status label */}
-            <div className="flex items-center gap-1.5 mb-4">
-              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: statusColor }}/>
-              <span className="text-[11px] font-semibold tracking-wider uppercase"
-                style={{ color: statusColor }}>{statusLabel || 'Voice Call'}</span>
+          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', padding:'6px 20px 20px' }}>
+
+            {/* Timer + status row */}
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:14 }}>
+              <div style={{ width:7, height:7, borderRadius:'50%', background: statusColor,
+                boxShadow:`0 0 8px ${statusColor}`, animation:'pulse 1.4s ease-in-out infinite' }}/>
+              <span style={{ fontSize:11, fontWeight:600, letterSpacing:'0.1em', color: statusColor, textTransform:'uppercase' }}>
+                {statusLabel}
+              </span>
+              <span style={{ fontSize:11, color:'rgba(255,255,255,0.3)', marginLeft:4 }}>
+                {fmt(callDuration)}
+              </span>
             </div>
 
-            {/* Avatar with animated rings */}
-            <div className="relative flex items-center justify-center mb-4">
-              {/* Outer rings — animate based on status */}
-              {[80, 108, 136].map((sz, ri) => (
-                <div key={ri} className="absolute rounded-full"
-                  style={{
-                    width: sz, height: sz,
-                    border: `1.5px solid ${statusColor}`,
-                    opacity: [0.5, 0.3, 0.15][ri],
-                    animation: callStatus !== 'idle'
-                      ? `ping ${1.1 + ri * 0.35}s cubic-bezier(0,0,0.2,1) infinite`
-                      : 'none',
-                    animationDelay: `${ri * 0.22}s`,
-                  }}/>
+            {/* Avatar — 3 ring animation */}
+            <div style={{ position:'relative', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14 }}>
+              {[88,116,148].map((sz, ri) => (
+                <div key={ri} style={{
+                  position:'absolute', width:sz, height:sz, borderRadius:'50%',
+                  border: `1.5px solid ${statusColor}`,
+                  opacity: isActive ? [0.45,0.25,0.12][ri] : 0.08,
+                  animation: isActive ? `ping ${1.0 + ri*0.3}s cubic-bezier(0,0,0.2,1) infinite` : 'none',
+                  animationDelay: `${ri * 0.2}s`,
+                  transition: 'opacity 0.4s',
+                }}/>
               ))}
-              {/* Avatar */}
-              <div className="relative w-[68px] h-[68px] rounded-full overflow-hidden"
-                style={{
-                  border: `3px solid ${statusColor}`,
-                  boxShadow: `0 0 0 4px ${statusColor}18, 0 0 30px ${statusColor}40`,
-                  transition: 'border-color 0.4s, box-shadow 0.4s',
-                }}>
-                <img src={avatarSrc} alt="Tessa" className="w-full h-full object-cover"
+              <div style={{
+                width:76, height:76, borderRadius:'50%', overflow:'hidden',
+                border: `3px solid ${statusColor}`,
+                boxShadow: `0 0 0 3px ${statusColor}20, 0 0 28px ${statusColor}45`,
+                transition: 'border-color 0.4s, box-shadow 0.4s',
+                position:'relative',
+              }}>
+                <img src={avatarSrc} alt="Tessa" style={{ width:'100%', height:'100%', objectFit:'cover' }}
                   onError={e => { (e.currentTarget as HTMLImageElement).src = '/avatars/cosmic.png'; }}/>
-                {/* Speaking overlay — animated gradient */}
-                {callStatus === 'speaking' && (
-                  <div className="absolute inset-0 rounded-full animate-pulse"
-                    style={{ background: `${statusColor}15` }}/>
+                {callStatus==='speaking' && (
+                  <div style={{ position:'absolute', inset:0, background:`${statusColor}12`,
+                    animation:'pulse 0.8s ease-in-out infinite' }}/>
                 )}
               </div>
             </div>
 
             {/* Name */}
-            <p className="text-white font-black text-[15px] tracking-wide mb-0.5">Tessa</p>
-            <p className="text-white/40 text-[10px] mb-3">
-              {callStatus === 'speaking' ? '🔊 Speaking…' : callStatus === 'listening' ? '🎤 Go ahead…' : callStatus === 'thinking' ? '💭 Processing…' : 'Voice Call'}
+            <p style={{ color:'white', fontWeight:900, fontSize:16, letterSpacing:'0.05em', margin:'0 0 2px' }}>Tessa</p>
+            <p style={{ color:'rgba(255,255,255,0.35)', fontSize:10, margin:'0 0 14px' }}>
+              {isCreatorMode ? '💝 Creator Mode' : 'AI Voice Call'}
             </p>
 
-            {/* Sound wave visualiser — only when speaking or listening */}
-            <div className="flex items-center gap-0.5 h-8 mb-4">
-              {Array.from({ length: 24 }, (_, i) => {
-                const active = callStatus === 'speaking' || callStatus === 'listening';
+            {/* Waveform bars — real visualiser feel */}
+            <div style={{ display:'flex', alignItems:'center', gap:2.5, height:36, marginBottom:14 }}>
+              {Array.from({length:28},(_,i)=>{
+                const h = isActive ? 8 + (i%7)*4 : 3;
                 return (
-                  <div key={i} className="rounded-full flex-shrink-0"
-                    style={{
-                      width: 2.5,
-                      background: active ? statusColor : 'rgba(255,255,255,0.15)',
-                      animation: active ? `soundBar ${0.35 + (i % 7) * 0.09}s ease-in-out infinite alternate` : 'none',
-                      animationDelay: `${i * 0.04}s`,
-                      height: active ? `${10 + (i % 6) * 4}px` : '4px',
-                      transition: 'height 0.3s, background 0.3s',
-                    }}/>
+                  <div key={i} style={{
+                    width:2.5, borderRadius:2,
+                    background: isActive ? statusColor : 'rgba(255,255,255,0.12)',
+                    height: h,
+                    animation: isActive ? `soundBar ${0.32+(i%7)*0.08}s ease-in-out infinite alternate` : 'none',
+                    animationDelay: `${i*0.035}s`,
+                    transition:'background 0.35s, height 0.35s',
+                  }}/>
                 );
               })}
             </div>
 
-            {/* Live transcript — last 2 lines */}
-            <div className="w-full rounded-xl px-3 py-2 mb-4 min-h-[48px]"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              {callTranscript.length === 0 ? (
-                <p className="text-[10px] text-white/30 text-center">Conversation will appear here…</p>
+            {/* Scrollable transcript */}
+            <div style={{
+              width:'100%', maxHeight:72, overflowY:'auto', borderRadius:14,
+              background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.07)',
+              padding:'8px 10px', marginBottom:16,
+            }}>
+              {callTranscript.length===0 ? (
+                <p style={{ fontSize:10, color:'rgba(255,255,255,0.25)', textAlign:'center', margin:0 }}>
+                  Your conversation appears here…
+                </p>
               ) : (
-                [...callTranscript].slice(-2).map((m, i) => (
-                  <p key={i} className="text-[10px] leading-relaxed truncate"
-                    style={{ color: m.role === 'user' ? 'rgba(255,255,255,0.75)' : statusColor }}>
-                    {m.role === 'user' ? '🗣 ' : '✨ '}{m.text}
+                [...callTranscript].slice(-4).map((m,i)=>(
+                  <p key={i} style={{ fontSize:10, color: m.role==='user'?'rgba(255,255,255,0.7)':statusColor,
+                    margin:'0 0 3px', lineHeight:1.4 }}>
+                    {m.role==='user'?'You: ':'Tessa: '}{m.text}
                   </p>
                 ))
               )}
               {interimText && (
-                <p className="text-[10px] text-white/50 italic truncate">🎤 {interimText}</p>
+                <p style={{ fontSize:10, color:'rgba(255,255,255,0.4)', fontStyle:'italic', margin:'2px 0 0' }}>
+                  {interimText}…
+                </p>
               )}
             </div>
 
             {/* End call button */}
-            <button
-              onClick={endVoiceCall}
-              className="w-14 h-14 rounded-full flex items-center justify-center transition-all active:scale-90 hover:scale-105"
+            <button onClick={endVoiceCall}
               style={{
-                background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-                boxShadow: '0 6px 24px rgba(239,68,68,0.55)',
-              }}>
-              {/* Phone hang-up icon */}
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-                <path d="M3 5.5C3 14.06 9.94 21 18.5 21c.386 0 .77-.014 1.148-.042.435-.033.813-.329.97-.745l1.5-4a1 1 0 00-.54-1.262l-3.5-1.5a1 1 0 00-1.197.37l-1.116 1.674A13.01 13.01 0 019.12 9.864L10.79 8.75a1 1 0 00.37-1.197l-1.5-3.5a1 1 0 00-1.262-.54l-4 1.5c-.416.157-.712.535-.745.97A17.1 17.1 0 003 5.5z" 
-                  fill="white" transform="rotate(135 12 12)"/>
+                width:58, height:58, borderRadius:'50%', border:'none', cursor:'pointer',
+                background:'linear-gradient(135deg, #ff4444, #cc0000)',
+                boxShadow:'0 6px 20px rgba(255,68,68,0.5)',
+                display:'flex', alignItems:'center', justifyContent:'center',
+                transition:'transform 0.15s, box-shadow 0.15s',
+              }}
+              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.transform='scale(1.08)';}}
+              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.transform='scale(1)';}}
+              onTouchStart={e=>{(e.currentTarget as HTMLElement).style.transform='scale(0.92)';}}
+              onTouchEnd={e=>{(e.currentTarget as HTMLElement).style.transform='scale(1)';}}
+            >
+              {/* Rotated phone = hang-up */}
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"
+                  transform="rotate(135 12 12)"/>
               </svg>
             </button>
-            <p className="text-white/30 text-[9px] mt-2">Tap to end call</p>
+            <p style={{ color:'rgba(255,255,255,0.2)', fontSize:9, marginTop:6 }}>End call</p>
           </div>
         </div>
       </div>

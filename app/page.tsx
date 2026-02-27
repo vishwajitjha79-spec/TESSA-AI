@@ -353,41 +353,43 @@ const THEMES = {
     settActive:'bg-rose-100 border border-rose-300',
     isLight:true,
   },
-  // ── ANKIT'S SPECIAL — Spider-Man light ──────────────────────────────────────
-  // Clean white canvas · light rose-red · soft blue accents
-  // Comic book page aesthetic — energetic but not garish
+  // ── ANKIT'S SPECIAL — Spider-Man ────────────────────────────────────────────
+  // Normal: warm cream canvas (#f5f0e8) + cute Spidey heart-web illustration
+  // Creator: parchment (#f0ebe0) + sketch/ink Spidey mask aesthetic
+  // Both light → ALL text stays dark slate for max readability
   ankit: {
-    bg:'bg-white', bgC:'bg-rose-50',
-    panel:'bg-white/90 backdrop-blur-md border-red-200/50',
-    panelC:'bg-rose-50/90 backdrop-blur-md border-blue-200/45',
-    header:'bg-white/88 backdrop-blur-md border-b border-red-200/40 shadow-sm shadow-red-100/30',
-    headerC:'bg-rose-50/88 backdrop-blur-md border-b border-blue-200/40 shadow-sm shadow-blue-100/25',
-    bar:'bg-white/88 backdrop-blur-md border-t border-red-200/40',
-    barC:'bg-rose-50/88 backdrop-blur-md border-t border-blue-200/40',
-    msgU:'bg-gradient-to-br from-red-50/90 to-rose-50/70 border border-red-200/45 border-l-[3px] border-l-red-500/70',
-    msgUC:'bg-gradient-to-br from-blue-50/90 to-sky-50/70 border border-blue-200/45 border-l-[3px] border-l-blue-500/70',
-    msgA:'bg-white/88 border border-slate-200/50 border-l-[3px] border-l-blue-300/55',
-    msgAC:'bg-white/88 border border-slate-200/50 border-l-[3px] border-l-red-300/55',
-    inp:'bg-white border border-red-200/55 text-slate-800 placeholder:text-slate-400/70 focus:border-red-400/65 focus:ring-2 focus:ring-red-300/20',
-    inpC:'bg-white border border-blue-200/55 text-slate-800 placeholder:text-slate-400/70 focus:border-blue-400/65 focus:ring-2 focus:ring-blue-300/20',
-    btnP:'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white shadow-sm shadow-red-400/30',
-    btnPC:'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white shadow-sm shadow-blue-400/30',
-    btnS:'bg-red-50 hover:bg-red-100 border border-red-200/55 text-red-700 hover:text-red-800',
-    btnSC:'bg-blue-50 hover:bg-blue-100 border border-blue-200/55 text-blue-700 hover:text-blue-800',
-    text:'text-slate-800', sub:'text-slate-500', subC:'text-slate-500',
-    accent:'text-red-600', accentC:'text-blue-600',
-    glow:'#ef4444', glowC:'#3b82f6',
-    card:'bg-white/85 border border-slate-200/60',
-    cardC:'bg-white/85 border border-slate-200/60',
-    active:'bg-red-50 border border-red-300/55',
-    activeC:'bg-blue-50 border border-blue-300/55',
-    div:'border-slate-200/50', divC:'border-slate-200/50',
-    settBg:'bg-white/98 backdrop-blur-md border-t border-slate-200/50',
-    settBgC:'bg-white/98 backdrop-blur-md border-t border-slate-200/50',
+    bg:'bg-[#f5f0e8]', bgC:'bg-[#f0ebe0]',
+    panel:'bg-white/80 backdrop-blur-md border-red-200/40 shadow-sm shadow-red-100/20',
+    panelC:'bg-white/75 backdrop-blur-md border-slate-300/40 shadow-sm shadow-slate-200/30',
+    header:'bg-[#f5f0e8]/92 backdrop-blur-md border-b border-red-200/35 shadow-sm',
+    headerC:'bg-[#f0ebe0]/92 backdrop-blur-md border-b border-slate-300/35 shadow-sm',
+    bar:'bg-[#f5f0e8]/92 backdrop-blur-md border-t border-red-200/35',
+    barC:'bg-[#f0ebe0]/92 backdrop-blur-md border-t border-slate-300/35',
+    msgU:'bg-white/70 border border-red-200/40 border-l-[3px] border-l-red-500/60',
+    msgUC:'bg-white/70 border border-slate-200/40 border-l-[3px] border-l-red-700/50',
+    msgA:'bg-white/65 border border-slate-200/40 border-l-[3px] border-l-blue-400/50',
+    msgAC:'bg-white/65 border border-slate-200/40 border-l-[3px] border-l-slate-500/50',
+    inp:'bg-white/90 border border-red-200/50 text-slate-800 placeholder:text-slate-400 focus:border-red-400/60 focus:ring-2 focus:ring-red-300/20',
+    inpC:'bg-white/90 border border-slate-300/50 text-slate-800 placeholder:text-slate-400 focus:border-slate-500/60 focus:ring-2 focus:ring-slate-300/20',
+    btnP:'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-sm shadow-red-500/30',
+    btnPC:'bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white shadow-sm shadow-slate-500/30',
+    btnS:'bg-white/80 hover:bg-white border border-red-200/50 text-slate-700 hover:text-slate-900',
+    btnSC:'bg-white/80 hover:bg-white border border-slate-300/50 text-slate-700 hover:text-slate-900',
+    text:'text-slate-800', sub:'text-slate-500', subC:'text-slate-600',
+    accent:'text-red-700', accentC:'text-slate-800',
+    glow:'#dc2626', glowC:'#1a1a2e',
+    card:'bg-white/75 border border-red-100/50',
+    cardC:'bg-white/75 border border-slate-200/50',
+    active:'bg-white border border-red-400/50',
+    activeC:'bg-white border border-slate-400/50',
+    div:'border-red-200/35', divC:'border-slate-300/35',
+    // Settings panel — solid white so sliders/toggles are fully readable
+    settBg:'bg-white/98 backdrop-blur-md border-t border-red-200/40',
+    settBgC:'bg-white/98 backdrop-blur-md border-t border-slate-300/40',
     settText:'text-slate-800', settTextHover:'hover:text-slate-900',
-    settSub:'text-slate-500', settLabel:'text-slate-500',
+    settSub:'text-slate-500', settLabel:'text-slate-600',
     settCard:'bg-slate-50 border border-slate-200/60',
-    settActive:'bg-red-50 border border-red-300/55',
+    settActive:'bg-red-50 border border-red-300/50',
     isLight:true,
   },
 } as const;
@@ -432,7 +434,7 @@ const THEME_POPUP_BG: Record<string, string> = {
   cyberpunk: 'rgba(3,2,18,0.98)',
   ocean:     'rgba(2,8,28,0.98)',
   sunset:    'rgba(12,6,3,0.98)',
-  ankit:     'rgba(255,255,255,0.99)',
+  ankit:     'rgba(245,240,232,0.99)',
   light:     'rgba(255,255,255,0.99)',
   pastel:    'rgba(255,255,255,0.99)',
   sakura:    'rgba(255,255,255,0.99)',
@@ -534,107 +536,183 @@ function AuroraBg({ glow, glow2 }: { glow: string; glow2: string; theme: Theme }
 // Light theme background — mobile: pure CSS gradient; desktop: animated blobs
 // Ankit: pure white/rose with subtle SVG web corners only
 function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
-  // Ankit Spider-Man — full wallpaper: NYC skyline + spider webs + logo
+  // Ankit Spider-Man wallpaper
+  // Normal: image 2 style — warm cream canvas, cute Spidey hanging from heart web (centre)
+  // Creator: image 4 style — parchment, sketch ink lines, Spidey mask corner art
   if (theme === 'ankit') {
-    const webC  = '#dc2626';
-    const cityC = creator ? '#1e3a5f' : '#1e3a5f';
-    const skyC  = creator
-      ? 'linear-gradient(180deg,#0a1628 0%,#1a2744 40%,#2d1b1b 80%,#3d1515 100%)'
-      : 'linear-gradient(180deg,#e8f4f8 0%,#d0e8f0 30%,#f0d4d4 70%,#ffe8e8 100%)';
-    const webOp  = creator ? 0.28 : 0.14;
-    const cityOp = creator ? 0.80 : 0.10;
-    const logoOp = creator ? 0.07 : 0.04;
+    // ── NORMAL MODE — Image 2: warm cream + cute Spidey heart-web ─────────────
+    if (!creator) return (
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
+        {/* Warm cream base — exactly like Image 2 */}
+        <div className="absolute inset-0" style={{ background: '#f5f0e8' }}/>
+
+        {/* Very subtle warm vignette edges */}
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(ellipse 80% 70% at 50% 50%, transparent 55%, rgba(210,185,155,0.15) 100%)',
+        }}/>
+
+        {/* ── CENTRE PIECE: Cute Spidey hanging from heart web ── */}
+        <svg className="absolute" style={{ width: 220, left: '50%', top: '18%', transform: 'translateX(-50%)' }}
+          viewBox="0 0 220 320">
+
+          {/* Thread from top */}
+          <line x1="110" y1="0" x2="110" y2="28" stroke="#c0392b" strokeWidth="1.2" strokeLinecap="round"/>
+
+          {/* Heart-shaped web */}
+          {/* Left lobe spokes */}
+          {[200,215,230,245,260,275].map((deg,i)=>{
+            const cx=80, cy=68, r=46;
+            const rad=deg*Math.PI/180;
+            return <line key={'ls'+i} x1={cx} y1={cy} x2={cx+r*Math.cos(rad)} y2={cy+r*Math.sin(rad)}
+              stroke="#c0392b" strokeWidth="1.1" strokeLinecap="round"/>;
+          })}
+          {/* Right lobe spokes */}
+          {[290,305,320,335,350,5].map((deg,i)=>{
+            const cx=140, cy=68, r=46;
+            const rad=deg*Math.PI/180;
+            return <line key={'rs'+i} x1={cx} y1={cy} x2={cx+r*Math.cos(rad)} y2={cy+r*Math.sin(rad)}
+              stroke="#c0392b" strokeWidth="1.1" strokeLinecap="round"/>;
+          })}
+          {/* Concentric heart arcs — left lobe */}
+          {[16,30,44].map((r,i)=>(
+            <path key={'la'+i} d={`M ${80-r},68 A ${r},${r} 0 1,1 ${80+r},68`}
+              fill="none" stroke="#c0392b" strokeWidth="0.9" strokeOpacity={0.85-i*0.15}/>
+          ))}
+          {/* Concentric heart arcs — right lobe */}
+          {[16,30,44].map((r,i)=>(
+            <path key={'ra'+i} d={`M ${140-r},68 A ${r},${r} 0 1,1 ${140+r},68`}
+              fill="none" stroke="#c0392b" strokeWidth="0.9" strokeOpacity={0.85-i*0.15}/>
+          ))}
+          {/* Heart outline */}
+          <path d="M 110,108 C 90,98 34,82 34,60 C 34,44 46,32 62,32 C 76,32 90,42 110,58 C 130,42 144,32 158,32 C 174,32 186,44 186,60 C 186,82 130,98 110,108 Z"
+            fill="none" stroke="#c0392b" strokeWidth="1.5"/>
+          {/* Heart centre */}
+          <path d="M 110,72 C 106,68 100,64 100,60 C 100,56 104,54 108,57 C 109,58 110,59 110,59 C 110,59 111,58 112,57 C 116,54 120,56 120,60 C 120,64 114,68 110,72 Z"
+            fill="#c0392b" opacity="0.9"/>
+
+          {/* Thread from heart bottom to Spidey */}
+          <line x1="110" y1="110" x2="110" y2="138" stroke="#c0392b" strokeWidth="1" strokeLinecap="round"/>
+
+          {/* ── Cute Spidey body (hanging upside-down, arms crossed, holding flowers) ── */}
+          {/* Head */}
+          <ellipse cx="110" cy="155" rx="18" ry="20" fill="#e53935"/>
+          {/* Web pattern on head */}
+          {[145,160,175,190,205,220].map((deg,i)=>{
+            const rad=deg*Math.PI/180;
+            return <line key={'hd'+i} x1="110" y1="155" x2={110+22*Math.cos(rad)} y2={155+22*Math.sin(rad)}
+              stroke="#b71c1c" strokeWidth="0.6" opacity="0.6"/>;
+          })}
+          {[6,12,18].map((r,i)=>(
+            <ellipse key={'hc'+i} cx="110" cy="155" rx={r} ry={r*1.1}
+              fill="none" stroke="#b71c1c" strokeWidth="0.5" opacity="0.5"/>
+          ))}
+          {/* Eyes */}
+          <ellipse cx="104" cy="150" rx="6" ry="7" fill="white" transform="rotate(-8 104 150)"/>
+          <ellipse cx="116" cy="150" rx="6" ry="7" fill="white" transform="rotate(8 116 150)"/>
+          <ellipse cx="104" cy="150" rx="4" ry="5" fill="#b0bec5" opacity="0.6" transform="rotate(-8 104 150)"/>
+          <ellipse cx="116" cy="150" rx="4" ry="5" fill="#b0bec5" opacity="0.6" transform="rotate(8 116 150)"/>
+          {/* Body — blue suit */}
+          <ellipse cx="110" cy="195" rx="16" ry="22" fill="#1565c0"/>
+          {/* Red chest patch */}
+          <ellipse cx="110" cy="188" rx="10" ry="8" fill="#e53935"/>
+          {/* Spider logo on chest */}
+          <ellipse cx="110" cy="187" rx="3" ry="4" fill="#1a1a1a"/>
+          {[-35,35].flatMap((a,i)=>[
+            <line key={'sl'+i} x1="110" y1="187" x2={110+9*Math.cos((90+a)*Math.PI/180)} y2={187+9*Math.sin((90+a)*Math.PI/180)}
+              stroke="#1a1a1a" strokeWidth="1.2"/>,
+            <line key={'sr'+i} x1="110" y1="187" x2={110+9*Math.cos((90-a)*Math.PI/180)} y2={187+9*Math.sin((90-a)*Math.PI/180)}
+              stroke="#1a1a1a" strokeWidth="1.2"/>,
+          ])}
+          {/* Arms crossed */}
+          <path d="M 98,190 C 90,195 86,202 84,208" fill="none" stroke="#1565c0" strokeWidth="8" strokeLinecap="round"/>
+          <path d="M 122,190 C 130,195 134,202 136,208" fill="none" stroke="#1565c0" strokeWidth="8" strokeLinecap="round"/>
+          {/* Hands holding flowers */}
+          <circle cx="82" cy="210" r="5" fill="#e53935"/>
+          <circle cx="138" cy="210" r="5" fill="#e53935"/>
+          {/* Flower bouquet */}
+          {[[-10,0],[0,-8],[10,0],[0,8]].map(([dx,dy],i)=>(
+            <circle key={'f'+i} cx={82+dx} cy={220+dy} r="4"
+              fill={['#f48fb1','#fff176','#a5d6a7','#80cbc4'][i]} opacity="0.9"/>
+          ))}
+          {/* Legs dangling up */}
+          <path d="M 102,215 C 96,226 94,235 90,242" fill="none" stroke="#1565c0" strokeWidth="9" strokeLinecap="round"/>
+          <path d="M 118,215 C 124,226 126,235 130,242" fill="none" stroke="#1565c0" strokeWidth="9" strokeLinecap="round"/>
+          {/* Shoes */}
+          <ellipse cx="88" cy="244" rx="7" ry="4" fill="#e53935" transform="rotate(-20 88 244)"/>
+          <ellipse cx="132" cy="244" rx="7" ry="4" fill="#e53935" transform="rotate(20 132 244)"/>
+        </svg>
+
+        {/* Very faint dot texture — like paper grain */}
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(circle, rgba(160,130,100,0.08) 1px, transparent 1px)',
+          backgroundSize: '20px 20px',
+        }}/>
+      </div>
+    );
+
+    // ── CREATOR MODE — Image 4: parchment + sketch aesthetic ──────────────────
     return (
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-        <div className="absolute inset-0" style={{ background: skyC }}/>
+        {/* Parchment base */}
+        <div className="absolute inset-0" style={{ background: '#f0ebe0' }}/>
 
-        {/* Full spider-web SVG wallpaper */}
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 700"
-          preserveAspectRatio="xMidYMid slice" style={{ opacity: webOp }}>
-          {[0,15,30,45,60,75,90,105,120].map((deg,i)=>{
+        {/* Speed/sketch lines — like Image 4 background */}
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" style={{ opacity: 0.08 }}>
+          {Array.from({length:40},(_,i)=>(
+            <line key={i}
+              x1={-50 + i*15} y1="0"
+              x2={-50 + i*15 + 200} y2="800"
+              stroke="#2c2c2c" strokeWidth={i%5===0?0.8:0.4}/>
+          ))}
+        </svg>
+
+        {/* Red paint splatter dots — like Image 4 */}
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" style={{ opacity: 0.45 }}>
+          {[[40,120],[60,280],[80,400],[30,550],[90,670],
+            [280,80],[310,200],[260,360],[320,480],[290,600],[350,720],
+            [150,150],[170,320],[130,480],[160,630],
+            [220,100],[200,260],[240,420],[210,580]].map(([x,y],i)=>(
+            <circle key={i} cx={x} cy={y} r={i%4===0?3.5:i%3===0?2.5:1.5}
+              fill={i%3===0?'#c0392b':i%4===0?'#1a1a2e':'#c0392b'} opacity={0.7-i%3*0.15}/>
+          ))}
+        </svg>
+
+        {/* Large Spidey mask — bottom-right corner, like Image 4 */}
+        <svg className="absolute bottom-0 right-0" style={{ width: '75%', maxWidth: 380, opacity: 0.09 }}
+          viewBox="0 0 300 420" preserveAspectRatio="xMaxYMax meet">
+          {/* Head shape */}
+          <ellipse cx="200" cy="160" rx="130" ry="160" fill="#c0392b"/>
+          {/* Eye — left (huge, angular like Spidey) */}
+          <path d="M 110,100 C 120,80 160,75 180,90 C 200,105 205,130 190,140 C 165,155 110,145 100,125 C 95,115 100,108 110,100 Z"
+            fill="white"/>
+          <path d="M 112,103 C 122,85 158,80 178,93 C 196,106 200,127 187,136 C 163,150 113,142 104,123 C 100,114 104,109 112,103 Z"
+            fill="#b0bec5" opacity="0.5"/>
+          {/* Web lines on mask */}
+          {[0,20,40,60,80,100,120,140,160,180].map((deg,i)=>{
             const rad=deg*Math.PI/180;
-            return <line key={'tl'+i} x1="0" y1="0" x2={420*Math.cos(rad)} y2={420*Math.sin(rad)}
-              stroke={webC} strokeWidth="0.7"/>;
+            return <line key={i} x1="200" y1="160" x2={200+200*Math.cos(rad)} y2={160+200*Math.sin(rad)}
+              stroke="#8b0000" strokeWidth="0.8" opacity="0.4"/>;
           })}
-          {[60,120,180,240,300,360].map((r,i)=>(
-            <path key={'tlc'+i} d={`M ${r},0 A ${r},${r} 0 0,1 0,${r}`}
-              fill="none" stroke={webC} strokeWidth="0.5"/>
+          {[40,80,120,160,200].map((r,i)=>(
+            <ellipse key={i} cx="200" cy="160" rx={r} ry={r*1.2}
+              fill="none" stroke="#8b0000" strokeWidth="0.6" opacity={0.35-i*0.05}/>
           ))}
-          {[90,105,120,135,150,165,180].map((deg,i)=>{
-            const rad=deg*Math.PI/180;
-            return <line key={'tr'+i} x1="400" y1="0" x2={400+360*Math.cos(rad)} y2={360*Math.sin(rad)}
-              stroke={webC} strokeWidth="0.7"/>;
-          })}
-          {[55,110,165,220].map((r,i)=>(
-            <path key={'trc'+i} d={`M ${400-r},0 A ${r},${r} 0 0,0 400,${r}`}
-              fill="none" stroke={webC} strokeWidth="0.5"/>
-          ))}
-          <path d="M 50,80 Q 200,180 380,60" fill="none" stroke={webC} strokeWidth="1.2"/>
-          <path d="M 0,150 Q 180,260 400,140" fill="none" stroke={webC} strokeWidth="0.9"/>
-          <path d="M 80,0 Q 200,120 400,30"   fill="none" stroke={webC} strokeWidth="0.8"/>
-          {[60,120,180,240,300,360].map((x,i)=>(
-            <g key={'h'+i}>
-              <line x1={x} y1="0" x2={x+20} y2="90" stroke={webC} strokeWidth="0.5"/>
-              {[25,50,75].map((y,j)=>(
-                <line key={j} x1={x+(j*7)} y1={y} x2={x+20+(j*7)} y2={y}
-                  stroke={webC} strokeWidth="0.35"/>
-              ))}
-            </g>
-          ))}
+          {/* Dark body shoulder */}
+          <ellipse cx="250" cy="380" rx="160" ry="120" fill="#1a1a2e" opacity="0.9"/>
         </svg>
 
-        {/* NYC city silhouette */}
-        <svg className="absolute bottom-0 w-full" viewBox="0 0 400 220"
-          style={{ opacity: cityOp }} preserveAspectRatio="xMidYMax meet">
-          <g fill={cityC}>
-            <rect x="0"   y="100" width="18"  height="120"/>
-            <rect x="20"  y="70"  width="22"  height="150"/>
-            <rect x="44"  y="90"  width="15"  height="130"/>
-            <rect x="60"  y="60"  width="25"  height="160"/>
-            <rect x="87"  y="80"  width="18"  height="140"/>
-            <rect x="107" y="50"  width="30"  height="170"/>
-            <rect x="140" y="75"  width="20"  height="145"/>
-            <rect x="162" y="40"  width="35"  height="180"/>
-            <rect x="199" y="65"  width="22"  height="155"/>
-            <rect x="223" y="45"  width="28"  height="175"/>
-            <rect x="253" y="80"  width="18"  height="140"/>
-            <rect x="273" y="55"  width="32"  height="165"/>
-            <rect x="307" y="85"  width="20"  height="135"/>
-            <rect x="329" y="60"  width="28"  height="160"/>
-            <rect x="359" y="75"  width="20"  height="145"/>
-            <rect x="381" y="95"  width="19"  height="125"/>
-            <rect x="168" y="20"  width="3"   height="22"/>
-            <rect x="230" y="28"  width="2"   height="18"/>
-            <rect x="115" y="35"  width="2"   height="16"/>
-          </g>
-          <g fill={creator ? '#fbbf24' : '#60a5fa'} opacity={creator ? 0.5 : 0.4}>
-            {[[25,75],[25,85],[30,75],[30,85],[65,65],[65,75],[70,65],[70,75],
-              [112,55],[112,65],[118,55],[118,65],[167,45],[167,55],[173,45],[173,55],
-              [228,50],[228,60],[234,50],[234,60],[278,60],[278,70],[284,60],[284,70],
-              [334,65],[334,75],[340,65],[340,75],
-            ].map(([x,y],i)=><rect key={i} x={x} y={y} width="3.5" height="2.5" rx="0.5"/>)}
-          </g>
+        {/* Ink splatter bottom-left */}
+        <svg className="absolute bottom-0 left-0" style={{ width: '40%', maxWidth: 160, opacity: 0.07 }}
+          viewBox="0 0 160 200">
+          <ellipse cx="60" cy="180" rx="80" ry="60" fill="#1a1a2e"/>
+          <ellipse cx="30" cy="160" rx="30" ry="50" fill="#c0392b"/>
         </svg>
 
-        {/* Giant spider watermark */}
-        <svg className="absolute" style={{ opacity: logoOp, width:200, height:200, left:'50%', top:'40%', transform:'translate(-50%,-50%)' }}
-          viewBox="0 0 100 100">
-          <ellipse cx="50" cy="52" rx="10" ry="14" fill={creator?'#dc2626':'#1e3a5f'}/>
-          <circle  cx="50" cy="36" r="9"           fill={creator?'#dc2626':'#1e3a5f'}/>
-          <ellipse cx="47" cy="34" rx="3.5" ry="2.5" fill="white" transform="rotate(-15 47 34)"/>
-          <ellipse cx="53" cy="34" rx="3.5" ry="2.5" fill="white" transform="rotate(15 53 34)"/>
-          {[[-1,-1],[1,-1],[-1,1],[1,1]].flatMap(([sx,sy],i)=>[
-            <line key={'a'+i} x1={50+sx*8} y1={52+sy*5} x2={50+sx*28} y2={52+sy*18}
-              stroke={creator?'#dc2626':'#1e3a5f'} strokeWidth="2.5" strokeLinecap="round"/>,
-            <line key={'b'+i} x1={50+sx*28} y1={52+sy*18} x2={50+sx*38} y2={52+sy*8}
-              stroke={creator?'#dc2626':'#1e3a5f'} strokeWidth="1.8" strokeLinecap="round"/>,
-          ])}
-        </svg>
-
-        <div className="hidden md:block absolute rounded-full blur-[200px]"
-          style={{ width:400, height:400, background:creator?'#dc2626':'#ef4444', opacity:0.07, top:'-10%', left:'-5%' }}/>
-        <div className="hidden md:block absolute rounded-full blur-[180px]"
-          style={{ width:350, height:350, background:'#3b82f6', opacity:0.06, bottom:'10%', right:'-5%' }}/>
+        {/* Paper grain texture */}
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(circle, rgba(100,80,60,0.07) 1px, transparent 1px)',
+          backgroundSize: '18px 18px',
+        }}/>
       </div>
     );
   }
@@ -1802,23 +1880,26 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
   };
 
   // ── TTS ───────────────────────────────────────────────────────────────────
-  // Pick the best available female voice — prioritise warm/bright ones
+  // Pick the best available female voice — prioritise sharp/cute ones
   const getBestVoice = (lang: string): SpeechSynthesisVoice | null => {
     const vs = window.speechSynthesis.getVoices();
-    // Tier 1 — best sounding warm female voices
-    const t1 = vs.find(v => /google uk english female/i.test(v.name));
-    if (t1) return t1;
-    const t2 = vs.find(v => /samantha|karen|moira|victoria/i.test(v.name));
-    if (t2) return t2;
-    // Hindi voices for hi mode
     if (lang === 'hi-IN') {
       const hi = vs.find(v => /lekha|sunita|veena|google.*hindi/i.test(v.name));
       if (hi) return hi;
     }
-    // Tier 3 — any female
-    const t3 = vs.find(v => /zira|hazel|nicky|tessa|aria|jenny|siri.*female|female/i.test(v.name) && v.lang.startsWith('en'));
+    // Tier 1 — sharp, bright, clear female voices (not warm/thick)
+    const t1 = vs.find(v => /microsoft zira|google us english female/i.test(v.name));
+    if (t1) return t1;
+    // Tier 2 — Google voices (sharp & clear)
+    const t2 = vs.find(v => /google.*english/i.test(v.name) && /female|woman/i.test(v.name));
+    if (t2) return t2;
+    const t2b = vs.find(v => /google uk english female|google.*female/i.test(v.name));
+    if (t2b) return t2b;
+    // Tier 3 — Apple/system clear voices
+    const t3 = vs.find(v => /nicky|aria|jenny|hazel|karen|samantha/i.test(v.name));
     if (t3) return t3;
-    return null;
+    // Tier 4 — any English female
+    return vs.find(v => /female|woman/i.test(v.name) && v.lang.startsWith('en')) ?? null;
   };
 
   const speakText = (raw: string) => {
@@ -1827,7 +1908,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
     const clean = raw.replace(/\*\*/g,'').replace(/#{1,6}\s/g,'').replace(/[*_~`]/g,'').slice(0,600);
     const lang = language === 'hi' ? 'hi-IN' : 'en-IN';
     const u = new SpeechSynthesisUtterance(clean);
-    u.pitch = 1.62; u.rate = 1.18; u.lang = lang; // Hot, quick, bright
+    u.pitch = 1.85; u.rate = 1.28; u.volume = 0.88; u.lang = lang; // Sharp, cute, light
     const speak = () => {
       const v = getBestVoice(lang); if (v) u.voice = v;
       window.speechSynthesis.speak(u);
@@ -1861,7 +1942,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                       .replace(/\bTESSA\b/gi,'').slice(0, 500); // shorter = snappier
     const lang = language === 'hi' ? 'hi-IN' : 'en-IN';
     const u = new SpeechSynthesisUtterance(clean);
-    u.pitch = 1.65; u.rate = 1.22; u.lang = lang; // Hotter + quicker voice
+    u.pitch = 1.85; u.rate = 1.28; u.volume = 0.88; u.lang = lang; // Sharp cute call voice
     const trySpeak = () => {
       const v = getBestVoice(lang); if (v) u.voice = v;
       u.onend  = () => { isSpeakingRef.current = false; onDone(); };
@@ -2261,7 +2342,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
     cyberpunk: ['#020108','#030112'],
     ocean:     ['#ecfeff','#f0f9ff'],
     sunset:    ['#110805','#17080f'],
-    ankit:     ['#ffffff','#fff1f2'],
+    ankit:     ['#f5f0e8','#f0ebe0'],
     light:     ['#f0f4ff','#fdf0ff'],
     pastel:    ['#f3efff','#fdf0ff'],
     sakura:    ['#fff2f5','#fff0f8'],

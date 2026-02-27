@@ -2623,9 +2623,9 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                     <SLabel label="Theme" t={t}/>
                     <div className="grid grid-cols-2 gap-1.5">
                       {(isCreatorMode
-                        ? [['dark','🌙','Dark'],['light','☀️','Light'],['cyberpunk','⚡','Cyber'],['ocean','🌊','Ocean'],['sunset','🌅','Sunset'],['pastel','🪻','Pastel'],['sakura','🌸','Sakura'],['ankit','🕷️',"Ankit's Special"]]
-                        : [['dark','🌙','Dark'],['light','☀️','Light'],['cyberpunk','⚡','Cyber'],['ocean','🌊','Ocean'],['sunset','🌅','Sunset'],['pastel','🪻','Pastel'],['sakura','🌸','Sakura']]
-                      as [Theme,string,string][]).map(([th,ico,lbl])=>(
+                        ? ([['dark','🌙','Dark'],['light','☀️','Light'],['cyberpunk','⚡','Cyber'],['ocean','🌊','Ocean'],['sunset','🌅','Sunset'],['pastel','🪻','Pastel'],['sakura','🌸','Sakura'],['ankit','🕷️',"Ankit's Special"]] as [Theme,string,string][])
+                        : ([['dark','🌙','Dark'],['light','☀️','Light'],['cyberpunk','⚡','Cyber'],['ocean','🌊','Ocean'],['sunset','🌅','Sunset'],['pastel','🪻','Pastel'],['sakura','🌸','Sakura']] as [Theme,string,string][])
+                      ).map(([th,ico,lbl])=>(
                         <button key={th} onClick={()=>setTheme(th)}
                           className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-[11px] font-medium transition-all ${theme===th?'text-white':t.sCard+' '+t.sSub}`}
                           style={theme===th?{background:`linear-gradient(135deg,${t.glow}28,${t.glow}12)`,border:`1px solid ${t.glow}35`,color:t.glow}:{}}>

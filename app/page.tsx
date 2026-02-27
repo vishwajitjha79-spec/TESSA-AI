@@ -1202,6 +1202,7 @@ export default function Home() {
   const [wellnessVersion, setWellnessVersion] = useState(0);
   const [selectedImage,   setSelectedImage] = useState<string | null>(null);
   const [isRecording,     setIsRecording]   = useState(false);
+  const [interimText,     setInterimText]   = useState('');
   const [settingsTab,     setSettingsTab]   = useState<string>('main');
   const [showTimerFloat,  setShowTimerFloat]  = useState(false);
   const [insightsOpen,              setInsightsOpen]             = useState(false);
@@ -1714,31 +1715,58 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
   };
 
   // ── Voice ─────────────────────────────────────────────────────────────────
-  const startRecording = () => {
-    const SR=(window as any).SpeechRecognition??(window as any).webkitSpeechRecognition;
-    if (!SR) { alert('Speech recognition not supported'); return; }
-    const r=new SR(); r.lang='en-IN'; r.continuous=false; r.interimResults=true; r.maxAlternatives=3;
-    let final='';
-    r.onstart=()=>setIsRecording(true);
-    r.onresult=(e:any)=>{
-      let interim='';
-      for(let i=e.resultIndex;i<e.results.length;i++){
-        const tx=e.results[i][0].transcript;
-        if(e.results[i].isFinal) final+=tx+' '; else interim+=tx;
-      }
-      setInput(final+interim);
-    };
-    r.onerror=(e:any)=>{
-      setIsRecording(false);
-      if(e.error==='audio-capture') alert('Microphone not found.');
-      else if(e.error==='not-allowed') alert('Mic access denied.');
-      else if(e.error!=='no-speech') alert('Voice failed, try again.');
-    };
-    r.onend=()=>setIsRecording(false);
-    recognitionRef.current=r;
-    try{r.start();}catch{setIsRecording(false);}
+  // ── Voice input — click to toggle, fullscreen overlay, auto-send on final ──
+  const toggleMic = () => {
+    if (isRecording) {
+      // Stop
+      if (recognitionRef.current) { recognitionRef.current.stop(); recognitionRef.current = null; }
+      setIsRecording(false); setInterimText('');
+      return;
+    }
+    const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    if (!SR) { alert('Speech recognition not supported on this browser. Try Chrome.'); return; }
+
+    // Request mic permission explicitly first
+    navigator.mediaDevices?.getUserMedia({ audio: true }).then(() => {
+      const r = new SR();
+      r.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
+      r.continuous = true;
+      r.interimResults = true;
+      r.maxAlternatives = 1;
+      let final = '';
+
+      r.onstart = () => { setIsRecording(true); setInterimText(''); };
+      r.onresult = (e: any) => {
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const tx = e.results[i][0].transcript;
+          if (e.results[i].isFinal) { final += tx + ' '; }
+          else { interim = tx; }
+        }
+        setInterimText(interim);
+        if (final) setInput(final.trim());
+      };
+      r.onerror = (e: any) => {
+        setIsRecording(false); setInterimText('');
+        if (e.error === 'audio-capture') alert('Microphone not found. Check browser permissions.');
+        else if (e.error === 'not-allowed') alert('Mic permission denied. Allow mic access in browser settings.');
+        else if (e.error !== 'no-speech' && e.error !== 'aborted') alert(`Voice error: ${e.error}`);
+      };
+      r.onend = () => {
+        setIsRecording(false); setInterimText('');
+        // Auto-send if there's text
+        if (final.trim()) {
+          const text = final.trim();
+          setInput('');
+          setTimeout(() => sendMessage(text), 80);
+        }
+      };
+      recognitionRef.current = r;
+      try { r.start(); } catch { setIsRecording(false); }
+    }).catch(() => {
+      alert('Microphone access denied. Please allow mic access in your browser settings and try again.');
+    });
   };
-  const stopRecording=()=>{ if(recognitionRef.current&&isRecording){recognitionRef.current.stop();recognitionRef.current=null;} };
 
   // ── Creator mode ──────────────────────────────────────────────────────────
   const unlockCreatorModeAction = () => {
@@ -1767,6 +1795,86 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
   // ─────────────────────────────────────────────────────────────────────────
   // LOADING
   // ─────────────────────────────────────────────────────────────────────────
+  // ── Browser Notifications ─────────────────────────────────────────────────
+  useEffect(() => {
+    if (notifications && typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, [notifications]);
+
+  // ── Voice Overlay component (inline, so it can access state/theme) ────────
+  const VoiceOverlay = () => {
+    if (!isRecording) return null;
+    const live = interimText || input || '';
+    return (
+      <div className="fixed inset-0 z-[80] flex flex-col items-center justify-center"
+        style={{ background: t.isLight ? 'rgba(255,255,255,0.97)' : 'rgba(5,6,20,0.97)', backdropFilter: 'blur(20px)' }}
+        onClick={toggleMic}>
+
+        {/* Animated soundwave rings */}
+        <div className="relative flex items-center justify-center mb-8">
+          {[1,2,3,4].map(i => (
+            <div key={i} className="absolute rounded-full border-2"
+              style={{
+                width: 72 + i * 44, height: 72 + i * 44,
+                borderColor: `${t.glow}${['55','38','25','12'][i-1]}`,
+                animation: `ping ${0.9 + i * 0.3}s cubic-bezier(0,0,0.2,1) infinite`,
+                animationDelay: `${i * 0.18}s`,
+              }}/>
+          ))}
+          {/* Centre avatar circle */}
+          <div className="relative w-[72px] h-[72px] rounded-full overflow-hidden border-[3px]"
+            style={{ borderColor: t.glow, boxShadow: `0 0 0 6px ${t.glow}20, 0 0 40px ${t.glow}45` }}>
+            <img src={avatarSrc} alt="Tessa" className="w-full h-full object-cover"
+              onError={e => { (e.currentTarget as HTMLImageElement).src = '/avatars/cosmic.png'; }}/>
+          </div>
+          {/* Mic indicator dot */}
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center"
+            style={{ background: '#ef4444', boxShadow: '0 0 12px #ef444488' }}>
+            <div className="w-2 h-2 rounded-full bg-white animate-pulse"/>
+          </div>
+        </div>
+
+        {/* Soundwave bars */}
+        <div className="flex items-center gap-1 mb-6 h-10">
+          {Array.from({length: 20}, (_, i) => (
+            <div key={i} className="rounded-full"
+              style={{
+                width: 3,
+                background: t.glow,
+                animation: `soundBar ${0.4 + Math.random() * 0.6}s ease-in-out infinite alternate`,
+                animationDelay: `${i * 0.05}s`,
+                height: `${20 + Math.random() * 20}px`,
+                opacity: 0.7,
+              }}/>
+          ))}
+        </div>
+
+        {/* Live text */}
+        <div className="text-center px-8 max-w-sm">
+          {live ? (
+            <p className="text-[16px] font-medium leading-relaxed" style={{ color: t.isLight ? '#1e293b' : 'rgba(255,255,255,0.9)' }}>
+              {live}
+              <span className="animate-pulse" style={{ color: t.glow }}>▌</span>
+            </p>
+          ) : (
+            <div>
+              <p className="text-[15px] font-semibold mb-1" style={{ color: t.glow }}>Listening…</p>
+              <p className="text-[11px]" style={{ color: t.isLight ? '#6b7280' : 'rgba(255,255,255,0.4)' }}>Speak clearly · tap anywhere to stop</p>
+            </div>
+          )}
+        </div>
+
+        {/* Stop button */}
+        <button className="mt-8 px-6 py-2.5 rounded-full text-[12px] font-bold text-white transition-all active:scale-95"
+          style={{ background: `linear-gradient(135deg, #ef4444, #dc2626)`, boxShadow: '0 4px 20px #ef444450' }}
+          onClick={e => { e.stopPropagation(); toggleMic(); }}>
+          ⏹ Stop Recording
+        </button>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="h-screen bg-[#050816] flex items-center justify-center overflow-hidden">
@@ -1836,6 +1944,10 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
       @keyframes slideUpSheet {
         from { opacity:0; transform: translateY(22px); }
         to   { opacity:1; transform: translateY(0);    }
+      }
+      @keyframes soundBar {
+        from { transform: scaleY(0.3); opacity: 0.4; }
+        to   { transform: scaleY(1);   opacity: 1;   }
       }
       /* ── Delete confirm expand ── */
       @keyframes expandConfirm {
@@ -2316,7 +2428,15 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                       <Toggle label="Message Grouping" sub="Groups consecutive messages" checked={messageGrouping} onChange={setMessageGrouping} color={t.glow} t={t}/>
                       <Toggle label="Send on Enter" sub="Shift+Enter for new line" checked={sendOnEnter} onChange={setSendOnEnter} color={t.glow} t={t}/>
                       <Toggle label="Word Count" sub="Shows character count while typing" checked={showWordCount} onChange={setShowWordCount} color={t.glow} t={t}/>
-                      <Toggle label="Browser Notifications" sub="Push alerts from Tessa" checked={notifications} onChange={setNotifications} color={t.glow} t={t}/>
+                      <Toggle label="Browser Notifications" sub="Push alerts from Tessa" checked={notifications}
+                        onChange={(v) => {
+                          setNotifications(v);
+                          if (v && typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
+                            Notification.requestPermission().then(p => {
+                              if (p !== 'granted') setNotifications(false);
+                            });
+                          }
+                        }} color={t.glow} t={t}/>
                     </div>
                   </div>
                 </>)}
@@ -2891,14 +3011,12 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                   <Paperclip size={16}/>
                 </button>
 
-                {/* Voice */}
+                {/* Voice — click to toggle */}
                 <button
-                  onMouseDown={startRecording} onMouseUp={stopRecording}
-                  onTouchStart={e=>{e.preventDefault();startRecording();}}
-                  onTouchEnd={e=>{e.preventDefault();stopRecording();}}
-                  disabled={isLoading} title="Hold to speak"
-                  className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all disabled:opacity-40 active:scale-90 ${isRecording?'bg-red-500/80 border border-red-400/50 text-white shadow-lg shadow-red-500/25 animate-pulse':t.btnS}`}>
-                  {isRecording?<MicOff size={16}/>:<Mic size={16}/>}
+                  onClick={toggleMic}
+                  disabled={isLoading} title={isRecording ? 'Tap to stop' : 'Tap to speak'}
+                  className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all disabled:opacity-40 active:scale-90 ${isRecording ? 'bg-red-500/80 border border-red-400/50 text-white shadow-lg shadow-red-500/25' : t.btnS}`}>
+                  {isRecording ? <MicOff size={16}/> : <Mic size={16}/>}
                 </button>
 
                 {/* Textarea */}
@@ -2934,7 +3052,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
               {/* Hint bar */}
               <div className="flex items-center justify-between mt-1.5 px-1">
                 <p className={`text-[9px] ${t.sub}`}>
-                  {isRecording?'🎤 Listening…':sendOnEnter?'Enter to send · Shift+Enter new line':'Click ➤ to send'}
+                  {isRecording ? '🎤 Listening… tap mic to stop' : sendOnEnter ? 'Enter to send · Shift+Enter new line' : 'Click ➤ to send'}
                 </p>
                 <div className="flex items-center gap-3">
                   {autoSearch&&!isCreatorMode&&(
@@ -3014,6 +3132,9 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
           </div>
         </aside>
       )}
+
+      {/* ── VOICE OVERLAY — fullscreen when recording ── */}
+      <VoiceOverlay />
 
       {/* ── FLOATING STUDY TIMER ── */}
       {showTimerFloat && (

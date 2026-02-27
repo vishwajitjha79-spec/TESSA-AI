@@ -1823,7 +1823,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
           }),
         });
         const data = await res.json();
-        const reply = (data.content || 'Sorry, I couldn't process that.').slice(0, 400);
+        const reply = (data.content || 'Sorry, I could not process that.').slice(0, 400);
         setCallTranscript(p => [...p, { role: 'tessa', text: reply }]);
         // Speak reply, then listen again
         callSpeakTessa(reply, () => {

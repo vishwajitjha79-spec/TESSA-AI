@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
     }
 
-    const { messages, isCreatorMode, currentMood, needsSearch, maxTokens = 600, _systemOverride } = body;
+    const { messages, isCreatorMode, currentMood, needsSearch, maxTokens = 600, _systemOverride, language } = body;
 
     // Validation
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     try {
       systemPrompt = _systemOverride
         ? String(_systemOverride)
-        : getSystemPrompt(isCreatorMode || false, userMessage);
+        : getSystemPrompt(isCreatorMode || false, userMessage, language || 'en');
     } catch (promptError) {
       console.error('Error generating system prompt:', promptError);
       systemPrompt = 'You are T.E.S.S.A., a helpful AI assistant.';
@@ -111,9 +111,12 @@ export async function POST(request: NextRequest) {
     // Call Groq API with comprehensive error handling
     let groqResponse;
     try {
+      // For complex queries (longer messages), lower temp for precision
+      const isComplex = userMessage.length > 120 || /solve|calculate|explain|prove|derive|analyse|code|write|essay|compare/i.test(userMessage);
+      const temperature = isComplex ? 0.4 : 0.75 + Math.random() * 0.15;
       groqResponse = await getChatCompletion(fullMessages, {
-        temperature: 0.85 + Math.random() * 0.25,
-        maxTokens: Math.min(maxTokens, 1400),
+        temperature,
+        maxTokens: Math.min(maxTokens, 2000), // Increased for complex answers
       });
     } catch (groqError: any) {
       console.error('Groq API error:', groqError);

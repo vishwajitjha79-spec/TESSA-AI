@@ -353,41 +353,41 @@ const THEMES = {
     settActive:'bg-rose-100 border border-rose-300',
     isLight:true,
   },
-  // ── ANKIT'S SPECIAL — Spider-Man theme ──────────────────────────────────────
-  // Standard: white canvas, red/blue comic style (daytime Spidey)
-  // Creator: dark red/blue near-black (night-time Spidey / noir)
+  // ── ANKIT'S SPECIAL — Spider-Man light ──────────────────────────────────────
+  // Clean white canvas · light rose-red · soft blue accents
+  // Comic book page aesthetic — energetic but not garish
   ankit: {
-    bg:'bg-white', bgC:'bg-[#0d0208]',
-    panel:'bg-white/90 backdrop-blur-md border-red-300/55',
-    panelC:'bg-[#1a0510]/90 backdrop-blur-md border-red-800/50',
-    header:'bg-white/88 backdrop-blur-md border-b border-red-300/45 shadow-sm shadow-red-100/40',
-    headerC:'bg-[#0d0208]/90 backdrop-blur-md border-b border-red-900/60 shadow-sm shadow-red-900/30',
-    bar:'bg-white/88 backdrop-blur-md border-t border-red-200/50',
-    barC:'bg-[#0d0208]/90 backdrop-blur-md border-t border-red-900/50',
-    msgU:'bg-gradient-to-br from-red-100/85 to-rose-50/60 border border-red-300/50 border-l-[3px] border-l-red-600',
-    msgUC:'bg-gradient-to-br from-red-900/40 to-rose-950/30 border border-red-700/40 border-l-[3px] border-l-red-500',
-    msgA:'bg-white/85 border border-red-100/60 border-l-[3px] border-l-blue-400/60',
-    msgAC:'bg-[#0a0515]/80 border border-blue-900/40 border-l-[3px] border-l-blue-500/70',
-    inp:'bg-white border border-red-300/50 text-slate-800 placeholder:text-red-400/55 focus:border-red-500/65 focus:ring-2 focus:ring-red-400/15',
-    inpC:'bg-[#150510] border border-red-800/50 text-red-100 placeholder:text-red-700/60 focus:border-red-500/65 focus:ring-2 focus:ring-red-500/20',
-    btnP:'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-md shadow-red-500/35',
-    btnPC:'bg-gradient-to-r from-red-700 to-rose-800 hover:from-red-600 hover:to-rose-700 text-white shadow-md shadow-red-700/50',
-    btnS:'bg-red-50 hover:bg-red-100 border border-red-300/55 text-red-800 hover:text-red-950',
-    btnSC:'bg-red-950/40 hover:bg-red-900/50 border border-red-700/50 text-red-300 hover:text-red-200',
-    text:'text-slate-800', sub:'text-red-500/65', subC:'text-red-400/70',
-    accent:'text-red-700', accentC:'text-red-400',
-    glow:'#dc2626', glowC:'#ef4444',
-    card:'bg-white/80 border border-red-100/70',
-    cardC:'bg-red-950/30 border border-red-800/40',
-    active:'bg-red-100 border border-red-400/55',
-    activeC:'bg-red-900/40 border border-red-500/60',
-    div:'border-red-200/45', divC:'border-red-800/35',
-    settBg:'bg-white/97 backdrop-blur-md border-t border-red-200/55',
-    settBgC:'bg-[#0d0208]/98 backdrop-blur-md border-t border-red-900/55',
+    bg:'bg-white', bgC:'bg-rose-50',
+    panel:'bg-white/90 backdrop-blur-md border-red-200/50',
+    panelC:'bg-rose-50/90 backdrop-blur-md border-blue-200/45',
+    header:'bg-white/88 backdrop-blur-md border-b border-red-200/40 shadow-sm shadow-red-100/30',
+    headerC:'bg-rose-50/88 backdrop-blur-md border-b border-blue-200/40 shadow-sm shadow-blue-100/25',
+    bar:'bg-white/88 backdrop-blur-md border-t border-red-200/40',
+    barC:'bg-rose-50/88 backdrop-blur-md border-t border-blue-200/40',
+    msgU:'bg-gradient-to-br from-red-50/90 to-rose-50/70 border border-red-200/45 border-l-[3px] border-l-red-500/70',
+    msgUC:'bg-gradient-to-br from-blue-50/90 to-sky-50/70 border border-blue-200/45 border-l-[3px] border-l-blue-500/70',
+    msgA:'bg-white/88 border border-slate-200/50 border-l-[3px] border-l-blue-300/55',
+    msgAC:'bg-white/88 border border-slate-200/50 border-l-[3px] border-l-red-300/55',
+    inp:'bg-white border border-red-200/55 text-slate-800 placeholder:text-slate-400/70 focus:border-red-400/65 focus:ring-2 focus:ring-red-300/20',
+    inpC:'bg-white border border-blue-200/55 text-slate-800 placeholder:text-slate-400/70 focus:border-blue-400/65 focus:ring-2 focus:ring-blue-300/20',
+    btnP:'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white shadow-sm shadow-red-400/30',
+    btnPC:'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white shadow-sm shadow-blue-400/30',
+    btnS:'bg-red-50 hover:bg-red-100 border border-red-200/55 text-red-700 hover:text-red-800',
+    btnSC:'bg-blue-50 hover:bg-blue-100 border border-blue-200/55 text-blue-700 hover:text-blue-800',
+    text:'text-slate-800', sub:'text-slate-500', subC:'text-slate-500',
+    accent:'text-red-600', accentC:'text-blue-600',
+    glow:'#ef4444', glowC:'#3b82f6',
+    card:'bg-white/85 border border-slate-200/60',
+    cardC:'bg-white/85 border border-slate-200/60',
+    active:'bg-red-50 border border-red-300/55',
+    activeC:'bg-blue-50 border border-blue-300/55',
+    div:'border-slate-200/50', divC:'border-slate-200/50',
+    settBg:'bg-white/98 backdrop-blur-md border-t border-slate-200/50',
+    settBgC:'bg-white/98 backdrop-blur-md border-t border-slate-200/50',
     settText:'text-slate-800', settTextHover:'hover:text-slate-900',
-    settSub:'text-slate-400', settLabel:'text-slate-400',
-    settCard:'bg-red-50 border border-red-200/60',
-    settActive:'bg-red-100 border border-red-400/55',
+    settSub:'text-slate-500', settLabel:'text-slate-500',
+    settCard:'bg-slate-50 border border-slate-200/60',
+    settActive:'bg-red-50 border border-red-300/55',
     isLight:true,
   },
 } as const;
@@ -413,8 +413,7 @@ function useT(theme: Theme, c: boolean) {
     sText: T.settText, sTextH: T.settTextHover,
     sSub: T.settSub, sLabel: T.settLabel,
     sCard: T.settCard, sActive: T.settActive,
-    // ankit creator mode is dark — override isLight
-    isLight: (theme === 'ankit' && c) ? false : T.isLight,
+    isLight: T.isLight,
   };
 }
 
@@ -434,7 +433,6 @@ const THEME_POPUP_BG: Record<string, string> = {
   ocean:     'rgba(2,8,28,0.98)',
   sunset:    'rgba(12,6,3,0.98)',
   ankit:     'rgba(255,255,255,0.99)',
-  ankitC:    'rgba(13,2,8,0.98)',
   light:     'rgba(255,255,255,0.99)',
   pastel:    'rgba(255,255,255,0.99)',
   sakura:    'rgba(255,255,255,0.99)',
@@ -534,105 +532,56 @@ function AuroraBg({ glow, glow2 }: { glow: string; glow2: string; theme: Theme }
 }
 
 // Light theme background — mobile: pure CSS gradient; desktop: animated blobs
-// Ankit theme gets a special Spider-Man treatment
+// Ankit: pure white/rose with subtle SVG web corners only
 function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
-  // Spider-Man theme — comic web pattern background
+  // Ankit Spider-Man: original light style + subtle web corner decorations
   if (theme === 'ankit') {
     return (
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-        {/* Deep red/blue gradient base */}
+        {/* Original gradient — white base, very light red/blue tint */}
         <div className="absolute inset-0" style={{
           background: creator
-            ? 'linear-gradient(135deg, #1a0505 0%, #0a0a2e 35%, #1a0505 65%, #0a0a2e 100%)'
-            : 'linear-gradient(135deg, #fff1f2 0%, #eff6ff 40%, #fff1f2 70%, #eff6ff 100%)',
+            ? 'radial-gradient(ellipse 80% 60% at 18% 10%, #fca5a530 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 80% 82%, #bfdbfe30 0%, transparent 55%)'
+            : 'radial-gradient(ellipse 80% 60% at 18% 10%, #fca5a520 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 80% 82%, #bfdbfe20 0%, transparent 55%)',
         }}/>
 
-        {/* Spider web SVG — full screen, tiled */}
-        <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg"
-          style={{ opacity: creator ? 0.18 : 0.07 }}>
-          <defs>
-            {/* Single web cell */}
-            <pattern id="webCell" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
-              {/* Radial lines from centre */}
-              {[0,30,60,90,120,150,180,210,240,270,300,330].map((deg, i) => {
-                const rad = deg * Math.PI / 180;
-                return <line key={i}
-                  x1="60" y1="60"
-                  x2={60 + 60 * Math.cos(rad)} y2={60 + 60 * Math.sin(rad)}
-                  stroke={creator ? '#dc2626' : '#dc2626'} strokeWidth="0.8" strokeOpacity="0.9"/>;
-              })}
-              {/* Concentric web arcs */}
-              {[15,30,45,60].map((r, i) => (
-                <circle key={i} cx="60" cy="60" r={r}
-                  fill="none" stroke={creator ? '#dc2626' : '#dc2626'}
-                  strokeWidth="0.6" strokeOpacity={0.7 - i * 0.1}
-                  strokeDasharray={`${r * 0.523} ${r * 0.523 * 0.1}`}/>
-              ))}
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#webCell)"/>
-        </svg>
-
-        {/* Corner spider web decorations */}
-        {/* Top-left */}
-        <svg className="absolute top-0 left-0" width="200" height="200" viewBox="0 0 200 200"
-          style={{ opacity: creator ? 0.45 : 0.15 }}>
-          {[0,15,30,45,60,75,90].map((deg, i) => {
+        {/* Top-left corner spider web — very light red */}
+        <svg className="absolute top-0 left-0" width="180" height="180" viewBox="0 0 180 180"
+          style={{ opacity: 0.12 }}>
+          {[0,12,24,36,48,60,72,84].map((deg, i) => {
             const rad = deg * Math.PI / 180;
             return <line key={i} x1="0" y1="0"
-              x2={200 * Math.cos(rad)} y2={200 * Math.sin(rad)}
-              stroke="#dc2626" strokeWidth="1.2"/>;
+              x2={180 * Math.cos(rad)} y2={180 * Math.sin(rad)}
+              stroke="#ef4444" strokeWidth="1.2" strokeLinecap="round"/>;
           })}
-          {[40,80,120,160].map((r,i) => (
+          {[40,80,120,160].map((r, i) => (
             <path key={i} d={`M ${r},0 A ${r},${r} 0 0,1 0,${r}`}
-              fill="none" stroke="#dc2626" strokeWidth="0.9"
-              strokeOpacity={0.8 - i * 0.15}/>
+              fill="none" stroke="#ef4444" strokeWidth="0.9" strokeOpacity={0.9 - i * 0.18}/>
           ))}
         </svg>
 
-        {/* Bottom-right */}
-        <svg className="absolute bottom-0 right-0" width="200" height="200" viewBox="0 0 200 200"
-          style={{ opacity: creator ? 0.45 : 0.15, transform: 'rotate(180deg)' }}>
-          {[0,15,30,45,60,75,90].map((deg, i) => {
+        {/* Bottom-right corner web — light blue */}
+        <svg className="absolute bottom-0 right-0" width="180" height="180" viewBox="0 0 180 180"
+          style={{ opacity: 0.12, transform: 'rotate(180deg)' }}>
+          {[0,12,24,36,48,60,72,84].map((deg, i) => {
             const rad = deg * Math.PI / 180;
             return <line key={i} x1="0" y1="0"
-              x2={200 * Math.cos(rad)} y2={200 * Math.sin(rad)}
-              stroke="#1d4ed8" strokeWidth="1.2"/>;
+              x2={180 * Math.cos(rad)} y2={180 * Math.sin(rad)}
+              stroke="#3b82f6" strokeWidth="1.2" strokeLinecap="round"/>;
           })}
-          {[40,80,120,160].map((r,i) => (
+          {[40,80,120,160].map((r, i) => (
             <path key={i} d={`M ${r},0 A ${r},${r} 0 0,1 0,${r}`}
-              fill="none" stroke="#1d4ed8" strokeWidth="0.9"
-              strokeOpacity={0.8 - i * 0.15}/>
+              fill="none" stroke="#3b82f6" strokeWidth="0.9" strokeOpacity={0.9 - i * 0.18}/>
           ))}
         </svg>
 
-        {/* Top-right smaller web */}
-        <svg className="absolute top-0 right-0" width="120" height="120" viewBox="0 0 120 120"
-          style={{ opacity: creator ? 0.3 : 0.1, transform: 'scaleX(-1)' }}>
-          {[0,18,36,54,72,90].map((deg, i) => {
-            const rad = deg * Math.PI / 180;
-            return <line key={i} x1="0" y1="0"
-              x2={120 * Math.cos(rad)} y2={120 * Math.sin(rad)}
-              stroke="#dc2626" strokeWidth="1"/>;
-          })}
-          {[30,60,90].map((r,i) => (
-            <path key={i} d={`M ${r},0 A ${r},${r} 0 0,1 0,${r}`}
-              fill="none" stroke="#dc2626" strokeWidth="0.8" strokeOpacity={0.7}/>
-          ))}
-        </svg>
-
-        {/* Animated colour blobs — desktop only */}
-        <div className="hidden md:block absolute rounded-full blur-[200px] animate-aurora-a"
-          style={{ width:500, height:500, background:'#dc2626', opacity: creator ? 0.12 : 0.06, top:'-15%', left:'-10%', willChange:'transform' }}/>
-        <div className="hidden md:block absolute rounded-full blur-[180px] animate-aurora-b"
-          style={{ width:400, height:400, background:'#1d4ed8', opacity: creator ? 0.10 : 0.05, bottom:'-10%', right:'-10%', willChange:'transform' }}/>
-
-        {/* Comic halftone dot overlay — very subtle */}
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle, ${creator ? '#dc262618' : '#dc262610'} 1px, transparent 1px)`,
-          backgroundSize: '16px 16px',
-          opacity: 0.6,
-        }}/>
+        {/* Original blobs — desktop only, same as before */}
+        <div className="hidden md:block absolute rounded-full blur-[160px] animate-aurora-a"
+          style={{ width:500, height:500, background:'#fca5a5', opacity:0.30, top:'-10%', left:'-5%', willChange:'transform' }}/>
+        <div className="hidden md:block absolute rounded-full blur-[130px] animate-aurora-b"
+          style={{ width:380, height:380, background:'#93c5fd', opacity:0.18, bottom:'-8%', right:'-5%', willChange:'transform' }}/>
+        <div className="hidden md:block absolute rounded-full blur-[100px] animate-aurora-c"
+          style={{ width:260, height:260, background:'#fca5a5', opacity:0.14, top:'45%', left:'55%', willChange:'transform' }}/>
       </div>
     );
   }
@@ -1874,7 +1823,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
           }),
         });
         const data = await res.json();
-        const reply = (data.content || 'Sorry, I could not process that.').slice(0, 400);
+        const reply = (data.content || 'Sorry, I couldn't process that.').slice(0, 400);
         setCallTranscript(p => [...p, { role: 'tessa', text: reply }]);
         // Speak reply, then listen again
         callSpeakTessa(reply, () => {
@@ -2161,7 +2110,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
     cyberpunk: ['#020108','#030112'],
     ocean:     ['#ecfeff','#f0f9ff'],
     sunset:    ['#110805','#17080f'],
-    ankit:     ['#ffffff','#0d0208'],
+    ankit:     ['#ffffff','#fff1f2'],
     light:     ['#f0f4ff','#fdf0ff'],
     pastel:    ['#f3efff','#fdf0ff'],
     sakura:    ['#fff2f5','#fff0f8'],

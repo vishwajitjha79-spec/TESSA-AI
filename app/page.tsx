@@ -353,38 +353,37 @@ const THEMES = {
     settActive:'bg-rose-100 border border-rose-300',
     isLight:true,
   },
-  // ── ANKIT'S SPECIAL — Spider-Man light ──────────────────────────────────────
-  // Crisp white base · bold red panels · electric blue accents
-  // Light but high-energy — like a comic book page, not pastel fluff
-  // Red = action/energy, Blue = cool precision, White = clean canvas
+  // ── ANKIT'S SPECIAL — Spider-Man theme ──────────────────────────────────────
+  // Standard: white canvas, red/blue comic style (daytime Spidey)
+  // Creator: dark red/blue near-black (night-time Spidey / noir)
   ankit: {
-    bg:'bg-white', bgC:'bg-red-50',
+    bg:'bg-white', bgC:'bg-[#0d0208]',
     panel:'bg-white/90 backdrop-blur-md border-red-300/55',
-    panelC:'bg-red-50/90 backdrop-blur-md border-blue-300/50',
-    header:'bg-white/85 backdrop-blur-md border-b border-red-300/45 shadow-sm shadow-red-100/40',
-    headerC:'bg-red-50/85 backdrop-blur-md border-b border-blue-300/45 shadow-sm shadow-blue-100/30',
+    panelC:'bg-[#1a0510]/90 backdrop-blur-md border-red-800/50',
+    header:'bg-white/88 backdrop-blur-md border-b border-red-300/45 shadow-sm shadow-red-100/40',
+    headerC:'bg-[#0d0208]/90 backdrop-blur-md border-b border-red-900/60 shadow-sm shadow-red-900/30',
     bar:'bg-white/88 backdrop-blur-md border-t border-red-200/50',
-    barC:'bg-red-50/88 backdrop-blur-md border-t border-blue-200/50',
+    barC:'bg-[#0d0208]/90 backdrop-blur-md border-t border-red-900/50',
     msgU:'bg-gradient-to-br from-red-100/85 to-rose-50/60 border border-red-300/50 border-l-[3px] border-l-red-600',
-    msgUC:'bg-gradient-to-br from-blue-100/85 to-sky-50/60 border border-blue-300/50 border-l-[3px] border-l-blue-600',
+    msgUC:'bg-gradient-to-br from-red-900/40 to-rose-950/30 border border-red-700/40 border-l-[3px] border-l-red-500',
     msgA:'bg-white/85 border border-red-100/60 border-l-[3px] border-l-blue-400/60',
-    msgAC:'bg-white/85 border border-blue-100/60 border-l-[3px] border-l-red-400/60',
+    msgAC:'bg-[#0a0515]/80 border border-blue-900/40 border-l-[3px] border-l-blue-500/70',
     inp:'bg-white border border-red-300/50 text-slate-800 placeholder:text-red-400/55 focus:border-red-500/65 focus:ring-2 focus:ring-red-400/15',
-    inpC:'bg-white border border-blue-300/50 text-slate-800 placeholder:text-blue-400/55 focus:border-blue-500/65 focus:ring-2 focus:ring-blue-400/15',
+    inpC:'bg-[#150510] border border-red-800/50 text-red-100 placeholder:text-red-700/60 focus:border-red-500/65 focus:ring-2 focus:ring-red-500/20',
     btnP:'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-md shadow-red-500/35',
-    btnPC:'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/35',
+    btnPC:'bg-gradient-to-r from-red-700 to-rose-800 hover:from-red-600 hover:to-rose-700 text-white shadow-md shadow-red-700/50',
     btnS:'bg-red-50 hover:bg-red-100 border border-red-300/55 text-red-800 hover:text-red-950',
-    btnSC:'bg-blue-50 hover:bg-blue-100 border border-blue-300/55 text-blue-800 hover:text-blue-950',
-    text:'text-slate-800', sub:'text-red-500/65', subC:'text-blue-500/65',
-    accent:'text-red-700', accentC:'text-blue-700',
-    glow:'#dc2626', glowC:'#1d4ed8',
+    btnSC:'bg-red-950/40 hover:bg-red-900/50 border border-red-700/50 text-red-300 hover:text-red-200',
+    text:'text-slate-800', sub:'text-red-500/65', subC:'text-red-400/70',
+    accent:'text-red-700', accentC:'text-red-400',
+    glow:'#dc2626', glowC:'#ef4444',
     card:'bg-white/80 border border-red-100/70',
-    cardC:'bg-white/80 border border-blue-100/70',
+    cardC:'bg-red-950/30 border border-red-800/40',
     active:'bg-red-100 border border-red-400/55',
-    activeC:'bg-blue-100 border border-blue-400/55',
-    div:'border-red-200/45', divC:'border-blue-200/45',
+    activeC:'bg-red-900/40 border border-red-500/60',
+    div:'border-red-200/45', divC:'border-red-800/35',
     settBg:'bg-white/97 backdrop-blur-md border-t border-red-200/55',
-    settBgC:'bg-white/97 backdrop-blur-md border-t border-blue-200/55',
+    settBgC:'bg-[#0d0208]/98 backdrop-blur-md border-t border-red-900/55',
     settText:'text-slate-800', settTextHover:'hover:text-slate-900',
     settSub:'text-slate-400', settLabel:'text-slate-400',
     settCard:'bg-red-50 border border-red-200/60',
@@ -414,7 +413,8 @@ function useT(theme: Theme, c: boolean) {
     sText: T.settText, sTextH: T.settTextHover,
     sSub: T.settSub, sLabel: T.settLabel,
     sCard: T.settCard, sActive: T.settActive,
-    isLight: T.isLight,
+    // ankit creator mode is dark — override isLight
+    isLight: (theme === 'ankit' && c) ? false : T.isLight,
   };
 }
 
@@ -433,7 +433,8 @@ const THEME_POPUP_BG: Record<string, string> = {
   cyberpunk: 'rgba(3,2,18,0.98)',
   ocean:     'rgba(2,8,28,0.98)',
   sunset:    'rgba(12,6,3,0.98)',
-  ankit:     'rgba(253,246,232,0.99)',
+  ankit:     'rgba(255,255,255,0.99)',
+  ankitC:    'rgba(13,2,8,0.98)',
   light:     'rgba(255,255,255,0.99)',
   pastel:    'rgba(255,255,255,0.99)',
   sakura:    'rgba(255,255,255,0.99)',
@@ -533,7 +534,109 @@ function AuroraBg({ glow, glow2 }: { glow: string; glow2: string; theme: Theme }
 }
 
 // Light theme background — mobile: pure CSS gradient; desktop: animated blobs
+// Ankit theme gets a special Spider-Man treatment
 function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
+  // Spider-Man theme — comic web pattern background
+  if (theme === 'ankit') {
+    return (
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
+        {/* Deep red/blue gradient base */}
+        <div className="absolute inset-0" style={{
+          background: creator
+            ? 'linear-gradient(135deg, #1a0505 0%, #0a0a2e 35%, #1a0505 65%, #0a0a2e 100%)'
+            : 'linear-gradient(135deg, #fff1f2 0%, #eff6ff 40%, #fff1f2 70%, #eff6ff 100%)',
+        }}/>
+
+        {/* Spider web SVG — full screen, tiled */}
+        <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg"
+          style={{ opacity: creator ? 0.18 : 0.07 }}>
+          <defs>
+            {/* Single web cell */}
+            <pattern id="webCell" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
+              {/* Radial lines from centre */}
+              {[0,30,60,90,120,150,180,210,240,270,300,330].map((deg, i) => {
+                const rad = deg * Math.PI / 180;
+                return <line key={i}
+                  x1="60" y1="60"
+                  x2={60 + 60 * Math.cos(rad)} y2={60 + 60 * Math.sin(rad)}
+                  stroke={creator ? '#dc2626' : '#dc2626'} strokeWidth="0.8" strokeOpacity="0.9"/>;
+              })}
+              {/* Concentric web arcs */}
+              {[15,30,45,60].map((r, i) => (
+                <circle key={i} cx="60" cy="60" r={r}
+                  fill="none" stroke={creator ? '#dc2626' : '#dc2626'}
+                  strokeWidth="0.6" strokeOpacity={0.7 - i * 0.1}
+                  strokeDasharray={`${r * 0.523} ${r * 0.523 * 0.1}`}/>
+              ))}
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#webCell)"/>
+        </svg>
+
+        {/* Corner spider web decorations */}
+        {/* Top-left */}
+        <svg className="absolute top-0 left-0" width="200" height="200" viewBox="0 0 200 200"
+          style={{ opacity: creator ? 0.45 : 0.15 }}>
+          {[0,15,30,45,60,75,90].map((deg, i) => {
+            const rad = deg * Math.PI / 180;
+            return <line key={i} x1="0" y1="0"
+              x2={200 * Math.cos(rad)} y2={200 * Math.sin(rad)}
+              stroke="#dc2626" strokeWidth="1.2"/>;
+          })}
+          {[40,80,120,160].map((r,i) => (
+            <path key={i} d={`M ${r},0 A ${r},${r} 0 0,1 0,${r}`}
+              fill="none" stroke="#dc2626" strokeWidth="0.9"
+              strokeOpacity={0.8 - i * 0.15}/>
+          ))}
+        </svg>
+
+        {/* Bottom-right */}
+        <svg className="absolute bottom-0 right-0" width="200" height="200" viewBox="0 0 200 200"
+          style={{ opacity: creator ? 0.45 : 0.15, transform: 'rotate(180deg)' }}>
+          {[0,15,30,45,60,75,90].map((deg, i) => {
+            const rad = deg * Math.PI / 180;
+            return <line key={i} x1="0" y1="0"
+              x2={200 * Math.cos(rad)} y2={200 * Math.sin(rad)}
+              stroke="#1d4ed8" strokeWidth="1.2"/>;
+          })}
+          {[40,80,120,160].map((r,i) => (
+            <path key={i} d={`M ${r},0 A ${r},${r} 0 0,1 0,${r}`}
+              fill="none" stroke="#1d4ed8" strokeWidth="0.9"
+              strokeOpacity={0.8 - i * 0.15}/>
+          ))}
+        </svg>
+
+        {/* Top-right smaller web */}
+        <svg className="absolute top-0 right-0" width="120" height="120" viewBox="0 0 120 120"
+          style={{ opacity: creator ? 0.3 : 0.1, transform: 'scaleX(-1)' }}>
+          {[0,18,36,54,72,90].map((deg, i) => {
+            const rad = deg * Math.PI / 180;
+            return <line key={i} x1="0" y1="0"
+              x2={120 * Math.cos(rad)} y2={120 * Math.sin(rad)}
+              stroke="#dc2626" strokeWidth="1"/>;
+          })}
+          {[30,60,90].map((r,i) => (
+            <path key={i} d={`M ${r},0 A ${r},${r} 0 0,1 0,${r}`}
+              fill="none" stroke="#dc2626" strokeWidth="0.8" strokeOpacity={0.7}/>
+          ))}
+        </svg>
+
+        {/* Animated colour blobs — desktop only */}
+        <div className="hidden md:block absolute rounded-full blur-[200px] animate-aurora-a"
+          style={{ width:500, height:500, background:'#dc2626', opacity: creator ? 0.12 : 0.06, top:'-15%', left:'-10%', willChange:'transform' }}/>
+        <div className="hidden md:block absolute rounded-full blur-[180px] animate-aurora-b"
+          style={{ width:400, height:400, background:'#1d4ed8', opacity: creator ? 0.10 : 0.05, bottom:'-10%', right:'-10%', willChange:'transform' }}/>
+
+        {/* Comic halftone dot overlay — very subtle */}
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle, ${creator ? '#dc262618' : '#dc262610'} 1px, transparent 1px)`,
+          backgroundSize: '16px 16px',
+          opacity: 0.6,
+        }}/>
+      </div>
+    );
+  }
+
   const configs: Record<string, { grad: string; blob1: string; blob2: string; blob3: string }> = {
     light: {
       grad: creator
@@ -551,27 +654,15 @@ function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
       grad: 'radial-gradient(ellipse 90% 70% at 15% 5%, #ffe4e6 0%, transparent 50%), radial-gradient(ellipse 70% 60% at 88% 82%, #fce7f3 0%, transparent 50%)',
       blob1: '#fecdd3', blob2: '#f9a8d4', blob3: '#fda4af',
     },
-    // Ocean: sky-blue + aqua coastal
     ocean: {
       grad: 'radial-gradient(ellipse 85% 65% at 15% 8%, #a5f3fc60 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 85% 80%, #bae6fd50 0%, transparent 55%)',
       blob1: '#67e8f9', blob2: '#7dd3fc', blob3: '#a5f3fc',
-    },
-    // Ankit Spider-Man: bold red + electric blue on white
-    ankit: {
-      grad: creator
-        ? 'radial-gradient(ellipse 80% 60% at 18% 10%, #fca5a555 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 80% 82%, #bfdbfe50 0%, transparent 55%)'
-        : 'radial-gradient(ellipse 80% 60% at 18% 10%, #fca5a540 0%, transparent 55%), radial-gradient(ellipse 65% 55% at 80% 82%, #bfdbfe40 0%, transparent 55%)',
-      blob1: creator ? '#f87171' : '#fca5a5',
-      blob2: creator ? '#60a5fa' : '#93c5fd',
-      blob3: creator ? '#fb923c' : '#fca5a5',
     },
   };
   const cfg = configs[theme] ?? configs.light;
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-      {/* Static gradient — all devices */}
       <div className="absolute inset-0" style={{ background: cfg.grad }} />
-      {/* Animated blobs — desktop only */}
       <div className="hidden md:block absolute rounded-full blur-[160px] animate-aurora-a"
         style={{ width:500, height:500, background:cfg.blob1, opacity:0.30, top:'-10%', left:'-5%', willChange:'transform' }} />
       <div className="hidden md:block absolute rounded-full blur-[130px] animate-aurora-b"
@@ -1203,6 +1294,14 @@ export default function Home() {
   const [selectedImage,   setSelectedImage] = useState<string | null>(null);
   const [isRecording,     setIsRecording]   = useState(false);
   const [interimText,     setInterimText]   = useState('');
+  const [voiceCallOpen,   setVoiceCallOpen] = useState(false);
+  const [callStatus,      setCallStatus]    = useState<'listening'|'thinking'|'speaking'|'idle'>('idle');
+  const [callTranscript,  setCallTranscript]= useState<{role:'user'|'tessa';text:string}[]>([]);
+  const [callPos,         setCallPos]       = useState<{x:number;y:number}|null>(null);
+  const isSpeakingRef  = useRef(false);
+  const callLoopRef    = useRef(false);
+  const callDragStart  = useRef({mx:0,my:0,px:0,py:0});
+  const callDragging   = useRef(false);
   const [settingsTab,     setSettingsTab]   = useState<string>('main');
   const [showTimerFloat,  setShowTimerFloat]  = useState(false);
   const [insightsOpen,              setInsightsOpen]             = useState(false);
@@ -1714,58 +1813,122 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
     } catch {}
   };
 
-  // ── Voice ─────────────────────────────────────────────────────────────────
-  // ── Voice input — click to toggle, fullscreen overlay, auto-send on final ──
-  const toggleMic = () => {
-    if (isRecording) {
-      // Stop
-      if (recognitionRef.current) { recognitionRef.current.stop(); recognitionRef.current = null; }
-      setIsRecording(false); setInterimText('');
-      return;
-    }
+  // ── Voice Call — continuous phone-call loop ─────────────────────────────────
+  // No stop button. Tessa listens → you speak → silence detected → she replies
+  // verbally → she listens again. Continues until you press End Call.
+  
+  const callSpeakTessa = (text: string, onDone: () => void) => {
+    if (!('speechSynthesis' in window)) { onDone(); return; }
+    window.speechSynthesis.cancel();
+    isSpeakingRef.current = true;
+    setCallStatus('speaking');
+    const clean = text.replace(/\*\*/g,'').replace(/#{1,6}\s/g,'').replace(/[*_~`]/g,'').slice(0, 800);
+    const u = new SpeechSynthesisUtterance(clean);
+    u.pitch = 1.4; u.rate = 1.08; u.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
+    const trySpeak = () => {
+      const vs = window.speechSynthesis.getVoices();
+      const f = vs.find(v => /samantha|victoria|karen|moira|veena|zira|google.*english.*female/i.test(v.name))
+             ?? vs.find(v => /female|woman/i.test(v.name));
+      if (f) u.voice = f;
+      u.onend = () => { isSpeakingRef.current = false; onDone(); };
+      u.onerror = () => { isSpeakingRef.current = false; onDone(); };
+      window.speechSynthesis.speak(u);
+    };
+    if (voicesReady.current) trySpeak();
+    else window.speechSynthesis.onvoiceschanged = () => { voicesReady.current = true; trySpeak(); };
+  };
+
+  const startCallListening = () => {
+    if (!callLoopRef.current) return;
     const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
-    if (!SR) { alert('Speech recognition not supported on this browser. Try Chrome.'); return; }
+    if (!SR) return;
+    const r = new SR();
+    r.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
+    r.continuous = false; // single utterance — auto-detects silence
+    r.interimResults = true;
+    r.maxAlternatives = 1;
+    let final = '';
+    setCallStatus('listening'); setIsRecording(true);
+    r.onresult = (e: any) => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const tx = e.results[i][0].transcript;
+        if (e.results[i].isFinal) final += tx + ' '; else interim = tx;
+      }
+      setInterimText(interim || final);
+    };
+    r.onend = async () => {
+      setIsRecording(false); setInterimText('');
+      if (!callLoopRef.current) return;
+      const said = final.trim();
+      if (!said) { startCallListening(); return; } // silence — listen again
+      setCallTranscript(p => [...p, { role: 'user', text: said }]);
+      setCallStatus('thinking');
+      // Send to Tessa API
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [{ role: 'user', content: said }],
+            isCreatorMode, language, maxTokens: 220,
+          }),
+        });
+        const data = await res.json();
+        const reply = (data.content || 'Sorry, I couldn't process that.').slice(0, 400);
+        setCallTranscript(p => [...p, { role: 'tessa', text: reply }]);
+        // Speak reply, then listen again
+        callSpeakTessa(reply, () => {
+          if (callLoopRef.current) setTimeout(startCallListening, 400);
+        });
+      } catch {
+        callSpeakTessa('Sorry, network error. Try again.', () => {
+          if (callLoopRef.current) setTimeout(startCallListening, 400);
+        });
+      }
+    };
+    r.onerror = (e: any) => {
+      setIsRecording(false);
+      if (e.error === 'not-allowed') { endVoiceCall(); alert('Mic permission denied.'); return; }
+      if (e.error === 'audio-capture') { endVoiceCall(); alert('Microphone not found.'); return; }
+      // For no-speech or aborted, just restart listening
+      if (callLoopRef.current) setTimeout(startCallListening, 600);
+    };
+    recognitionRef.current = r;
+    try { r.start(); } catch { if (callLoopRef.current) setTimeout(startCallListening, 800); }
+  };
 
-    // Request mic permission explicitly first
+  const startVoiceCall = () => {
+    const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    if (!SR) { alert('Speech recognition not supported. Use Chrome or Edge.'); return; }
     navigator.mediaDevices?.getUserMedia({ audio: true }).then(() => {
-      const r = new SR();
-      r.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
-      r.continuous = true;
-      r.interimResults = true;
-      r.maxAlternatives = 1;
-      let final = '';
-
-      r.onstart = () => { setIsRecording(true); setInterimText(''); };
-      r.onresult = (e: any) => {
-        let interim = '';
-        for (let i = e.resultIndex; i < e.results.length; i++) {
-          const tx = e.results[i][0].transcript;
-          if (e.results[i].isFinal) { final += tx + ' '; }
-          else { interim = tx; }
-        }
-        setInterimText(interim);
-        if (final) setInput(final.trim());
-      };
-      r.onerror = (e: any) => {
-        setIsRecording(false); setInterimText('');
-        if (e.error === 'audio-capture') alert('Microphone not found. Check browser permissions.');
-        else if (e.error === 'not-allowed') alert('Mic permission denied. Allow mic access in browser settings.');
-        else if (e.error !== 'no-speech' && e.error !== 'aborted') alert(`Voice error: ${e.error}`);
-      };
-      r.onend = () => {
-        setIsRecording(false); setInterimText('');
-        // Auto-send if there's text
-        if (final.trim()) {
-          const text = final.trim();
-          setInput('');
-          setTimeout(() => sendMessage(text), 80);
-        }
-      };
-      recognitionRef.current = r;
-      try { r.start(); } catch { setIsRecording(false); }
+      setVoiceCallOpen(true);
+      setCallTranscript([]);
+      setCallStatus('listening');
+      callLoopRef.current = true;
+      // Tessa greets first, then listens
+      const greet = isCreatorMode
+        ? "Hey! I'm listening. What's on your mind?"
+        : "Hi! Voice call connected. How can I help?";
+      callSpeakTessa(greet, () => { if (callLoopRef.current) startCallListening(); });
     }).catch(() => {
-      alert('Microphone access denied. Please allow mic access in your browser settings and try again.');
+      alert('Mic access denied. Please allow microphone access in browser settings.');
     });
+  };
+
+  const endVoiceCall = () => {
+    callLoopRef.current = false;
+    if (recognitionRef.current) { try { recognitionRef.current.stop(); } catch {} recognitionRef.current = null; }
+    window.speechSynthesis?.cancel();
+    isSpeakingRef.current = false;
+    setVoiceCallOpen(false);
+    setIsRecording(false);
+    setInterimText('');
+    setCallStatus('idle');
+  };
+
+  // Legacy toggleMic — kept for compatibility (just starts call now)
+  const toggleMic = () => {
+    if (voiceCallOpen) endVoiceCall(); else startVoiceCall();
   };
 
   // ── Creator mode ──────────────────────────────────────────────────────────
@@ -1802,75 +1965,157 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
     }
   }, [notifications]);
 
-  // ── Voice Overlay component (inline, so it can access state/theme) ────────
-  const VoiceOverlay = () => {
-    if (!isRecording) return null;
-    const live = interimText || input || '';
+  // ── Voice Call Window — draggable floating card, phone-call style ─────────
+  const VoiceCallWindow = () => {
+    if (!voiceCallOpen) return null;
+
+    // Drag handlers
+    const onPtrDown = (e: React.PointerEvent<HTMLDivElement>) => {
+      if ((e.target as HTMLElement).closest('button')) return;
+      callDragging.current = true;
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      callDragStart.current = {
+        mx: e.clientX, my: e.clientY,
+        px: callPos?.x ?? (window.innerWidth / 2 - 140),
+        py: callPos?.y ?? 80,
+      };
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    };
+    const onPtrMove = (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!callDragging.current) return;
+      const nx = Math.max(0, Math.min(window.innerWidth  - 280, callDragStart.current.px + e.clientX - callDragStart.current.mx));
+      const ny = Math.max(0, Math.min(window.innerHeight - 420, callDragStart.current.py + e.clientY - callDragStart.current.my));
+      setCallPos({ x: nx, y: ny });
+    };
+    const onPtrUp = () => { callDragging.current = false; };
+
+    const panelX = callPos?.x ?? (typeof window !== 'undefined' ? window.innerWidth / 2 - 140 : 100);
+    const panelY = callPos?.y ?? 80;
+
+    const statusLabel = callStatus === 'listening' ? 'Listening…' : callStatus === 'thinking' ? 'Thinking…' : callStatus === 'speaking' ? 'Speaking…' : '';
+    const statusColor = callStatus === 'listening' ? '#22c55e' : callStatus === 'thinking' ? t.glow : callStatus === 'speaking' ? '#f59e0b' : '#6b7280';
+
     return (
-      <div className="fixed inset-0 z-[80] flex flex-col items-center justify-center"
-        style={{ background: t.isLight ? 'rgba(255,255,255,0.97)' : 'rgba(5,6,20,0.97)', backdropFilter: 'blur(20px)' }}
-        onClick={toggleMic}>
+      <div
+        className="fixed z-[90] select-none"
+        style={{ left: panelX, top: panelY, width: 280 }}
+        onPointerDown={onPtrDown} onPointerMove={onPtrMove}
+        onPointerUp={onPtrUp} onPointerCancel={onPtrUp}
+      >
+        <div className="rounded-3xl overflow-hidden cursor-grab active:cursor-grabbing"
+          style={{
+            background: t.isLight
+              ? 'linear-gradient(160deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)'
+              : 'linear-gradient(160deg,#0d0d1a 0%,#0a1628 50%,#0d2137 100%)',
+            boxShadow: `0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px ${t.glow}30, 0 0 40px ${t.glow}15`,
+            border: `1px solid ${t.glow}25`,
+          }}>
 
-        {/* Animated soundwave rings */}
-        <div className="relative flex items-center justify-center mb-8">
-          {[1,2,3,4].map(i => (
-            <div key={i} className="absolute rounded-full border-2"
-              style={{
-                width: 72 + i * 44, height: 72 + i * 44,
-                borderColor: `${t.glow}${['55','38','25','12'][i-1]}`,
-                animation: `ping ${0.9 + i * 0.3}s cubic-bezier(0,0,0.2,1) infinite`,
-                animationDelay: `${i * 0.18}s`,
-              }}/>
-          ))}
-          {/* Centre avatar circle */}
-          <div className="relative w-[72px] h-[72px] rounded-full overflow-hidden border-[3px]"
-            style={{ borderColor: t.glow, boxShadow: `0 0 0 6px ${t.glow}20, 0 0 40px ${t.glow}45` }}>
-            <img src={avatarSrc} alt="Tessa" className="w-full h-full object-cover"
-              onError={e => { (e.currentTarget as HTMLImageElement).src = '/avatars/cosmic.png'; }}/>
+          {/* Drag handle bar */}
+          <div className="flex justify-center pt-2.5 pb-1">
+            <div className="w-8 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.2)' }}/>
           </div>
-          {/* Mic indicator dot */}
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center"
-            style={{ background: '#ef4444', boxShadow: '0 0 12px #ef444488' }}>
-            <div className="w-2 h-2 rounded-full bg-white animate-pulse"/>
-          </div>
-        </div>
 
-        {/* Soundwave bars */}
-        <div className="flex items-center gap-1 mb-6 h-10">
-          {Array.from({length: 20}, (_, i) => (
-            <div key={i} className="rounded-full"
-              style={{
-                width: 3,
-                background: t.glow,
-                animation: `soundBar ${0.4 + Math.random() * 0.6}s ease-in-out infinite alternate`,
-                animationDelay: `${i * 0.05}s`,
-                height: `${20 + Math.random() * 20}px`,
-                opacity: 0.7,
-              }}/>
-          ))}
-        </div>
-
-        {/* Live text */}
-        <div className="text-center px-8 max-w-sm">
-          {live ? (
-            <p className="text-[16px] font-medium leading-relaxed" style={{ color: t.isLight ? '#1e293b' : 'rgba(255,255,255,0.9)' }}>
-              {live}
-              <span className="animate-pulse" style={{ color: t.glow }}>▌</span>
-            </p>
-          ) : (
-            <div>
-              <p className="text-[15px] font-semibold mb-1" style={{ color: t.glow }}>Listening…</p>
-              <p className="text-[11px]" style={{ color: t.isLight ? '#6b7280' : 'rgba(255,255,255,0.4)' }}>Speak clearly · tap anywhere to stop</p>
+          {/* Avatar + status section */}
+          <div className="flex flex-col items-center px-4 pt-2 pb-4">
+            {/* Status label */}
+            <div className="flex items-center gap-1.5 mb-4">
+              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: statusColor }}/>
+              <span className="text-[11px] font-semibold tracking-wider uppercase"
+                style={{ color: statusColor }}>{statusLabel || 'Voice Call'}</span>
             </div>
-          )}
-        </div>
 
-        {/* Stop button */}
-        <button className="mt-8 px-6 py-2.5 rounded-full text-[12px] font-bold text-white transition-all active:scale-95"
-          style={{ background: `linear-gradient(135deg, #ef4444, #dc2626)`, boxShadow: '0 4px 20px #ef444450' }}
-          onClick={e => { e.stopPropagation(); toggleMic(); }}>
-          ⏹ Stop Recording
-        </button>
+            {/* Avatar with animated rings */}
+            <div className="relative flex items-center justify-center mb-4">
+              {/* Outer rings — animate based on status */}
+              {[80, 108, 136].map((sz, ri) => (
+                <div key={ri} className="absolute rounded-full"
+                  style={{
+                    width: sz, height: sz,
+                    border: `1.5px solid ${statusColor}`,
+                    opacity: [0.5, 0.3, 0.15][ri],
+                    animation: callStatus !== 'idle'
+                      ? `ping ${1.1 + ri * 0.35}s cubic-bezier(0,0,0.2,1) infinite`
+                      : 'none',
+                    animationDelay: `${ri * 0.22}s`,
+                  }}/>
+              ))}
+              {/* Avatar */}
+              <div className="relative w-[68px] h-[68px] rounded-full overflow-hidden"
+                style={{
+                  border: `3px solid ${statusColor}`,
+                  boxShadow: `0 0 0 4px ${statusColor}18, 0 0 30px ${statusColor}40`,
+                  transition: 'border-color 0.4s, box-shadow 0.4s',
+                }}>
+                <img src={avatarSrc} alt="Tessa" className="w-full h-full object-cover"
+                  onError={e => { (e.currentTarget as HTMLImageElement).src = '/avatars/cosmic.png'; }}/>
+                {/* Speaking overlay — animated gradient */}
+                {callStatus === 'speaking' && (
+                  <div className="absolute inset-0 rounded-full animate-pulse"
+                    style={{ background: `${statusColor}15` }}/>
+                )}
+              </div>
+            </div>
+
+            {/* Name */}
+            <p className="text-white font-black text-[15px] tracking-wide mb-0.5">Tessa</p>
+            <p className="text-white/40 text-[10px] mb-3">
+              {callStatus === 'speaking' ? '🔊 Speaking…' : callStatus === 'listening' ? '🎤 Go ahead…' : callStatus === 'thinking' ? '💭 Processing…' : 'Voice Call'}
+            </p>
+
+            {/* Sound wave visualiser — only when speaking or listening */}
+            <div className="flex items-center gap-0.5 h-8 mb-4">
+              {Array.from({ length: 24 }, (_, i) => {
+                const active = callStatus === 'speaking' || callStatus === 'listening';
+                return (
+                  <div key={i} className="rounded-full flex-shrink-0"
+                    style={{
+                      width: 2.5,
+                      background: active ? statusColor : 'rgba(255,255,255,0.15)',
+                      animation: active ? `soundBar ${0.35 + (i % 7) * 0.09}s ease-in-out infinite alternate` : 'none',
+                      animationDelay: `${i * 0.04}s`,
+                      height: active ? `${10 + (i % 6) * 4}px` : '4px',
+                      transition: 'height 0.3s, background 0.3s',
+                    }}/>
+                );
+              })}
+            </div>
+
+            {/* Live transcript — last 2 lines */}
+            <div className="w-full rounded-xl px-3 py-2 mb-4 min-h-[48px]"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              {callTranscript.length === 0 ? (
+                <p className="text-[10px] text-white/30 text-center">Conversation will appear here…</p>
+              ) : (
+                [...callTranscript].slice(-2).map((m, i) => (
+                  <p key={i} className="text-[10px] leading-relaxed truncate"
+                    style={{ color: m.role === 'user' ? 'rgba(255,255,255,0.75)' : statusColor }}>
+                    {m.role === 'user' ? '🗣 ' : '✨ '}{m.text}
+                  </p>
+                ))
+              )}
+              {interimText && (
+                <p className="text-[10px] text-white/50 italic truncate">🎤 {interimText}</p>
+              )}
+            </div>
+
+            {/* End call button */}
+            <button
+              onClick={endVoiceCall}
+              className="w-14 h-14 rounded-full flex items-center justify-center transition-all active:scale-90 hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                boxShadow: '0 6px 24px rgba(239,68,68,0.55)',
+              }}>
+              {/* Phone hang-up icon */}
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                <path d="M3 5.5C3 14.06 9.94 21 18.5 21c.386 0 .77-.014 1.148-.042.435-.033.813-.329.97-.745l1.5-4a1 1 0 00-.54-1.262l-3.5-1.5a1 1 0 00-1.197.37l-1.116 1.674A13.01 13.01 0 019.12 9.864L10.79 8.75a1 1 0 00.37-1.197l-1.5-3.5a1 1 0 00-1.262-.54l-4 1.5c-.416.157-.712.535-.745.97A17.1 17.1 0 003 5.5z" 
+                  fill="white" transform="rotate(135 12 12)"/>
+              </svg>
+            </button>
+            <p className="text-white/30 text-[9px] mt-2">Tap to end call</p>
+          </div>
+        </div>
       </div>
     );
   };
@@ -1916,7 +2161,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
     cyberpunk: ['#020108','#030112'],
     ocean:     ['#ecfeff','#f0f9ff'],
     sunset:    ['#110805','#17080f'],
-    ankit:     ['#ffffff','#fff1f2'],
+    ankit:     ['#ffffff','#0d0208'],
     light:     ['#f0f4ff','#fdf0ff'],
     pastel:    ['#f3efff','#fdf0ff'],
     sakura:    ['#fff2f5','#fff0f8'],
@@ -3011,12 +3256,12 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                   <Paperclip size={16}/>
                 </button>
 
-                {/* Voice — click to toggle */}
+                {/* Voice — click to open call window */}
                 <button
-                  onClick={toggleMic}
-                  disabled={isLoading} title={isRecording ? 'Tap to stop' : 'Tap to speak'}
-                  className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all disabled:opacity-40 active:scale-90 ${isRecording ? 'bg-red-500/80 border border-red-400/50 text-white shadow-lg shadow-red-500/25' : t.btnS}`}>
-                  {isRecording ? <MicOff size={16}/> : <Mic size={16}/>}
+                  onClick={startVoiceCall}
+                  disabled={isLoading || voiceCallOpen} title="Start voice call"
+                  className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all disabled:opacity-40 active:scale-90 ${voiceCallOpen ? 'bg-green-500/80 border border-green-400/50 text-white shadow-lg shadow-green-500/25 animate-pulse' : t.btnS}`}>
+                  <Mic size={16}/>
                 </button>
 
                 {/* Textarea */}
@@ -3133,8 +3378,8 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
         </aside>
       )}
 
-      {/* ── VOICE OVERLAY — fullscreen when recording ── */}
-      <VoiceOverlay />
+      {/* ── VOICE CALL WINDOW — floating draggable phone-call UI ── */}
+      <VoiceCallWindow />
 
       {/* ── FLOATING STUDY TIMER ── */}
       {showTimerFloat && (

@@ -607,97 +607,103 @@ function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
           <ellipse cx="22" cy="148" rx="26" ry="44" fill="#c0392b"/>
         </svg>
 
-        {/* TASM2-inspired scene — Gwen hanging from web (right), Spidey sitting in sorrow (left) */}
+        {/* TASM2 scene — Gwen horizontal suspended, Spidey grieving beside her */}
+        {/* Placed together upper-left, not in extreme corners */}
 
-        {/* Gwen — hanging limp from web strand, right side, upside-down */}
-        <svg className="absolute top-0 right-0" style={{ width: 90, opacity: 0.30, marginRight: 14 }}
-          viewBox="0 0 60 200">
-          {/* Web thread from top anchor */}
-          <line x1="38" y1="0" x2="38" y2="32" stroke="#888" strokeWidth="1.2" strokeLinecap="round"/>
-          {/* Tiny web anchor burst */}
-          {[200,220,240,260,280,300,320].map((deg,i)=>{
+        {/* Web threads holding Gwen up — anchor at top */}
+        <svg className="absolute" style={{ left:'8%', top:0, width:160, height:100, opacity:0.15 }}
+          viewBox="0 0 160 100" preserveAspectRatio="none">
+          <line x1="48"  y1="0" x2="48"  y2="100" stroke="#999" strokeWidth="1.2" strokeDasharray="3,3"/>
+          <line x1="112" y1="0" x2="112" y2="100" stroke="#999" strokeWidth="1.2" strokeDasharray="3,3"/>
+          {([210,225,240,255,270,285,300] as number[]).map((deg,i)=>{
             const r=deg*Math.PI/180;
-            return <line key={i} x1="38" y1="4" x2={38+12*Math.cos(r)} y2={4+12*Math.sin(r)}
-              stroke="#999" strokeWidth="0.5" opacity="0.5"/>;
+            return <line key={i} x1="48" y1="4" x2={48+12*Math.cos(r)} y2={4+12*Math.sin(r)} stroke="#aaa" strokeWidth="0.5" opacity="0.5"/>;
           })}
-          {/* Blonde hair — flowing downward (she's inverted, so hair = upward from head) */}
-          {/* Head — upside-down, hair fans up */}
-          <ellipse cx="38" cy="47" rx="10" ry="11" fill="#f5deb3"/>
-          {/* Hair strands fanning upward */}
-          <path d="M 30,42 C 22,34 18,24 20,12" fill="none" stroke="#c8a84b" strokeWidth="3.5" strokeLinecap="round"/>
-          <path d="M 33,38 C 27,28 26,18 28,8" fill="none" stroke="#d4aa55" strokeWidth="3" strokeLinecap="round"/>
-          <path d="M 38,36 C 35,25 36,15 38,5" fill="none" stroke="#c8a84b" strokeWidth="2.5" strokeLinecap="round"/>
-          <path d="M 43,38 C 48,27 50,17 48,6" fill="none" stroke="#d4aa55" strokeWidth="3" strokeLinecap="round"/>
-          <path d="M 46,43 C 53,33 56,23 54,12" fill="none" stroke="#c8a84b" strokeWidth="3.5" strokeLinecap="round"/>
-          {/* Face — small delicate features */}
-          <ellipse cx="35" cy="48" rx="2" ry="1.5" fill="#e8b4b8" opacity="0.7"/>
-          <ellipse cx="41" cy="48" rx="2" ry="1.5" fill="#e8b4b8" opacity="0.7"/>
-          <path d="M 36,52 Q 38,54 40,52" fill="none" stroke="#c0726a" strokeWidth="0.8"/>
-          {/* Jacket — red/maroon */}
-          <path d="M 28,56 C 24,68 22,82 24,95" fill="none" stroke="#8b1a1a" strokeWidth="9" strokeLinecap="round"/>
-          <path d="M 48,56 C 52,68 54,82 52,95" fill="none" stroke="#8b1a1a" strokeWidth="9" strokeLinecap="round"/>
-          <ellipse cx="38" cy="72" rx="11" ry="18" fill="#8b1a1a"/>
-          {/* White collar/shirt */}
-          <ellipse cx="38" cy="58" rx="8" ry="5" fill="#f0f0f0"/>
-          {/* Arms — limp, dangling */}
-          <path d="M 28,65 C 18,70 12,75 10,82" fill="none" stroke="#8b1a1a" strokeWidth="6" strokeLinecap="round"/>
-          <path d="M 48,65 C 56,72 58,78 56,86" fill="none" stroke="#8b1a1a" strokeWidth="6" strokeLinecap="round"/>
-          {/* Hands */}
-          <circle cx="9" cy="84" r="4" fill="#f5deb3"/>
-          <circle cx="57" cy="88" r="4" fill="#f5deb3"/>
-          {/* Skirt/legs */}
-          <path d="M 29,88 C 26,105 24,118 22,132" fill="none" stroke="#2c3e70" strokeWidth="7" strokeLinecap="round"/>
-          <path d="M 47,88 C 50,105 52,118 54,132" fill="none" stroke="#2c3e70" strokeWidth="7" strokeLinecap="round"/>
-          {/* Shoes */}
-          <ellipse cx="21" cy="134" rx="5" ry="3" fill="#1a1a1a" transform="rotate(10 21 134)"/>
-          <ellipse cx="55" cy="134" rx="5" ry="3" fill="#1a1a1a" transform="rotate(-10 55 134)"/>
+          {([210,225,240,255,270,285,300] as number[]).map((deg,i)=>{
+            const r=deg*Math.PI/180;
+            return <line key={'b'+i} x1="112" y1="4" x2={112+12*Math.cos(r)} y2={4+12*Math.sin(r)} stroke="#aaa" strokeWidth="0.5" opacity="0.5"/>;
+          })}
         </svg>
 
-        {/* Spider-Man — sitting slumped against bottom-left, mask off-angle, head bowed */}
-        <svg className="absolute bottom-0 left-0" style={{ width: 110, opacity: 0.28, marginLeft: 6 }}
-          viewBox="0 0 80 140">
-          {/* Sitting on ground — legs bent, back against wall */}
-          {/* Legs — bent at knee, sitting */}
-          <path d="M 22,95 C 18,108 14,118 12,128" fill="none" stroke="#c0392b" strokeWidth="10" strokeLinecap="round"/>
-          <path d="M 42,95 C 48,106 52,116 54,126" fill="none" stroke="#c0392b" strokeWidth="10" strokeLinecap="round"/>
-          {/* Knees */}
-          <path d="M 12,128 C 10,132 14,135 24,134" fill="none" stroke="#c0392b" strokeWidth="9" strokeLinecap="round"/>
-          <path d="M 54,126 C 58,130 62,133 58,136" fill="none" stroke="#1565c0" strokeWidth="8" strokeLinecap="round"/>
+        {/* ── Gwen: lying horizontal, parallel to ground, suspended by two web strands ── */}
+        <svg className="absolute" style={{ left:'5%', top:68, width:200, opacity:0.27 }}
+          viewBox="0 0 200 80">
+          {/* Web attachment points on body */}
+          <line x1="52"  y1="0" x2="52"  y2="30" stroke="#999" strokeWidth="1" strokeDasharray="2,2"/>
+          <line x1="118" y1="0" x2="118" y2="30" stroke="#999" strokeWidth="1" strokeDasharray="2,2"/>
+          {/* Legs — horizontal, feet to the right */}
+          <path d="M 132,36 C 150,35 168,34 184,32" fill="none" stroke="#2c3e70" strokeWidth="10" strokeLinecap="round"/>
+          <path d="M 132,44 C 150,45 168,46 184,48" fill="none" stroke="#2c3e70" strokeWidth="8" strokeLinecap="round"/>
           {/* Shoes */}
-          <ellipse cx="17" cy="135" rx="9" ry="4" fill="#c0392b"/>
-          <ellipse cx="55" cy="137" rx="8" ry="4" fill="#c0392b"/>
-          {/* Body — slumped, torso leaning forward */}
-          <ellipse cx="32" cy="78" rx="16" ry="19" fill="#1565c0"/>
-          {/* Red chest/abdomen */}
-          <ellipse cx="32" cy="75" rx="10" ry="12" fill="#c0392b"/>
-          {/* Spider emblem on chest — small */}
-          <ellipse cx="32" cy="72" rx="3.5" ry="4.5" fill="#0d0d0d"/>
-          <line x1="32" y1="68" x2="26" y2="62" stroke="#0d0d0d" strokeWidth="1.5"/>
-          <line x1="32" y1="68" x2="38" y2="62" stroke="#0d0d0d" strokeWidth="1.5"/>
-          <line x1="32" y1="76" x2="26" y2="82" stroke="#0d0d0d" strokeWidth="1.5"/>
-          <line x1="32" y1="76" x2="38" y2="82" stroke="#0d0d0d" strokeWidth="1.5"/>
-          {/* Arms — one on knee, one hanging */}
-          <path d="M 18,80 C 12,88 10,95 12,100" fill="none" stroke="#1565c0" strokeWidth="8" strokeLinecap="round"/>
-          <path d="M 46,78 C 52,84 56,90 54,96" fill="none" stroke="#c0392b" strokeWidth="8" strokeLinecap="round"/>
-          {/* Hand resting on knee */}
-          <circle cx="53" cy="97" r="5" fill="#c0392b"/>
-          <circle cx="11" cy="101" r="5" fill="#1565c0"/>
-          {/* Head — bowed down in grief */}
-          <ellipse cx="30" cy="54" rx="13" ry="14" fill="#c0392b" transform="rotate(12 30 54)"/>
+          <ellipse cx="186" cy="31" rx="9" ry="5" fill="#1a1a1a" transform="rotate(-4 186 31)"/>
+          <ellipse cx="186" cy="49" rx="8" ry="4" fill="#1a1a1a" transform="rotate(4 186 49)"/>
+          {/* Torso — red jacket */}
+          <rect x="72" y="28" width="62" height="24" rx="10" fill="#8b1a1a"/>
+          {/* White collar */}
+          <ellipse cx="74" cy="40" rx="11" ry="8" fill="#f0f0f0"/>
+          {/* Arms — left arm trailing back, right slightly forward */}
+          <path d="M 74,34 C 58,30 44,26 32,24" fill="none" stroke="#8b1a1a" strokeWidth="7" strokeLinecap="round"/>
+          <path d="M 74,48 C 60,52 46,54 34,56" fill="none" stroke="#8b1a1a" strokeWidth="6" strokeLinecap="round"/>
+          <circle cx="30" cy="23" r="5" fill="#f5deb3"/>
+          <circle cx="32" cy="57" r="5" fill="#f5deb3"/>
+          {/* Head — facing right, eyes closed */}
+          <ellipse cx="54" cy="40" rx="15" ry="13" fill="#f5deb3"/>
+          {/* Blonde hair streaming to the left */}
+          <path d="M 46,30 C 30,22 16,16 4,14"  fill="none" stroke="#d4aa55" strokeWidth="4"   strokeLinecap="round"/>
+          <path d="M 44,34 C 28,28 14,24 2,24"  fill="none" stroke="#c8a84b" strokeWidth="3.5" strokeLinecap="round"/>
+          <path d="M 44,40 C 28,40 14,39 2,38"  fill="none" stroke="#d4aa55" strokeWidth="3"   strokeLinecap="round"/>
+          <path d="M 46,47 C 30,52 16,54 4,54"  fill="none" stroke="#c8a84b" strokeWidth="3"   strokeLinecap="round"/>
+          <path d="M 48,52 C 34,58 22,62 8,64"  fill="none" stroke="#d4aa55" strokeWidth="2.5" strokeLinecap="round"/>
+          {/* Closed eyes */}
+          <path d="M 49,38 C 51,35 55,35 58,38" fill="none" stroke="#8b6347" strokeWidth="1.2"/>
+          <path d="M 50,43 C 52,40 56,40 59,43" fill="none" stroke="#8b6347" strokeWidth="1.2"/>
+          <path d="M 50,46 Q 54,48 58,46" fill="none" stroke="#c0726a" strokeWidth="0.9"/>
+        </svg>
+
+        {/* ── Spider-Man: sitting beside Gwen, head bowed, grieving ── */}
+        <svg className="absolute" style={{ left:'34%', top:60, width:130, opacity:0.26 }}
+          viewBox="0 0 100 170">
+          {/* Sitting legs bent — knees up */}
+          <path d="M 30,105 C 22,120 16,132 14,144" fill="none" stroke="#c0392b" strokeWidth="11" strokeLinecap="round"/>
+          <path d="M 56,105 C 66,118 72,130 74,142" fill="none" stroke="#1565c0" strokeWidth="11" strokeLinecap="round"/>
+          {/* Lower legs */}
+          <path d="M 14,144 C 10,150 18,154 34,150" fill="none" stroke="#c0392b" strokeWidth="10" strokeLinecap="round"/>
+          <path d="M 74,142 C 80,148 78,154 64,152" fill="none" stroke="#1565c0" strokeWidth="9" strokeLinecap="round"/>
+          {/* Shoes */}
+          <ellipse cx="23" cy="151" rx="12" ry="5" fill="#c0392b"/>
+          <ellipse cx="68" cy="153" rx="11" ry="5" fill="#c0392b"/>
+          {/* Body slumped forward */}
+          <ellipse cx="43" cy="86" rx="19" ry="22" fill="#1565c0"/>
+          <ellipse cx="43" cy="81" rx="13" ry="15" fill="#c0392b"/>
+          {/* Spider emblem */}
+          <ellipse cx="43" cy="79" rx="4" ry="5.5" fill="#0d0d0d"/>
+          <line x1="43" y1="73" x2="35" y2="66" stroke="#0d0d0d" strokeWidth="1.8"/>
+          <line x1="43" y1="73" x2="51" y2="66" stroke="#0d0d0d" strokeWidth="1.8"/>
+          <line x1="43" y1="85" x2="35" y2="92" stroke="#0d0d0d" strokeWidth="1.8"/>
+          <line x1="43" y1="85" x2="51" y2="92" stroke="#0d0d0d" strokeWidth="1.8"/>
+          {/* Arms — both resting on knees, hanging forward */}
+          <path d="M 25,90 C 18,102 16,112 18,118" fill="none" stroke="#c0392b" strokeWidth="9" strokeLinecap="round"/>
+          <path d="M 61,88 C 68,100 70,110 68,116" fill="none" stroke="#1565c0" strokeWidth="9" strokeLinecap="round"/>
+          <circle cx="18" cy="119" r="7" fill="#c0392b"/>
+          <circle cx="68" cy="117" r="7" fill="#1565c0"/>
+          {/* Head — deeply bowed, chin to chest */}
+          <ellipse cx="42" cy="60" rx="18" ry="18" fill="#c0392b" transform="rotate(10 42 60)"/>
           {/* Web lines on mask */}
-          {[200,220,240,260,280].map((deg,i)=>{
-            const r=deg*Math.PI/180;
-            return <line key={i} x1="30" y1="54" x2={30+16*Math.cos(r)} y2={54+16*Math.sin(r)}
-              stroke="#8b0000" strokeWidth="0.6" opacity="0.5"/>;
+          {[175,195,215,235,255].map((deg,i)=>{
+            const r2=deg*Math.PI/180;
+            return <line key={i} x1="42" y1="60" x2={42+22*Math.cos(r2)} y2={60+22*Math.sin(r2)}
+              stroke="#8b0000" strokeWidth="0.7" opacity="0.4"/>;
           })}
-          <ellipse cx="30" cy="54" rx="6" ry="7" fill="none" stroke="#8b0000" strokeWidth="0.5" opacity="0.4"/>
-          <ellipse cx="30" cy="54" rx="11" ry="12" fill="none" stroke="#8b0000" strokeWidth="0.5" opacity="0.3"/>
-          {/* One visible eye — half-lidded with grief */}
-          <path d="M 24,49 C 26,44 30,43 33,46" fill="white" stroke="none"/>
-          <ellipse cx="28.5" cy="47" rx="3" ry="2.5" fill="white" opacity="0.9"/>
-          <ellipse cx="28.5" cy="47.5" rx="1.5" ry="1.2" fill="#b0bec5" opacity="0.5"/>
+          <ellipse cx="42" cy="60" rx="8" ry="9"  fill="none" stroke="#8b0000" strokeWidth="0.6" opacity="0.4"/>
+          <ellipse cx="42" cy="60" rx="14" ry="15" fill="none" stroke="#8b0000" strokeWidth="0.5" opacity="0.3"/>
+          {/* Grief-lidded eyes — looking down */}
+          <path d="M 33,54 C 35,49 40,48 44,50" fill="white" opacity="0.8"/>
+          <path d="M 44,50 C 48,48 51,50 52,54" fill="white" opacity="0.8"/>
+          <ellipse cx="38" cy="53" rx="3.5" ry="2.5" fill="#b0bec5" opacity="0.45"/>
+          <ellipse cx="47" cy="53" rx="3.5" ry="2.5" fill="#b0bec5" opacity="0.45"/>
+          {/* Tear drop — subtle */}
+          <ellipse cx="36" cy="57" rx="1.2" ry="2" fill="#aac8e0" opacity="0.5"/>
         </svg>
-
         {/* Paper grain */}
         <div className="absolute inset-0" style={{
           backgroundImage: 'radial-gradient(circle, rgba(100,80,60,0.065) 1px, transparent 1px)',
@@ -1320,101 +1326,154 @@ type SettingsSection = 'appearance' | 'ai' | 'chat' | 'data' | 'about';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ─────────────────────────────────────────────────────────────────────────────
-// TESSA SPORTS — live scores browser with real-time search suggestions
+// ─────────────────────────────────────────────────────────────────────────────
+// TESSA SPORTS — Cricbuzz-style live scores browser (2025-2026 data)
 // ─────────────────────────────────────────────────────────────────────────────
 type SportTab = 'cricket' | 'football' | 'tennis' | 'f1' | 'basketball' | 'other';
-const SPORT_TABS: { id: SportTab; emoji: string; label: string }[] = [
+const SPORT_TABS2: { id: SportTab; emoji: string; label: string }[] = [
   { id: 'cricket',    emoji: '🏏', label: 'Cricket'    },
   { id: 'football',   emoji: '⚽', label: 'Football'   },
   { id: 'tennis',     emoji: '🎾', label: 'Tennis'     },
   { id: 'f1',         emoji: '🏎️', label: 'F1'         },
-  { id: 'basketball', emoji: '🏀', label: 'Basketball' },
+  { id: 'basketball', emoji: '🏀', label: 'NBA'        },
   { id: 'other',      emoji: '🏆', label: 'More'       },
 ];
-
-// Suggestions per tab — shown as you type each word
-const SPORT_SUGGESTIONS: Record<SportTab, string[]> = {
+const SPORT_SUGG: Record<SportTab, string[]> = {
   cricket: [
-    'India vs Australia live score', 'IPL 2025 today match score',
-    'England vs Pakistan Test scorecard', 'ICC World Cup live score',
-    'India vs England ODI scorecard', 'IPL points table 2025',
-    'MI vs CSK score today', 'RCB vs DC live', 'T20 World Cup score',
-    'Test match day 2 scorecard', 'India batting score now',
-    'Pakistan vs New Zealand live', 'Virat Kohli score today',
-    'Champions Trophy 2025 score', 'ODI series score',
+    'India vs England 2026 live score',
+    'IPL 2026 today match scorecard',
+    'ICC Champions Trophy 2025 result',
+    'India batting score now',
+    'Test match today scorecard',
+    'Pakistan vs Australia live',
+    'IPL points table 2026',
+    'T20 World Cup 2026 score',
+    'MI vs CSK live 2026',
+    'Rohit Sharma score today',
+    'Virat Kohli runs today',
+    'India vs New Zealand ODI',
+    'England vs Australia Ashes 2025',
+    'India T20 score today',
+    'ICC rankings 2026 batsmen',
   ],
   football: [
-    'Premier League scores today', 'Man City vs Arsenal score',
-    'Champions League live score', 'La Liga scores this week',
-    'Barcelona vs Real Madrid score', 'Liverpool score today',
-    'Serie A results today', 'Bundesliga live score',
-    'Chelsea vs Tottenham score', 'Europa League results',
-    'FIFA World Cup qualifier score', 'Ligue 1 scores today',
-    'Man United latest score', 'Arsenal vs Chelsea live',
+    'Premier League scores today 2025',
+    'Man City vs Arsenal live',
+    'Champions League 2025 result',
+    'La Liga scores this week',
+    'Liverpool vs Chelsea score',
+    'FIFA World Cup 2026 qualifier',
+    'Bundesliga results today',
+    'Serie A live score now',
+    'Real Madrid vs Barcelona 2025',
+    'Europa League result today',
+    'Premier League standings 2025',
+    'PSG vs Man United score',
+    'Arsenal latest score today',
+    'Ligue 1 standings 2025',
   ],
   tennis: [
-    'Wimbledon 2025 live score', 'US Open live score today',
-    'French Open results today', 'Australian Open scores',
-    'Djokovic match score today', 'Alcaraz vs Sinner score',
-    'ATP live scores today', 'WTA live scores now',
-    'Roland Garros 2025 results', 'Indian Wells scores today',
-    'Federer match today', 'Nadal vs Djokovic score',
-    'Wimbledon final score', 'Davis Cup live score',
+    'Australian Open 2026 live score',
+    'Wimbledon 2025 final result',
+    'US Open 2025 score today',
+    'ATP rankings 2026',
+    'Sinner vs Djokovic score',
+    'Alcaraz match today result',
+    'French Open 2025 winner',
+    'WTA rankings 2026 today',
+    'Davis Cup 2025 score',
+    'Medvedev match result today',
+    'Nadal comeback 2026',
+    'Australian Open draw 2026',
   ],
   f1: [
-    'F1 race live score today', 'Monaco GP 2025 result',
-    'Max Verstappen race result', 'F1 championship standings 2025',
-    'Lewis Hamilton race today', 'British GP 2025 result',
-    'F1 qualifying results today', 'Ferrari race result today',
-    'Japanese GP 2025 score', 'F1 race winner today',
-    'Red Bull F1 result', 'McLaren race score today',
-    'F1 Singapore GP result', 'Sprint race F1 result',
+    'F1 2026 season race result',
+    'F1 Abu Dhabi GP 2025 result',
+    'Verstappen championship 2025',
+    'F1 drivers standings 2026',
+    'McLaren race result today',
+    'Ferrari F1 2025 result',
+    'Hamilton Mercedes 2026',
+    'F1 qualifying result today',
+    'Norris race result 2025',
+    'F1 constructors standings 2026',
+    'Monaco GP 2026 race result',
+    'British GP 2025 winner',
   ],
   basketball: [
-    'NBA live scores today', 'NBA finals 2025 score',
-    'Lakers vs Warriors score', 'LeBron James game score today',
-    'Stephen Curry points today', 'NBA playoffs live score',
-    'Celtics vs Heat score', 'NBA standings 2025',
-    'NBA game results last night', 'Bulls vs Knicks score',
-    'Giannis game score today', 'Eastern Conference standings',
-    'Western Conference standings', 'NBA MVP 2025',
+    'NBA Finals 2025 score',
+    'NBA live score tonight',
+    'Lakers vs Warriors 2025',
+    'LeBron James stats today',
+    'NBA playoffs 2025 result',
+    'Stephen Curry game score',
+    'Celtics vs Heat score 2025',
+    'NBA standings 2025-26',
+    'Giannis game result today',
+    'NBA MVP 2025 winner',
+    'Eastern Conference standings',
+    'Western Conference standings',
   ],
   other: [
-    'Olympic Games 2025 results', 'Hockey World Cup score',
-    'Badminton world championship', 'Boxing match result today',
-    'UFC fight result today', 'Golf Masters 2025 score',
-    'Swimming World Championship', 'Athletics World Cup result',
-    'Kabaddi Pro League score', 'Wrestling championship result',
-    'Table tennis world championship', 'Volleyball World Cup score',
-    'Cycling Tour de France score', 'Snooker World Championship',
+    'Hockey World Cup 2026 score',
+    'Pro Kabaddi League 2025 score',
+    'Olympic Paris 2024 final results',
+    'Badminton Thomas Cup 2026',
+    'ISL football score today',
+    'UFC fight result this week',
+    'Golf Masters 2025 winner',
+    'Boxing result today 2025',
+    'WWE SmackDown result',
+    'Kho Kho World Cup 2025',
   ],
 };
 
-const SPORTS_SYSTEM = `You are Tessa Sports — a live sports score assistant. 
-CRITICAL: Use web search to get REAL current data. NEVER invent or guess scores.
+const SPORTS_SYSTEM = `You are Tessa Sports — a real-time sports score assistant. Today is ${new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}.
 
-OUTPUT FORMAT — scores only, no headlines, no fluff:
-═══════════════════════
-🏏 IND vs AUS — 3rd ODI
-📍 Wankhede Stadium  📅 Feb 28
-━━━━━━━━━━━━━━━━━━━━━
-🇮🇳 India    : 287/6 (48.2 ov)  ✅ Batting
-🇦🇺 Australia: 245/8 (50 ov)    ✅ Bowled out
-━━━━━━━━━━━━━━━━━━━━━
-📊 India leads by 42 runs | 10 balls left
-🏆 Result: India won by 42 runs
-Top bat: Rohit 87(64) | Top bowl: Bumrah 3/28
-═══════════════════════
+CRITICAL RULES:
+1. ALWAYS use web search to find CURRENT 2025-2026 data
+2. NEVER use old data — always verify with search first
+3. Format results EXACTLY like Cricbuzz scorecards — clean boxes
 
-Rules:
-- Always use this box format with separators
-- Show BOTH teams' scores with flags/emojis
-- Show overs, wickets, top performers
-- For LIVE: show current over and required rate
-- For completed: show result and Man of Match
-- For upcoming: show fixture date/time + recent form
-- Multiple matches: use separate boxes
-- If truly no data found: say "No live data found — match may not have started"`;
+FORMAT TEMPLATE (use this exact structure):
+┌─────────────────────────────┐
+│ 🏏 IND vs ENG · 2nd Test    │
+│ 📍 Lord's  · Day 3 Live     │
+├─────────────────────────────┤
+│ 🇮🇳 INDIA    472/6 (134 ov) │
+│ 🇬🇧 ENGLAND  289 & 45/2     │
+├─────────────────────────────┤
+│ 🟢 LIVE · India leads 138   │
+│ ⚡ Jaiswal 134* · Siraj 3/45│
+└─────────────────────────────┘
+
+For completed matches:
+┌─────────────────────────────┐
+│ ⚽ Man City vs Arsenal      │
+│ 📅 Feb 26, 2025 · EPL       │
+├─────────────────────────────┤
+│ 🔵 Man City   2             │
+│ 🔴 Arsenal    1             │
+├─────────────────────────────┤
+│ ✅ FT · Haaland 45', 67'    │
+│ 📊 Man City win · 3pts      │
+└─────────────────────────────┘
+
+For no live match:
+┌─────────────────────────────┐
+│ ℹ️ No live match right now   │
+│ 📅 Next: IND vs ENG Mar 2   │
+│ 🕐 10:00 AM IST             │
+└─────────────────────────────┘
+
+RULES:
+- Always show BOTH teams with scores
+- Show venue and match type
+- Include top batsman/scorer/driver
+- For upcoming: show date + time IST
+- Multiple matches = multiple boxes
+- Use 🟢 for LIVE, ✅ for completed, 📅 for upcoming
+- Search with current year (2025 or 2026) in your query`;
 
 function SportsBrowser({ glow, isLight, hidden }: { glow: string; isLight: boolean; hidden?: boolean }) {
   const [open,        setOpen]        = useState(false);
@@ -1425,36 +1484,36 @@ function SportsBrowser({ glow, isLight, hidden }: { glow: string; isLight: boole
   const [results,     setResults]     = useState('');
   const [loading,     setLoading]     = useState(false);
   const [pos,         setPos]         = useState<{x:number;y:number}|null>(null);
-  const dragging  = useRef(false);
-  const dragStart = useRef({mx:0,my:0,px:0,py:0});
-  const panelRef  = useRef<HTMLDivElement>(null);
-  const inputRef  = useRef<HTMLInputElement>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>|null>(null);
+  const dragging    = useRef(false);
+  const dragStart   = useRef({mx:0,my:0,px:0,py:0});
+  const panelRef    = useRef<HTMLDivElement>(null);
+  const inputRef    = useRef<HTMLInputElement>(null);
+  const debRef      = useRef<ReturnType<typeof setTimeout>|null>(null);
 
-  const bg     = isLight ? '#ffffff'  : '#0d0f1e';
-  const hdrBg  = isLight ? '#f8fafc'  : '#111827';
-  const text   = isLight ? '#1e293b'  : '#e2e8f0';
-  const sub    = isLight ? '#64748b'  : '#94a3b8';
-  const brd    = isLight ? `${glow}28` : `${glow}35`;
-  const inpBg  = isLight ? '#f1f5f9'  : '#1e293b';
-  const sugBg  = isLight ? '#ffffff'  : '#1a2235';
+  const bg    = isLight ? '#ffffff'  : '#0d1117';
+  const hdr   = isLight ? '#f8fafc'  : '#161b22';
+  const card  = isLight ? '#f1f5f9'  : '#1c2333';
+  const text  = isLight ? '#1e293b'  : '#e6edf3';
+  const sub   = isLight ? '#64748b'  : '#8b949e';
+  const brd   = isLight ? '#e2e8f0'  : '#30363d';
+  const sugBg = isLight ? '#ffffff'  : '#1c2333';
 
-  // GPU-accelerated drag — direct DOM mutation
+  // GPU drag
   const onDragStart = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest('button,input')) return;
     dragging.current = true;
     dragStart.current = {
       mx: e.clientX, my: e.clientY,
-      px: pos?.x ?? Math.max(8, window.innerWidth  - 408),
-      py: pos?.y ?? Math.max(8, window.innerHeight - 570),
+      px: pos?.x ?? Math.max(8, window.innerWidth / 2 - 195),
+      py: pos?.y ?? 60,
     };
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     if (panelRef.current) panelRef.current.style.transition = 'none';
   };
   const onDragMove = (e: React.PointerEvent) => {
     if (!dragging.current || !panelRef.current) return;
-    const nx = Math.max(8, Math.min(window.innerWidth  - 392, dragStart.current.px + e.clientX - dragStart.current.mx));
-    const ny = Math.max(8, Math.min(window.innerHeight - 555, dragStart.current.py + e.clientY - dragStart.current.my));
+    const nx = Math.max(8, Math.min(window.innerWidth - 398, dragStart.current.px + e.clientX - dragStart.current.mx));
+    const ny = Math.max(8, Math.min(window.innerHeight - 560, dragStart.current.py + e.clientY - dragStart.current.my));
     panelRef.current.style.left   = `${nx}px`;
     panelRef.current.style.top    = `${ny}px`;
     panelRef.current.style.bottom = 'unset';
@@ -1463,228 +1522,210 @@ function SportsBrowser({ glow, isLight, hidden }: { glow: string; isLight: boole
   const onDragEnd = (e: React.PointerEvent) => {
     if (!dragging.current) return;
     dragging.current = false;
-    const nx = Math.max(8, Math.min(window.innerWidth  - 392, dragStart.current.px + e.clientX - dragStart.current.mx));
-    const ny = Math.max(8, Math.min(window.innerHeight - 555, dragStart.current.py + e.clientY - dragStart.current.my));
+    const nx = Math.max(8, Math.min(window.innerWidth - 398, dragStart.current.px + e.clientX - dragStart.current.mx));
+    const ny = Math.max(8, Math.min(window.innerHeight - 560, dragStart.current.py + e.clientY - dragStart.current.my));
     setPos({ x: nx, y: ny });
     if (panelRef.current) panelRef.current.style.transition = '';
   };
 
-  // Filter suggestions live as user types — every word triggers new suggestions
   const onQueryChange = (val: string) => {
     setQuery(val);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (val.trim().length < 2) { setSuggestions([]); setShowSug(false); return; }
-    const lower = val.toLowerCase();
-    const all = SPORT_SUGGESTIONS[tab];
-    const filtered = all.filter(s => {
-      // Match every typed word somewhere in the suggestion
-      const words = lower.split(/\s+/).filter(Boolean);
-      return words.every(w => s.toLowerCase().includes(w));
-    }).slice(0, 7);
+    if (debRef.current) clearTimeout(debRef.current);
+    const trimmed = val.trim();
+    if (trimmed.length < 2) { setSuggestions([]); setShowSug(false); return; }
+    const words = trimmed.toLowerCase().split(/\s+/).filter(Boolean);
+    const filtered = SPORT_SUGG[tab]
+      .filter(s => words.every(w => s.toLowerCase().includes(w)))
+      .slice(0, 8);
     setSuggestions(filtered);
     setShowSug(filtered.length > 0);
-    // Auto-search after 900ms of no typing
-    debounceRef.current = setTimeout(() => {
-      if (val.trim().length > 4) search(val);
-    }, 900);
+    if (trimmed.length > 5) {
+      debRef.current = setTimeout(() => search(trimmed), 1000);
+    }
   };
 
   const search = async (q: string) => {
     const clean = q.trim();
     if (!clean || loading) return;
     setShowSug(false);
-    setLoading(true);
-    setResults('');
+    setLoading(true); setResults('');
     try {
       const res = await fetch('/api/chat', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
-          messages: [{ role: 'user', content: `Get live/latest scores for: ${clean}` }],
-          isCreatorMode: false, maxTokens: 600,
+          messages:[{ role:'user', content:`Search for and show scores/results for: ${clean}. Include 2025 or 2026 data.` }],
+          isCreatorMode:false, maxTokens:700,
           _systemOverride: SPORTS_SYSTEM,
-          useWebSearch: true,
+          useWebSearch:true,
         }),
       });
       const data = await res.json();
-      setResults(data.content || 'No data found — try a different search.');
+      setResults(data.content || 'No data found. Try being more specific, e.g. "India vs England 2026".');
     } catch {
-      setResults('Connection error. Check your internet and try again.');
-    } finally {
-      setLoading(false);
-    }
+      setResults('Connection error. Check internet and try again.');
+    } finally { setLoading(false); }
   };
 
-  const pickSuggestion = (s: string) => {
-    setQuery(s); setSuggestions([]); setShowSug(false);
-    search(s);
-  };
+  const pick = (s: string) => { setQuery(s); setSuggestions([]); setShowSug(false); search(s); };
+  const switchTab = (t: SportTab) => { setTab(t); setResults(''); setQuery(''); setSuggestions([]); setShowSug(false); };
 
-  const switchTab = (t: SportTab) => {
-    setTab(t); setResults(''); setQuery(''); setSuggestions([]); setShowSug(false);
+  // Parse and render score boxes (lines starting with box chars)
+  const renderResults = () => {
+    if (!results) return null;
+    const lines = results.split('\n');
+    const boxLineStyle = (line: string): React.CSSProperties => {
+      if (line.includes('🟢') || line.includes('LIVE'))   return { color:'#22c55e', fontWeight:700 };
+      if (line.includes('✅') || line.includes('FT'))      return { color:'#60a5fa', fontWeight:600 };
+      if (line.includes('🏆') || line.includes('Result'))  return { color:'#fbbf24', fontWeight:700 };
+      if (line.startsWith('│') && /\d/.test(line))        return { color:text, fontWeight:600, fontSize:12.5 };
+      if (line.startsWith('├') || line.startsWith('└') || line.startsWith('┌')) return { color:sub };
+      return { color:text };
+    };
+    return (
+      <div style={{ fontFamily:"'Courier New',Courier,monospace", fontSize:11.5, lineHeight:1.7 }}>
+        {lines.map((line,i) => (
+          <div key={i} style={{ ...boxLineStyle(line), whiteSpace:'pre', userSelect:'text',
+            background: line.startsWith('│') && /[🟢✅🏆⚡📅]/.test(line) ? (isLight?'#f0fdf4':'#0d2818') : 'transparent',
+            borderRadius: line.startsWith('│') ? 4 : 0,
+            padding: line.startsWith('│') ? '0 4px' : 0,
+          }}>
+            {line || '\u00a0'}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   const panelStyle: React.CSSProperties = pos
     ? { position:'fixed', left:pos.x, top:pos.y, zIndex:58 }
-    : { position:'fixed', bottom:168, right:72, zIndex:58 };
+    : { position:'fixed', top:60, left:'50%', transform:'translateX(-50%)', zIndex:58 };
 
   if (hidden) return null;
-
   return (
     <>
-      {/* FAB button */}
-      <button
-        onClick={() => setOpen(p => !p)}
+      {/* FAB */}
+      <button onClick={() => setOpen(p=>!p)}
         className="fixed z-[59] w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all active:scale-90 hover:scale-105"
-        style={{
-          bottom: 88, right: 68,
-          background: `linear-gradient(135deg,${glow},${glow}cc)`,
-          boxShadow: `0 4px 20px ${glow}50`,
-          border: `1.5px solid ${glow}60`,
-        }}
-        title="Tessa Sports"
-      >
+        style={{ bottom:88, right:68, background:`linear-gradient(135deg,${glow},${glow}cc)`,
+          boxShadow:`0 4px 20px ${glow}50`, border:`1.5px solid ${glow}60` }}
+        title="Tessa Sports">
         {open ? <X size={18} className="text-white"/> : <Trophy size={18} className="text-white"/>}
       </button>
 
       {open && (
         <div ref={panelRef} style={{
           ...panelStyle,
-          width: 'min(390px, calc(100vw - 16px))',
-          height: 545,
-          background: bg,
-          border: `1px solid ${brd}`,
-          boxShadow: `0 12px 48px rgba(0,0,0,0.35), 0 0 0 1px ${glow}10`,
-          borderRadius: 22,
-          overflow: 'visible',
-          display: 'flex',
-          flexDirection: 'column',
-          animation: 'slideUpSheet 0.22s cubic-bezier(0.32,0.72,0,1)',
-          touchAction: 'none',
-          userSelect: 'none',
+          width:'min(395px,calc(100vw - 16px))',
+          maxHeight:'calc(100vh - 80px)',
+          background:bg,
+          border:`1px solid ${brd}`,
+          boxShadow:`0 16px 56px rgba(0,0,0,0.45), 0 0 0 1px ${glow}12`,
+          borderRadius:16,
+          overflow:'visible',
+          display:'flex',
+          flexDirection:'column',
+          animation:'slideUpSheet 0.22s cubic-bezier(0.32,0.72,0,1)',
+          touchAction:'none',
+          userSelect:'none',
         }}
           onPointerDown={onDragStart} onPointerMove={onDragMove}
           onPointerUp={onDragEnd}    onPointerCancel={onDragEnd}
         >
-          {/* ── Browser chrome header — drag to move ── */}
-          <div style={{
-            flexShrink:0, borderRadius:'22px 22px 0 0', overflow:'hidden',
-            background: `linear-gradient(135deg,${glow}18,${glow}08)`,
-            borderBottom:`1px solid ${brd}`, cursor:'grab',
-          }}>
-            {/* Title bar */}
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
-              padding:'11px 14px 8px' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:9 }}>
-                {/* Browser icon */}
-                <div style={{ width:32, height:32, borderRadius:11,
-                  background:`linear-gradient(135deg,${glow},${glow}bb)`,
+
+          {/* ── Header — browser chrome ── */}
+          <div style={{ flexShrink:0, background:`linear-gradient(135deg,${glow}20,${glow}06)`,
+            borderRadius:'16px 16px 0 0', borderBottom:`1px solid ${brd}`, cursor:'grab' }}>
+
+            {/* Title row */}
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 14px 8px' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                <div style={{ width:34, height:34, borderRadius:10,
+                  background:`linear-gradient(135deg,${glow},${glow}aa)`,
                   display:'flex', alignItems:'center', justifyContent:'center',
-                  boxShadow:`0 2px 8px ${glow}40` }}>
-                  <Trophy size={15} className="text-white"/>
+                  boxShadow:`0 3px 10px ${glow}50` }}>
+                  <Trophy size={16} className="text-white"/>
                 </div>
                 <div>
-                  <div style={{ display:'flex', alignItems:'center', gap:5 }}>
-                    <p style={{ fontSize:14, fontWeight:900, color:glow, margin:0,
-                      letterSpacing:'-0.02em', lineHeight:1.2 }}>Tessa Sports</p>
-                    {/* Live badge */}
-                    <span style={{ fontSize:8, fontWeight:700, color:'#22c55e',
-                      background:'#22c55e18', border:'1px solid #22c55e40',
-                      padding:'1px 5px', borderRadius:4, letterSpacing:'0.05em' }}>● LIVE</span>
+                  <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                    <span style={{ fontSize:15, fontWeight:900, color:glow, letterSpacing:'-0.03em' }}>Tessa Sports</span>
+                    <span style={{ fontSize:9, fontWeight:700, color:'#22c55e', background:'#22c55e15',
+                      border:'1px solid #22c55e40', padding:'1px 6px', borderRadius:6 }}>● LIVE</span>
                   </div>
-                  <p style={{ fontSize:9, color:sub, margin:0 }}>Scores · Fixtures · Standings</p>
+                  <span style={{ fontSize:9.5, color:sub }}>Live · Scores · Standings · 2026</span>
                 </div>
               </div>
-              {/* Window controls */}
-              <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                <div style={{ width:10, height:10, borderRadius:'50%', background:'#fbbf24', cursor:'pointer' }}/>
-                <div style={{ width:10, height:10, borderRadius:'50%', background:'#34d399', cursor:'pointer' }}/>
-                <button onClick={() => setOpen(false)}
-                  style={{ width:18, height:18, borderRadius:'50%', background:'#ef4444',
-                    border:'none', cursor:'pointer', display:'flex', alignItems:'center',
-                    justifyContent:'center', marginLeft:2 }}>
-                  <X size={9} className="text-white"/>
-                </button>
+              {/* macOS-style close */}
+              <div style={{ display:'flex', gap:5 }}>
+                <div style={{ width:11,height:11,borderRadius:'50%',background:'#fbbf24' }}/>
+                <div style={{ width:11,height:11,borderRadius:'50%',background:'#34d399' }}/>
+                <button onClick={()=>setOpen(false)}
+                  style={{ width:11,height:11,borderRadius:'50%',background:'#ef4444',border:'none',cursor:'pointer' }}/>
               </div>
             </div>
-            {/* Sport tabs — pill style */}
-            <div style={{ display:'flex', gap:3, padding:'0 12px 10px',
-              overflowX:'auto', scrollbarWidth:'none' }}>
-              {SPORT_TABS.map(s => (
-                <button key={s.id} onClick={() => switchTab(s.id)}
-                  style={{
-                    flexShrink:0, padding:'5px 11px', borderRadius:20,
-                    fontSize:11, fontWeight:600, cursor:'pointer',
-                    border: tab===s.id ? `1px solid ${glow}60` : `1px solid ${brd}`,
+
+            {/* Sport tabs */}
+            <div style={{ display:'flex', gap:4, padding:'0 12px 10px', overflowX:'auto', scrollbarWidth:'none' }}>
+              {SPORT_TABS2.map(s => (
+                <button key={s.id} onClick={()=>switchTab(s.id)}
+                  style={{ flexShrink:0, padding:'5px 12px', borderRadius:20,
+                    fontSize:11, fontWeight:600, cursor:'pointer', whiteSpace:'nowrap',
+                    transition:'all 0.15s',
                     background: tab===s.id ? glow : 'transparent',
-                    color: tab===s.id ? 'white' : sub,
-                    transition:'all 0.15s', whiteSpace:'nowrap',
-                  }}>
+                    border: tab===s.id ? `1px solid ${glow}` : `1px solid ${brd}`,
+                    color: tab===s.id ? 'white' : sub }}>
                   {s.emoji} {s.label}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* ── Results area ── */}
-          <div style={{ flex:1, overflowY:'auto', padding:'10px 14px',
-            scrollbarWidth:'thin', scrollbarColor:`${glow}40 transparent`,
-            borderRadius:'0', minHeight:0, overflowX:'hidden' }}>
+          {/* ── Results ── */}
+          <div style={{ flex:1, overflowY:'auto', padding:'12px 14px',
+            minHeight:0, maxHeight:360,
+            scrollbarWidth:'thin', scrollbarColor:`${glow}40 transparent` }}>
             {loading ? (
               <div style={{ display:'flex', flexDirection:'column', alignItems:'center',
-                justifyContent:'center', height:'100%', gap:12 }}>
-                <div style={{ position:'relative', width:44, height:44 }}>
+                justifyContent:'center', minHeight:200, gap:14 }}>
+                <div style={{ position:'relative', width:48, height:48 }}>
                   <div style={{ position:'absolute', inset:0, borderRadius:'50%',
                     border:`3px solid ${glow}20`, borderTopColor:glow,
                     animation:'spin 0.75s linear infinite' }}/>
-                  <div style={{ position:'absolute', inset:6, borderRadius:'50%',
-                    border:`2px solid ${glow}15`, borderTopColor:`${glow}80`,
-                    animation:'spin 1.2s linear infinite reverse' }}/>
+                  <div style={{ position:'absolute', inset:7, borderRadius:'50%',
+                    border:`2px solid ${glow}10`, borderTopColor:`${glow}70`,
+                    animation:'spin 1.3s linear infinite reverse' }}/>
+                  <div style={{ position:'absolute', inset:0, display:'flex',
+                    alignItems:'center', justifyContent:'center' }}>
+                    <Trophy size={16} style={{ color:glow }}/>
+                  </div>
                 </div>
-                <p style={{ fontSize:11, color:sub, margin:0 }}>Fetching live scores…</p>
-                <p style={{ fontSize:10, color:sub, margin:0, opacity:0.6 }}>Searching the web</p>
+                <div style={{ textAlign:'center' }}>
+                  <p style={{ fontSize:12, color:text, margin:'0 0 4px', fontWeight:600 }}>Fetching live scores…</p>
+                  <p style={{ fontSize:10, color:sub, margin:0 }}>Searching web for 2025-2026 data</p>
+                </div>
               </div>
-            ) : results ? (
-              <div style={{ fontFamily:'monospace', fontSize:11.5, color:text, lineHeight:1.7,
-                whiteSpace:'pre-wrap', userSelect:'text' }}>
-                {results.split('\n').map((line, i) => {
-                  // Colour-code different line types
-                  const isHeader   = /═+/.test(line);
-                  const isSep      = /━+/.test(line);
-                  const isScore    = /\d+\/\d+/.test(line) || /\d{2,}:\d{2}/.test(line);
-                  const isResult   = line.includes('🏆') || line.includes('Result');
-                  const isEmpty    = line.trim() === '';
-                  return (
-                    <p key={i} style={{
-                      margin: isEmpty ? '6px 0' : '0',
-                      color: isHeader   ? glow
-                           : isSep      ? `${glow}60`
-                           : isResult   ? '#22c55e'
-                           : isScore    ? text
-                           : sub,
-                      fontWeight: isHeader||isResult ? 700 : 400,
-                      fontSize: isHeader ? 11 : 11.5,
-                    }}>{line}</p>
-                  );
-                })}
-              </div>
-            ) : (
+            ) : results ? renderResults() : (
               <div style={{ display:'flex', flexDirection:'column', alignItems:'center',
-                justifyContent:'center', height:'100%', gap:10, opacity:0.55 }}>
-                <Trophy size={36} style={{ color:glow }}/>
-                <p style={{ fontSize:13, fontWeight:700, color:text, margin:0 }}>
-                  {SPORT_TABS.find(s=>s.id===tab)?.emoji} {SPORT_TABS.find(s=>s.id===tab)?.label} Scores
-                </p>
-                <p style={{ fontSize:11, color:sub, textAlign:'center', margin:0, lineHeight:1.6 }}>
-                  Type a search below or tap a suggestion
-                </p>
-                {/* Quick suggestions on empty state */}
-                <div style={{ display:'flex', flexWrap:'wrap', gap:5, justifyContent:'center',
-                  marginTop:4, maxWidth:280 }}>
-                  {SPORT_SUGGESTIONS[tab].slice(0,4).map((s,i)=>(
-                    <button key={i} onClick={() => pickSuggestion(s)}
-                      style={{ padding:'5px 10px', borderRadius:8, fontSize:10,
-                        border:`1px solid ${brd}`, background:`${glow}0a`,
-                        color:sub, cursor:'pointer' }}>
+                justifyContent:'center', minHeight:200, gap:12 }}>
+                <div style={{ width:52, height:52, borderRadius:16, background:`${glow}15`,
+                  display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <Trophy size={26} style={{ color:glow }}/>
+                </div>
+                <div style={{ textAlign:'center' }}>
+                  <p style={{ fontSize:13, fontWeight:700, color:text, margin:'0 0 6px' }}>
+                    {SPORT_TABS2.find(s=>s.id===tab)?.emoji} {SPORT_TABS2.find(s=>s.id===tab)?.label} Scores
+                  </p>
+                  <p style={{ fontSize:11, color:sub, margin:'0 0 12px', lineHeight:1.5 }}>
+                    Tap a suggestion or search below
+                  </p>
+                </div>
+                <div style={{ display:'flex', flexWrap:'wrap', gap:6, justifyContent:'center', maxWidth:320 }}>
+                  {SPORT_SUGG[tab].slice(0,6).map((s,i)=>(
+                    <button key={i} onClick={()=>pick(s)}
+                      style={{ padding:'5px 11px', borderRadius:10, fontSize:10.5, fontWeight:500,
+                        border:`1px solid ${brd}`, background:card,
+                        color:sub, cursor:'pointer', transition:'all 0.15s' }}
+                      onMouseEnter={e=>{e.currentTarget.style.background=`${glow}18`;e.currentTarget.style.color=glow;}}
+                      onMouseLeave={e=>{e.currentTarget.style.background=card;e.currentTarget.style.color=sub;}}>
                       {s}
                     </button>
                   ))}
@@ -1693,83 +1734,55 @@ function SportsBrowser({ glow, isLight, hidden }: { glow: string; isLight: boole
             )}
           </div>
 
-          {/* ── Search bar with live suggestions ── */}
-          <div style={{ flexShrink:0, borderTop:`1px solid ${brd}`,
-            borderRadius:'0 0 22px 22px', background:hdrBg,
-            padding:'10px 12px', position:'relative' }}>
+          {/* ── Search bar ── */}
+          <div style={{ flexShrink:0, borderTop:`1px solid ${brd}`, background:hdr,
+            borderRadius:'0 0 16px 16px', padding:'10px 12px', position:'relative' }}>
 
-            {/* Suggestions dropdown — floats ABOVE the input */}
+            {/* Dropdown suggestions */}
             {showSug && suggestions.length > 0 && (
-              <div style={{
-                position:'absolute', left:12, right:12,
-                bottom:'calc(100% - 2px)',
-                background: sugBg,
-                border:`1px solid ${brd}`,
-                borderRadius:'12px 12px 0 0',
-                overflow:'hidden',
-                boxShadow:`0 -8px 24px rgba(0,0,0,0.15)`,
-                zIndex: 10,
-              }}>
-                {suggestions.map((s, i) => (
-                  <button key={i} onClick={() => pickSuggestion(s)}
-                    style={{
-                      display:'block', width:'100%', textAlign:'left',
-                      padding:'8px 13px', fontSize:11.5, color:text,
+              <div style={{ position:'absolute', left:12, right:12, bottom:'calc(100% - 4px)',
+                background:sugBg, border:`1px solid ${brd}`, borderRadius:'10px 10px 0 0',
+                overflow:'hidden', boxShadow:`0 -10px 28px rgba(0,0,0,0.2)`, zIndex:10 }}>
+                {suggestions.map((s,i) => (
+                  <button key={i} onClick={()=>pick(s)}
+                    style={{ display:'flex', alignItems:'center', gap:8, width:'100%',
+                      textAlign:'left', padding:'8px 12px', fontSize:11.5, color:text,
                       background:'transparent', border:'none',
-                      borderBottom: i < suggestions.length-1 ? `1px solid ${brd}` : 'none',
-                      cursor:'pointer', transition:'background 0.1s',
-                    }}
-                    onMouseEnter={e=>(e.currentTarget.style.background=`${glow}10`)}
-                    onMouseLeave={e=>(e.currentTarget.style.background='transparent')}
-                  >
-                    <span style={{ marginRight:7, opacity:0.6 }}>
-                      {SPORT_TABS.find(t=>t.id===tab)?.emoji}
-                    </span>
-                    {/* Highlight matched text */}
-                    {s}
+                      borderBottom:i<suggestions.length-1?`1px solid ${brd}`:'none',
+                      cursor:'pointer', transition:'background 0.1s' }}
+                    onMouseEnter={e=>e.currentTarget.style.background=`${glow}12`}
+                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                    <span style={{ fontSize:14 }}>{SPORT_TABS2.find(t=>t.id===tab)?.emoji}</span>
+                    <span>{s}</span>
                   </button>
                 ))}
               </div>
             )}
 
-            <div style={{ display:'flex', gap:7, alignItems:'center' }}>
-              <div style={{ flex:1, position:'relative' }}>
-                <input
-                  ref={inputRef}
-                  value={query}
-                  onChange={e => onQueryChange(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') { search(query); setShowSug(false); }
-                    if (e.key === 'Escape') setShowSug(false);
-                    e.stopPropagation();
-                  }}
-                  onFocus={() => query.length > 1 && setShowSug(suggestions.length > 0)}
-                  placeholder={`Search ${SPORT_TABS.find(s=>s.id===tab)?.label} scores…`}
-                  style={{
-                    width:'100%', padding:'9px 12px', borderRadius:11,
-                    fontSize:12, border:`1.5px solid ${brd}`,
-                    background:inpBg, color:text, outline:'none',
-                    boxSizing:'border-box',
-                    transition:'border-color 0.2s',
-                  }}
-                  onFocusCapture={e=>(e.currentTarget.style.borderColor=glow)}
-                  onBlurCapture={e=>{
-                    e.currentTarget.style.borderColor=brd;
-                    setTimeout(()=>setShowSug(false), 180);
-                  }}
-                />
-              </div>
-              <button onClick={() => search(query)}
-                style={{
-                  width:38, height:38, borderRadius:11, border:'none',
-                  background: loading ? `${glow}50` : glow,
-                  cursor: loading ? 'not-allowed' : 'pointer',
+            <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+              <input ref={inputRef} value={query}
+                onChange={e=>onQueryChange(e.target.value)}
+                onKeyDown={e=>{
+                  if(e.key==='Enter'){search(query);setShowSug(false);}
+                  if(e.key==='Escape') setShowSug(false);
+                  e.stopPropagation();
+                }}
+                onFocus={()=>query.length>1&&setShowSug(suggestions.length>0)}
+                onBlur={()=>setTimeout(()=>setShowSug(false),200)}
+                placeholder={`Search ${SPORT_TABS2.find(s=>s.id===tab)?.label} scores 2025-26…`}
+                style={{ flex:1, padding:'9px 13px', borderRadius:10, fontSize:12,
+                  border:`1.5px solid ${brd}`, background:isLight?'white':card,
+                  color:text, outline:'none', transition:'border-color 0.2s' }}
+                onFocusCapture={e=>e.currentTarget.style.borderColor=glow}
+                onBlurCapture={e=>e.currentTarget.style.borderColor=brd}
+              />
+              <button onClick={()=>{search(query);setShowSug(false);}}
+                style={{ width:38, height:38, borderRadius:10, border:'none',
+                  background:loading?`${glow}60`:glow, cursor:loading?'not-allowed':'pointer',
                   display:'flex', alignItems:'center', justifyContent:'center',
-                  flexShrink:0, transition:'all 0.15s',
-                  boxShadow:`0 2px 8px ${glow}40`,
-                }}>
+                  flexShrink:0, boxShadow:`0 2px 8px ${glow}40`, transition:'all 0.15s' }}>
                 {loading
-                  ? <RefreshCw size={15} className="text-white" style={{ animation:'spin 0.8s linear infinite' }}/>
+                  ? <RefreshCw size={15} className="text-white" style={{animation:'spin 0.8s linear infinite'}}/>
                   : <Radio size={15} className="text-white"/>}
               </button>
             </div>
@@ -1815,6 +1828,9 @@ export default function Home() {
   // ── Settings ──────────────────────────────────────────────────────────────
   const [theme,           setThemeState]    = useState<Theme>('dark');
   const [autoSearch,      setAutoSearch]    = useState(true);
+  const [webSearchOn,     setWebSearchOn]   = useState(false);   // manual per-message toggle
+  const [lastSearchData,  setLastSearchData] = useState<{snippets:string[];sources:{title:string;url:string;snippet:string}[];query:string}|null>(null);
+  const [showSearchPanel, setShowSearchPanel] = useState(false); // show/hide web results drawer
   const [voiceOutput,     setVoiceOutput]   = useState(false);
   const [responseLength,  setResponseLength]= useState<ResponseLength>('medium');
   const [animations,      setAnimations]    = useState(true);
@@ -2266,11 +2282,12 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
 
     try {
       const needsSearch =
-        autoSearch && !!text && !hasImage && !isCreatorMode &&
+        (webSearchOn) ||  // manual toggle always forces search
+        (autoSearch && !!text && !hasImage && !isCreatorMode &&
         (/\b(latest|current|today|now|recent|this week|202[3-6])\b/i.test(text) ||
          /\b(search|find|look up|google|news)\b/i.test(text) ||
          (/\?/.test(text) && text.split(' ').length > 4)) &&
-        !/\b(how are you|what do you think|about yourself|i feel|i think|my day|i'm|i am|tell me a)\b/i.test(text);
+        !/\b(how are you|what do you think|about yourself|i feel|i think|my day|i'm|i am|tell me a)\b/i.test(text));
 
       const hist = [...messages, userMsg].slice(-12);
       const payload = hasImage && imageCopy
@@ -2294,6 +2311,11 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
+      // Store web search results for the panel
+      if (data.searchPerformed && data.sources) {
+        setLastSearchData({ snippets: data.sources.map((s:any)=>s.snippet), sources: data.sources, query: text });
+        setShowSearchPanel(false); // ready to show, but don't auto-open
+      }
       const extra = parseDashboardUpdates(data.content, text);
       const assistantMsg: Message = {
         id:uuidv4(), role:'assistant',
@@ -3871,6 +3893,60 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
           <div className={`flex-shrink-0 ${t.bar} px-3 md:px-6 py-3 safe-bottom`}>
             <div className="max-w-2xl mx-auto w-full">
 
+              {/* ── WEB SEARCH RESULTS DRAWER ── slides in above input */}
+              {showSearchPanel && lastSearchData && (
+                <div className="mb-2 rounded-2xl overflow-hidden border animate-in slide-in-from-bottom-2"
+                  style={{ borderColor:`${t.glow}30`, background: t.isLight?'#ffffff':'#0d1117',
+                    boxShadow:`0 -4px 24px rgba(0,0,0,0.15)` }}>
+                  {/* Panel header */}
+                  <div className="flex items-center justify-between px-3 py-2 border-b"
+                    style={{ borderColor:`${t.glow}20`, background:`${t.glow}08` }}>
+                    <div className="flex items-center gap-2">
+                      <Globe size={12} style={{color:t.glow}}/>
+                      <span className="text-[11px] font-bold" style={{color:t.glow}}>Web Results</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold"
+                        style={{background:`${t.glow}15`, color:t.glow}}>
+                        LIVE
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[9px] ${t.sub} truncate max-w-[140px]`}>"{lastSearchData.query}"</span>
+                      <button onClick={()=>setShowSearchPanel(false)}
+                        className={`w-5 h-5 rounded-lg flex items-center justify-center ${t.btnS}`}>
+                        <X size={10}/>
+                      </button>
+                    </div>
+                  </div>
+                  {/* Sources list */}
+                  <div className="max-h-48 overflow-y-auto" style={{scrollbarWidth:'thin',scrollbarColor:`${t.glow}30 transparent`}}>
+                    {lastSearchData.sources.map((src, i) => (
+                      <div key={i} className="flex gap-3 px-3 py-2.5 border-b last:border-0 hover:bg-opacity-50 transition-colors"
+                        style={{ borderColor:`${t.glow}12`, cursor:'pointer' }}
+                        onClick={()=>window.open(src.url,'_blank')}>
+                        {/* Favicon */}
+                        <div className="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center mt-0.5"
+                          style={{background:`${t.glow}15`}}>
+                          <span className="text-[10px]">{['🌐','📰','🔗'][i%3]}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[11px] font-semibold truncate" style={{color:t.isLight?'#1e40af':'#60a5fa'}}>
+                            {src.title}
+                          </p>
+                          <p className={`text-[10px] mt-0.5 leading-relaxed line-clamp-2 ${t.sub}`}>
+                            {src.snippet}
+                          </p>
+                          <p className={`text-[8.5px] mt-0.5 truncate opacity-50 ${t.sub}`}>{src.url}</p>
+                        </div>
+                        <ExternalLink size={10} className="flex-shrink-0 mt-1 opacity-40" style={{color:t.glow}}/>
+                      </div>
+                    ))}
+                    {lastSearchData.sources.length === 0 && (
+                      <p className={`text-[11px] px-3 py-3 ${t.sub}`}>No web sources cached — search is embedded in Tessa's reply.</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Image preview */}
               {selectedImage&&(
                 <div className="mb-2.5 flex items-start gap-2">
@@ -3898,25 +3974,19 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                   <Paperclip size={16}/>
                 </button>
 
-                {/* Voice — click to open call window */}
-                <button
-                  onClick={startVoiceCall}
-                  disabled={isLoading || voiceCallOpen} title="Start voice call"
-                  className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all disabled:opacity-40 active:scale-90 ${voiceCallOpen ? 'bg-green-500/80 border border-green-400/50 text-white shadow-lg shadow-green-500/25 animate-pulse' : t.btnS}`}>
+                {/* Voice */}
+                <button onClick={startVoiceCall} disabled={isLoading||voiceCallOpen} title="Start voice call"
+                  className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all disabled:opacity-40 active:scale-90 ${voiceCallOpen?'bg-green-500/80 border border-green-400/50 text-white shadow-lg shadow-green-500/25 animate-pulse':t.btnS}`}>
                   <Mic size={16}/>
                 </button>
 
                 {/* Textarea */}
                 <div className="flex-1 relative">
-                  <textarea
-                    ref={textareaRef}
-                    value={input}
+                  <textarea ref={textareaRef} value={input}
                     onChange={e=>setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    onInput={handleTextareaInput}
+                    onKeyDown={handleKeyDown} onInput={handleTextareaInput}
                     placeholder={isCreatorMode?`Tell me anything…`:`Message Tessa…`}
-                    disabled={isLoading}
-                    rows={1}
+                    disabled={isLoading} rows={1}
                     className={`w-full px-4 py-2.5 rounded-xl resize-none outline-none transition-all duration-200 disabled:opacity-60 ${t.inp} ${fontSizeClass}`}
                     style={{minHeight:'44px',maxHeight:'144px',lineHeight:'1.5',color:t.isLight?'#1e293b':'#fff'}}
                   />
@@ -3926,8 +3996,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                 </div>
 
                 {/* Send */}
-                <button onClick={()=>sendMessage()}
-                  disabled={(!input.trim()&&!selectedImage)||isLoading}
+                <button onClick={()=>sendMessage()} disabled={(!input.trim()&&!selectedImage)||isLoading}
                   title={sendOnEnter?'Send (Enter)':'Send'}
                   className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-90 ${t.btnP}`}>
                   {isLoading
@@ -3936,20 +4005,60 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                 </button>
               </div>
 
-              {/* Hint bar */}
-              <div className="flex items-center justify-between mt-1.5 px-1">
-                <p className={`text-[9px] ${t.sub}`}>
-                  {isRecording ? '🎤 Listening… tap mic to stop' : sendOnEnter ? 'Enter to send · Shift+Enter new line' : 'Click ➤ to send'}
-                </p>
-                <div className="flex items-center gap-3">
-                  {autoSearch&&!isCreatorMode&&(
-                    <span className={`text-[9px] ${t.sub} flex items-center gap-1`}>
-                      <span>🔍</span>Web search on
+              {/* Toolbar row — web search toggle + results button + hints */}
+              <div className="flex items-center justify-between mt-1.5 px-0.5 gap-2">
+                {/* Left: web search controls */}
+                <div className="flex items-center gap-1.5">
+                  {/* Web Search toggle button */}
+                  <button
+                    onClick={()=>setWebSearchOn(p=>!p)}
+                    title={webSearchOn ? 'Web search ON — click to disable' : 'Enable live web search for this message'}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all active:scale-95"
+                    style={{
+                      background: webSearchOn ? `${t.glow}18` : 'transparent',
+                      border: `1px solid ${webSearchOn ? t.glow+'50' : t.glow+'20'}`,
+                      color: webSearchOn ? t.glow : undefined,
+                    }}>
+                    <Globe size={11} style={{color: webSearchOn ? t.glow : undefined}}/>
+                    <span className="text-[10px] font-semibold" style={{color: webSearchOn ? t.glow : undefined}}>
+                      {webSearchOn ? 'Web: ON' : 'Web'}
+                    </span>
+                    {webSearchOn && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"/>
+                    )}
+                  </button>
+
+                  {/* Show Results button — only if we have results */}
+                  {lastSearchData && (
+                    <button
+                      onClick={()=>setShowSearchPanel(p=>!p)}
+                      title="View web search sources used"
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all active:scale-95"
+                      style={{
+                        background: showSearchPanel ? `${t.glow}15` : 'transparent',
+                        border: `1px solid ${t.glow}25`,
+                      }}>
+                      <ExternalLink size={10} style={{color:t.glow}}/>
+                      <span className="text-[10px] font-medium" style={{color:t.glow}}>
+                        {showSearchPanel ? 'Hide sources' : `Sources (${lastSearchData.sources.length})`}
+                      </span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Right: hints */}
+                <div className="flex items-center gap-2.5">
+                  <p className={`text-[9px] ${t.sub}`}>
+                    {isRecording ? '🎤 Listening…' : sendOnEnter ? 'Enter ↵ send' : ''}
+                  </p>
+                  {autoSearch&&!isCreatorMode&&!webSearchOn&&(
+                    <span className={`text-[9px] ${t.sub} flex items-center gap-1 opacity-60`}>
+                      <span>🔍</span>auto
                     </span>
                   )}
                   {isCreatorMode&&(
                     <span className="text-[9px] text-pink-400/60 flex items-center gap-1">
-                      <Heart size={7}/>Creator Mode
+                      <Heart size={7}/>Creator
                     </span>
                   )}
                 </div>

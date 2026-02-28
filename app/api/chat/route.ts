@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
     }
 
-    const { messages, isCreatorMode, currentMood, needsSearch, maxTokens = 600, _systemOverride, language } = body;
+    const { messages, isCreatorMode, currentMood, needsSearch, maxTokens = 600, _systemOverride, language, useWebSearch } = body;
 
     // Validation
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -47,13 +47,15 @@ export async function POST(request: NextRequest) {
 
     let searchContext = '';
     let webPages: string[] = [];
+    let searchSources: {title:string;url:string;snippet:string}[] = [];
 
     // Web search (with error handling)
-    if (needsSearch && userMessage) {
+    if ((needsSearch || useWebSearch) && userMessage) {
       try {
         const searchResults = await searchWeb(userMessage);
         if (searchResults?.length > 0) {
-          const topResults = searchResults.slice(0, 3);
+          const topResults = searchResults.slice(0, 4);
+          searchSources = topResults.map(r => ({ title: r.title || '', url: r.url || '', snippet: r.snippet || '' }));
           
           // Scrape first result
           if (topResults[0]?.url) {
@@ -65,7 +67,8 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          searchContext = '\n\n=== CURRENT WEB INFORMATION (Live Data) ===\n';
+          searchContext = '\n\n=== CURRENT WEB INFORMATION (Live Data — February 2026) ===\n';
+          searchContext += `NOTE: Today is ${new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}. Use this recent data.\n`;
           if (webPages.length > 0) {
             searchContext += `\nFULL PAGE CONTENT:\n${webPages[0].slice(0, 3000)}\n`;
           }
@@ -74,7 +77,7 @@ export async function POST(request: NextRequest) {
             searchContext += `\n[${i + 1}] ${r.title}\n${r.snippet}\nURL: ${r.url}\n`;
           });
           searchContext += '\n=== END WEB INFORMATION ===\n';
-          searchContext += '\nIMPORTANT: Use this current web data to provide accurate, up-to-date information. Cite sources when relevant.\n';
+          searchContext += '\nIMPORTANT: Use this current web data. Cite sources when relevant. Today is 2026.\n';
         }
       } catch (searchError) {
         console.error('Search failed:', searchError);
@@ -168,6 +171,7 @@ export async function POST(request: NextRequest) {
       mood: newMood,
       usage,
       searchPerformed: !!searchContext,
+      sources: searchSources,
       sourcesUsed: searchContext ? 'live web data' : 'knowledge base',
     });
 

@@ -13,6 +13,7 @@ import {
   Lock, Unlock, Cpu, BarChart3, Hash,
   Check, Database, Info, Globe, Image as ImageIcon,
   Salad, Flame, ChevronRight, Stethoscope, TrendingUp,
+  Trophy, Tv2, Radio, RefreshCw, ExternalLink,
 } from 'lucide-react';
 
 import type { Message, MoodType, Conversation } from '@/types';
@@ -606,6 +607,50 @@ function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
           <ellipse cx="22" cy="148" rx="26" ry="44" fill="#c0392b"/>
         </svg>
 
+        {/* Small hanging Spidey — top-left side, dangling from web thread */}
+        <svg className="absolute top-0 left-0" style={{ width: 88, opacity: 0.22, marginLeft: 18 }}
+          viewBox="0 0 60 160">
+          {/* Web thread from top */}
+          <line x1="30" y1="0" x2="30" y2="30" stroke="#c0392b" strokeWidth="1" strokeLinecap="round"/>
+          {/* Tiny web burst at anchor */}
+          {[210,225,240,255,270,285,300,315,330].map((deg,i)=>{
+            const rad=deg*Math.PI/180;
+            return <line key={i} x1="30" y1="5" x2={30+14*Math.cos(rad)} y2={5+14*Math.sin(rad)}
+              stroke="#c0392b" strokeWidth="0.5" opacity="0.6"/>;
+          })}
+          {[5,10].map((r,i)=>(
+            <path key={i} d={`M ${30-r},5 A ${r},${r} 0 1,1 ${30+r},5`}
+              fill="none" stroke="#c0392b" strokeWidth="0.4" opacity={0.5-i*0.1}/>
+          ))}
+          {/* Head */}
+          <ellipse cx="30" cy="43" rx="11" ry="12" fill="#e53935"/>
+          {/* Web lines on head */}
+          {[150,165,180,195,210].map((deg,i)=>{
+            const rad=deg*Math.PI/180;
+            return <line key={i} x1="30" y1="43" x2={30+14*Math.cos(rad)} y2={43+14*Math.sin(rad)}
+              stroke="#b71c1c" strokeWidth="0.5" opacity="0.5"/>;
+          })}
+          <ellipse cx="30" cy="43" rx="5" ry="6" fill="none" stroke="#b71c1c" strokeWidth="0.4" opacity="0.4"/>
+          <ellipse cx="30" cy="43" rx="9" ry="10" fill="none" stroke="#b71c1c" strokeWidth="0.4" opacity="0.3"/>
+          {/* Eyes */}
+          <ellipse cx="26.5" cy="40" rx="3.5" ry="4" fill="white" transform="rotate(-10 26.5 40)"/>
+          <ellipse cx="33.5" cy="40" rx="3.5" ry="4" fill="white" transform="rotate(10 33.5 40)"/>
+          <ellipse cx="26.5" cy="40" rx="2" ry="2.5" fill="#b0bec5" opacity="0.5" transform="rotate(-10 26.5 40)"/>
+          <ellipse cx="33.5" cy="40" rx="2" ry="2.5" fill="#b0bec5" opacity="0.5" transform="rotate(10 33.5 40)"/>
+          {/* Body */}
+          <ellipse cx="30" cy="68" rx="9" ry="13" fill="#1565c0"/>
+          <ellipse cx="30" cy="63" rx="6" ry="5" fill="#e53935"/>
+          {/* Arms — spread out (hanging) */}
+          <path d="M 22,62 C 14,58 10,54 8,50" fill="none" stroke="#1565c0" strokeWidth="5" strokeLinecap="round"/>
+          <path d="M 38,62 C 46,58 50,54 52,50" fill="none" stroke="#1565c0" strokeWidth="5" strokeLinecap="round"/>
+          {/* Legs dangling down */}
+          <path d="M 25,79 C 22,90 20,100 18,110" fill="none" stroke="#1565c0" strokeWidth="6" strokeLinecap="round"/>
+          <path d="M 35,79 C 38,90 40,100 42,110" fill="none" stroke="#1565c0" strokeWidth="6" strokeLinecap="round"/>
+          {/* Feet */}
+          <ellipse cx="16" cy="112" rx="5" ry="3" fill="#e53935" transform="rotate(15 16 112)"/>
+          <ellipse cx="44" cy="112" rx="5" ry="3" fill="#e53935" transform="rotate(-15 44 112)"/>
+        </svg>
+
         {/* Paper grain */}
         <div className="absolute inset-0" style={{
           backgroundImage: 'radial-gradient(circle, rgba(100,80,60,0.065) 1px, transparent 1px)',
@@ -938,30 +983,26 @@ function HealthPulse({ glow, isLight, hidden, onSync }: { glow: string; isLight:
     if (panelRef.current) panelRef.current.style.transition = '';
   };
 
-  const HEALTH_SYSTEM = `You are Tessa's Health Pulse — a compact, specialist health sub-agent.
+  const HEALTH_SYSTEM = `You are Tessa's Health Pulse — a compact health tracker.
 Focus: calorie logging and water tracking for Ankit (17, male, Delhi, Class 12 CBSE 2026).
 
-CALORIE LOGGING RULES:
-- When user mentions food, calculate and confirm calories precisely
-- Always end calorie-containing replies with EXACTLY this pattern: **TOTAL: X cal**
-  Example: "2 rotis (120 cal) + dal (120 cal) = **TOTAL: 240 cal**"
-- Include breakdown for multi-item meals
-- Use India-specific portion sizes (roti=60cal, dal=120cal, rice bowl=130cal, samosa=262cal)
+CALORIE LOGGING — CRITICAL RULES:
+- The [CURRENT STATE] block shows calories ALREADY logged today
+- **TOTAL: X cal** must contain ONLY the calories of the NEW food the user just mentioned
+- NEVER include the existing logged calories in **TOTAL: X cal**
+- Show the running sum in your text, but the tag is new-meal-only
+- Example: user already has 670 cal logged, eats rice bowl (130 cal):
+  Reply: "Rice bowl (130 cal) added! 670 + 130 = **800 cal** today 🍚  **TOTAL: 130 cal**"
+- Multi-item meal: "Roti×2 (120) + dal (120) = 240 cal  **TOTAL: 240 cal**"
+- Use India-specific portions: roti=60cal, dal=120cal, rice bowl=130cal, samosa=262cal, chai=45cal
 
-WATER LOGGING RULES:
-- When user says they drank water, confirm with: **WATER: X glasses**
-  Example: "Noted! **WATER: 2 glasses** logged 💧"
-- If they say "a bottle" = 2 glasses
+WATER LOGGING:
+- When user drinks water: **WATER: X glasses** (new glasses only, not cumulative)
+- "a bottle" = 2 glasses
 
-HEALTH TIPS:
-- India-specific, practical, exam-focused
-- Max 3 lines per response
+HEALTH TIPS: India-specific, exam-focused, max 3 lines
 
-STRICT RULES:
-- Always use **TOTAL: X cal** format for meals (never just "X cal logged")
-- Always use **WATER: X glasses** format for water
-- Be short — no fluff, no filler
-- If non-health topic: "This is your health channel — ask Tessa directly!"`;
+STRICT: Be short. No fluff. Non-health topics: "Use main Tessa chat for that!"`;
 
   const send = async () => {
     const text = input.trim();
@@ -979,7 +1020,7 @@ STRICT RULES:
       const today = new Date().toISOString().split('T')[0];
       const curCal = h.date === today ? (h.totalCalories || 0) : 0;
       const curWater = w.date === today ? (w.water || 0) : 0;
-      healthCtx = `\n\n[CURRENT STATE]\nCalories so far: ${curCal}/2200 cal\nWater: ${curWater}/${w.waterGoal||8} glasses\nWeight: ${h.weight||'?'}kg · Height: ${h.height||'?'}cm`;
+      healthCtx = `\n\n[CURRENT STATE — already logged today, DO NOT include in TOTAL tag]\nCalories already logged: ${curCal} cal (out of 2200)\nWater already logged: ${curWater} glasses (goal ${w.waterGoal||8})\nUser stats: ${h.weight||'?'}kg · ${h.height||'?'}cm`;
     } catch {}
 
     try {
@@ -1227,6 +1268,279 @@ STRICT RULES:
 // ─────────────────────────────────────────────────────────────────────────────
 type SettingsSection = 'appearance' | 'ai' | 'chat' | 'data' | 'about';
 
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// T-SPORTS BROWSER — live + historical sports scores via AI web search
+// ─────────────────────────────────────────────────────────────────────────────
+type SportTab = 'cricket' | 'football' | 'tennis' | 'f1' | 'basketball' | 'other';
+const SPORT_TABS: { id: SportTab; emoji: string; label: string }[] = [
+  { id: 'cricket',    emoji: '🏏', label: 'Cricket'    },
+  { id: 'football',   emoji: '⚽', label: 'Football'   },
+  { id: 'tennis',     emoji: '🎾', label: 'Tennis'     },
+  { id: 'f1',         emoji: '🏎️', label: 'F1'         },
+  { id: 'basketball', emoji: '🏀', label: 'Basketball' },
+  { id: 'other',      emoji: '🏆', label: 'More'       },
+];
+const SPORT_QUERIES: Record<SportTab, string[]> = {
+  cricket:    ['Live cricket score today', 'Recent IPL/Test match scorecard', 'Today\'s cricket match result'],
+  football:   ['Live football scores today', 'Premier League / La Liga latest results', 'UEFA Champions League score'],
+  tennis:     ['ATP WTA live tennis scores', 'Latest tennis match results today', 'Grand Slam current score'],
+  f1:         ['Formula 1 race result today', 'Latest F1 qualifying / race standings', 'F1 championship standings 2025'],
+  basketball: ['NBA live scores today', 'Latest NBA game results', 'NBA standings 2025'],
+  other:      ['Live sports scores today', 'Latest sports results worldwide', 'Today\'s major sports events'],
+};
+
+function SportsBrowser({ glow, isLight, hidden }: { glow: string; isLight: boolean; hidden?: boolean }) {
+  const [open,     setOpen]     = useState(false);
+  const [tab,      setTab]      = useState<SportTab>('cricket');
+  const [query,    setQuery]    = useState('');
+  const [results,  setResults]  = useState('');
+  const [loading,  setLoading]  = useState(false);
+  const [pos,      setPos]      = useState<{x:number;y:number}|null>(null);
+  const dragging   = useRef(false);
+  const dragStart  = useRef({mx:0,my:0,px:0,py:0});
+  const panelRef   = useRef<HTMLDivElement>(null);
+  const inputRef   = useRef<HTMLInputElement>(null);
+
+  const bg   = isLight ? '#ffffff' : '#0d0f1e';
+  const text = isLight ? '#1e293b' : '#e2e8f0';
+  const sub  = isLight ? '#64748b' : '#94a3b8';
+  const border = isLight ? `${glow}25` : `${glow}30`;
+  const tabBg  = isLight ? '#f8fafc' : '#111827';
+
+  // GPU-drag
+  const onDragStart = (e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).closest('button,input')) return;
+    dragging.current = true;
+    dragStart.current = {
+      mx: e.clientX, my: e.clientY,
+      px: pos?.x ?? Math.max(8, window.innerWidth  - 400),
+      py: pos?.y ?? Math.max(8, window.innerHeight - 560),
+    };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    if (panelRef.current) panelRef.current.style.transition = 'none';
+  };
+  const onDragMove = (e: React.PointerEvent) => {
+    if (!dragging.current || !panelRef.current) return;
+    const nx = Math.max(8, Math.min(window.innerWidth  - 384, dragStart.current.px + e.clientX - dragStart.current.mx));
+    const ny = Math.max(8, Math.min(window.innerHeight - 520, dragStart.current.py + e.clientY - dragStart.current.my));
+    panelRef.current.style.left   = `${nx}px`;
+    panelRef.current.style.top    = `${ny}px`;
+    panelRef.current.style.bottom = 'unset';
+    panelRef.current.style.right  = 'unset';
+  };
+  const onDragEnd = (e: React.PointerEvent) => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    const nx = Math.max(8, Math.min(window.innerWidth  - 384, dragStart.current.px + e.clientX - dragStart.current.mx));
+    const ny = Math.max(8, Math.min(window.innerHeight - 520, dragStart.current.py + e.clientY - dragStart.current.my));
+    setPos({ x: nx, y: ny });
+    if (panelRef.current) panelRef.current.style.transition = '';
+  };
+
+  const search = async (q: string) => {
+    if (!q.trim() || loading) return;
+    setLoading(true);
+    setResults('');
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: q }],
+          isCreatorMode: false,
+          maxTokens: 500,
+          _systemOverride: `You are T-Sports, a live sports information assistant inside Tessa AI.
+Use web search to find the LATEST scores, results, and standings.
+Format responses clearly:
+- Use match scores like: Team A 245/6 (45 ov) vs Team B 210/8 (40 ov) — Team A leads
+- Bold team/player names with **name**
+- Show time/date of match when available
+- For live matches, show current score and status
+- For completed matches, show final score and result
+- Keep it clean, scannable, no long paragraphs
+- If no live match, show most recent result + next upcoming fixture
+Always search the web for real-time data. Never guess scores.`,
+          useWebSearch: true,
+        }),
+      });
+      const data = await res.json();
+      setResults(data.content || 'No results found. Try a more specific query.');
+    } catch {
+      setResults('Network error — check your connection and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const quickSearch = (q: string) => { setQuery(q); search(q); };
+
+  const panelStyle: React.CSSProperties = pos
+    ? { position: 'fixed', left: pos.x, top: pos.y, zIndex: 58 }
+    : { position: 'fixed', bottom: 168, right: 72, zIndex: 58 };
+
+  if (hidden) return null;
+
+  return (
+    <>
+      {/* FAB */}
+      <button
+        onClick={() => setOpen(p => !p)}
+        className="fixed z-[59] w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all active:scale-90"
+        style={{
+          bottom: 88, right: 68,
+          background: open ? glow : `linear-gradient(135deg,${glow},${glow}cc)`,
+          boxShadow: `0 4px 20px ${glow}50`,
+          border: `1.5px solid ${glow}60`,
+        }}
+        title="T-Sports Browser"
+      >
+        {open ? <X size={18} className="text-white"/> : <Trophy size={18} className="text-white"/>}
+      </button>
+
+      {open && (
+        <div ref={panelRef} style={{
+          ...panelStyle,
+          width: 'min(380px, calc(100vw - 16px))',
+          height: 510,
+          background: bg,
+          border: `1px solid ${border}`,
+          boxShadow: `0 8px 40px rgba(0,0,0,0.3), 0 0 0 1px ${glow}12`,
+          borderRadius: 20,
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          animation: 'slideUpSheet 0.22s cubic-bezier(0.32,0.72,0,1)',
+          touchAction: 'none',
+          userSelect: 'none',
+        }}
+          onPointerDown={onDragStart} onPointerMove={onDragMove}
+          onPointerUp={onDragEnd}    onPointerCancel={onDragEnd}
+        >
+          {/* Header drag handle */}
+          <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between',
+            padding:'10px 14px 8px', borderBottom:`1px solid ${border}`,
+            background:`linear-gradient(135deg,${glow}10,${glow}04)`, cursor:'grab' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+              <div style={{ width:30, height:30, borderRadius:10, background:glow,
+                display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <Trophy size={14} className="text-white"/>
+              </div>
+              <div>
+                <p style={{ fontSize:13, fontWeight:800, color:glow, margin:0, lineHeight:1.2 }}>T-Sports</p>
+                <p style={{ fontSize:9, color:sub, margin:0 }}>Live scores · Results · Standings</p>
+              </div>
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+              <div style={{ width:7, height:7, borderRadius:'50%', background:'#22c55e',
+                boxShadow:'0 0 6px #22c55e', animation:'pulse 2s infinite' }} title="Live data"/>
+              <button onClick={() => setOpen(false)}
+                style={{ background:'none', border:'none', cursor:'pointer', padding:4 }}>
+                <X size={14} style={{ color:sub }}/>
+              </button>
+            </div>
+          </div>
+
+          {/* Sport tabs */}
+          <div style={{ flexShrink:0, display:'flex', overflowX:'auto', gap:4, padding:'8px 12px 6px',
+            borderBottom:`1px solid ${border}`, background:tabBg,
+            scrollbarWidth:'none', msOverflowStyle:'none' }}>
+            {SPORT_TABS.map(s => (
+              <button key={s.id} onClick={() => { setTab(s.id); setResults(''); setQuery(''); }}
+                style={{
+                  flexShrink:0, display:'flex', alignItems:'center', gap:4,
+                  padding:'5px 10px', borderRadius:10, fontSize:11, fontWeight:600,
+                  border: tab===s.id ? `1px solid ${glow}50` : `1px solid transparent`,
+                  background: tab===s.id ? `${glow}18` : 'transparent',
+                  color: tab===s.id ? glow : sub,
+                  cursor:'pointer', whiteSpace:'nowrap',
+                }}>
+                {s.emoji} {s.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Quick search chips */}
+          <div style={{ flexShrink:0, display:'flex', gap:6, padding:'8px 12px 4px',
+            overflowX:'auto', scrollbarWidth:'none' }}>
+            {SPORT_QUERIES[tab].map((q,i) => (
+              <button key={i} onClick={() => quickSearch(q)}
+                style={{
+                  flexShrink:0, padding:'4px 10px', borderRadius:8, fontSize:10, fontWeight:500,
+                  border:`1px solid ${border}`, background:'transparent', color:sub,
+                  cursor:'pointer', whiteSpace:'nowrap',
+                  transition:'all 0.15s',
+                }}
+                onMouseEnter={e=>(e.currentTarget.style.background=`${glow}12`)}
+                onMouseLeave={e=>(e.currentTarget.style.background='transparent')}
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+
+          {/* Results area */}
+          <div style={{ flex:1, overflowY:'auto', padding:'10px 14px',
+            scrollbarWidth:'thin', scrollbarColor:`${glow}40 transparent` }}>
+            {loading ? (
+              <div style={{ display:'flex', flexDirection:'column', alignItems:'center',
+                justifyContent:'center', height:'100%', gap:10 }}>
+                <div style={{ width:28, height:28, borderRadius:'50%',
+                  border:`3px solid ${glow}30`, borderTopColor:glow,
+                  animation:'spin 0.8s linear infinite' }}/>
+                <p style={{ fontSize:11, color:sub }}>Fetching live data…</p>
+              </div>
+            ) : results ? (
+              <div style={{ fontSize:12, color:text, lineHeight:1.65, whiteSpace:'pre-wrap',
+                userSelect:'text' }}>
+                {results.split('\n').map((line,i) => {
+                  const bold = line.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                  return <p key={i} style={{ margin:'0 0 4px',
+                    fontWeight: line.startsWith('##')||line.startsWith('**') ? 700 : 400,
+                    color: line.startsWith('#') ? glow : text,
+                    fontSize: line.startsWith('##') ? 13 : 12,
+                  }} dangerouslySetInnerHTML={{ __html: bold.replace(/^#+\s*/,'') }}/>;
+                })}
+              </div>
+            ) : (
+              <div style={{ display:'flex', flexDirection:'column', alignItems:'center',
+                justifyContent:'center', height:'100%', gap:8, opacity:0.5 }}>
+                <Trophy size={32} style={{ color:glow }}/>
+                <p style={{ fontSize:12, color:sub, textAlign:'center' }}>
+                  Pick a quick search above<br/>or type your own query below
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Search input */}
+          <div style={{ flexShrink:0, display:'flex', gap:8, padding:'10px 12px',
+            borderTop:`1px solid ${border}`, background: isLight?'#f8fafc':bg }}>
+            <input ref={inputRef} value={query} onChange={e=>setQuery(e.target.value)}
+              onKeyDown={e=>{ if(e.key==='Enter') search(query); e.stopPropagation(); }}
+              placeholder={`Search ${SPORT_TABS.find(s=>s.id===tab)?.label} scores…`}
+              style={{
+                flex:1, padding:'8px 12px', borderRadius:10, fontSize:12,
+                border:`1px solid ${border}`, background:isLight?'white':'#1e293b',
+                color:text, outline:'none',
+              }}/>
+            <button onClick={() => search(query)}
+              style={{
+                width:36, height:36, borderRadius:10, border:'none', cursor:'pointer',
+                background:glow, display:'flex', alignItems:'center', justifyContent:'center',
+                flexShrink:0, transition:'opacity 0.15s', opacity: loading?0.5:1,
+              }}>
+              {loading
+                ? <RefreshCw size={14} className="text-white" style={{ animation:'spin 0.8s linear infinite' }}/>
+                : <Radio size={14} className="text-white"/>}
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN COMPONENT
@@ -2275,6 +2589,10 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
       @keyframes soundBar {
         from { transform: scaleY(0.3); opacity: 0.4; }
         to   { transform: scaleY(1);   opacity: 1;   }
+      }
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
       }
       /* ── Delete confirm expand ── */
       @keyframes expandConfirm {
@@ -3480,6 +3798,9 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
         <HealthPulse glow={t.glow} isLight={t.isLight} hidden={showSettings || showDashboard}
           onSync={() => setWellnessVersion(v => v + 1)} />
       )}
+
+      {/* ── T-SPORTS BROWSER — live scores, always visible ── */}
+      <SportsBrowser glow={t.glow} isLight={t.isLight} hidden={showSettings || showDashboard} />
 
       {/* ── FLOATING INSIGHTS PANEL ── */}
       {insightsOpen && isCreatorMode && (

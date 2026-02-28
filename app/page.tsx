@@ -607,48 +607,95 @@ function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
           <ellipse cx="22" cy="148" rx="26" ry="44" fill="#c0392b"/>
         </svg>
 
-        {/* Small hanging Spidey — top-left side, dangling from web thread */}
-        <svg className="absolute top-0 left-0" style={{ width: 88, opacity: 0.22, marginLeft: 18 }}
-          viewBox="0 0 60 160">
-          {/* Web thread from top */}
-          <line x1="30" y1="0" x2="30" y2="30" stroke="#c0392b" strokeWidth="1" strokeLinecap="round"/>
-          {/* Tiny web burst at anchor */}
-          {[210,225,240,255,270,285,300,315,330].map((deg,i)=>{
-            const rad=deg*Math.PI/180;
-            return <line key={i} x1="30" y1="5" x2={30+14*Math.cos(rad)} y2={5+14*Math.sin(rad)}
-              stroke="#c0392b" strokeWidth="0.5" opacity="0.6"/>;
+        {/* TASM2-inspired scene — Gwen hanging from web (right), Spidey sitting in sorrow (left) */}
+
+        {/* Gwen — hanging limp from web strand, right side, upside-down */}
+        <svg className="absolute top-0 right-0" style={{ width: 90, opacity: 0.30, marginRight: 14 }}
+          viewBox="0 0 60 200">
+          {/* Web thread from top anchor */}
+          <line x1="38" y1="0" x2="38" y2="32" stroke="#888" strokeWidth="1.2" strokeLinecap="round"/>
+          {/* Tiny web anchor burst */}
+          {[200,220,240,260,280,300,320].map((deg,i)=>{
+            const r=deg*Math.PI/180;
+            return <line key={i} x1="38" y1="4" x2={38+12*Math.cos(r)} y2={4+12*Math.sin(r)}
+              stroke="#999" strokeWidth="0.5" opacity="0.5"/>;
           })}
-          {[5,10].map((r,i)=>(
-            <path key={i} d={`M ${30-r},5 A ${r},${r} 0 1,1 ${30+r},5`}
-              fill="none" stroke="#c0392b" strokeWidth="0.4" opacity={0.5-i*0.1}/>
-          ))}
-          {/* Head */}
-          <ellipse cx="30" cy="43" rx="11" ry="12" fill="#e53935"/>
-          {/* Web lines on head */}
-          {[150,165,180,195,210].map((deg,i)=>{
-            const rad=deg*Math.PI/180;
-            return <line key={i} x1="30" y1="43" x2={30+14*Math.cos(rad)} y2={43+14*Math.sin(rad)}
-              stroke="#b71c1c" strokeWidth="0.5" opacity="0.5"/>;
+          {/* Blonde hair — flowing downward (she's inverted, so hair = upward from head) */}
+          {/* Head — upside-down, hair fans up */}
+          <ellipse cx="38" cy="47" rx="10" ry="11" fill="#f5deb3"/>
+          {/* Hair strands fanning upward */}
+          <path d="M 30,42 C 22,34 18,24 20,12" fill="none" stroke="#c8a84b" strokeWidth="3.5" strokeLinecap="round"/>
+          <path d="M 33,38 C 27,28 26,18 28,8" fill="none" stroke="#d4aa55" strokeWidth="3" strokeLinecap="round"/>
+          <path d="M 38,36 C 35,25 36,15 38,5" fill="none" stroke="#c8a84b" strokeWidth="2.5" strokeLinecap="round"/>
+          <path d="M 43,38 C 48,27 50,17 48,6" fill="none" stroke="#d4aa55" strokeWidth="3" strokeLinecap="round"/>
+          <path d="M 46,43 C 53,33 56,23 54,12" fill="none" stroke="#c8a84b" strokeWidth="3.5" strokeLinecap="round"/>
+          {/* Face — small delicate features */}
+          <ellipse cx="35" cy="48" rx="2" ry="1.5" fill="#e8b4b8" opacity="0.7"/>
+          <ellipse cx="41" cy="48" rx="2" ry="1.5" fill="#e8b4b8" opacity="0.7"/>
+          <path d="M 36,52 Q 38,54 40,52" fill="none" stroke="#c0726a" strokeWidth="0.8"/>
+          {/* Jacket — red/maroon */}
+          <path d="M 28,56 C 24,68 22,82 24,95" fill="none" stroke="#8b1a1a" strokeWidth="9" strokeLinecap="round"/>
+          <path d="M 48,56 C 52,68 54,82 52,95" fill="none" stroke="#8b1a1a" strokeWidth="9" strokeLinecap="round"/>
+          <ellipse cx="38" cy="72" rx="11" ry="18" fill="#8b1a1a"/>
+          {/* White collar/shirt */}
+          <ellipse cx="38" cy="58" rx="8" ry="5" fill="#f0f0f0"/>
+          {/* Arms — limp, dangling */}
+          <path d="M 28,65 C 18,70 12,75 10,82" fill="none" stroke="#8b1a1a" strokeWidth="6" strokeLinecap="round"/>
+          <path d="M 48,65 C 56,72 58,78 56,86" fill="none" stroke="#8b1a1a" strokeWidth="6" strokeLinecap="round"/>
+          {/* Hands */}
+          <circle cx="9" cy="84" r="4" fill="#f5deb3"/>
+          <circle cx="57" cy="88" r="4" fill="#f5deb3"/>
+          {/* Skirt/legs */}
+          <path d="M 29,88 C 26,105 24,118 22,132" fill="none" stroke="#2c3e70" strokeWidth="7" strokeLinecap="round"/>
+          <path d="M 47,88 C 50,105 52,118 54,132" fill="none" stroke="#2c3e70" strokeWidth="7" strokeLinecap="round"/>
+          {/* Shoes */}
+          <ellipse cx="21" cy="134" rx="5" ry="3" fill="#1a1a1a" transform="rotate(10 21 134)"/>
+          <ellipse cx="55" cy="134" rx="5" ry="3" fill="#1a1a1a" transform="rotate(-10 55 134)"/>
+        </svg>
+
+        {/* Spider-Man — sitting slumped against bottom-left, mask off-angle, head bowed */}
+        <svg className="absolute bottom-0 left-0" style={{ width: 110, opacity: 0.28, marginLeft: 6 }}
+          viewBox="0 0 80 140">
+          {/* Sitting on ground — legs bent, back against wall */}
+          {/* Legs — bent at knee, sitting */}
+          <path d="M 22,95 C 18,108 14,118 12,128" fill="none" stroke="#c0392b" strokeWidth="10" strokeLinecap="round"/>
+          <path d="M 42,95 C 48,106 52,116 54,126" fill="none" stroke="#c0392b" strokeWidth="10" strokeLinecap="round"/>
+          {/* Knees */}
+          <path d="M 12,128 C 10,132 14,135 24,134" fill="none" stroke="#c0392b" strokeWidth="9" strokeLinecap="round"/>
+          <path d="M 54,126 C 58,130 62,133 58,136" fill="none" stroke="#1565c0" strokeWidth="8" strokeLinecap="round"/>
+          {/* Shoes */}
+          <ellipse cx="17" cy="135" rx="9" ry="4" fill="#c0392b"/>
+          <ellipse cx="55" cy="137" rx="8" ry="4" fill="#c0392b"/>
+          {/* Body — slumped, torso leaning forward */}
+          <ellipse cx="32" cy="78" rx="16" ry="19" fill="#1565c0"/>
+          {/* Red chest/abdomen */}
+          <ellipse cx="32" cy="75" rx="10" ry="12" fill="#c0392b"/>
+          {/* Spider emblem on chest — small */}
+          <ellipse cx="32" cy="72" rx="3.5" ry="4.5" fill="#0d0d0d"/>
+          <line x1="32" y1="68" x2="26" y2="62" stroke="#0d0d0d" strokeWidth="1.5"/>
+          <line x1="32" y1="68" x2="38" y2="62" stroke="#0d0d0d" strokeWidth="1.5"/>
+          <line x1="32" y1="76" x2="26" y2="82" stroke="#0d0d0d" strokeWidth="1.5"/>
+          <line x1="32" y1="76" x2="38" y2="82" stroke="#0d0d0d" strokeWidth="1.5"/>
+          {/* Arms — one on knee, one hanging */}
+          <path d="M 18,80 C 12,88 10,95 12,100" fill="none" stroke="#1565c0" strokeWidth="8" strokeLinecap="round"/>
+          <path d="M 46,78 C 52,84 56,90 54,96" fill="none" stroke="#c0392b" strokeWidth="8" strokeLinecap="round"/>
+          {/* Hand resting on knee */}
+          <circle cx="53" cy="97" r="5" fill="#c0392b"/>
+          <circle cx="11" cy="101" r="5" fill="#1565c0"/>
+          {/* Head — bowed down in grief */}
+          <ellipse cx="30" cy="54" rx="13" ry="14" fill="#c0392b" transform="rotate(12 30 54)"/>
+          {/* Web lines on mask */}
+          {[200,220,240,260,280].map((deg,i)=>{
+            const r=deg*Math.PI/180;
+            return <line key={i} x1="30" y1="54" x2={30+16*Math.cos(r)} y2={54+16*Math.sin(r)}
+              stroke="#8b0000" strokeWidth="0.6" opacity="0.5"/>;
           })}
-          <ellipse cx="30" cy="43" rx="5" ry="6" fill="none" stroke="#b71c1c" strokeWidth="0.4" opacity="0.4"/>
-          <ellipse cx="30" cy="43" rx="9" ry="10" fill="none" stroke="#b71c1c" strokeWidth="0.4" opacity="0.3"/>
-          {/* Eyes */}
-          <ellipse cx="26.5" cy="40" rx="3.5" ry="4" fill="white" transform="rotate(-10 26.5 40)"/>
-          <ellipse cx="33.5" cy="40" rx="3.5" ry="4" fill="white" transform="rotate(10 33.5 40)"/>
-          <ellipse cx="26.5" cy="40" rx="2" ry="2.5" fill="#b0bec5" opacity="0.5" transform="rotate(-10 26.5 40)"/>
-          <ellipse cx="33.5" cy="40" rx="2" ry="2.5" fill="#b0bec5" opacity="0.5" transform="rotate(10 33.5 40)"/>
-          {/* Body */}
-          <ellipse cx="30" cy="68" rx="9" ry="13" fill="#1565c0"/>
-          <ellipse cx="30" cy="63" rx="6" ry="5" fill="#e53935"/>
-          {/* Arms — spread out (hanging) */}
-          <path d="M 22,62 C 14,58 10,54 8,50" fill="none" stroke="#1565c0" strokeWidth="5" strokeLinecap="round"/>
-          <path d="M 38,62 C 46,58 50,54 52,50" fill="none" stroke="#1565c0" strokeWidth="5" strokeLinecap="round"/>
-          {/* Legs dangling down */}
-          <path d="M 25,79 C 22,90 20,100 18,110" fill="none" stroke="#1565c0" strokeWidth="6" strokeLinecap="round"/>
-          <path d="M 35,79 C 38,90 40,100 42,110" fill="none" stroke="#1565c0" strokeWidth="6" strokeLinecap="round"/>
-          {/* Feet */}
-          <ellipse cx="16" cy="112" rx="5" ry="3" fill="#e53935" transform="rotate(15 16 112)"/>
-          <ellipse cx="44" cy="112" rx="5" ry="3" fill="#e53935" transform="rotate(-15 44 112)"/>
+          <ellipse cx="30" cy="54" rx="6" ry="7" fill="none" stroke="#8b0000" strokeWidth="0.5" opacity="0.4"/>
+          <ellipse cx="30" cy="54" rx="11" ry="12" fill="none" stroke="#8b0000" strokeWidth="0.5" opacity="0.3"/>
+          {/* One visible eye — half-lidded with grief */}
+          <path d="M 24,49 C 26,44 30,43 33,46" fill="white" stroke="none"/>
+          <ellipse cx="28.5" cy="47" rx="3" ry="2.5" fill="white" opacity="0.9"/>
+          <ellipse cx="28.5" cy="47.5" rx="1.5" ry="1.2" fill="#b0bec5" opacity="0.5"/>
         </svg>
 
         {/* Paper grain */}
@@ -1272,7 +1319,8 @@ type SettingsSection = 'appearance' | 'ai' | 'chat' | 'data' | 'about';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// T-SPORTS BROWSER — live + historical sports scores via AI web search
+// ─────────────────────────────────────────────────────────────────────────────
+// TESSA SPORTS — live scores browser with real-time search suggestions
 // ─────────────────────────────────────────────────────────────────────────────
 type SportTab = 'cricket' | 'football' | 'tennis' | 'f1' | 'basketball' | 'other';
 const SPORT_TABS: { id: SportTab; emoji: string; label: string }[] = [
@@ -1283,49 +1331,130 @@ const SPORT_TABS: { id: SportTab; emoji: string; label: string }[] = [
   { id: 'basketball', emoji: '🏀', label: 'Basketball' },
   { id: 'other',      emoji: '🏆', label: 'More'       },
 ];
-const SPORT_QUERIES: Record<SportTab, string[]> = {
-  cricket:    ['Live cricket score today', 'Recent IPL/Test match scorecard', 'Today\'s cricket match result'],
-  football:   ['Live football scores today', 'Premier League / La Liga latest results', 'UEFA Champions League score'],
-  tennis:     ['ATP WTA live tennis scores', 'Latest tennis match results today', 'Grand Slam current score'],
-  f1:         ['Formula 1 race result today', 'Latest F1 qualifying / race standings', 'F1 championship standings 2025'],
-  basketball: ['NBA live scores today', 'Latest NBA game results', 'NBA standings 2025'],
-  other:      ['Live sports scores today', 'Latest sports results worldwide', 'Today\'s major sports events'],
+
+// Suggestions per tab — shown as you type each word
+const SPORT_SUGGESTIONS: Record<SportTab, string[]> = {
+  cricket: [
+    'India vs Australia live score', 'IPL 2025 today match score',
+    'England vs Pakistan Test scorecard', 'ICC World Cup live score',
+    'India vs England ODI scorecard', 'IPL points table 2025',
+    'MI vs CSK score today', 'RCB vs DC live', 'T20 World Cup score',
+    'Test match day 2 scorecard', 'India batting score now',
+    'Pakistan vs New Zealand live', 'Virat Kohli score today',
+    'Champions Trophy 2025 score', 'ODI series score',
+  ],
+  football: [
+    'Premier League scores today', 'Man City vs Arsenal score',
+    'Champions League live score', 'La Liga scores this week',
+    'Barcelona vs Real Madrid score', 'Liverpool score today',
+    'Serie A results today', 'Bundesliga live score',
+    'Chelsea vs Tottenham score', 'Europa League results',
+    'FIFA World Cup qualifier score', 'Ligue 1 scores today',
+    'Man United latest score', 'Arsenal vs Chelsea live',
+  ],
+  tennis: [
+    'Wimbledon 2025 live score', 'US Open live score today',
+    'French Open results today', 'Australian Open scores',
+    'Djokovic match score today', 'Alcaraz vs Sinner score',
+    'ATP live scores today', 'WTA live scores now',
+    'Roland Garros 2025 results', 'Indian Wells scores today',
+    'Federer match today', 'Nadal vs Djokovic score',
+    'Wimbledon final score', 'Davis Cup live score',
+  ],
+  f1: [
+    'F1 race live score today', 'Monaco GP 2025 result',
+    'Max Verstappen race result', 'F1 championship standings 2025',
+    'Lewis Hamilton race today', 'British GP 2025 result',
+    'F1 qualifying results today', 'Ferrari race result today',
+    'Japanese GP 2025 score', 'F1 race winner today',
+    'Red Bull F1 result', 'McLaren race score today',
+    'F1 Singapore GP result', 'Sprint race F1 result',
+  ],
+  basketball: [
+    'NBA live scores today', 'NBA finals 2025 score',
+    'Lakers vs Warriors score', 'LeBron James game score today',
+    'Stephen Curry points today', 'NBA playoffs live score',
+    'Celtics vs Heat score', 'NBA standings 2025',
+    'NBA game results last night', 'Bulls vs Knicks score',
+    'Giannis game score today', 'Eastern Conference standings',
+    'Western Conference standings', 'NBA MVP 2025',
+  ],
+  other: [
+    'Olympic Games 2025 results', 'Hockey World Cup score',
+    'Badminton world championship', 'Boxing match result today',
+    'UFC fight result today', 'Golf Masters 2025 score',
+    'Swimming World Championship', 'Athletics World Cup result',
+    'Kabaddi Pro League score', 'Wrestling championship result',
+    'Table tennis world championship', 'Volleyball World Cup score',
+    'Cycling Tour de France score', 'Snooker World Championship',
+  ],
 };
 
+const SPORTS_SYSTEM = `You are Tessa Sports — a live sports score assistant. 
+CRITICAL: Use web search to get REAL current data. NEVER invent or guess scores.
+
+OUTPUT FORMAT — scores only, no headlines, no fluff:
+═══════════════════════
+🏏 IND vs AUS — 3rd ODI
+📍 Wankhede Stadium  📅 Feb 28
+━━━━━━━━━━━━━━━━━━━━━
+🇮🇳 India    : 287/6 (48.2 ov)  ✅ Batting
+🇦🇺 Australia: 245/8 (50 ov)    ✅ Bowled out
+━━━━━━━━━━━━━━━━━━━━━
+📊 India leads by 42 runs | 10 balls left
+🏆 Result: India won by 42 runs
+Top bat: Rohit 87(64) | Top bowl: Bumrah 3/28
+═══════════════════════
+
+Rules:
+- Always use this box format with separators
+- Show BOTH teams' scores with flags/emojis
+- Show overs, wickets, top performers
+- For LIVE: show current over and required rate
+- For completed: show result and Man of Match
+- For upcoming: show fixture date/time + recent form
+- Multiple matches: use separate boxes
+- If truly no data found: say "No live data found — match may not have started"`;
+
 function SportsBrowser({ glow, isLight, hidden }: { glow: string; isLight: boolean; hidden?: boolean }) {
-  const [open,     setOpen]     = useState(false);
-  const [tab,      setTab]      = useState<SportTab>('cricket');
-  const [query,    setQuery]    = useState('');
-  const [results,  setResults]  = useState('');
-  const [loading,  setLoading]  = useState(false);
-  const [pos,      setPos]      = useState<{x:number;y:number}|null>(null);
-  const dragging   = useRef(false);
-  const dragStart  = useRef({mx:0,my:0,px:0,py:0});
-  const panelRef   = useRef<HTMLDivElement>(null);
-  const inputRef   = useRef<HTMLInputElement>(null);
+  const [open,        setOpen]        = useState(false);
+  const [tab,         setTab]         = useState<SportTab>('cricket');
+  const [query,       setQuery]       = useState('');
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSug,     setShowSug]     = useState(false);
+  const [results,     setResults]     = useState('');
+  const [loading,     setLoading]     = useState(false);
+  const [pos,         setPos]         = useState<{x:number;y:number}|null>(null);
+  const dragging  = useRef(false);
+  const dragStart = useRef({mx:0,my:0,px:0,py:0});
+  const panelRef  = useRef<HTMLDivElement>(null);
+  const inputRef  = useRef<HTMLInputElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>|null>(null);
 
-  const bg   = isLight ? '#ffffff' : '#0d0f1e';
-  const text = isLight ? '#1e293b' : '#e2e8f0';
-  const sub  = isLight ? '#64748b' : '#94a3b8';
-  const border = isLight ? `${glow}25` : `${glow}30`;
-  const tabBg  = isLight ? '#f8fafc' : '#111827';
+  const bg     = isLight ? '#ffffff'  : '#0d0f1e';
+  const hdrBg  = isLight ? '#f8fafc'  : '#111827';
+  const text   = isLight ? '#1e293b'  : '#e2e8f0';
+  const sub    = isLight ? '#64748b'  : '#94a3b8';
+  const brd    = isLight ? `${glow}28` : `${glow}35`;
+  const inpBg  = isLight ? '#f1f5f9'  : '#1e293b';
+  const sugBg  = isLight ? '#ffffff'  : '#1a2235';
 
-  // GPU-drag
+  // GPU-accelerated drag — direct DOM mutation
   const onDragStart = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest('button,input')) return;
     dragging.current = true;
     dragStart.current = {
       mx: e.clientX, my: e.clientY,
-      px: pos?.x ?? Math.max(8, window.innerWidth  - 400),
-      py: pos?.y ?? Math.max(8, window.innerHeight - 560),
+      px: pos?.x ?? Math.max(8, window.innerWidth  - 408),
+      py: pos?.y ?? Math.max(8, window.innerHeight - 570),
     };
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     if (panelRef.current) panelRef.current.style.transition = 'none';
   };
   const onDragMove = (e: React.PointerEvent) => {
     if (!dragging.current || !panelRef.current) return;
-    const nx = Math.max(8, Math.min(window.innerWidth  - 384, dragStart.current.px + e.clientX - dragStart.current.mx));
-    const ny = Math.max(8, Math.min(window.innerHeight - 520, dragStart.current.py + e.clientY - dragStart.current.my));
+    const nx = Math.max(8, Math.min(window.innerWidth  - 392, dragStart.current.px + e.clientX - dragStart.current.mx));
+    const ny = Math.max(8, Math.min(window.innerHeight - 555, dragStart.current.py + e.clientY - dragStart.current.my));
     panelRef.current.style.left   = `${nx}px`;
     panelRef.current.style.top    = `${ny}px`;
     panelRef.current.style.bottom = 'unset';
@@ -1334,67 +1463,85 @@ function SportsBrowser({ glow, isLight, hidden }: { glow: string; isLight: boole
   const onDragEnd = (e: React.PointerEvent) => {
     if (!dragging.current) return;
     dragging.current = false;
-    const nx = Math.max(8, Math.min(window.innerWidth  - 384, dragStart.current.px + e.clientX - dragStart.current.mx));
-    const ny = Math.max(8, Math.min(window.innerHeight - 520, dragStart.current.py + e.clientY - dragStart.current.my));
+    const nx = Math.max(8, Math.min(window.innerWidth  - 392, dragStart.current.px + e.clientX - dragStart.current.mx));
+    const ny = Math.max(8, Math.min(window.innerHeight - 555, dragStart.current.py + e.clientY - dragStart.current.my));
     setPos({ x: nx, y: ny });
     if (panelRef.current) panelRef.current.style.transition = '';
   };
 
+  // Filter suggestions live as user types — every word triggers new suggestions
+  const onQueryChange = (val: string) => {
+    setQuery(val);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (val.trim().length < 2) { setSuggestions([]); setShowSug(false); return; }
+    const lower = val.toLowerCase();
+    const all = SPORT_SUGGESTIONS[tab];
+    const filtered = all.filter(s => {
+      // Match every typed word somewhere in the suggestion
+      const words = lower.split(/\s+/).filter(Boolean);
+      return words.every(w => s.toLowerCase().includes(w));
+    }).slice(0, 7);
+    setSuggestions(filtered);
+    setShowSug(filtered.length > 0);
+    // Auto-search after 900ms of no typing
+    debounceRef.current = setTimeout(() => {
+      if (val.trim().length > 4) search(val);
+    }, 900);
+  };
+
   const search = async (q: string) => {
-    if (!q.trim() || loading) return;
+    const clean = q.trim();
+    if (!clean || loading) return;
+    setShowSug(false);
     setLoading(true);
     setResults('');
     try {
       const res = await fetch('/api/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [{ role: 'user', content: q }],
-          isCreatorMode: false,
-          maxTokens: 500,
-          _systemOverride: `You are T-Sports, a live sports information assistant inside Tessa AI.
-Use web search to find the LATEST scores, results, and standings.
-Format responses clearly:
-- Use match scores like: Team A 245/6 (45 ov) vs Team B 210/8 (40 ov) — Team A leads
-- Bold team/player names with **name**
-- Show time/date of match when available
-- For live matches, show current score and status
-- For completed matches, show final score and result
-- Keep it clean, scannable, no long paragraphs
-- If no live match, show most recent result + next upcoming fixture
-Always search the web for real-time data. Never guess scores.`,
+          messages: [{ role: 'user', content: `Get live/latest scores for: ${clean}` }],
+          isCreatorMode: false, maxTokens: 600,
+          _systemOverride: SPORTS_SYSTEM,
           useWebSearch: true,
         }),
       });
       const data = await res.json();
-      setResults(data.content || 'No results found. Try a more specific query.');
+      setResults(data.content || 'No data found — try a different search.');
     } catch {
-      setResults('Network error — check your connection and try again.');
+      setResults('Connection error. Check your internet and try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const quickSearch = (q: string) => { setQuery(q); search(q); };
+  const pickSuggestion = (s: string) => {
+    setQuery(s); setSuggestions([]); setShowSug(false);
+    search(s);
+  };
+
+  const switchTab = (t: SportTab) => {
+    setTab(t); setResults(''); setQuery(''); setSuggestions([]); setShowSug(false);
+  };
 
   const panelStyle: React.CSSProperties = pos
-    ? { position: 'fixed', left: pos.x, top: pos.y, zIndex: 58 }
-    : { position: 'fixed', bottom: 168, right: 72, zIndex: 58 };
+    ? { position:'fixed', left:pos.x, top:pos.y, zIndex:58 }
+    : { position:'fixed', bottom:168, right:72, zIndex:58 };
 
   if (hidden) return null;
 
   return (
     <>
-      {/* FAB */}
+      {/* FAB button */}
       <button
         onClick={() => setOpen(p => !p)}
-        className="fixed z-[59] w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all active:scale-90"
+        className="fixed z-[59] w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all active:scale-90 hover:scale-105"
         style={{
           bottom: 88, right: 68,
-          background: open ? glow : `linear-gradient(135deg,${glow},${glow}cc)`,
+          background: `linear-gradient(135deg,${glow},${glow}cc)`,
           boxShadow: `0 4px 20px ${glow}50`,
           border: `1.5px solid ${glow}60`,
         }}
-        title="T-Sports Browser"
+        title="Tessa Sports"
       >
         {open ? <X size={18} className="text-white"/> : <Trophy size={18} className="text-white"/>}
       </button>
@@ -1402,13 +1549,13 @@ Always search the web for real-time data. Never guess scores.`,
       {open && (
         <div ref={panelRef} style={{
           ...panelStyle,
-          width: 'min(380px, calc(100vw - 16px))',
-          height: 510,
+          width: 'min(390px, calc(100vw - 16px))',
+          height: 545,
           background: bg,
-          border: `1px solid ${border}`,
-          boxShadow: `0 8px 40px rgba(0,0,0,0.3), 0 0 0 1px ${glow}12`,
-          borderRadius: 20,
-          overflow: 'hidden',
+          border: `1px solid ${brd}`,
+          boxShadow: `0 12px 48px rgba(0,0,0,0.35), 0 0 0 1px ${glow}10`,
+          borderRadius: 22,
+          overflow: 'visible',
           display: 'flex',
           flexDirection: 'column',
           animation: 'slideUpSheet 0.22s cubic-bezier(0.32,0.72,0,1)',
@@ -1418,129 +1565,221 @@ Always search the web for real-time data. Never guess scores.`,
           onPointerDown={onDragStart} onPointerMove={onDragMove}
           onPointerUp={onDragEnd}    onPointerCancel={onDragEnd}
         >
-          {/* Header drag handle */}
-          <div style={{ flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between',
-            padding:'10px 14px 8px', borderBottom:`1px solid ${border}`,
-            background:`linear-gradient(135deg,${glow}10,${glow}04)`, cursor:'grab' }}>
-            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-              <div style={{ width:30, height:30, borderRadius:10, background:glow,
-                display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <Trophy size={14} className="text-white"/>
+          {/* ── Browser chrome header — drag to move ── */}
+          <div style={{
+            flexShrink:0, borderRadius:'22px 22px 0 0', overflow:'hidden',
+            background: `linear-gradient(135deg,${glow}18,${glow}08)`,
+            borderBottom:`1px solid ${brd}`, cursor:'grab',
+          }}>
+            {/* Title bar */}
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
+              padding:'11px 14px 8px' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:9 }}>
+                {/* Browser icon */}
+                <div style={{ width:32, height:32, borderRadius:11,
+                  background:`linear-gradient(135deg,${glow},${glow}bb)`,
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  boxShadow:`0 2px 8px ${glow}40` }}>
+                  <Trophy size={15} className="text-white"/>
+                </div>
+                <div>
+                  <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+                    <p style={{ fontSize:14, fontWeight:900, color:glow, margin:0,
+                      letterSpacing:'-0.02em', lineHeight:1.2 }}>Tessa Sports</p>
+                    {/* Live badge */}
+                    <span style={{ fontSize:8, fontWeight:700, color:'#22c55e',
+                      background:'#22c55e18', border:'1px solid #22c55e40',
+                      padding:'1px 5px', borderRadius:4, letterSpacing:'0.05em' }}>● LIVE</span>
+                  </div>
+                  <p style={{ fontSize:9, color:sub, margin:0 }}>Scores · Fixtures · Standings</p>
+                </div>
               </div>
-              <div>
-                <p style={{ fontSize:13, fontWeight:800, color:glow, margin:0, lineHeight:1.2 }}>T-Sports</p>
-                <p style={{ fontSize:9, color:sub, margin:0 }}>Live scores · Results · Standings</p>
+              {/* Window controls */}
+              <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                <div style={{ width:10, height:10, borderRadius:'50%', background:'#fbbf24', cursor:'pointer' }}/>
+                <div style={{ width:10, height:10, borderRadius:'50%', background:'#34d399', cursor:'pointer' }}/>
+                <button onClick={() => setOpen(false)}
+                  style={{ width:18, height:18, borderRadius:'50%', background:'#ef4444',
+                    border:'none', cursor:'pointer', display:'flex', alignItems:'center',
+                    justifyContent:'center', marginLeft:2 }}>
+                  <X size={9} className="text-white"/>
+                </button>
               </div>
             </div>
-            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-              <div style={{ width:7, height:7, borderRadius:'50%', background:'#22c55e',
-                boxShadow:'0 0 6px #22c55e', animation:'pulse 2s infinite' }} title="Live data"/>
-              <button onClick={() => setOpen(false)}
-                style={{ background:'none', border:'none', cursor:'pointer', padding:4 }}>
-                <X size={14} style={{ color:sub }}/>
-              </button>
+            {/* Sport tabs — pill style */}
+            <div style={{ display:'flex', gap:3, padding:'0 12px 10px',
+              overflowX:'auto', scrollbarWidth:'none' }}>
+              {SPORT_TABS.map(s => (
+                <button key={s.id} onClick={() => switchTab(s.id)}
+                  style={{
+                    flexShrink:0, padding:'5px 11px', borderRadius:20,
+                    fontSize:11, fontWeight:600, cursor:'pointer',
+                    border: tab===s.id ? `1px solid ${glow}60` : `1px solid ${brd}`,
+                    background: tab===s.id ? glow : 'transparent',
+                    color: tab===s.id ? 'white' : sub,
+                    transition:'all 0.15s', whiteSpace:'nowrap',
+                  }}>
+                  {s.emoji} {s.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Sport tabs */}
-          <div style={{ flexShrink:0, display:'flex', overflowX:'auto', gap:4, padding:'8px 12px 6px',
-            borderBottom:`1px solid ${border}`, background:tabBg,
-            scrollbarWidth:'none', msOverflowStyle:'none' }}>
-            {SPORT_TABS.map(s => (
-              <button key={s.id} onClick={() => { setTab(s.id); setResults(''); setQuery(''); }}
-                style={{
-                  flexShrink:0, display:'flex', alignItems:'center', gap:4,
-                  padding:'5px 10px', borderRadius:10, fontSize:11, fontWeight:600,
-                  border: tab===s.id ? `1px solid ${glow}50` : `1px solid transparent`,
-                  background: tab===s.id ? `${glow}18` : 'transparent',
-                  color: tab===s.id ? glow : sub,
-                  cursor:'pointer', whiteSpace:'nowrap',
-                }}>
-                {s.emoji} {s.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Quick search chips */}
-          <div style={{ flexShrink:0, display:'flex', gap:6, padding:'8px 12px 4px',
-            overflowX:'auto', scrollbarWidth:'none' }}>
-            {SPORT_QUERIES[tab].map((q,i) => (
-              <button key={i} onClick={() => quickSearch(q)}
-                style={{
-                  flexShrink:0, padding:'4px 10px', borderRadius:8, fontSize:10, fontWeight:500,
-                  border:`1px solid ${border}`, background:'transparent', color:sub,
-                  cursor:'pointer', whiteSpace:'nowrap',
-                  transition:'all 0.15s',
-                }}
-                onMouseEnter={e=>(e.currentTarget.style.background=`${glow}12`)}
-                onMouseLeave={e=>(e.currentTarget.style.background='transparent')}
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-
-          {/* Results area */}
+          {/* ── Results area ── */}
           <div style={{ flex:1, overflowY:'auto', padding:'10px 14px',
-            scrollbarWidth:'thin', scrollbarColor:`${glow}40 transparent` }}>
+            scrollbarWidth:'thin', scrollbarColor:`${glow}40 transparent`,
+            borderRadius:'0', minHeight:0, overflowX:'hidden' }}>
             {loading ? (
               <div style={{ display:'flex', flexDirection:'column', alignItems:'center',
-                justifyContent:'center', height:'100%', gap:10 }}>
-                <div style={{ width:28, height:28, borderRadius:'50%',
-                  border:`3px solid ${glow}30`, borderTopColor:glow,
-                  animation:'spin 0.8s linear infinite' }}/>
-                <p style={{ fontSize:11, color:sub }}>Fetching live data…</p>
+                justifyContent:'center', height:'100%', gap:12 }}>
+                <div style={{ position:'relative', width:44, height:44 }}>
+                  <div style={{ position:'absolute', inset:0, borderRadius:'50%',
+                    border:`3px solid ${glow}20`, borderTopColor:glow,
+                    animation:'spin 0.75s linear infinite' }}/>
+                  <div style={{ position:'absolute', inset:6, borderRadius:'50%',
+                    border:`2px solid ${glow}15`, borderTopColor:`${glow}80`,
+                    animation:'spin 1.2s linear infinite reverse' }}/>
+                </div>
+                <p style={{ fontSize:11, color:sub, margin:0 }}>Fetching live scores…</p>
+                <p style={{ fontSize:10, color:sub, margin:0, opacity:0.6 }}>Searching the web</p>
               </div>
             ) : results ? (
-              <div style={{ fontSize:12, color:text, lineHeight:1.65, whiteSpace:'pre-wrap',
-                userSelect:'text' }}>
-                {results.split('\n').map((line,i) => {
-                  const bold = line.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-                  return <p key={i} style={{ margin:'0 0 4px',
-                    fontWeight: line.startsWith('##')||line.startsWith('**') ? 700 : 400,
-                    color: line.startsWith('#') ? glow : text,
-                    fontSize: line.startsWith('##') ? 13 : 12,
-                  }} dangerouslySetInnerHTML={{ __html: bold.replace(/^#+\s*/,'') }}/>;
+              <div style={{ fontFamily:'monospace', fontSize:11.5, color:text, lineHeight:1.7,
+                whiteSpace:'pre-wrap', userSelect:'text' }}>
+                {results.split('\n').map((line, i) => {
+                  // Colour-code different line types
+                  const isHeader   = /═+/.test(line);
+                  const isSep      = /━+/.test(line);
+                  const isScore    = /\d+\/\d+/.test(line) || /\d{2,}:\d{2}/.test(line);
+                  const isResult   = line.includes('🏆') || line.includes('Result');
+                  const isEmpty    = line.trim() === '';
+                  return (
+                    <p key={i} style={{
+                      margin: isEmpty ? '6px 0' : '0',
+                      color: isHeader   ? glow
+                           : isSep      ? `${glow}60`
+                           : isResult   ? '#22c55e'
+                           : isScore    ? text
+                           : sub,
+                      fontWeight: isHeader||isResult ? 700 : 400,
+                      fontSize: isHeader ? 11 : 11.5,
+                    }}>{line}</p>
+                  );
                 })}
               </div>
             ) : (
               <div style={{ display:'flex', flexDirection:'column', alignItems:'center',
-                justifyContent:'center', height:'100%', gap:8, opacity:0.5 }}>
-                <Trophy size={32} style={{ color:glow }}/>
-                <p style={{ fontSize:12, color:sub, textAlign:'center' }}>
-                  Pick a quick search above<br/>or type your own query below
+                justifyContent:'center', height:'100%', gap:10, opacity:0.55 }}>
+                <Trophy size={36} style={{ color:glow }}/>
+                <p style={{ fontSize:13, fontWeight:700, color:text, margin:0 }}>
+                  {SPORT_TABS.find(s=>s.id===tab)?.emoji} {SPORT_TABS.find(s=>s.id===tab)?.label} Scores
                 </p>
+                <p style={{ fontSize:11, color:sub, textAlign:'center', margin:0, lineHeight:1.6 }}>
+                  Type a search below or tap a suggestion
+                </p>
+                {/* Quick suggestions on empty state */}
+                <div style={{ display:'flex', flexWrap:'wrap', gap:5, justifyContent:'center',
+                  marginTop:4, maxWidth:280 }}>
+                  {SPORT_SUGGESTIONS[tab].slice(0,4).map((s,i)=>(
+                    <button key={i} onClick={() => pickSuggestion(s)}
+                      style={{ padding:'5px 10px', borderRadius:8, fontSize:10,
+                        border:`1px solid ${brd}`, background:`${glow}0a`,
+                        color:sub, cursor:'pointer' }}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
-          {/* Search input */}
-          <div style={{ flexShrink:0, display:'flex', gap:8, padding:'10px 12px',
-            borderTop:`1px solid ${border}`, background: isLight?'#f8fafc':bg }}>
-            <input ref={inputRef} value={query} onChange={e=>setQuery(e.target.value)}
-              onKeyDown={e=>{ if(e.key==='Enter') search(query); e.stopPropagation(); }}
-              placeholder={`Search ${SPORT_TABS.find(s=>s.id===tab)?.label} scores…`}
-              style={{
-                flex:1, padding:'8px 12px', borderRadius:10, fontSize:12,
-                border:`1px solid ${border}`, background:isLight?'white':'#1e293b',
-                color:text, outline:'none',
-              }}/>
-            <button onClick={() => search(query)}
-              style={{
-                width:36, height:36, borderRadius:10, border:'none', cursor:'pointer',
-                background:glow, display:'flex', alignItems:'center', justifyContent:'center',
-                flexShrink:0, transition:'opacity 0.15s', opacity: loading?0.5:1,
+          {/* ── Search bar with live suggestions ── */}
+          <div style={{ flexShrink:0, borderTop:`1px solid ${brd}`,
+            borderRadius:'0 0 22px 22px', background:hdrBg,
+            padding:'10px 12px', position:'relative' }}>
+
+            {/* Suggestions dropdown — floats ABOVE the input */}
+            {showSug && suggestions.length > 0 && (
+              <div style={{
+                position:'absolute', left:12, right:12,
+                bottom:'calc(100% - 2px)',
+                background: sugBg,
+                border:`1px solid ${brd}`,
+                borderRadius:'12px 12px 0 0',
+                overflow:'hidden',
+                boxShadow:`0 -8px 24px rgba(0,0,0,0.15)`,
+                zIndex: 10,
               }}>
-              {loading
-                ? <RefreshCw size={14} className="text-white" style={{ animation:'spin 0.8s linear infinite' }}/>
-                : <Radio size={14} className="text-white"/>}
-            </button>
+                {suggestions.map((s, i) => (
+                  <button key={i} onClick={() => pickSuggestion(s)}
+                    style={{
+                      display:'block', width:'100%', textAlign:'left',
+                      padding:'8px 13px', fontSize:11.5, color:text,
+                      background:'transparent', border:'none',
+                      borderBottom: i < suggestions.length-1 ? `1px solid ${brd}` : 'none',
+                      cursor:'pointer', transition:'background 0.1s',
+                    }}
+                    onMouseEnter={e=>(e.currentTarget.style.background=`${glow}10`)}
+                    onMouseLeave={e=>(e.currentTarget.style.background='transparent')}
+                  >
+                    <span style={{ marginRight:7, opacity:0.6 }}>
+                      {SPORT_TABS.find(t=>t.id===tab)?.emoji}
+                    </span>
+                    {/* Highlight matched text */}
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div style={{ display:'flex', gap:7, alignItems:'center' }}>
+              <div style={{ flex:1, position:'relative' }}>
+                <input
+                  ref={inputRef}
+                  value={query}
+                  onChange={e => onQueryChange(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') { search(query); setShowSug(false); }
+                    if (e.key === 'Escape') setShowSug(false);
+                    e.stopPropagation();
+                  }}
+                  onFocus={() => query.length > 1 && setShowSug(suggestions.length > 0)}
+                  placeholder={`Search ${SPORT_TABS.find(s=>s.id===tab)?.label} scores…`}
+                  style={{
+                    width:'100%', padding:'9px 12px', borderRadius:11,
+                    fontSize:12, border:`1.5px solid ${brd}`,
+                    background:inpBg, color:text, outline:'none',
+                    boxSizing:'border-box',
+                    transition:'border-color 0.2s',
+                  }}
+                  onFocusCapture={e=>(e.currentTarget.style.borderColor=glow)}
+                  onBlurCapture={e=>{
+                    e.currentTarget.style.borderColor=brd;
+                    setTimeout(()=>setShowSug(false), 180);
+                  }}
+                />
+              </div>
+              <button onClick={() => search(query)}
+                style={{
+                  width:38, height:38, borderRadius:11, border:'none',
+                  background: loading ? `${glow}50` : glow,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  flexShrink:0, transition:'all 0.15s',
+                  boxShadow:`0 2px 8px ${glow}40`,
+                }}>
+                {loading
+                  ? <RefreshCw size={15} className="text-white" style={{ animation:'spin 0.8s linear infinite' }}/>
+                  : <Radio size={15} className="text-white"/>}
+              </button>
+            </div>
           </div>
         </div>
       )}
     </>
   );
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN COMPONENT

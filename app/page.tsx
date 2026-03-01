@@ -455,9 +455,12 @@ function lsGetJson<T>(k: string, fb: T): T {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CREATOR SYNC  ·  One Supabase row per user keeps all creator data live
-// Table DDL is in creator_sync_migration.sql — run it once in Supabase SQL editor
+// CREATOR SYNC  ·  Universal sync — independent of email/account
+// Uses a fixed CREATOR_SYNC_ID so ALL devices that unlock creator mode stay in sync
+// No login required — the secret IS the authentication
 // ─────────────────────────────────────────────────────────────────────────────
+const CREATOR_SYNC_ID = 'ankit-tessa-creator-v1'; // fixed universal ID
+
 function buildCreatorPayload() {
   return {
     health:      lsGetJson('tessa-health',   null),
@@ -470,18 +473,18 @@ function buildCreatorPayload() {
     last_active: new Date().toISOString(),
   };
 }
-async function pushCreatorSync(userId: string): Promise<void> {
+async function pushCreatorSync(_userId?: string): Promise<void> {
   try {
     await supabase.from('creator_sync').upsert(
-      { user_id: userId, payload: buildCreatorPayload(), updated_at: new Date().toISOString() },
+      { user_id: CREATOR_SYNC_ID, payload: buildCreatorPayload(), updated_at: new Date().toISOString() },
       { onConflict: 'user_id' }
     );
   } catch {}
 }
-async function pullCreatorSync(userId: string): Promise<boolean> {
+async function pullCreatorSync(_userId?: string): Promise<boolean> {
   try {
     const { data, error } = await supabase
-      .from('creator_sync').select('payload,updated_at').eq('user_id', userId).single();
+      .from('creator_sync').select('payload,updated_at').eq('user_id', CREATOR_SYNC_ID).single();
     if (error || !data?.payload) return false;
     const p   = data.payload as Record<string, any>;
     const rem = new Date(data.updated_at).getTime();
@@ -963,7 +966,7 @@ function estimateHP(text: string): { calories: number; water: number; items: str
   return { calories, water, items };
 }
 
-function HealthPulse({ glow, isLight, hidden, onSync }: { glow: string; isLight: boolean; hidden?: boolean; onSync?: () => void }) {
+function HealthPulse({ glow, isLight, hidden, onSync, inDock }: { glow: string; isLight: boolean; hidden?: boolean; onSync?: () => void; inDock?: boolean }) {
   const [open,    setOpen]    = useState(false);
   const [msgs,    setMsgs]    = useState<HPMsg[]>([]);
   const [input,   setInput]   = useState('');
@@ -1148,12 +1151,13 @@ STRICT: Be short. No fluff. Non-health topics: "Use main Tessa chat for that!"`;
 
   return (
     <>
-      {/* ── FAB — always fixed bottom-right ── */}
+      {/* ── FAB — dock-aware position ── */}
       <button
         onClick={() => setOpen(p => !p)}
-        className="fixed z-[60] w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all active:scale-90"
+        className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all active:scale-90"
         style={{
-          bottom: 88, right: 16,
+          position: inDock ? 'relative' : 'fixed',
+          ...(inDock ? {} : { bottom: 88, right: 16 }),
           background: open ? glow : `linear-gradient(135deg, ${glow}, ${glow}cc)`,
           boxShadow: `0 4px 20px ${glow}50`,
           border: `1.5px solid ${glow}60`,
@@ -1428,54 +1432,39 @@ const SPORT_SUGG: Record<SportTab, string[]> = {
   ],
 };
 
-const SPORTS_SYSTEM = `You are Tessa Sports — a real-time sports score assistant. Today is ${new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}.
+const SPORTS_SYSTEM = `You are Tessa Sports. Today is ${new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}.
 
-CRITICAL RULES:
-1. ALWAYS use web search to find CURRENT 2025-2026 data
-2. NEVER use old data — always verify with search first
-3. Format results EXACTLY like Cricbuzz scorecards — clean boxes
-
-FORMAT TEMPLATE (use this exact structure):
-┌─────────────────────────────┐
-│ 🏏 IND vs ENG · 2nd Test    │
-│ 📍 Lord's  · Day 3 Live     │
-├─────────────────────────────┤
-│ 🇮🇳 INDIA    472/6 (134 ov) │
-│ 🇬🇧 ENGLAND  289 & 45/2     │
-├─────────────────────────────┤
-│ 🟢 LIVE · India leads 138   │
-│ ⚡ Jaiswal 134* · Siraj 3/45│
-└─────────────────────────────┘
-
-For completed matches:
-┌─────────────────────────────┐
-│ ⚽ Man City vs Arsenal      │
-│ 📅 Feb 26, 2025 · EPL       │
-├─────────────────────────────┤
-│ 🔵 Man City   2             │
-│ 🔴 Arsenal    1             │
-├─────────────────────────────┤
-│ ✅ FT · Haaland 45', 67'    │
-│ 📊 Man City win · 3pts      │
-└─────────────────────────────┘
-
-For no live match:
-┌─────────────────────────────┐
-│ ℹ️ No live match right now   │
-│ 📅 Next: IND vs ENG Mar 2   │
-│ 🕐 10:00 AM IST             │
-└─────────────────────────────┘
+CRITICAL: Always use web search. Return ONLY a valid JSON array, no other text.
+Output format — array of match cards:
+[
+  {
+    "sport": "cricket",
+    "status": "live|completed|upcoming",
+    "title": "IND vs ENG · 3rd ODI",
+    "venue": "Wankhede Stadium, Mumbai",
+    "date": "Mar 1, 2026",
+    "team1": { "name": "India", "flag": "🇮🇳", "score": "287/6", "overs": "48.2", "batting": true },
+    "team2": { "name": "England", "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "score": "245/8", "overs": "50.0", "batting": false },
+    "summary": "India leads by 42 runs · 10 balls left",
+    "result": "India won by 42 runs",
+    "topBat": "Rohit 87(64)",
+    "topBowl": "Bumrah 3/28",
+    "innings": [
+      { "team": "India", "score": "287/6", "overs": "50", "batsmen": [{"name":"Rohit","runs":"87","balls":"64","fours":"9","sixes":"2","sr":"135.9"},{"name":"Shubman","runs":"64","balls":"71","fours":"6","sixes":"1","sr":"90.1"}], "bowlers": [{"name":"Archer","overs":"10","runs":"52","wickets":"2","econ":"5.2"},{"name":"Wood","overs":"10","runs":"61","wickets":"1","econ":"6.1"}] },
+      { "team": "England", "score": "245/8", "overs": "50", "batsmen": [{"name":"Root","runs":"72","balls":"88","fours":"7","sixes":"0","sr":"81.8"}], "bowlers": [{"name":"Bumrah","overs":"10","runs":"28","wickets":"3","econ":"2.8"},{"name":"Shami","overs":"10","runs":"45","wickets":"2","econ":"4.5"}] }
+    ]
+  }
+]
 
 RULES:
-- Always show BOTH teams with scores
-- Show venue and match type
-- Include top batsman/scorer/driver
-- For upcoming: show date + time IST
-- Multiple matches = multiple boxes
-- Use 🟢 for LIVE, ✅ for completed, 📅 for upcoming
-- Search with current year (2025 or 2026) in your query`;
+- status must be exactly "live", "completed", or "upcoming"
+- For upcoming: omit scores, add "time": "10:00 AM IST"
+- For football/tennis/F1: use goals/sets/points instead of cricket fields — keep same JSON structure but adapt
+- Include real innings data with at least 2 batsmen and 2 bowlers per innings when available
+- Return 1-4 matches maximum
+- ONLY return the JSON array, no markdown, no explanation`;
 
-function SportsBrowser({ glow, isLight, hidden }: { glow: string; isLight: boolean; hidden?: boolean }) {
+function SportsBrowser({ glow, isLight, hidden, inDock }: { glow: string; isLight: boolean; hidden?: boolean; inDock?: boolean }) {
   const [open,        setOpen]        = useState(false);
   const [tab,         setTab]         = useState<SportTab>('cricket');
   const [query,       setQuery]       = useState('');
@@ -1484,6 +1473,7 @@ function SportsBrowser({ glow, isLight, hidden }: { glow: string; isLight: boole
   const [results,     setResults]     = useState('');
   const [loading,     setLoading]     = useState(false);
   const [pos,         setPos]         = useState<{x:number;y:number}|null>(null);
+  const [expandedCard,setExpandedCard]= useState(-1);
   const dragging    = useRef(false);
   const dragStart   = useRef({mx:0,my:0,px:0,py:0});
   const panelRef    = useRef<HTMLDivElement>(null);
@@ -1567,31 +1557,220 @@ function SportsBrowser({ glow, isLight, hidden }: { glow: string; isLight: boole
   };
 
   const pick = (s: string) => { setQuery(s); setSuggestions([]); setShowSug(false); search(s); };
-  const switchTab = (t: SportTab) => { setTab(t); setResults(''); setQuery(''); setSuggestions([]); setShowSug(false); };
+  const switchTab = (t: SportTab) => {
+    setTab(t); setResults(''); setQuery(''); setSuggestions([]); setShowSug(false); setExpandedCard(-1);
+    // Auto-load major live/recent matches for this sport
+    const autoQ: Record<SportTab,string> = {
+      cricket: 'major cricket matches live and recent today 2026',
+      football: 'major football matches live and recent today 2026',
+      tennis: 'major tennis matches live and recent today 2026',
+      f1: 'latest Formula 1 race result and standings 2026',
+      basketball: 'NBA games live and recent today 2026',
+      other: 'major live sports scores today 2026',
+    };
+    setTimeout(() => search(autoQ[t]), 50);
+  };
 
-  // Parse and render score boxes (lines starting with box chars)
+  // Render structured score cards from JSON
   const renderResults = () => {
     if (!results) return null;
-    const lines = results.split('\n');
-    const boxLineStyle = (line: string): React.CSSProperties => {
-      if (line.includes('🟢') || line.includes('LIVE'))   return { color:'#22c55e', fontWeight:700 };
-      if (line.includes('✅') || line.includes('FT'))      return { color:'#60a5fa', fontWeight:600 };
-      if (line.includes('🏆') || line.includes('Result'))  return { color:'#fbbf24', fontWeight:700 };
-      if (line.startsWith('│') && /\d/.test(line))        return { color:text, fontWeight:600, fontSize:12.5 };
-      if (line.startsWith('├') || line.startsWith('└') || line.startsWith('┌')) return { color:sub };
-      return { color:text };
-    };
+    let matches: any[] = [];
+    try {
+      // Strip markdown fences if present
+      const clean = results.replace(/```json|```/g,'').trim();
+      const parsed = JSON.parse(clean);
+      matches = Array.isArray(parsed) ? parsed : [parsed];
+    } catch {
+      // Fallback: plain text display
+      return (
+        <div style={{ fontSize:12, color:text, lineHeight:1.7, whiteSpace:'pre-wrap', userSelect:'text', padding:'4px 0' }}>
+          {results}
+        </div>
+      );
+    }
+
+    const statusColor = (s:string) => s==='live' ? '#22c55e' : s==='completed' ? '#60a5fa' : '#f59e0b';
+    const statusLabel = (s:string) => s==='live' ? '🔴 LIVE' : s==='completed' ? '✅ Final' : '🕐 Upcoming';
+    const cardBg  = isLight ? '#f8fafc' : '#161b22';
+    const rowBg   = isLight ? '#f1f5f9' : '#1c2333';
+    const divCol  = isLight ? '#e2e8f0' : '#30363d';
+    const dimText = isLight ? '#64748b' : '#8b949e';
+    const boldText= isLight ? '#1e293b' : '#e6edf3';
+
     return (
-      <div style={{ fontFamily:"'Courier New',Courier,monospace", fontSize:11.5, lineHeight:1.7 }}>
-        {lines.map((line,i) => (
-          <div key={i} style={{ ...boxLineStyle(line), whiteSpace:'pre', userSelect:'text',
-            background: line.startsWith('│') && /[🟢✅🏆⚡📅]/.test(line) ? (isLight?'#f0fdf4':'#0d2818') : 'transparent',
-            borderRadius: line.startsWith('│') ? 4 : 0,
-            padding: line.startsWith('│') ? '0 4px' : 0,
-          }}>
-            {line || '\u00a0'}
-          </div>
-        ))}
+      <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+        {matches.map((m:any, mi:number) => {
+          const [showCard, setShowCard] = [expandedCard===mi, (v:boolean)=>setExpandedCard(v?mi:-1)];
+          return (
+            <div key={mi} style={{ background:cardBg, borderRadius:14, overflow:'hidden',
+              border:`1px solid ${divCol}`, boxShadow:`0 2px 8px rgba(0,0,0,0.08)` }}>
+
+              {/* Match header */}
+              <div style={{ background:`linear-gradient(135deg,${glow}14,${glow}06)`,
+                padding:'10px 13px 8px', borderBottom:`1px solid ${divCol}` }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+                  <div>
+                    <p style={{ fontSize:13, fontWeight:800, color:boldText, margin:0, lineHeight:1.3 }}>{m.title||'Match'}</p>
+                    <p style={{ fontSize:10, color:dimText, margin:'2px 0 0' }}>
+                      {m.venue && <span>📍 {m.venue}</span>}
+                      {m.date && <span style={{marginLeft:6}}>📅 {m.date}</span>}
+                    </p>
+                  </div>
+                  <span style={{ fontSize:10, fontWeight:700, color:statusColor(m.status),
+                    background:`${statusColor(m.status)}18`, border:`1px solid ${statusColor(m.status)}40`,
+                    padding:'3px 8px', borderRadius:6, flexShrink:0, marginLeft:8 }}>
+                    {statusLabel(m.status)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Score rows */}
+              <div style={{ padding:'10px 13px' }}>
+                {/* Team 1 */}
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
+                  padding:'8px 10px', borderRadius:10, marginBottom:6,
+                  background: m.team1?.batting ? `${glow}0e` : rowBg,
+                  border: m.team1?.batting ? `1px solid ${glow}30` : `1px solid transparent` }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                    <span style={{ fontSize:18, lineHeight:1 }}>{m.team1?.flag||'🏳'}</span>
+                    <div>
+                      <p style={{ fontSize:12, fontWeight:700, color:boldText, margin:0 }}>{m.team1?.name||'Team 1'}</p>
+                      {m.team1?.batting && <p style={{ fontSize:9, color:glow, margin:0, fontWeight:600 }}>● Batting</p>}
+                    </div>
+                  </div>
+                  <div style={{ textAlign:'right' }}>
+                    <p style={{ fontSize:16, fontWeight:900, color:boldText, margin:0, fontFamily:'monospace' }}>
+                      {m.team1?.score||m.status==='upcoming'?m.team1?.score||'—':'TBD'}
+                    </p>
+                    {m.team1?.overs && <p style={{ fontSize:10, color:dimText, margin:0 }}>({m.team1.overs} ov)</p>}
+                  </div>
+                </div>
+                {/* vs divider */}
+                <div style={{ display:'flex', alignItems:'center', gap:8, margin:'4px 0' }}>
+                  <div style={{ flex:1, height:1, background:divCol }}/>
+                  <span style={{ fontSize:10, color:dimText, fontWeight:700 }}>vs</span>
+                  <div style={{ flex:1, height:1, background:divCol }}/>
+                </div>
+                {/* Team 2 */}
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
+                  padding:'8px 10px', borderRadius:10, marginTop:6,
+                  background: m.team2?.batting ? `${glow}0e` : rowBg,
+                  border: m.team2?.batting ? `1px solid ${glow}30` : `1px solid transparent` }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                    <span style={{ fontSize:18, lineHeight:1 }}>{m.team2?.flag||'🏳'}</span>
+                    <div>
+                      <p style={{ fontSize:12, fontWeight:700, color:boldText, margin:0 }}>{m.team2?.name||'Team 2'}</p>
+                      {m.team2?.batting && <p style={{ fontSize:9, color:glow, margin:0, fontWeight:600 }}>● Batting</p>}
+                    </div>
+                  </div>
+                  <div style={{ textAlign:'right' }}>
+                    <p style={{ fontSize:16, fontWeight:900, color:boldText, margin:0, fontFamily:'monospace' }}>
+                      {m.team2?.score||m.status==='upcoming'?m.team2?.score||'—':'TBD'}
+                    </p>
+                    {m.team2?.overs && <p style={{ fontSize:10, color:dimText, margin:0 }}>({m.team2.overs} ov)</p>}
+                  </div>
+                </div>
+              </div>
+
+              {/* Summary / result bar */}
+              {(m.summary||m.result||m.time) && (
+                <div style={{ padding:'7px 13px', borderTop:`1px solid ${divCol}`,
+                  background: m.status==='live'?`#22c55e0a`:m.status==='completed'?`${glow}08`:`#f59e0b0a` }}>
+                  <p style={{ fontSize:11, fontWeight:600, margin:0,
+                    color: m.status==='live'?'#22c55e':m.status==='completed'?glow:'#f59e0b' }}>
+                    {m.result||m.summary||m.time}
+                  </p>
+                </div>
+              )}
+
+              {/* Key performers */}
+              {(m.topBat||m.topBowl) && (
+                <div style={{ display:'flex', gap:8, padding:'6px 13px 8px',
+                  borderTop:`1px solid ${divCol}` }}>
+                  {m.topBat  && <span style={{ fontSize:10, color:dimText, background:rowBg, padding:'3px 8px', borderRadius:6 }}>🏏 {m.topBat}</span>}
+                  {m.topBowl && <span style={{ fontSize:10, color:dimText, background:rowBg, padding:'3px 8px', borderRadius:6 }}>⚡ {m.topBowl}</span>}
+                </div>
+              )}
+
+              {/* Scorecard expand toggle */}
+              {m.innings && m.innings.length > 0 && (
+                <>
+                  <button onClick={()=>setShowCard(!showCard)}
+                    style={{ width:'100%', padding:'7px 13px', borderTop:`1px solid ${divCol}`,
+                      background:'transparent', border:'none', cursor:'pointer', textAlign:'left',
+                      display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                    <span style={{ fontSize:10.5, fontWeight:600, color:glow }}>
+                      {showCard ? '▲ Hide scorecard' : '▼ Full scorecard'}
+                    </span>
+                    <span style={{ fontSize:9, color:dimText }}>Batting · Bowling</span>
+                  </button>
+
+                  {showCard && (
+                    <div style={{ borderTop:`1px solid ${divCol}` }}>
+                      {(m.innings||[]).map((inn:any, ii:number) => (
+                        <div key={ii} style={{ padding:'10px 13px', borderBottom:ii<(m.innings.length-1)?`1px solid ${divCol}`:'none' }}>
+                          <p style={{ fontSize:11, fontWeight:800, color:glow, margin:'0 0 6px',
+                            textTransform:'uppercase', letterSpacing:'0.05em' }}>
+                            {inn.team} · {inn.score} ({inn.overs} ov)
+                          </p>
+                          {/* Batting table */}
+                          {inn.batsmen && inn.batsmen.length > 0 && (
+                            <div style={{ marginBottom:8 }}>
+                              <p style={{ fontSize:9.5, fontWeight:700, color:dimText, margin:'0 0 4px', letterSpacing:'0.04em' }}>BATTING</p>
+                              <div style={{ borderRadius:8, overflow:'hidden', border:`1px solid ${divCol}` }}>
+                                <div style={{ display:'grid', gridTemplateColumns:'1fr 40px 40px 30px 30px 50px',
+                                  padding:'4px 8px', background:rowBg }}>
+                                  {['Batter','R','B','4s','6s','SR'].map(h=>(
+                                    <p key={h} style={{ fontSize:9, fontWeight:700, color:dimText, margin:0, textAlign:h==='Batter'?'left':'right' }}>{h}</p>
+                                  ))}
+                                </div>
+                                {inn.batsmen.map((b:any,bi:number)=>(
+                                  <div key={bi} style={{ display:'grid', gridTemplateColumns:'1fr 40px 40px 30px 30px 50px',
+                                    padding:'5px 8px', borderTop:`1px solid ${divCol}`, background:bi%2===0?'transparent':rowBg+'80' }}>
+                                    <p style={{ fontSize:11, fontWeight:600, color:boldText, margin:0 }}>{b.name}</p>
+                                    <p style={{ fontSize:11, fontWeight:800, color:boldText, margin:0, textAlign:'right' }}>{b.runs}</p>
+                                    <p style={{ fontSize:10, color:dimText, margin:0, textAlign:'right' }}>{b.balls}</p>
+                                    <p style={{ fontSize:10, color:dimText, margin:0, textAlign:'right' }}>{b.fours}</p>
+                                    <p style={{ fontSize:10, color:dimText, margin:0, textAlign:'right' }}>{b.sixes}</p>
+                                    <p style={{ fontSize:10, color:dimText, margin:0, textAlign:'right' }}>{b.sr}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {/* Bowling table */}
+                          {inn.bowlers && inn.bowlers.length > 0 && (
+                            <div>
+                              <p style={{ fontSize:9.5, fontWeight:700, color:dimText, margin:'0 0 4px', letterSpacing:'0.04em' }}>BOWLING</p>
+                              <div style={{ borderRadius:8, overflow:'hidden', border:`1px solid ${divCol}` }}>
+                                <div style={{ display:'grid', gridTemplateColumns:'1fr 40px 40px 40px 40px',
+                                  padding:'4px 8px', background:rowBg }}>
+                                  {['Bowler','O','R','W','Econ'].map(h=>(
+                                    <p key={h} style={{ fontSize:9, fontWeight:700, color:dimText, margin:0, textAlign:h==='Bowler'?'left':'right' }}>{h}</p>
+                                  ))}
+                                </div>
+                                {inn.bowlers.map((b:any,bi:number)=>(
+                                  <div key={bi} style={{ display:'grid', gridTemplateColumns:'1fr 40px 40px 40px 40px',
+                                    padding:'5px 8px', borderTop:`1px solid ${divCol}`, background:bi%2===0?'transparent':rowBg+'80' }}>
+                                    <p style={{ fontSize:11, fontWeight:600, color:boldText, margin:0 }}>{b.name}</p>
+                                    <p style={{ fontSize:10, color:dimText, margin:0, textAlign:'right' }}>{b.overs}</p>
+                                    <p style={{ fontSize:10, color:dimText, margin:0, textAlign:'right' }}>{b.runs}</p>
+                                    <p style={{ fontSize:11, fontWeight:800, color:b.wickets>'0'?'#f87171':dimText, margin:0, textAlign:'right' }}>{b.wickets}</p>
+                                    <p style={{ fontSize:10, color:dimText, margin:0, textAlign:'right' }}>{b.econ}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -1604,10 +1783,20 @@ function SportsBrowser({ glow, isLight, hidden }: { glow: string; isLight: boole
   return (
     <>
       {/* FAB */}
-      <button onClick={() => setOpen(p=>!p)}
-        className="fixed z-[59] w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all active:scale-90 hover:scale-105"
-        style={{ bottom:88, right:68, background:`linear-gradient(135deg,${glow},${glow}cc)`,
-          boxShadow:`0 4px 20px ${glow}50`, border:`1.5px solid ${glow}60` }}
+      <button onClick={() => {
+        const wasOpen = open;
+        setOpen(p=>!p);
+        if (!wasOpen && !results) {
+          setTimeout(() => search('major cricket matches live and recent today 2026'), 100);
+        }
+      }}
+        className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all active:scale-90 hover:scale-105"
+        style={{
+          position: inDock ? 'relative' : 'fixed',
+          ...(inDock ? {} : { bottom:88, right:64 }),
+          background:`linear-gradient(135deg,${glow},${glow}cc)`,
+          boxShadow:`0 4px 20px ${glow}50`, border:`1.5px solid ${glow}60`,
+        }}
         title="Tessa Sports">
         {open ? <X size={18} className="text-white"/> : <Trophy size={18} className="text-white"/>}
       </button>
@@ -1648,10 +1837,9 @@ function SportsBrowser({ glow, isLight, hidden }: { glow: string; isLight: boole
                 <div>
                   <div style={{ display:'flex', alignItems:'center', gap:7 }}>
                     <span style={{ fontSize:15, fontWeight:900, color:glow, letterSpacing:'-0.03em' }}>Tessa Sports</span>
-                    <span style={{ fontSize:9, fontWeight:700, color:'#22c55e', background:'#22c55e15',
-                      border:'1px solid #22c55e40', padding:'1px 6px', borderRadius:6 }}>● LIVE</span>
+
                   </div>
-                  <span style={{ fontSize:9.5, color:sub }}>Live · Scores · Standings · 2026</span>
+                  <span style={{ fontSize:9.5, color:sub }}>Scores · Standings · 2026</span>
                 </div>
               </div>
               {/* macOS-style close */}
@@ -1794,6 +1982,110 @@ function SportsBrowser({ glow, isLight, hidden }: { glow: string; isLight: boole
 }
 
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FLOATING DOCK — unified bottom-right pill housing Health + Sports FABs
+// ─────────────────────────────────────────────────────────────────────────────
+function FloatingDock({ glow, isLight, showHealth, hidden, onHealthSync }:
+  { glow:string; isLight:boolean; showHealth:boolean; hidden?:boolean; onHealthSync?:()=>void }) {
+  if (hidden) return null;
+  const dockBg  = isLight ? 'rgba(255,255,255,0.92)' : 'rgba(13,15,30,0.92)';
+  const dockBdr = isLight ? `${glow}30` : `${glow}35`;
+  return (
+    <div style={{
+      position:'fixed', bottom:24, right:16, zIndex:60,
+      display:'flex', flexDirection:'column', alignItems:'center', gap:8,
+    }}>
+      {/* Tessa Sports button */}
+      <SportsBrowser glow={glow} isLight={isLight} hidden={false} inDock />
+      {/* Health Pulse button — only in creator mode */}
+      {showHealth && (
+        <HealthPulse glow={glow} isLight={isLight} hidden={false} onSync={onHealthSync} inDock />
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OFFLINE SCREEN — shows when navigator.onLine is false
+// ─────────────────────────────────────────────────────────────────────────────
+function OfflineScreen({ theme, glow }: { theme: string; glow: string }) {
+  const isDark = theme !== 'light' && theme !== 'pastel' && theme !== 'ankit';
+  const bg     = isDark ? '#0d0f1e' : '#f8fafc';
+  const text   = isDark ? '#e2e8f0' : '#1e293b';
+  const sub    = isDark ? '#64748b' : '#94a3b8';
+  return (
+    <div style={{
+      position:'fixed', inset:0, zIndex:9999,
+      background: isDark
+        ? `radial-gradient(ellipse 90% 80% at 50% 30%, #1a1035 0%, #0d0f1e 60%, #080a1a 100%)`
+        : `radial-gradient(ellipse 90% 80% at 50% 30%, #eef2ff 0%, #f8fafc 60%, #f1f5f9 100%)`,
+      display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+      padding:32, userSelect:'none',
+    }}>
+      {/* Animated signal rings */}
+      <div style={{ position:'relative', width:120, height:120, marginBottom:32 }}>
+        {[0,1,2].map(i=>(
+          <div key={i} style={{
+            position:'absolute', inset: i*16,
+            borderRadius:'50%',
+            border: `2px solid ${glow}`,
+            opacity: 0.15 + i*0.08,
+            animation: `pulse ${1.4+i*0.4}s ease-in-out ${i*0.2}s infinite`,
+          }}/>
+        ))}
+        {/* Centre icon — wifi with slash */}
+        <div style={{
+          position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center',
+          flexDirection:'column', gap:4,
+        }}>
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="22" r="21" fill={glow} fillOpacity="0.12" stroke={glow} strokeWidth="1.5" strokeOpacity="0.4"/>
+            {/* Wifi arcs with diagonal slash */}
+            <path d="M 8,20 Q 22,8 36,20" stroke={glow} strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.5"/>
+            <path d="M 13,25 Q 22,16 31,25" stroke={glow} strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.7"/>
+            <circle cx="22" cy="31" r="2.5" fill={glow}/>
+            {/* Slash */}
+            <line x1="8" y1="36" x2="36" y2="8" stroke={isDark?'#ef4444':'#dc2626'} strokeWidth="2.5" strokeLinecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      {/* Title */}
+      <h2 style={{ fontSize:24, fontWeight:900, color:text, margin:'0 0 8px',
+        letterSpacing:'-0.02em', textAlign:'center' }}>
+        You're offline
+      </h2>
+      <p style={{ fontSize:14, color:sub, margin:'0 0 28px', textAlign:'center', lineHeight:1.6, maxWidth:280 }}>
+        Tessa needs an internet connection to think.<br/>Check your Wi-Fi or mobile data.
+      </p>
+
+      {/* Status pill */}
+      <div style={{
+        display:'flex', alignItems:'center', gap:8, padding:'10px 20px',
+        borderRadius:40, border:`1px solid ${glow}25`,
+        background: isDark?`${glow}10`:`${glow}0a`,
+        marginBottom:36,
+      }}>
+        <div style={{ width:8, height:8, borderRadius:'50%', background:'#ef4444',
+          boxShadow:'0 0 8px #ef4444', animation:'pulse 1.5s infinite' }}/>
+        <span style={{ fontSize:12, fontWeight:700, color:glow }}>No connection detected</span>
+      </div>
+
+      {/* Decorative Tessa monogram */}
+      <div style={{ opacity:0.08, fontSize:88, fontWeight:900, color:glow,
+        letterSpacing:'-0.05em', lineHeight:1, position:'absolute', bottom:-12 }}>
+        TESSA
+      </div>
+
+      {/* Tip */}
+      <p style={{ fontSize:11, color:sub, textAlign:'center', maxWidth:240, lineHeight:1.5, opacity:0.7 }}>
+        💡 Conversations and notes saved locally will still be available once you're back online.
+      </p>
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1828,6 +2120,7 @@ export default function Home() {
   // ── Settings ──────────────────────────────────────────────────────────────
   const [theme,           setThemeState]    = useState<Theme>('dark');
   const [autoSearch,      setAutoSearch]    = useState(true);
+  const [isOnline,        setIsOnline]       = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const [webSearchOn,     setWebSearchOn]   = useState(false);   // manual per-message toggle
   const [lastSearchData,  setLastSearchData] = useState<{snippets:string[];sources:{title:string;url:string;snippet:string}[];query:string}|null>(null);
   const [showSearchPanel, setShowSearchPanel] = useState(false); // show/hide web results drawer
@@ -1954,6 +2247,12 @@ export default function Home() {
     checkMidnightReset();
     midnightTimer.current = setInterval(checkMidnightReset, 60_000);
 
+    // Online / offline detection
+    const goOnline  = () => setIsOnline(true);
+    const goOffline = () => setIsOnline(false);
+    window.addEventListener('online',  goOnline);
+    window.addEventListener('offline', goOffline);
+
     if (shouldDeliverBriefing()) {
       const b = buildMorningBriefing(); markBriefingDelivered(b); lsSet('tessa-pending-briefing', b);
     }
@@ -1965,35 +2264,37 @@ export default function Home() {
         fetchCloudConversations(u.id);
         // Pull creator data when auth fires
         if (isCreatorModePersistent()) {
-          pullCreatorSync(u.id).then(changed => { if (changed) setWellnessVersion(v=>v+1); });
+          pullCreatorSync().then(changed => { if (changed) setWellnessVersion(v=>v+1); });
         }
       }
     });
 
-    // Real-time subscription — updates when another device pushes
-    const setupRealtimeSync = (uid: string) => {
+    // Real-time subscription — always active for creator mode, no login needed
+    const setupCreatorSync = () => {
       if (syncChannel.current) supabase.removeChannel(syncChannel.current);
       syncChannel.current = supabase
-        .channel(`creator-sync-${uid}`)
+        .channel('creator-sync-universal')
         .on('postgres_changes', {
           event: 'UPDATE', schema: 'public', table: 'creator_sync',
-          filter: `user_id=eq.${uid}`,
+          filter: `user_id=eq.${CREATOR_SYNC_ID}`,
         }, () => {
-          // Another device pushed — pull the latest
-          pullCreatorSync(uid).then(changed => {
-            if (changed) { setWellnessVersion(v=>v+1); setSyncStatus('synced'); }
-          });
+          if (isCreatorModePersistent()) {
+            pullCreatorSync().then(changed => {
+              if (changed) { setWellnessVersion(v=>v+1); setSyncStatus('synced'); }
+            });
+          }
         })
         .subscribe();
     };
-
-    getCurrentUser().then(u => { if (u) setupRealtimeSync(u.id); });
+    setupCreatorSync(); // always start — no user required
 
     return () => {
       subscription.unsubscribe();
       if (proactiveTimer.current) clearInterval(proactiveTimer.current);
       if (midnightTimer.current)  clearInterval(midnightTimer.current);
       if (syncChannel.current)    supabase.removeChannel(syncChannel.current);
+      window.removeEventListener('online',  goOnline);
+      window.removeEventListener('offline', goOffline);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -2330,12 +2631,12 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
       if (voiceOutput) speakText(data.content);
       if (sfx) playChime();
       if (autoSave) setTimeout(persistConversation, 1_000);
-      // Debounced creator sync push
-      if (isCreatorMode && user && !isGuest) {
+      // Debounced creator sync push — no login required
+      if (isCreatorMode) {
         setSyncStatus('syncing');
         if (syncTimer.current) clearTimeout(syncTimer.current);
         syncTimer.current = setTimeout(async () => {
-          await pushCreatorSync(user.id);
+          await pushCreatorSync();
           setSyncStatus('synced');
           setTimeout(()=>setSyncStatus('idle'), 3000);
         }, 3000);
@@ -2552,6 +2853,10 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
   const unlockCreatorModeAction = () => {
     persistConversation(); setIsCreatorMode(true); setCurrentConvId(uuidv4());
     setCurrentMood('loving'); lockCreatorMode();
+    // Sign out any logged-in user — creator mode is auth-independent
+    if (user) { signOut().then(()=>{ setUser(null); setIsGuest(true); }); }
+    // Pull latest creator data from universal sync (no login needed)
+    pullCreatorSync().then(changed => { if (changed) setWellnessVersion(v=>v+1); });
     const pb=lsGet('tessa-pending-briefing');
     const init:Message={id:uuidv4(),role:'assistant',content:pb??getRandomWelcomeMessage(),timestamp:new Date(),mood:'loving' as MoodType};
     if(pb) lsRemove('tessa-pending-briefing');
@@ -2829,6 +3134,9 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
   return (
     <div className={`h-screen ${t.text} flex overflow-hidden relative ${fontSizeClass}`}
       style={{height:"100dvh", backgroundColor: bgStyle, transition:'background-color 0.45s ease, color 0.25s ease'}}>
+
+      {/* ── OFFLINE SCREEN ── */}
+      {!isOnline && <OfflineScreen theme={theme} glow={t.glow} />}
       <style>{`
       /* ── Floating panel entrance ── */
       @keyframes floatIn {
@@ -3055,9 +3363,25 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
             )}
           </div>
 
-          {/* Account */}
+          {/* Account — hidden in creator mode (creator is auth-independent) */}
           <div className={`flex-shrink-0 px-3 py-3 border-t ${t.div}`}>
-            {user&&!isGuest ? (
+            {isCreatorMode ? (
+              <div className="flex items-center gap-2.5 px-1 py-1">
+                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{background:`linear-gradient(135deg,#ec4899,#a855f7)`}}>
+                  <Heart size={12} className="text-white fill-white"/>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-bold text-pink-400">Creator Mode</p>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"/>
+                    <p className={`text-[9px] ${t.sub}`}>
+                      {syncStatus==='syncing'?'Syncing…':syncStatus==='synced'?'Synced ✓':'Universal sync'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : user&&!isGuest ? (
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
                   style={{background:`linear-gradient(135deg,${t.glow},${glow2})`}}>
@@ -3067,7 +3391,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                   <p className="text-[10px] font-medium truncate">{user.email}</p>
                   <div className="flex items-center gap-1 mt-0.5">
                     <div className="w-1 h-1 rounded-full bg-emerald-400" />
-                    <p className={`text-[9px] ${t.sub}`}>Signed in</p>
+                    <p className={`text-[9px] ${t.sub}`}>Cloud sync on</p>
                   </div>
                 </div>
                 <button onClick={handleSignOut} className="p-1.5 rounded-lg hover:bg-red-500/15 text-red-400 transition-colors">
@@ -3077,7 +3401,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
             ) : (
               <button onClick={()=>setShowAuthModal(true)}
                 className={`w-full py-2 rounded-xl text-[11px] font-medium transition-all ${t.btnS}`}>
-                👤 Sign In
+                👤 Sign In / Sign Up
               </button>
             )}
           </div>
@@ -3353,9 +3677,33 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                 {settingsTab==='data' && (<>
                   <div>
                     <SLabel label="Storage" t={t}/>
-                    <Toggle label="Auto-save Chats"
-                      sub={user&&!isGuest?'☁️ Synced to Supabase cloud':'📱 Saved to local storage'}
-                      checked={autoSave} onChange={setAutoSave} color={t.glow} t={t}/>
+                    {isCreatorMode ? (
+                      <div className={`p-3 rounded-xl ${t.sCard} space-y-2`}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"/>
+                          <p className={`text-[11px] font-bold text-emerald-400`}>Creator Sync Active</p>
+                        </div>
+                        <p className={`text-[10px] ${t.sSub} leading-relaxed`}>
+                          All your data (memories, health, streaks, settings) syncs automatically across every device where Creator Mode is unlocked. No login required — the secret key is your identity.
+                        </p>
+                        <div className={`text-[10px] font-medium mt-1 ${t.sSub}`}>
+                          Status: <span style={{color:t.glow}}>{syncStatus==='syncing'?'Syncing now…':syncStatus==='synced'?'✓ Synced just now':'● Ready to sync'}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <Toggle label="Auto-save Chats"
+                          sub={user&&!isGuest?'☁️ Synced to cloud via your account':'📱 Saved to local storage only (sign in to sync)'}
+                          checked={autoSave} onChange={setAutoSave} color={t.glow} t={t}/>
+                        {!user&&(
+                          <button onClick={()=>{setShowAuthModal(true);setShowSettings(false);}}
+                            className={`w-full mt-2 py-2 rounded-xl text-[11px] font-medium flex items-center justify-center gap-2 transition-all ${t.btnS}`}
+                            style={{border:`1px solid ${t.glow}22`}}>
+                            <Database size={11} style={{color:t.glow}}/>Sign in to enable cloud sync
+                          </button>
+                        )}
+                      </>
+                    )}
                   </div>
                   <Hr cls={t.div}/>
                   <div>
@@ -3506,9 +3854,9 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                   {isCreatorMode && (
                     <Heart size={11} className="text-pink-400 fill-pink-400 flex-shrink-0 animate-pulse" />
                   )}
-                  {/* Sync dot — only in creator mode, signed in */}
-                  {isCreatorMode && user && !isGuest && (
-                    <span title={syncStatus==='syncing'?'Syncing…':syncStatus==='synced'?'Synced ✓':'Live sync'}
+                  {/* Sync dot — always shows in creator mode */}
+                  {isCreatorMode && (
+                    <span title={syncStatus==='syncing'?'Syncing…':syncStatus==='synced'?'Synced ✓':'Universal sync active'}
                       className="flex-shrink-0 w-1.5 h-1.5 rounded-full transition-all duration-500"
                       style={{
                         background: syncStatus==='syncing'?'#f59e0b':syncStatus==='synced'?'#22c55e':syncStatus==='error'?'#ef4444':'#22c55e',
@@ -3519,7 +3867,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                 </div>
                 <p className={`text-[10px] mt-0.5 truncate leading-none ${t.sub}`}>
                   {isCreatorMode
-                    ? `Personal AI · ${moodEmoji} ${moodLabel}${user&&!isGuest?' · ☁️ Live':''}`
+                    ? `Personal AI · ${moodEmoji} ${moodLabel} · 🔗 Synced`
                     : `${TESSA.tagline} · ${moodEmoji} ${moodLabel}`}
                 </p>
               </div>
@@ -4141,14 +4489,13 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
         />
       )}
 
-      {/* ── HEALTH PULSE — floating calorie/health mini-chat (creator mode) ── */}
-      {isCreatorMode && (
-        <HealthPulse glow={t.glow} isLight={t.isLight} hidden={showSettings || showDashboard}
-          onSync={() => setWellnessVersion(v => v + 1)} />
-      )}
-
-      {/* ── T-SPORTS BROWSER — live scores, always visible ── */}
-      <SportsBrowser glow={t.glow} isLight={t.isLight} hidden={showSettings || showDashboard} />
+      {/* ── UNIFIED BOTTOM DOCK — HealthPulse + Tessa Sports together ── */}
+      <FloatingDock
+        glow={t.glow} isLight={t.isLight}
+        showHealth={!!isCreatorMode}
+        hidden={showSettings || showDashboard}
+        onHealthSync={() => setWellnessVersion(v => v + 1)}
+      />
 
       {/* ── FLOATING INSIGHTS PANEL ── */}
       {insightsOpen && isCreatorMode && (

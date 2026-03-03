@@ -2565,8 +2565,9 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
             </button>
             <p style={{ color:'rgba(255,255,255,0.2)', fontSize:9, marginTop:6 }}>End call</p>
           </div>
-        </div>
+   </div>
       </div>
+      </> 
     );
   };
 

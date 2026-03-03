@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
     }
 
-    const { messages, isCreatorMode, currentMood, needsSearch, maxTokens = 600, _systemOverride, language, useWebSearch } = body;
+    const { messages, isCreatorMode, currentMood, needsSearch, maxTokens = 600, _systemOverride, language, useWebSearch, tessaPersona } = body;
 
     // Validation
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -67,8 +67,9 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          searchContext = '\n\n=== CURRENT WEB INFORMATION (Live Data — February 2026) ===\n';
-          searchContext += `NOTE: Today is ${new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}. Use this recent data.\n`;
+          const todayFull = new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+          searchContext = `\n\n=== LIVE WEB SEARCH RESULTS — ${todayFull} ===\n`;
+          searchContext += `You have just retrieved real-time web results. Today is ${todayFull}.\nUse this data authoritatively — do NOT say your knowledge is limited to 2023 or any past date.\n`;
           if (webPages.length > 0) {
             searchContext += `\nFULL PAGE CONTENT:\n${webPages[0].slice(0, 3000)}\n`;
           }
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
             searchContext += `\n[${i + 1}] ${r.title}\n${r.snippet}\nURL: ${r.url}\n`;
           });
           searchContext += '\n=== END WEB INFORMATION ===\n';
-          searchContext += '\nIMPORTANT: Use this current web data. Cite sources when relevant. Today is 2026.\n';
+          searchContext += `\nIMPORTANT: Use this data. Cite sources when relevant. Remember: today is ${todayFull} — you have live results.\n`;
         }
       } catch (searchError) {
         console.error('Search failed:', searchError);
@@ -90,7 +91,7 @@ export async function POST(request: NextRequest) {
     try {
       systemPrompt = _systemOverride
         ? String(_systemOverride)
-        : getSystemPrompt(isCreatorMode || false, userMessage, language || 'en');
+        : getSystemPrompt(isCreatorMode || false, userMessage, language || 'en', tessaPersona || 'companion');
     } catch (promptError) {
       console.error('Error generating system prompt:', promptError);
       systemPrompt = 'You are T.E.S.S.A., a helpful AI assistant.';

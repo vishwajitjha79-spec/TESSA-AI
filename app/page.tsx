@@ -2398,13 +2398,14 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
     const statusLabel = callStatus==='listening' ? 'Listening…' : callStatus==='thinking' ? 'Thinking…' : callStatus==='speaking' ? 'Speaking…' : 'Connected';
     const isActive    = callStatus === 'speaking' || callStatus === 'listening';
 
-    return (
-      {/* Fullscreen overlay backdrop */}
-      callFullscreen && (
-        <div style={{ position:'fixed', inset:0, zIndex:89,
-          background:'linear-gradient(160deg,#0a0818 0%,#0f1a2e 100%)' }}/>
-    )
-      <div
+   return (
+      <>
+        {/* Fullscreen overlay backdrop */}
+        {callFullscreen && (
+          <div style={{ position:'fixed', inset:0, zIndex:89,
+            background:'linear-gradient(160deg,#0a0818 0%,#0f1a2e 100%)' }}/>
+        )}
+        <div
         style={callFullscreen ? {
           position:'fixed', inset:0, zIndex:90,
           display:'flex', alignItems:'center', justifyContent:'center',

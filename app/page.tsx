@@ -356,41 +356,44 @@ const THEMES = {
   },
   // ── ANKIT'S SPECIAL — Creator-mode only theme ───────────────────────────────
   // Only appears in creator mode settings. Standard mode doesn't show this.
-  // Background: parchment (#f0ebe0) + sketch lines + Spidey mask corner art
+  // Background: ivory cream + rose-pink + blue-indigo colour washes
   // All text stays dark slate — fully readable over the light parchment
   ankit: {
-    // Standard: warm cream with dusty rose accents
+    // Standard (non-creator): warm white + red accent
     bg:'bg-[#fdf6f0]', bgC:'bg-[#fdf6f0]',
-    panel:'bg-white/85 backdrop-blur-xl border-rose-200/50 shadow-lg shadow-rose-100/30',
-    panelC:'bg-white/85 backdrop-blur-xl border-rose-200/50 shadow-lg shadow-rose-100/30',
-    header:'bg-[#fdf6f0]/94 backdrop-blur-xl border-b border-rose-200/40 shadow-sm shadow-rose-100/20',
-    headerC:'bg-[#fdf6f0]/94 backdrop-blur-xl border-b border-rose-200/40 shadow-sm shadow-rose-100/20',
-    bar:'bg-[#fdf6f0]/94 backdrop-blur-xl border-t border-rose-200/40',
-    barC:'bg-[#fdf6f0]/94 backdrop-blur-xl border-t border-rose-200/40',
-    msgU:'bg-white/80 border border-rose-200/50 border-l-[3px] border-l-rose-400/70 shadow-sm shadow-rose-50',
-    msgUC:'bg-white/80 border border-rose-200/50 border-l-[3px] border-l-rose-500/60 shadow-sm shadow-rose-50',
-    msgA:'bg-white/70 border border-stone-200/50 border-l-[3px] border-l-amber-400/60 shadow-sm',
-    msgAC:'bg-white/70 border border-stone-200/50 border-l-[3px] border-l-amber-400/60 shadow-sm',
-    inp:'bg-white/95 border border-rose-200/60 text-stone-800 placeholder:text-stone-400 focus:border-rose-400/70 focus:ring-2 focus:ring-rose-200/40',
-    inpC:'bg-white/95 border border-rose-200/60 text-stone-800 placeholder:text-stone-400 focus:border-rose-400/70 focus:ring-2 focus:ring-rose-200/40',
-    btnP:'bg-gradient-to-br from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white shadow-md shadow-rose-300/40',
-    btnPC:'bg-gradient-to-br from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white shadow-md shadow-rose-300/40',
-    btnS:'bg-white/90 hover:bg-white border border-rose-200/60 text-stone-700 hover:text-stone-900 hover:border-rose-300/80',
-    btnSC:'bg-white/90 hover:bg-white border border-rose-200/60 text-stone-700 hover:text-stone-900 hover:border-rose-300/80',
-    text:'text-stone-800', sub:'text-stone-500', subC:'text-stone-500',
-    accent:'text-rose-600', accentC:'text-rose-600',
-    glow:'#e11d48', glowC:'#e11d48',
-    card:'bg-white/80 border border-rose-100/60',
-    cardC:'bg-white/80 border border-rose-100/60',
-    active:'bg-white border border-rose-400/60 shadow-sm',
-    activeC:'bg-white border border-rose-400/60 shadow-sm',
-    div:'border-rose-200/40', divC:'border-rose-200/40',
-    settBg:'bg-white/98 backdrop-blur-xl border-t border-rose-200/40',
-    settBgC:'bg-white/98 backdrop-blur-xl border-t border-rose-200/40',
-    settText:'text-stone-800', settTextHover:'hover:text-stone-900',
-    settSub:'text-stone-500', settLabel:'text-stone-600',
-    settCard:'bg-rose-50/60 border border-rose-100/70',
-    settActive:'bg-rose-50 border border-rose-300/60',
+    panel:'bg-white/85 backdrop-blur-xl border-red-200/40 shadow-lg shadow-red-100/20',
+    panelC:'bg-white/85 backdrop-blur-xl border-red-200/40 shadow-lg shadow-red-100/20',
+    header:'bg-[#fdf6f0]/95 backdrop-blur-xl border-b border-red-200/35 shadow-sm',
+    headerC:'bg-[#fdf6f0]/95 backdrop-blur-xl border-b border-red-200/35 shadow-sm',
+    bar:'bg-[#fdf6f0]/95 backdrop-blur-xl border-t border-red-200/35',
+    barC:'bg-[#fdf6f0]/95 backdrop-blur-xl border-t border-red-200/35',
+    // User messages: red-pink left border (like original)
+    msgU:'bg-white/80 border border-red-200/40 border-l-[3px] border-l-red-500/60 shadow-sm',
+    msgUC:'bg-white/80 border border-red-200/40 border-l-[3px] border-l-pink-500/60 shadow-sm',
+    // Tessa messages: blue left border (blue/black feel)
+    msgA:'bg-white/75 border border-blue-100/50 border-l-[3px] border-l-blue-500/55 shadow-sm',
+    msgAC:'bg-white/75 border border-blue-100/50 border-l-[3px] border-l-blue-600/55 shadow-sm',
+    inp:'bg-white/95 border border-red-200/50 text-slate-800 placeholder:text-slate-400 focus:border-red-400/60 focus:ring-2 focus:ring-red-200/30',
+    inpC:'bg-white/95 border border-red-200/50 text-slate-800 placeholder:text-slate-400 focus:border-red-400/60 focus:ring-2 focus:ring-red-200/30',
+    // Send button: red-pink gradient (user); blue-indigo gradient (creator)
+    btnP:'bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-md shadow-red-400/30',
+    btnPC:'bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white shadow-md shadow-blue-400/30',
+    btnS:'bg-white/90 hover:bg-white border border-red-200/50 text-slate-700 hover:text-slate-900',
+    btnSC:'bg-white/90 hover:bg-white border border-blue-200/50 text-slate-700 hover:text-slate-900',
+    text:'text-slate-800', sub:'text-slate-500', subC:'text-slate-600',
+    accent:'text-red-600', accentC:'text-blue-700',
+    glow:'#dc2626', glowC:'#1d4ed8',
+    card:'bg-white/80 border border-red-100/50',
+    cardC:'bg-white/80 border border-blue-100/50',
+    active:'bg-white border border-red-400/50 shadow-sm',
+    activeC:'bg-white border border-blue-500/50 shadow-sm',
+    div:'border-red-200/35', divC:'border-blue-200/35',
+    settBg:'bg-white/98 backdrop-blur-xl border-t border-red-200/40',
+    settBgC:'bg-white/98 backdrop-blur-xl border-t border-blue-200/40',
+    settText:'text-slate-800', settTextHover:'hover:text-slate-900',
+    settSub:'text-slate-500', settLabel:'text-slate-600',
+    settCard:'bg-slate-50 border border-slate-200/60',
+    settActive:'bg-red-50 border border-red-300/50',
     isLight:true,
   },
 } as const;
@@ -538,174 +541,67 @@ function AuroraBg({ glow, glow2 }: { glow: string; glow2: string; theme: Theme }
 }
 
 // Light theme background — mobile: pure CSS gradient; desktop: animated blobs
-// Ankit: pure white/rose with subtle SVG web corners only
+// Ankit: ivory-cream base with soft rose-pink + blue-indigo colour washes
 function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
   // Ankit theme: only active in creator mode. Standard mode falls through to configs below.
   if (theme === 'ankit' && creator) {
+    // Creator theme: clean soft light bg — no figures, just subtle colour washes
+    // Palette: warm ivory base + rose-pink top-left + blue/indigo bottom-right
     return (
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
 
-        {/* ── Base: soft ivory-cream ── */}
+        {/* Ivory cream base */}
         <div className="absolute inset-0"
-          style={{ background: 'linear-gradient(160deg, #fdf6f0 0%, #fff0f3 35%, #fdf6f0 60%, #fff8f0 100%)' }}/>
+          style={{ background: 'linear-gradient(150deg, #fdf6f0 0%, #fff0f5 40%, #f0f4ff 75%, #fdf6f0 100%)' }}/>
 
-        {/* ── Delicate watercolour wash — top-left blush ── */}
+        {/* Rose-pink wash — top-left */}
         <div className="absolute" style={{
-          top:-80, left:-60, width:520, height:520, borderRadius:'50%',
-          background:'radial-gradient(circle, rgba(251,113,133,0.13) 0%, rgba(251,113,133,0.04) 55%, transparent 75%)',
-          filter:'blur(40px)',
-        }}/>
-        {/* ── Watercolour wash — bottom-right amber/peach ── */}
-        <div className="absolute" style={{
-          bottom:-100, right:-80, width:600, height:560, borderRadius:'50%',
-          background:'radial-gradient(circle, rgba(251,191,100,0.11) 0%, rgba(255,167,120,0.07) 45%, transparent 70%)',
+          top:-100, left:-80, width:500, height:480, borderRadius:'50%',
+          background:'radial-gradient(circle, rgba(225,29,72,0.10) 0%, rgba(251,113,133,0.06) 50%, transparent 72%)',
           filter:'blur(48px)',
         }}/>
-        {/* ── Centre vignette — very soft rose heart ── */}
-        <div className="absolute inset-0" style={{
-          background:'radial-gradient(ellipse 70% 55% at 50% 48%, rgba(253,162,180,0.07) 0%, transparent 65%)',
+
+        {/* Blue-indigo wash — bottom-right */}
+        <div className="absolute" style={{
+          bottom:-120, right:-100, width:560, height:520, borderRadius:'50%',
+          background:'radial-gradient(circle, rgba(37,99,235,0.09) 0%, rgba(99,102,241,0.06) 50%, transparent 72%)',
+          filter:'blur(52px)',
         }}/>
 
-        {/* ── Fine botanical line art — top-right corner rose ── */}
-        <svg className="absolute top-0 right-0" style={{ width:260, opacity:0.09 }}
-          viewBox="0 0 260 320" preserveAspectRatio="xMaxYMin meet">
-          {/* Main stem */}
-          <path d="M 200,320 C 196,260 188,200 168,140 C 152,88 130,42 110,0"
-            fill="none" stroke="#be185d" strokeWidth="1.4" strokeLinecap="round"/>
-          {/* Branch left 1 */}
-          <path d="M 178,210 C 155,195 132,186 108,182"
-            fill="none" stroke="#be185d" strokeWidth="0.9" strokeLinecap="round"/>
-          {/* Branch left 2 */}
-          <path d="M 160,158 C 138,148 118,144 95,144"
-            fill="none" stroke="#be185d" strokeWidth="0.9" strokeLinecap="round"/>
-          {/* Branch right 1 */}
-          <path d="M 175,240 C 198,228 218,224 240,225"
-            fill="none" stroke="#be185d" strokeWidth="0.9" strokeLinecap="round"/>
-          {/* Rose bloom 1 — top */}
-          <circle cx="110" cy="0" r="16" fill="none" stroke="#e11d48" strokeWidth="0.8" opacity="0.7"/>
-          <circle cx="110" cy="0" r="10" fill="none" stroke="#e11d48" strokeWidth="0.6" opacity="0.5"/>
-          <circle cx="110" cy="0" r="5"  fill="rgba(225,29,72,0.15)"/>
-          {/* Petals around bloom 1 */}
-          {[0,51,103,154,206,257,308].map((deg,i)=>{
-            const r=deg*Math.PI/180; const rx=110+20*Math.cos(r); const ry=0+20*Math.sin(r);
-            return <ellipse key={i} cx={rx} cy={ry} rx="6" ry="10"
-              fill="rgba(225,29,72,0.12)" stroke="#e11d48" strokeWidth="0.5" opacity="0.6"
-              transform={`rotate(${deg+90} ${rx} ${ry})`}/>;
-          })}
-          {/* Rose bloom 2 — mid */}
-          <circle cx="95" cy="144" r="13" fill="none" stroke="#e11d48" strokeWidth="0.7" opacity="0.55"/>
-          <circle cx="95" cy="144" r="7"  fill="rgba(225,29,72,0.1)"/>
-          {[0,60,120,180,240,300].map((deg,i)=>{
-            const r=deg*Math.PI/180; const rx=95+16*Math.cos(r); const ry=144+16*Math.sin(r);
-            return <ellipse key={i} cx={rx} cy={ry} rx="5" ry="9"
-              fill="rgba(225,29,72,0.09)" stroke="#e11d48" strokeWidth="0.5" opacity="0.5"
-              transform={`rotate(${deg+90} ${rx} ${ry})`}/>;
-          })}
-          {/* Leaves */}
-          <path d="M 108,182 Q 90,168 75,172 Q 88,185 108,182 Z" fill="rgba(120,60,30,0.12)" stroke="#92400e" strokeWidth="0.6" opacity="0.5"/>
-          <path d="M 160,158 Q 148,138 136,136 Q 140,152 160,158 Z" fill="rgba(120,60,30,0.1)"  stroke="#92400e" strokeWidth="0.5" opacity="0.4"/>
-          <path d="M 240,225 Q 228,212 218,218 Q 226,228 240,225 Z" fill="rgba(120,60,30,0.1)"  stroke="#92400e" strokeWidth="0.5" opacity="0.4"/>
-        </svg>
-
-        {/* ── Fine botanical — bottom-left corner small sprig ── */}
-        <svg className="absolute bottom-0 left-0" style={{ width:160, opacity:0.08 }}
-          viewBox="0 0 160 200" preserveAspectRatio="xMinYMax meet">
-          <path d="M 30,200 C 36,162 48,128 68,98 C 84,72 104,52 118,26"
-            fill="none" stroke="#be185d" strokeWidth="1.2" strokeLinecap="round"/>
-          <path d="M 58,148 C 40,140 24,136 8,138" fill="none" stroke="#be185d" strokeWidth="0.8" strokeLinecap="round"/>
-          <path d="M 84,98 C 96,88 110,86 124,90"  fill="none" stroke="#be185d" strokeWidth="0.8" strokeLinecap="round"/>
-          <circle cx="118" cy="26" r="11" fill="none" stroke="#e11d48" strokeWidth="0.7" opacity="0.6"/>
-          <circle cx="118" cy="26" r="6"  fill="rgba(225,29,72,0.12)"/>
-          {[0,72,144,216,288].map((deg,i)=>{
-            const r=deg*Math.PI/180; const rx=118+14*Math.cos(r); const ry=26+14*Math.sin(r);
-            return <ellipse key={i} cx={rx} cy={ry} rx="4" ry="7"
-              fill="rgba(225,29,72,0.1)" stroke="#e11d48" strokeWidth="0.5" opacity="0.5"
-              transform={`rotate(${deg+90} ${rx} ${ry})`}/>;
-          })}
-          <path d="M 8,138 Q 14,126 22,128 Q 16,138 8,138 Z" fill="rgba(120,60,30,0.1)" stroke="#92400e" strokeWidth="0.5" opacity="0.4"/>
-        </svg>
-
-        {/* ── TASM2 scene — placed upper-centre, Gwen horizontal, Spidey beside ── */}
-        {/* Gwen — lying flat, web strands from top */}
-        <svg className="absolute" style={{ left:'6%', top:0, width:4, height:90, opacity:0.12 }}
-          viewBox="0 0 4 90">
-          <line x1="2" y1="0" x2="2" y2="90" stroke="#c0392b" strokeWidth="1.5" strokeDasharray="4,3"/>
-        </svg>
-        <svg className="absolute" style={{ left:'26%', top:0, width:4, height:90, opacity:0.12 }}
-          viewBox="0 0 4 90">
-          <line x1="2" y1="0" x2="2" y2="90" stroke="#c0392b" strokeWidth="1.5" strokeDasharray="4,3"/>
-        </svg>
-
-        {/* Gwen body — horizontal, opacity lower on light bg */}
-        <svg className="absolute" style={{ left:'3%', top:68, width:195, opacity:0.18 }}
-          viewBox="0 0 200 80">
-          <path d="M 132,36 C 150,35 168,34 184,32" fill="none" stroke="#1e3a5f" strokeWidth="10" strokeLinecap="round"/>
-          <path d="M 132,44 C 150,45 168,46 184,48" fill="none" stroke="#1e3a5f" strokeWidth="8" strokeLinecap="round"/>
-          <ellipse cx="186" cy="31" rx="9" ry="5" fill="#111" transform="rotate(-4 186 31)"/>
-          <ellipse cx="186" cy="49" rx="8" ry="4" fill="#111" transform="rotate(4 186 49)"/>
-          <rect x="72" y="28" width="62" height="24" rx="10" fill="#7f1d1d"/>
-          <ellipse cx="74" cy="40" rx="11" ry="8" fill="#f8f0e8"/>
-          <path d="M 74,34 C 58,30 44,26 32,24" fill="none" stroke="#7f1d1d" strokeWidth="7" strokeLinecap="round"/>
-          <path d="M 74,48 C 60,52 46,54 34,56" fill="none" stroke="#7f1d1d" strokeWidth="6" strokeLinecap="round"/>
-          <circle cx="30" cy="23" r="5" fill="#e8c4a0"/>
-          <circle cx="32" cy="57" r="5" fill="#e8c4a0"/>
-          <ellipse cx="54" cy="40" rx="15" ry="13" fill="#e8c4a0"/>
-          <path d="M 46,30 C 30,22 16,16 4,14"  fill="none" stroke="#b8860b" strokeWidth="4"   strokeLinecap="round"/>
-          <path d="M 44,34 C 28,28 14,24 2,24"  fill="none" stroke="#c8a84b" strokeWidth="3.5" strokeLinecap="round"/>
-          <path d="M 44,40 C 28,40 14,39 2,38"  fill="none" stroke="#b8860b" strokeWidth="3"   strokeLinecap="round"/>
-          <path d="M 46,47 C 30,52 16,54 4,54"  fill="none" stroke="#c8a84b" strokeWidth="3"   strokeLinecap="round"/>
-          <path d="M 48,52 C 34,58 22,62 8,64"  fill="none" stroke="#b8860b" strokeWidth="2.5" strokeLinecap="round"/>
-          <path d="M 49,38 C 51,35 55,35 58,38" fill="none" stroke="#7c5c44" strokeWidth="1.2"/>
-          <path d="M 50,43 C 52,40 56,40 59,43" fill="none" stroke="#7c5c44" strokeWidth="1.2"/>
-        </svg>
-
-        {/* Spidey — sitting, grieving, next to Gwen */}
-        <svg className="absolute" style={{ left:'31%', top:52, width:118, opacity:0.18 }}
-          viewBox="0 0 100 170">
-          <path d="M 30,105 C 22,120 16,132 14,144" fill="none" stroke="#9b1c1c" strokeWidth="11" strokeLinecap="round"/>
-          <path d="M 56,105 C 66,118 72,130 74,142" fill="none" stroke="#1e3a8a" strokeWidth="11" strokeLinecap="round"/>
-          <path d="M 14,144 C 10,150 18,154 34,150" fill="none" stroke="#9b1c1c" strokeWidth="10" strokeLinecap="round"/>
-          <path d="M 74,142 C 80,148 78,154 64,152" fill="none" stroke="#1e3a8a" strokeWidth="9"  strokeLinecap="round"/>
-          <ellipse cx="43" cy="86" rx="19" ry="22" fill="#1e3a8a"/>
-          <ellipse cx="43" cy="81" rx="13" ry="15" fill="#9b1c1c"/>
-          <ellipse cx="43" cy="79" rx="4"  ry="5.5" fill="#0d0d0d"/>
-          <line x1="43" y1="73" x2="35" y2="66" stroke="#0d0d0d" strokeWidth="1.8"/>
-          <line x1="43" y1="73" x2="51" y2="66" stroke="#0d0d0d" strokeWidth="1.8"/>
-          <line x1="43" y1="85" x2="35" y2="92" stroke="#0d0d0d" strokeWidth="1.8"/>
-          <line x1="43" y1="85" x2="51" y2="92" stroke="#0d0d0d" strokeWidth="1.8"/>
-          <path d="M 25,90 C 18,102 16,112 18,118" fill="none" stroke="#9b1c1c" strokeWidth="9" strokeLinecap="round"/>
-          <path d="M 61,88 C 68,100 70,110 68,116" fill="none" stroke="#1e3a8a" strokeWidth="9" strokeLinecap="round"/>
-          <ellipse cx="42" cy="60" rx="18" ry="18" fill="#9b1c1c" transform="rotate(10 42 60)"/>
-          {[175,200,225,250].map((deg,i)=>{
-            const r=deg*Math.PI/180;
-            return <line key={i} x1="42" y1="60" x2={42+22*Math.cos(r)} y2={60+22*Math.sin(r)}
-              stroke="#7f1d1d" strokeWidth="0.7" opacity="0.5"/>;
-          })}
-          <path d="M 33,54 C 35,49 40,48 44,50" fill="white" opacity="0.75"/>
-          <path d="M 44,50 C 48,48 51,50 52,54" fill="white" opacity="0.75"/>
-          <ellipse cx="38" cy="53" rx="3" ry="2" fill="#94a3b8" opacity="0.4"/>
-          <ellipse cx="47" cy="53" rx="3" ry="2" fill="#94a3b8" opacity="0.4"/>
-        </svg>
-
-        {/* ── Fine gold dividing rule — mid-screen subtle ── */}
-        <svg className="absolute" style={{ top:'50%', left:0, width:'100%', opacity:0.06 }}
-          viewBox="0 0 400 2" preserveAspectRatio="none">
-          <line x1="0" y1="1" x2="400" y2="1" stroke="#b8860b" strokeWidth="0.8"/>
-        </svg>
-
-        {/* ── Paper grain noise overlay ── */}
+        {/* Soft centre glow */}
         <div className="absolute inset-0" style={{
-          backgroundImage:"url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E\")",
-          backgroundSize:'180px 180px',
-          opacity:0.5,
-          mixBlendMode:'multiply',
+          background:'radial-gradient(ellipse 65% 50% at 50% 50%, rgba(253,162,180,0.05) 0%, transparent 70%)',
         }}/>
 
-        {/* ── Soft dot-grid pattern ── */}
+        {/* Fine dot grid */}
         <div className="absolute inset-0" style={{
           backgroundImage:'radial-gradient(circle, rgba(190,24,93,0.04) 1px, transparent 1px)',
           backgroundSize:'28px 28px',
         }}/>
+
+        {/* Subtle diagonal lines — very faint texture */}
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 800"
+          preserveAspectRatio="xMidYMid slice" style={{ opacity: 0.025 }}>
+          {Array.from({length:30},(_,i)=>(
+            <line key={i}
+              x1={-60 + i*16} y1="0"
+              x2={-60 + i*16 + 200} y2="800"
+              stroke="#2c2c2c" strokeWidth={i%5===0?0.8:0.4}/>
+          ))}
+        </svg>
+
+        {/* Rose corner accent — top right */}
+        <div className="absolute top-0 right-0" style={{
+          width:180, height:180,
+          background:'radial-gradient(circle at 100% 0%, rgba(225,29,72,0.08) 0%, transparent 60%)',
+        }}/>
+
+        {/* Blue corner accent — bottom left */}
+        <div className="absolute bottom-0 left-0" style={{
+          width:180, height:180,
+          background:'radial-gradient(circle at 0% 100%, rgba(37,99,235,0.07) 0%, transparent 60%)',
+        }}/>
+
       </div>
     );
   }
@@ -1325,465 +1221,6 @@ type SettingsSection = 'appearance' | 'ai' | 'chat' | 'data' | 'about';
 // ─────────────────────────────────────────────────────────────────────────────
 // ─────────────────────────────────────────────────────────────────────────────
 // ─────────────────────────────────────────────────────────────────────────────
-// NOVA — Tessa's built-in web browser
-// Opens as a full-screen overlay when user clicks "Web" in the chat input bar.
-// Features: real URL navigation via iframe, tab management, back/forward,
-//           bookmarks bar, Tessa AI sidebar, and smooth animations.
-// ─────────────────────────────────────────────────────────────────────────────
-const NOVA_BOOKMARKS = [
-  { icon:'🌐', label:'Google',    url:'https://www.google.com'      },
-  { icon:'📰', label:'BBC News',  url:'https://www.bbc.com/news'    },
-  { icon:'🐙', label:'GitHub',    url:'https://github.com'          },
-  { icon:'▶️', label:'YouTube',   url:'https://www.youtube.com'     },
-  { icon:'🔬', label:'Wikipedia', url:'https://www.wikipedia.org'   },
-  { icon:'🌤️', label:'Weather',   url:'https://wttr.in/?format=3'   },
-];
-
-interface NovaTab { id:string; url:string; title:string; favicon:string; }
-
-function NovaBrowser({
-  open, onClose, initialUrl, glow, isLight
-}: {
-  open:boolean; onClose:()=>void; initialUrl?:string;
-  glow:string; isLight:boolean;
-}) {
-  const [tabs,       setTabs]       = useState<NovaTab[]>([{ id:'t1', url: initialUrl||'https://www.google.com', title:'New Tab', favicon:'🌐' }]);
-  const [activeTab,  setActiveTab]  = useState('t1');
-  const [urlInput,   setUrlInput]   = useState(initialUrl||'https://www.google.com');
-  const [urlFocused, setUrlFocused] = useState(false);
-  const [loading,    setLoading]    = useState(false);
-  const [history,    setHistory]    = useState<string[]>([initialUrl||'https://www.google.com']);
-  const [histIdx,    setHistIdx]    = useState(0);
-  const [showBkBar,  setShowBkBar]  = useState(true);
-  const [sideOpen,   setSideOpen]   = useState(false);
-  const [sideQuery,  setSideQuery]  = useState('');
-  const [sideReply,  setSideReply]  = useState('');
-  const [sideLoad,   setSideLoad]   = useState(false);
-  const iframeRef  = useRef<HTMLIFrameElement>(null);
-  const urlRef     = useRef<HTMLInputElement>(null);
-
-  const curTab = tabs.find(t=>t.id===activeTab) ?? tabs[0];
-
-  // Update URL bar when active tab changes
-  useEffect(()=>{ if (curTab) setUrlInput(curTab.url); }, [activeTab]);
-  // Reset on open
-  useEffect(()=>{
-    if (open && initialUrl) {
-      navigate(initialUrl);
-    }
-  // eslint-disable-next-line
-  }, [open]);
-
-  const normalise = (raw:string) => {
-    const s = raw.trim();
-    if (!s) return 'https://www.google.com';
-    if (s.startsWith('http')) return s;
-    if (s.includes('.') && !s.includes(' ')) return 'https://'+s;
-    return `https://www.google.com/search?q=${encodeURIComponent(s)}`;
-  };
-
-  const navigate = (raw:string) => {
-    const url = normalise(raw);
-    setUrlInput(url);
-    setLoading(true);
-    const newHist = [...history.slice(0, histIdx+1), url];
-    setHistory(newHist); setHistIdx(newHist.length-1);
-    setTabs(ts => ts.map(t => t.id===activeTab ? {...t, url, title: getDomain(url), favicon: getFavicon(url)} : t));
-  };
-
-  const getDomain = (url:string) => {
-    try { return new URL(url).hostname.replace('www.',''); } catch { return url.slice(0,30); }
-  };
-  const getFavicon = (url:string) => {
-    try {
-      const h = new URL(url).hostname;
-      if (h.includes('google'))    return '🔍';
-      if (h.includes('youtube'))   return '▶️';
-      if (h.includes('github'))    return '🐙';
-      if (h.includes('wikipedia')) return '📖';
-      if (h.includes('bbc'))       return '📰';
-      if (h.includes('reddit'))    return '🤖';
-      if (h.includes('twitter') || h.includes('x.com')) return '𝕏';
-      if (h.includes('instagram')) return '📸';
-      if (h.includes('linkedin'))  return '💼';
-      if (h.includes('amazon'))    return '📦';
-      if (h.includes('wikipedia')) return '📖';
-    } catch {}
-    return '🌐';
-  };
-
-  const goBack    = () => { if(histIdx>0){ const i=histIdx-1; setHistIdx(i); navigate(history[i]); } };
-  const goForward = () => { if(histIdx<history.length-1){ const i=histIdx+1; setHistIdx(i); navigate(history[i]); } };
-  const refresh   = () => { if(iframeRef.current) { iframeRef.current.src = iframeRef.current.src; setLoading(true); } };
-
-  const newTab = () => {
-    const id = 'tab-'+Date.now();
-    setTabs(ts=>[...ts, {id, url:'https://www.google.com', title:'New Tab', favicon:'🌐'}]);
-    setActiveTab(id); setUrlInput('https://www.google.com');
-  };
-  const closeTab = (id:string, e:React.MouseEvent) => {
-    e.stopPropagation();
-    if (tabs.length===1) { onClose(); return; }
-    const idx = tabs.findIndex(t=>t.id===id);
-    const next = tabs[idx===0?1:idx-1];
-    setTabs(ts=>ts.filter(t=>t.id!==id));
-    if (activeTab===id) setActiveTab(next.id);
-  };
-
-  const askTessa = async () => {
-    if (!sideQuery.trim()) return;
-    setSideLoad(true); setSideReply('');
-    try {
-      const res = await fetch('/api/chat', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({
-          messages:[{role:'user', content: `I'm browsing ${curTab?.url}. ${sideQuery}`}],
-          isCreatorMode:false, needsSearch:true, useWebSearch:true,
-          maxTokens:600, language:'en', currentMood:'calm',
-        }),
-      });
-      const data = await res.json();
-      setSideReply(data.content || 'No response.');
-    } catch { setSideReply('Connection error.'); }
-    finally { setSideLoad(false); }
-  };
-
-  const bg   = isLight ? '#f8fafc' : '#0d1117';
-  const chr  = isLight ? '#ffffff' : '#161b22';  // chrome / toolbar bg
-  const brd  = isLight ? '#e2e8f0' : '#30363d';
-  const txt  = isLight ? '#1e293b' : '#e6edf3';
-  const sub  = isLight ? '#64748b' : '#8b949e';
-  const tabA = isLight ? '#ffffff' : '#1c2333';
-  const tabI = isLight ? '#f1f5f9' : '#161b22';
-
-  if (!open) return null;
-
-  return (
-    <div style={{
-      position:'fixed', inset:0, zIndex:200,
-      background: bg,
-      display:'flex', flexDirection:'column',
-      animation:'fadeInFast 0.18s ease',
-    }}>
-      <style>{`
-        @keyframes fadeInFast { from{opacity:0;transform:scale(0.98)} to{opacity:1;transform:scale(1)} }
-        @keyframes slideInRight { from{opacity:0;transform:translateX(18px)} to{opacity:1;transform:translateX(0)} }
-        .nova-tab-scroll::-webkit-scrollbar { height:3px; }
-        .nova-tab-scroll::-webkit-scrollbar-thumb { background:${glow}40; border-radius:2px; }
-        .nova-url:focus { outline:none; }
-      `}</style>
-
-      {/* ══ CHROME BAR ═══════════════════════════════════════════════════ */}
-      <div style={{
-        background: chr, borderBottom:`1px solid ${brd}`,
-        flexShrink:0, userSelect:'none',
-      }}>
-
-        {/* ── Tab strip ── */}
-        <div style={{ display:'flex', alignItems:'center', gap:0, paddingLeft:12, paddingTop:8, overflowX:'auto' }}
-          className="nova-tab-scroll">
-          {/* NOVA wordmark pill */}
-          <div style={{
-            display:'flex', alignItems:'center', gap:6, marginRight:12, flexShrink:0,
-            padding:'4px 10px', borderRadius:8,
-            background:`linear-gradient(135deg,${glow},${glow}bb)`,
-          }}>
-            <span style={{ fontSize:11, fontWeight:700, color:'white', letterSpacing:'0.14em' }}>NOVA</span>
-            <span style={{ fontSize:8, color:'white', opacity:0.7, letterSpacing:'0.04em' }}>Networked Oracle for Virtual Access</span>
-          </div>
-
-          {/* Tabs */}
-          {tabs.map(tab=>(
-            <div key={tab.id} onClick={()=>setActiveTab(tab.id)}
-              style={{
-                display:'flex', alignItems:'center', gap:6,
-                padding:'6px 12px 6px 10px', borderRadius:'8px 8px 0 0',
-                background: tab.id===activeTab ? tabA : tabI,
-                border: `1px solid ${brd}`,
-                borderBottom: tab.id===activeTab ? `1px solid ${chr}` : `1px solid ${brd}`,
-                cursor:'pointer', flexShrink:0, minWidth:120, maxWidth:180,
-                marginRight:2, position:'relative', transition:'background 0.15s',
-              }}>
-              <span style={{ fontSize:12 }}>{tab.favicon}</span>
-              <span style={{ fontSize:11, fontWeight: tab.id===activeTab?600:400, color:txt,
-                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', flex:1 }}>
-                {tab.title}
-              </span>
-              <button onClick={e=>closeTab(tab.id,e)}
-                style={{ background:'none', border:'none', cursor:'pointer', color:sub,
-                  padding:'0 2px', borderRadius:4, lineHeight:1, fontSize:14, flexShrink:0 }}>
-                ×
-              </button>
-            </div>
-          ))}
-
-          {/* New tab */}
-          <button onClick={newTab} style={{
-            flexShrink:0, marginLeft:4, width:28, height:28, borderRadius:8,
-            background:'transparent', border:`1px solid ${brd}`, color:sub,
-            cursor:'pointer', fontSize:16, display:'flex', alignItems:'center', justifyContent:'center',
-          }}>+</button>
-        </div>
-
-        {/* ── Nav + URL bar ── */}
-        <div style={{ display:'flex', alignItems:'center', gap:6, padding:'6px 10px 8px' }}>
-          {/* Back */}
-          <button onClick={goBack} disabled={histIdx===0}
-            style={{ width:32, height:32, borderRadius:8, border:'none', background:'transparent',
-              cursor:histIdx===0?'default':'pointer', color:histIdx===0?sub+'60':sub, fontSize:18,
-              display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.15s' }}>
-            ‹
-          </button>
-          {/* Forward */}
-          <button onClick={goForward} disabled={histIdx>=history.length-1}
-            style={{ width:32, height:32, borderRadius:8, border:'none', background:'transparent',
-              cursor:histIdx>=history.length-1?'default':'pointer',
-              color:histIdx>=history.length-1?sub+'60':sub, fontSize:18,
-              display:'flex', alignItems:'center', justifyContent:'center' }}>
-            ›
-          </button>
-          {/* Refresh */}
-          <button onClick={refresh}
-            style={{ width:32, height:32, borderRadius:8, border:'none', background:'transparent',
-              cursor:'pointer', color:sub, fontSize:16,
-              display:'flex', alignItems:'center', justifyContent:'center' }}>
-            {loading ? '⟳' : '↻'}
-          </button>
-
-          {/* URL bar */}
-          <div style={{ flex:1, position:'relative' }}>
-            <div style={{
-              display:'flex', alignItems:'center', gap:8,
-              background: urlFocused ? (isLight?'#fff':'#1c2333') : (isLight?'#f1f5f9':'#1c2333'),
-              border: `1.5px solid ${urlFocused?glow:brd}`,
-              borderRadius:10, padding:'0 12px', height:34,
-              transition:'border-color 0.15s',
-              boxShadow: urlFocused ? `0 0 0 3px ${glow}20` : 'none',
-            }}>
-              {/* Lock / protocol icon */}
-              <span style={{ fontSize:11, opacity:0.5, flexShrink:0 }}>
-                {curTab?.url?.startsWith('https')?'🔒':'🔓'}
-              </span>
-              <input
-                ref={urlRef}
-                className="nova-url"
-                value={urlFocused ? urlInput : (urlInput.length>60?getDomain(urlInput):urlInput)}
-                onChange={e=>setUrlInput(e.target.value)}
-                onFocus={()=>{ setUrlFocused(true); urlRef.current?.select(); }}
-                onBlur={()=>setUrlFocused(false)}
-                onKeyDown={e=>{ if(e.key==='Enter'){ navigate(urlInput); urlRef.current?.blur(); } }}
-                style={{
-                  flex:1, background:'transparent', border:'none', outline:'none',
-                  fontSize:12, color:txt, minWidth:0,
-                  fontFamily: urlFocused ? 'monospace' : 'inherit',
-                }}
-                spellCheck={false}
-                autoComplete="off"
-              />
-              {urlFocused && urlInput && (
-                <button onClick={()=>setUrlInput('')}
-                  style={{ background:'none', border:'none', color:sub, cursor:'pointer', fontSize:14, flexShrink:0 }}>
-                  ×
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Tessa side panel toggle */}
-          <button onClick={()=>setSideOpen(p=>!p)}
-            title="Ask Tessa about this page"
-            style={{
-              flexShrink:0, width:32, height:32, borderRadius:8, border:`1px solid ${sideOpen?glow:brd}`,
-              background: sideOpen?`${glow}18`:'transparent', cursor:'pointer',
-              display:'flex', alignItems:'center', justifyContent:'center',
-              color: sideOpen?glow:sub, fontSize:15, transition:'all 0.15s',
-            }}>
-            ✦
-          </button>
-
-          {/* Bookmark bar toggle */}
-          <button onClick={()=>setShowBkBar(p=>!p)}
-            style={{ flexShrink:0, width:32, height:32, borderRadius:8, border:`1px solid ${brd}`,
-              background:'transparent', cursor:'pointer', color:sub,
-              display:'flex', alignItems:'center', justifyContent:'center', fontSize:13 }}>
-            🔖
-          </button>
-
-          {/* Close NOVA */}
-          <button onClick={onClose}
-            style={{ flexShrink:0, width:32, height:32, borderRadius:8,
-              border:`1px solid ${brd}`, background:'transparent',
-              cursor:'pointer', color:sub, fontSize:15,
-              display:'flex', alignItems:'center', justifyContent:'center',
-              transition:'all 0.15s',
-            }}
-            onMouseEnter={e=>(e.currentTarget.style.background='#ef444415', e.currentTarget.style.color='#ef4444')}
-            onMouseLeave={e=>(e.currentTarget.style.background='transparent', e.currentTarget.style.color=sub)}>
-            ✕
-          </button>
-        </div>
-
-        {/* ── Bookmarks bar ── */}
-        {showBkBar && (
-          <div style={{ display:'flex', alignItems:'center', gap:4, padding:'0 14px 8px',
-            overflowX:'auto', borderTop:`1px solid ${brd}` }} className="nova-tab-scroll">
-            {NOVA_BOOKMARKS.map((bk,i)=>(
-              <button key={i} onClick={()=>navigate(bk.url)}
-                style={{ flexShrink:0, display:'flex', alignItems:'center', gap:5,
-                  padding:'3px 10px', borderRadius:6, background:'transparent',
-                  border:`1px solid transparent`, cursor:'pointer',
-                  fontSize:11, color:sub, transition:'all 0.12s',
-                  whiteSpace:'nowrap',
-                }}
-                onMouseEnter={e=>(e.currentTarget.style.background=`${glow}12`, e.currentTarget.style.borderColor=`${glow}25`, (e.currentTarget.style.color=txt))}
-                onMouseLeave={e=>(e.currentTarget.style.background='transparent', e.currentTarget.style.borderColor='transparent', (e.currentTarget.style.color=sub))}>
-                <span style={{ fontSize:13 }}>{bk.icon}</span>
-                <span>{bk.label}</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* ══ CONTENT AREA ═════════════════════════════════════════════════ */}
-      <div style={{ flex:1, display:'flex', overflow:'hidden', position:'relative' }}>
-
-        {/* Loading bar */}
-        {loading && (
-          <div style={{ position:'absolute', top:0, left:0, right:0, height:2, zIndex:10,
-            background:`linear-gradient(90deg,${glow},${glow}88,${glow})`,
-            animation:'novaLoad 1.2s linear infinite',
-          }}/>
-        )}
-        <style>{`@keyframes novaLoad{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}`}</style>
-
-        {/* Iframe */}
-        <iframe
-          ref={iframeRef}
-          src={curTab?.url}
-          style={{ flex:1, border:'none', background:bg }}
-          title="Nova browser"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
-          onLoad={()=>{ setLoading(false); }}
-          onError={()=>setLoading(false)}
-        />
-
-        {/* ── Tessa AI sidebar ── */}
-        {sideOpen && (
-          <div style={{
-            width: 320, flexShrink:0, background:chr, borderLeft:`1px solid ${brd}`,
-            display:'flex', flexDirection:'column', animation:'slideInRight 0.18s ease',
-          }}>
-            {/* Header */}
-            <div style={{ padding:'12px 14px 10px', borderBottom:`1px solid ${brd}`,
-              background:`linear-gradient(135deg,${glow}14,${glow}05)` }}>
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                  <div style={{ width:26, height:26, borderRadius:8,
-                    background:`linear-gradient(135deg,${glow},${glow}bb)`,
-                    display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    <span style={{ fontSize:13 }}>✦</span>
-                  </div>
-                  <div>
-                    <p style={{ fontSize:12, fontWeight:700, color:txt, margin:0 }}>Ask Tessa</p>
-                    <p style={{ fontSize:9, color:sub, margin:0 }}>About this page</p>
-                  </div>
-                </div>
-                <button onClick={()=>setSideOpen(false)}
-                  style={{ background:'none', border:'none', color:sub, cursor:'pointer', fontSize:16 }}>×</button>
-              </div>
-              {/* Current page chip */}
-              <div style={{ marginTop:8, padding:'4px 8px', borderRadius:6,
-                background:isLight?'#f1f5f9':'#1c2333', border:`1px solid ${brd}` }}>
-                <p style={{ fontSize:10, color:sub, margin:0, overflow:'hidden',
-                  textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                  📄 {getDomain(curTab?.url||'')}
-                </p>
-              </div>
-            </div>
-
-            {/* Response area */}
-            <div style={{ flex:1, overflowY:'auto', padding:'12px 14px' }}>
-              {!sideReply && !sideLoad && (
-                <div style={{ textAlign:'center', paddingTop:24 }}>
-                  <div style={{ fontSize:32, marginBottom:8 }}>✦</div>
-                  <p style={{ fontSize:12, color:sub, lineHeight:1.6 }}>
-                    Ask me anything about this page, search for related info, or get a quick summary.
-                  </p>
-                  {/* Quick actions */}
-                  <div style={{ display:'flex', flexDirection:'column', gap:6, marginTop:16 }}>
-                    {['Summarise this page','What is this site about?','Find key facts here','Search for similar topics'].map(q=>(
-                      <button key={q} onClick={()=>{ setSideQuery(q); setTimeout(()=>{ setSideQuery(q); askTessa(); },0); }}
-                        style={{ padding:'8px 12px', borderRadius:8, background:isLight?'#f1f5f9':'#1c2333',
-                          border:`1px solid ${brd}`, color:sub, fontSize:11, cursor:'pointer',
-                          textAlign:'left', transition:'all 0.12s',
-                        }}
-                        onMouseEnter={e=>(e.currentTarget.style.borderColor=`${glow}40`, (e.currentTarget.style.color=txt))}
-                        onMouseLeave={e=>(e.currentTarget.style.borderColor=brd, (e.currentTarget.style.color=sub))}>
-                        {q}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {sideLoad && (
-                <div style={{ display:'flex', flexDirection:'column', gap:10, paddingTop:12 }}>
-                  {[80,60,90,45].map((w,i)=>(
-                    <div key={i} style={{ height:10, borderRadius:5, width:`${w}%`,
-                      background:isLight?'#e2e8f0':'#30363d',
-                      animation:`pulse 1.4s ease ${i*0.15}s infinite` }}/>
-                  ))}
-                  <style>{`@keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}`}</style>
-                </div>
-              )}
-              {sideReply && !sideLoad && (
-                <div>
-                  <div style={{ padding:'10px 12px', borderRadius:10, marginBottom:10,
-                    background:isLight?'#f0fdf4':'#0d2818', border:`1px solid ${glow}25` }}>
-                    <p style={{ fontSize:8.5, fontWeight:700, color:glow, margin:'0 0 5px',
-                      textTransform:'uppercase', letterSpacing:'0.06em' }}>✦ Tessa</p>
-                    <p style={{ fontSize:12, color:txt, margin:0, lineHeight:1.7,
-                      whiteSpace:'pre-wrap', userSelect:'text' }}>{sideReply}</p>
-                  </div>
-                  <button onClick={()=>{ setSideReply(''); setSideQuery(''); }}
-                    style={{ fontSize:10, color:sub, background:'none', border:'none', cursor:'pointer', padding:0 }}>
-                    ← Ask another question
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Input */}
-            <div style={{ padding:'10px 14px', borderTop:`1px solid ${brd}` }}>
-              <div style={{ display:'flex', gap:8 }}>
-                <input
-                  value={sideQuery}
-                  onChange={e=>setSideQuery(e.target.value)}
-                  onKeyDown={e=>{ if(e.key==='Enter') askTessa(); }}
-                  placeholder="Ask about this page…"
-                  style={{ flex:1, padding:'8px 12px', borderRadius:9,
-                    background:isLight?'#f1f5f9':'#1c2333',
-                    border:`1px solid ${brd}`, outline:'none', fontSize:12,
-                    color:txt,
-                  }}
-                />
-                <button onClick={askTessa} disabled={sideLoad||!sideQuery.trim()}
-                  style={{ width:36, height:36, borderRadius:9, border:'none', cursor:'pointer',
-                    background:`linear-gradient(135deg,${glow},${glow}bb)`, color:'white',
-                    display:'flex', alignItems:'center', justifyContent:'center',
-                    opacity: sideLoad||!sideQuery.trim() ? 0.4 : 1, fontSize:16 }}>
-                  ↑
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // FLOATING DOCK — bottom-right: HealthPulse only (Tessa Sports removed)
 // ─────────────────────────────────────────────────────────────────────────────
 function FloatingDock({ glow, isLight, showHealth, hidden, onHealthSync }:
@@ -1913,8 +1350,6 @@ export default function Home() {
   const [webSearchOn,     setWebSearchOn]   = useState(false);   // manual per-message toggle
   const [lastSearchData,  setLastSearchData] = useState<{snippets:string[];sources:{title:string;url:string;snippet:string}[];query:string}|null>(null);
   const [showSearchPanel, setShowSearchPanel] = useState(false); // show/hide web results drawer
-  const [showNova,        setShowNova]       = useState(false);  // NOVA browser overlay
-  const [novaInitUrl,     setNovaInitUrl]    = useState('https://www.google.com');
   const [voiceOutput,     setVoiceOutput]   = useState(false);
   const [responseLength,  setResponseLength]= useState<ResponseLength>('medium');
   const [animations,      setAnimations]    = useState(true);
@@ -1978,7 +1413,7 @@ export default function Home() {
     : theme==='dark' ? '#6366f1' : theme==='cyberpunk' ? '#ec4899'
     : theme==='ocean' ? '#0ea5e9' : theme==='sunset' ? '#f59e0b'
     : theme==='pastel' ? '#a855f7' : theme==='sakura' ? '#f43f5e'
-    : theme==='ankit' ? '#fb7185' : '#818cf8';
+    : theme==='ankit' ? '#2563eb' : '#818cf8';
 
   const fontSizeClass = fontSize==='sm' ? 'text-xs' : fontSize==='lg' ? 'text-base' : 'text-sm';
 
@@ -3553,15 +2988,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                       <img src={avatarSrc} alt="Tessa" className="w-full h-full object-cover"
                         onError={e=>{(e.currentTarget as HTMLImageElement).src=AVATARS[0].path;}}/>
                     </div>
-                    <p style={{
-                      fontSize: 22,
-                      fontWeight: 300,
-                      letterSpacing: '0.38em',
-                      textTransform: 'uppercase',
-                      color: t.glow,
-                      lineHeight: 1,
-                      WebkitFontSmoothing: 'antialiased',
-                    }}>TESSA</p>
+                    <p className="text-xl font-black tracking-[0.25em] uppercase" style={{color:t.glow}}>TESSA</p>
                     <p className={`text-[10px] mt-1 max-w-[180px] mx-auto ${t.sSub}`}>The Exceptional System, Surpassing ALL</p>
                     <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold"
                       style={{background:`${t.glow}18`,border:`1px solid ${t.glow}28`,color:t.glow}}>
@@ -3647,16 +3074,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
               {/* Name block */}
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <h1 style={{
-                    fontSize: isCreatorMode ? 15 : 14,
-                    fontWeight: isCreatorMode ? 600 : 700,
-                    letterSpacing: '0.22em',
-                    textTransform: 'uppercase',
-                    lineHeight: 1,
-                    color: t.glow,
-                    fontVariantNumeric: 'tabular-nums',
-                    WebkitFontSmoothing: 'antialiased',
-                  }}>
+                  <h1 className={`font-black text-[13px] leading-none tracking-[0.12em] uppercase ${t.accent}`}>
                     TESSA
                   </h1>
                   {isCreatorMode && (
@@ -3899,19 +3317,10 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                     </div>
 
                     {/* Greeting */}
-                    <h2 className="mb-1 text-center" style={{
-                      fontSize: 26,
-                      fontWeight: isCreatorMode ? 400 : 700,
-                      letterSpacing: isCreatorMode ? '0.04em' : '-0.01em',
-                      lineHeight: 1.2,
-                      background: isCreatorMode
-                        ? `linear-gradient(135deg, ${t.glow} 0%, #fb7185 50%, #fbbf24 100%)`
-                        : undefined,
-                      WebkitBackgroundClip: isCreatorMode ? 'text' : undefined,
-                      WebkitTextFillColor: isCreatorMode ? 'transparent' : undefined,
-                      backgroundClip: isCreatorMode ? 'text' : undefined,
-                    }}>
-                      {isCreatorMode ? `Hey, Ankit 💝` : `Hi, I'm Tessa 👋`}
+                    <h2 className={`text-2xl font-black mb-1 text-center`}>
+                      {isCreatorMode
+                        ? `Hey Ankit! 💝`
+                        : `Hi, I'm Tessa 👋`}
                     </h2>
                     <p className={`text-sm ${t.sub} text-center max-w-xs leading-relaxed mb-6`}>
                       {isCreatorMode
@@ -4170,55 +3579,41 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                 </button>
               </div>
 
-              {/* Toolbar row — NOVA launcher + web search toggle + hints */}
+              {/* Toolbar row — web search toggle + sources + hints */}
               <div className="flex items-center justify-between mt-1.5 px-0.5 gap-2">
-                {/* Left: browser + search controls */}
+                {/* Left: web search controls */}
                 <div className="flex items-center gap-1.5">
 
-                  {/* ── NOVA browser button — opens full browser overlay ── */}
-                  <button
-                    onClick={()=>{ setNovaInitUrl('https://www.google.com'); setShowNova(true); }}
-                    title="Open NOVA — Networked Oracle for Virtual Access"
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all active:scale-95"
-                    style={{
-                      background: `linear-gradient(135deg,${t.glow}18,${t.glow}0a)`,
-                      border: `1px solid ${t.glow}40`,
-                    }}>
-                    <Globe size={11} style={{color:t.glow}}/>
-                    <span className="text-[10px] font-bold" style={{
-                      color:t.glow, letterSpacing:'0.06em',
-                    }}>NOVA</span>
-                  </button>
-
-                  {/* Web search toggle for this message */}
+                  {/* Web search toggle */}
                   <button
                     onClick={()=>setWebSearchOn(p=>!p)}
-                    title={webSearchOn ? 'Web search ON for next message — click to disable' : 'Force web search for next message'}
-                    className="flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all active:scale-95"
+                    title={webSearchOn ? 'Web search ON — click to disable' : 'Enable web search for this message'}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all active:scale-95"
                     style={{
-                      background: webSearchOn ? `${t.glow}15` : 'transparent',
-                      border: `1px solid ${webSearchOn ? t.glow+'45' : t.glow+'18'}`,
+                      background: webSearchOn ? `${t.glow}18` : 'transparent',
+                      border: `1px solid ${webSearchOn ? t.glow+'50' : t.glow+'20'}`,
                     }}>
-                    <span style={{ fontSize:9, color: webSearchOn ? t.glow : undefined }}
-                      className={`font-semibold ${webSearchOn ? '' : t.sub}`}>
-                      {webSearchOn ? '🔍 Search: ON' : '🔍 Search'}
+                    <Globe size={11} style={{color: webSearchOn ? t.glow : undefined}}/>
+                    <span className={`text-[10px] font-semibold ${webSearchOn ? '' : t.sub}`}
+                      style={{color: webSearchOn ? t.glow : undefined}}>
+                      {webSearchOn ? 'Web: ON' : 'Web'}
                     </span>
                     {webSearchOn && <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"/>}
                   </button>
 
-                  {/* Sources button — shows after a search */}
+                  {/* Sources button — shows after a web-search reply */}
                   {lastSearchData && (
                     <button
                       onClick={()=>setShowSearchPanel(p=>!p)}
                       title="View sources used by Tessa"
-                      className="flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all active:scale-95"
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all active:scale-95"
                       style={{
                         background: showSearchPanel ? `${t.glow}15` : 'transparent',
-                        border: `1px solid ${t.glow}22`,
+                        border: `1px solid ${t.glow}25`,
                       }}>
-                      <ExternalLink size={9} style={{color:t.glow}}/>
-                      <span className="text-[9px] font-medium" style={{color:t.glow}}>
-                        {showSearchPanel ? 'Hide' : `Sources (${lastSearchData.sources.length})`}
+                      <ExternalLink size={10} style={{color:t.glow}}/>
+                      <span className="text-[10px] font-medium" style={{color:t.glow}}>
+                        {showSearchPanel ? 'Hide sources' : `Sources (${lastSearchData.sources.length})`}
                       </span>
                     </button>
                   )}
@@ -4327,14 +3722,6 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
         onHealthSync={() => setWellnessVersion(v => v + 1)}
       />
 
-      {/* ── NOVA BROWSER — Tessa's built-in web browser ── */}
-      <NovaBrowser
-        open={showNova}
-        onClose={()=>setShowNova(false)}
-        initialUrl={novaInitUrl}
-        glow={t.glow}
-        isLight={t.isLight}
-      />
 
       {/* ── FLOATING INSIGHTS PANEL ── */}
       {insightsOpen && isCreatorMode && (

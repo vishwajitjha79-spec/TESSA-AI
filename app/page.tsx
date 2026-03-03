@@ -13,7 +13,7 @@ import {
   Lock, Unlock, Cpu, BarChart3, Hash,
   Check, Database, Info, Globe, Image as ImageIcon,
   Salad, Flame, ChevronRight, Stethoscope, TrendingUp,
-  Trophy, Tv2, Radio, RefreshCw, ExternalLink,
+  Trophy, Tv2, Radio, RefreshCw, ExternalLink, Search,
 } from 'lucide-react';
 
 import type { Message, MoodType, Conversation } from '@/types';
@@ -359,38 +359,38 @@ const THEMES = {
   // Background: parchment (#f0ebe0) + sketch lines + Spidey mask corner art
   // All text stays dark slate — fully readable over the light parchment
   ankit: {
-    bg:'bg-[#f5f0e8]', bgC:'bg-[#f0ebe0]',
-    panel:'bg-white/80 backdrop-blur-md border-red-200/40 shadow-sm shadow-red-100/20',
-    panelC:'bg-white/75 backdrop-blur-md border-slate-300/40 shadow-sm shadow-slate-200/30',
-    header:'bg-[#f5f0e8]/92 backdrop-blur-md border-b border-red-200/35 shadow-sm',
-    headerC:'bg-[#f0ebe0]/92 backdrop-blur-md border-b border-slate-300/35 shadow-sm',
-    bar:'bg-[#f5f0e8]/92 backdrop-blur-md border-t border-red-200/35',
-    barC:'bg-[#f0ebe0]/92 backdrop-blur-md border-t border-slate-300/35',
-    msgU:'bg-white/70 border border-red-200/40 border-l-[3px] border-l-red-500/60',
-    msgUC:'bg-white/70 border border-slate-200/40 border-l-[3px] border-l-red-700/50',
-    msgA:'bg-white/65 border border-slate-200/40 border-l-[3px] border-l-blue-400/50',
-    msgAC:'bg-white/65 border border-slate-200/40 border-l-[3px] border-l-slate-500/50',
-    inp:'bg-white/90 border border-red-200/50 text-slate-800 placeholder:text-slate-400 focus:border-red-400/60 focus:ring-2 focus:ring-red-300/20',
-    inpC:'bg-white/90 border border-slate-300/50 text-slate-800 placeholder:text-slate-400 focus:border-slate-500/60 focus:ring-2 focus:ring-slate-300/20',
-    btnP:'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-sm shadow-red-500/30',
-    btnPC:'bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white shadow-sm shadow-slate-500/30',
-    btnS:'bg-white/80 hover:bg-white border border-red-200/50 text-slate-700 hover:text-slate-900',
-    btnSC:'bg-white/80 hover:bg-white border border-slate-300/50 text-slate-700 hover:text-slate-900',
-    text:'text-slate-800', sub:'text-slate-500', subC:'text-slate-600',
-    accent:'text-red-700', accentC:'text-slate-800',
-    glow:'#dc2626', glowC:'#1a1a2e',
-    card:'bg-white/75 border border-red-100/50',
-    cardC:'bg-white/75 border border-slate-200/50',
-    active:'bg-white border border-red-400/50',
-    activeC:'bg-white border border-slate-400/50',
-    div:'border-red-200/35', divC:'border-slate-300/35',
-    // Settings panel — solid white so sliders/toggles are fully readable
-    settBg:'bg-white/98 backdrop-blur-md border-t border-red-200/40',
-    settBgC:'bg-white/98 backdrop-blur-md border-t border-slate-300/40',
-    settText:'text-slate-800', settTextHover:'hover:text-slate-900',
-    settSub:'text-slate-500', settLabel:'text-slate-600',
-    settCard:'bg-slate-50 border border-slate-200/60',
-    settActive:'bg-red-50 border border-red-300/50',
+    // Standard: warm cream with dusty rose accents
+    bg:'bg-[#fdf6f0]', bgC:'bg-[#fdf6f0]',
+    panel:'bg-white/85 backdrop-blur-xl border-rose-200/50 shadow-lg shadow-rose-100/30',
+    panelC:'bg-white/85 backdrop-blur-xl border-rose-200/50 shadow-lg shadow-rose-100/30',
+    header:'bg-[#fdf6f0]/94 backdrop-blur-xl border-b border-rose-200/40 shadow-sm shadow-rose-100/20',
+    headerC:'bg-[#fdf6f0]/94 backdrop-blur-xl border-b border-rose-200/40 shadow-sm shadow-rose-100/20',
+    bar:'bg-[#fdf6f0]/94 backdrop-blur-xl border-t border-rose-200/40',
+    barC:'bg-[#fdf6f0]/94 backdrop-blur-xl border-t border-rose-200/40',
+    msgU:'bg-white/80 border border-rose-200/50 border-l-[3px] border-l-rose-400/70 shadow-sm shadow-rose-50',
+    msgUC:'bg-white/80 border border-rose-200/50 border-l-[3px] border-l-rose-500/60 shadow-sm shadow-rose-50',
+    msgA:'bg-white/70 border border-stone-200/50 border-l-[3px] border-l-amber-400/60 shadow-sm',
+    msgAC:'bg-white/70 border border-stone-200/50 border-l-[3px] border-l-amber-400/60 shadow-sm',
+    inp:'bg-white/95 border border-rose-200/60 text-stone-800 placeholder:text-stone-400 focus:border-rose-400/70 focus:ring-2 focus:ring-rose-200/40',
+    inpC:'bg-white/95 border border-rose-200/60 text-stone-800 placeholder:text-stone-400 focus:border-rose-400/70 focus:ring-2 focus:ring-rose-200/40',
+    btnP:'bg-gradient-to-br from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white shadow-md shadow-rose-300/40',
+    btnPC:'bg-gradient-to-br from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white shadow-md shadow-rose-300/40',
+    btnS:'bg-white/90 hover:bg-white border border-rose-200/60 text-stone-700 hover:text-stone-900 hover:border-rose-300/80',
+    btnSC:'bg-white/90 hover:bg-white border border-rose-200/60 text-stone-700 hover:text-stone-900 hover:border-rose-300/80',
+    text:'text-stone-800', sub:'text-stone-500', subC:'text-stone-500',
+    accent:'text-rose-600', accentC:'text-rose-600',
+    glow:'#e11d48', glowC:'#e11d48',
+    card:'bg-white/80 border border-rose-100/60',
+    cardC:'bg-white/80 border border-rose-100/60',
+    active:'bg-white border border-rose-400/60 shadow-sm',
+    activeC:'bg-white border border-rose-400/60 shadow-sm',
+    div:'border-rose-200/40', divC:'border-rose-200/40',
+    settBg:'bg-white/98 backdrop-blur-xl border-t border-rose-200/40',
+    settBgC:'bg-white/98 backdrop-blur-xl border-t border-rose-200/40',
+    settText:'text-stone-800', settTextHover:'hover:text-stone-900',
+    settSub:'text-stone-500', settLabel:'text-stone-600',
+    settCard:'bg-rose-50/60 border border-rose-100/70',
+    settActive:'bg-rose-50 border border-rose-300/60',
     isLight:true,
   },
 } as const;
@@ -435,7 +435,7 @@ const THEME_POPUP_BG: Record<string, string> = {
   cyberpunk: 'rgba(3,2,18,0.98)',
   ocean:     'rgba(2,8,28,0.98)',
   sunset:    'rgba(12,6,3,0.98)',
-  ankit:     'rgba(245,240,232,0.99)',
+  ankit:     'rgba(253,246,240,0.99)',
   light:     'rgba(255,255,255,0.99)',
   pastel:    'rgba(255,255,255,0.99)',
   sakura:    'rgba(255,255,255,0.99)',
@@ -542,180 +542,173 @@ function AuroraBg({ glow, glow2 }: { glow: string; glow2: string; theme: Theme }
 function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
   // Ankit theme: only active in creator mode. Standard mode falls through to configs below.
   if (theme === 'ankit' && creator) {
-    // Parchment + sketch/ink aesthetic (Image 4 inspired)
-    // No spider figure in centre — just texture, sketch lines, mask corner art
     return (
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-        {/* Parchment base */}
-        <div className="absolute inset-0" style={{ background: '#f0ebe0' }}/>
 
-        {/* Warm vignette — very subtle */}
+        {/* ── Base: soft ivory-cream ── */}
+        <div className="absolute inset-0"
+          style={{ background: 'linear-gradient(160deg, #fdf6f0 0%, #fff0f3 35%, #fdf6f0 60%, #fff8f0 100%)' }}/>
+
+        {/* ── Delicate watercolour wash — top-left blush ── */}
+        <div className="absolute" style={{
+          top:-80, left:-60, width:520, height:520, borderRadius:'50%',
+          background:'radial-gradient(circle, rgba(251,113,133,0.13) 0%, rgba(251,113,133,0.04) 55%, transparent 75%)',
+          filter:'blur(40px)',
+        }}/>
+        {/* ── Watercolour wash — bottom-right amber/peach ── */}
+        <div className="absolute" style={{
+          bottom:-100, right:-80, width:600, height:560, borderRadius:'50%',
+          background:'radial-gradient(circle, rgba(251,191,100,0.11) 0%, rgba(255,167,120,0.07) 45%, transparent 70%)',
+          filter:'blur(48px)',
+        }}/>
+        {/* ── Centre vignette — very soft rose heart ── */}
         <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse 80% 70% at 50% 50%, transparent 50%, rgba(180,150,110,0.12) 100%)',
+          background:'radial-gradient(ellipse 70% 55% at 50% 48%, rgba(253,162,180,0.07) 0%, transparent 65%)',
         }}/>
 
-        {/* Diagonal speed / sketch lines — Image 4 style */}
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 800"
-          preserveAspectRatio="xMidYMid slice" style={{ opacity: 0.07 }}>
-          {Array.from({length:50},(_,i)=>(
-            <line key={i}
-              x1={-80 + i*12} y1="0"
-              x2={-80 + i*12 + 220} y2="800"
-              stroke="#2c2c2c" strokeWidth={i%6===0?0.9:i%3===0?0.55:0.35}/>
-          ))}
-        </svg>
-
-        {/* Red + dark ink splatter dots scattered across — Image 4 style */}
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 800"
-          preserveAspectRatio="xMidYMid slice" style={{ opacity: 0.40 }}>
-          {[
-            [38,115,'#c0392b',3],[62,275,'#c0392b',2],[78,395,'#1a1a2e',2.5],[28,548,'#c0392b',1.8],[88,665,'#1a1a2e',1.5],
-            [285,78,'#c0392b',2.2],[312,198,'#1a1a2e',3],[258,362,'#c0392b',1.8],[322,478,'#c0392b',2],[288,598,'#1a1a2e',1.5],[348,718,'#c0392b',1.2],
-            [148,148,'#1a1a2e',2],[168,318,'#c0392b',1.5],[128,478,'#1a1a2e',2.5],[158,628,'#c0392b',1],
-            [218,98,'#c0392b',1.5],[198,258,'#1a1a2e',2],[238,418,'#c0392b',1.8],[208,578,'#1a1a2e',1.2],
-            [55,35,'#c0392b',1.2],[320,35,'#1a1a2e',1],[180,22,'#c0392b',0.8],
-          ].map(([x,y,fill,r],i)=>(
-            <circle key={i} cx={x as number} cy={y as number} r={r as number} fill={fill as string}/>
-          ))}
-        </svg>
-
-        {/* Spidey mask — bottom-right corner only, large, artistic */}
-        <svg className="absolute bottom-0 right-0" style={{ width: '72%', maxWidth: 340, opacity: 0.10 }}
-          viewBox="0 0 300 400" preserveAspectRatio="xMaxYMax meet">
-          {/* Head */}
-          <ellipse cx="195" cy="155" rx="125" ry="155" fill="#c0392b"/>
-          {/* Web lines radiating from eye area */}
-          {[0,18,36,54,72,90,108,126,144,162,180].map((deg,i)=>{
-            const rad=deg*Math.PI/180;
-            return <line key={i} x1="195" y1="155" x2={195+210*Math.cos(rad)} y2={155+210*Math.sin(rad)}
-              stroke="#8b0000" strokeWidth="0.7" opacity="0.5"/>;
+        {/* ── Fine botanical line art — top-right corner rose ── */}
+        <svg className="absolute top-0 right-0" style={{ width:260, opacity:0.09 }}
+          viewBox="0 0 260 320" preserveAspectRatio="xMaxYMin meet">
+          {/* Main stem */}
+          <path d="M 200,320 C 196,260 188,200 168,140 C 152,88 130,42 110,0"
+            fill="none" stroke="#be185d" strokeWidth="1.4" strokeLinecap="round"/>
+          {/* Branch left 1 */}
+          <path d="M 178,210 C 155,195 132,186 108,182"
+            fill="none" stroke="#be185d" strokeWidth="0.9" strokeLinecap="round"/>
+          {/* Branch left 2 */}
+          <path d="M 160,158 C 138,148 118,144 95,144"
+            fill="none" stroke="#be185d" strokeWidth="0.9" strokeLinecap="round"/>
+          {/* Branch right 1 */}
+          <path d="M 175,240 C 198,228 218,224 240,225"
+            fill="none" stroke="#be185d" strokeWidth="0.9" strokeLinecap="round"/>
+          {/* Rose bloom 1 — top */}
+          <circle cx="110" cy="0" r="16" fill="none" stroke="#e11d48" strokeWidth="0.8" opacity="0.7"/>
+          <circle cx="110" cy="0" r="10" fill="none" stroke="#e11d48" strokeWidth="0.6" opacity="0.5"/>
+          <circle cx="110" cy="0" r="5"  fill="rgba(225,29,72,0.15)"/>
+          {/* Petals around bloom 1 */}
+          {[0,51,103,154,206,257,308].map((deg,i)=>{
+            const r=deg*Math.PI/180; const rx=110+20*Math.cos(r); const ry=0+20*Math.sin(r);
+            return <ellipse key={i} cx={rx} cy={ry} rx="6" ry="10"
+              fill="rgba(225,29,72,0.12)" stroke="#e11d48" strokeWidth="0.5" opacity="0.6"
+              transform={`rotate(${deg+90} ${rx} ${ry})`}/>;
           })}
-          {[38,76,114,152,190].map((r,i)=>(
-            <ellipse key={i} cx="195" cy="155" rx={r} ry={r*1.22}
-              fill="none" stroke="#8b0000" strokeWidth="0.55" opacity={0.38-i*0.05}/>
-          ))}
-          {/* Big angular eye lens — top left */}
-          <path d="M 108,96 C 118,74 162,68 184,84 C 206,100 212,128 196,139 C 170,155 110,143 100,120 C 96,110 100,104 108,96 Z"
-            fill="white" opacity="0.92"/>
-          <path d="M 111,99 C 121,79 160,74 181,88 C 201,103 206,125 191,135 C 166,150 113,139 105,118 C 101,109 104,105 111,99 Z"
-            fill="#b0bec5" opacity="0.4"/>
-          {/* Dark body/shoulder at bottom */}
-          <ellipse cx="240" cy="370" rx="155" ry="115" fill="#1a1a2e" opacity="0.88"/>
-        </svg>
-
-        {/* Small ink blot — bottom-left corner accent */}
-        <svg className="absolute bottom-0 left-0" style={{ width: '32%', maxWidth: 130, opacity: 0.08 }}
-          viewBox="0 0 130 180">
-          <ellipse cx="50" cy="165" rx="70" ry="55" fill="#1a1a2e"/>
-          <ellipse cx="22" cy="148" rx="26" ry="44" fill="#c0392b"/>
-        </svg>
-
-        {/* TASM2 scene — Gwen horizontal suspended, Spidey grieving beside her */}
-        {/* Placed together upper-left, not in extreme corners */}
-
-        {/* Web threads holding Gwen up — anchor at top */}
-        <svg className="absolute" style={{ left:'8%', top:0, width:160, height:100, opacity:0.15 }}
-          viewBox="0 0 160 100" preserveAspectRatio="none">
-          <line x1="48"  y1="0" x2="48"  y2="100" stroke="#999" strokeWidth="1.2" strokeDasharray="3,3"/>
-          <line x1="112" y1="0" x2="112" y2="100" stroke="#999" strokeWidth="1.2" strokeDasharray="3,3"/>
-          {([210,225,240,255,270,285,300] as number[]).map((deg,i)=>{
-            const r=deg*Math.PI/180;
-            return <line key={i} x1="48" y1="4" x2={48+12*Math.cos(r)} y2={4+12*Math.sin(r)} stroke="#aaa" strokeWidth="0.5" opacity="0.5"/>;
+          {/* Rose bloom 2 — mid */}
+          <circle cx="95" cy="144" r="13" fill="none" stroke="#e11d48" strokeWidth="0.7" opacity="0.55"/>
+          <circle cx="95" cy="144" r="7"  fill="rgba(225,29,72,0.1)"/>
+          {[0,60,120,180,240,300].map((deg,i)=>{
+            const r=deg*Math.PI/180; const rx=95+16*Math.cos(r); const ry=144+16*Math.sin(r);
+            return <ellipse key={i} cx={rx} cy={ry} rx="5" ry="9"
+              fill="rgba(225,29,72,0.09)" stroke="#e11d48" strokeWidth="0.5" opacity="0.5"
+              transform={`rotate(${deg+90} ${rx} ${ry})`}/>;
           })}
-          {([210,225,240,255,270,285,300] as number[]).map((deg,i)=>{
-            const r=deg*Math.PI/180;
-            return <line key={'b'+i} x1="112" y1="4" x2={112+12*Math.cos(r)} y2={4+12*Math.sin(r)} stroke="#aaa" strokeWidth="0.5" opacity="0.5"/>;
-          })}
+          {/* Leaves */}
+          <path d="M 108,182 Q 90,168 75,172 Q 88,185 108,182 Z" fill="rgba(120,60,30,0.12)" stroke="#92400e" strokeWidth="0.6" opacity="0.5"/>
+          <path d="M 160,158 Q 148,138 136,136 Q 140,152 160,158 Z" fill="rgba(120,60,30,0.1)"  stroke="#92400e" strokeWidth="0.5" opacity="0.4"/>
+          <path d="M 240,225 Q 228,212 218,218 Q 226,228 240,225 Z" fill="rgba(120,60,30,0.1)"  stroke="#92400e" strokeWidth="0.5" opacity="0.4"/>
         </svg>
 
-        {/* ── Gwen: lying horizontal, parallel to ground, suspended by two web strands ── */}
-        <svg className="absolute" style={{ left:'5%', top:68, width:200, opacity:0.27 }}
+        {/* ── Fine botanical — bottom-left corner small sprig ── */}
+        <svg className="absolute bottom-0 left-0" style={{ width:160, opacity:0.08 }}
+          viewBox="0 0 160 200" preserveAspectRatio="xMinYMax meet">
+          <path d="M 30,200 C 36,162 48,128 68,98 C 84,72 104,52 118,26"
+            fill="none" stroke="#be185d" strokeWidth="1.2" strokeLinecap="round"/>
+          <path d="M 58,148 C 40,140 24,136 8,138" fill="none" stroke="#be185d" strokeWidth="0.8" strokeLinecap="round"/>
+          <path d="M 84,98 C 96,88 110,86 124,90"  fill="none" stroke="#be185d" strokeWidth="0.8" strokeLinecap="round"/>
+          <circle cx="118" cy="26" r="11" fill="none" stroke="#e11d48" strokeWidth="0.7" opacity="0.6"/>
+          <circle cx="118" cy="26" r="6"  fill="rgba(225,29,72,0.12)"/>
+          {[0,72,144,216,288].map((deg,i)=>{
+            const r=deg*Math.PI/180; const rx=118+14*Math.cos(r); const ry=26+14*Math.sin(r);
+            return <ellipse key={i} cx={rx} cy={ry} rx="4" ry="7"
+              fill="rgba(225,29,72,0.1)" stroke="#e11d48" strokeWidth="0.5" opacity="0.5"
+              transform={`rotate(${deg+90} ${rx} ${ry})`}/>;
+          })}
+          <path d="M 8,138 Q 14,126 22,128 Q 16,138 8,138 Z" fill="rgba(120,60,30,0.1)" stroke="#92400e" strokeWidth="0.5" opacity="0.4"/>
+        </svg>
+
+        {/* ── TASM2 scene — placed upper-centre, Gwen horizontal, Spidey beside ── */}
+        {/* Gwen — lying flat, web strands from top */}
+        <svg className="absolute" style={{ left:'6%', top:0, width:4, height:90, opacity:0.12 }}
+          viewBox="0 0 4 90">
+          <line x1="2" y1="0" x2="2" y2="90" stroke="#c0392b" strokeWidth="1.5" strokeDasharray="4,3"/>
+        </svg>
+        <svg className="absolute" style={{ left:'26%', top:0, width:4, height:90, opacity:0.12 }}
+          viewBox="0 0 4 90">
+          <line x1="2" y1="0" x2="2" y2="90" stroke="#c0392b" strokeWidth="1.5" strokeDasharray="4,3"/>
+        </svg>
+
+        {/* Gwen body — horizontal, opacity lower on light bg */}
+        <svg className="absolute" style={{ left:'3%', top:68, width:195, opacity:0.18 }}
           viewBox="0 0 200 80">
-          {/* Web attachment points on body */}
-          <line x1="52"  y1="0" x2="52"  y2="30" stroke="#999" strokeWidth="1" strokeDasharray="2,2"/>
-          <line x1="118" y1="0" x2="118" y2="30" stroke="#999" strokeWidth="1" strokeDasharray="2,2"/>
-          {/* Legs — horizontal, feet to the right */}
-          <path d="M 132,36 C 150,35 168,34 184,32" fill="none" stroke="#2c3e70" strokeWidth="10" strokeLinecap="round"/>
-          <path d="M 132,44 C 150,45 168,46 184,48" fill="none" stroke="#2c3e70" strokeWidth="8" strokeLinecap="round"/>
-          {/* Shoes */}
-          <ellipse cx="186" cy="31" rx="9" ry="5" fill="#1a1a1a" transform="rotate(-4 186 31)"/>
-          <ellipse cx="186" cy="49" rx="8" ry="4" fill="#1a1a1a" transform="rotate(4 186 49)"/>
-          {/* Torso — red jacket */}
-          <rect x="72" y="28" width="62" height="24" rx="10" fill="#8b1a1a"/>
-          {/* White collar */}
-          <ellipse cx="74" cy="40" rx="11" ry="8" fill="#f0f0f0"/>
-          {/* Arms — left arm trailing back, right slightly forward */}
-          <path d="M 74,34 C 58,30 44,26 32,24" fill="none" stroke="#8b1a1a" strokeWidth="7" strokeLinecap="round"/>
-          <path d="M 74,48 C 60,52 46,54 34,56" fill="none" stroke="#8b1a1a" strokeWidth="6" strokeLinecap="round"/>
-          <circle cx="30" cy="23" r="5" fill="#f5deb3"/>
-          <circle cx="32" cy="57" r="5" fill="#f5deb3"/>
-          {/* Head — facing right, eyes closed */}
-          <ellipse cx="54" cy="40" rx="15" ry="13" fill="#f5deb3"/>
-          {/* Blonde hair streaming to the left */}
-          <path d="M 46,30 C 30,22 16,16 4,14"  fill="none" stroke="#d4aa55" strokeWidth="4"   strokeLinecap="round"/>
+          <path d="M 132,36 C 150,35 168,34 184,32" fill="none" stroke="#1e3a5f" strokeWidth="10" strokeLinecap="round"/>
+          <path d="M 132,44 C 150,45 168,46 184,48" fill="none" stroke="#1e3a5f" strokeWidth="8" strokeLinecap="round"/>
+          <ellipse cx="186" cy="31" rx="9" ry="5" fill="#111" transform="rotate(-4 186 31)"/>
+          <ellipse cx="186" cy="49" rx="8" ry="4" fill="#111" transform="rotate(4 186 49)"/>
+          <rect x="72" y="28" width="62" height="24" rx="10" fill="#7f1d1d"/>
+          <ellipse cx="74" cy="40" rx="11" ry="8" fill="#f8f0e8"/>
+          <path d="M 74,34 C 58,30 44,26 32,24" fill="none" stroke="#7f1d1d" strokeWidth="7" strokeLinecap="round"/>
+          <path d="M 74,48 C 60,52 46,54 34,56" fill="none" stroke="#7f1d1d" strokeWidth="6" strokeLinecap="round"/>
+          <circle cx="30" cy="23" r="5" fill="#e8c4a0"/>
+          <circle cx="32" cy="57" r="5" fill="#e8c4a0"/>
+          <ellipse cx="54" cy="40" rx="15" ry="13" fill="#e8c4a0"/>
+          <path d="M 46,30 C 30,22 16,16 4,14"  fill="none" stroke="#b8860b" strokeWidth="4"   strokeLinecap="round"/>
           <path d="M 44,34 C 28,28 14,24 2,24"  fill="none" stroke="#c8a84b" strokeWidth="3.5" strokeLinecap="round"/>
-          <path d="M 44,40 C 28,40 14,39 2,38"  fill="none" stroke="#d4aa55" strokeWidth="3"   strokeLinecap="round"/>
+          <path d="M 44,40 C 28,40 14,39 2,38"  fill="none" stroke="#b8860b" strokeWidth="3"   strokeLinecap="round"/>
           <path d="M 46,47 C 30,52 16,54 4,54"  fill="none" stroke="#c8a84b" strokeWidth="3"   strokeLinecap="round"/>
-          <path d="M 48,52 C 34,58 22,62 8,64"  fill="none" stroke="#d4aa55" strokeWidth="2.5" strokeLinecap="round"/>
-          {/* Closed eyes */}
-          <path d="M 49,38 C 51,35 55,35 58,38" fill="none" stroke="#8b6347" strokeWidth="1.2"/>
-          <path d="M 50,43 C 52,40 56,40 59,43" fill="none" stroke="#8b6347" strokeWidth="1.2"/>
-          <path d="M 50,46 Q 54,48 58,46" fill="none" stroke="#c0726a" strokeWidth="0.9"/>
+          <path d="M 48,52 C 34,58 22,62 8,64"  fill="none" stroke="#b8860b" strokeWidth="2.5" strokeLinecap="round"/>
+          <path d="M 49,38 C 51,35 55,35 58,38" fill="none" stroke="#7c5c44" strokeWidth="1.2"/>
+          <path d="M 50,43 C 52,40 56,40 59,43" fill="none" stroke="#7c5c44" strokeWidth="1.2"/>
         </svg>
 
-        {/* ── Spider-Man: sitting beside Gwen, head bowed, grieving ── */}
-        <svg className="absolute" style={{ left:'34%', top:60, width:130, opacity:0.26 }}
+        {/* Spidey — sitting, grieving, next to Gwen */}
+        <svg className="absolute" style={{ left:'31%', top:52, width:118, opacity:0.18 }}
           viewBox="0 0 100 170">
-          {/* Sitting legs bent — knees up */}
-          <path d="M 30,105 C 22,120 16,132 14,144" fill="none" stroke="#c0392b" strokeWidth="11" strokeLinecap="round"/>
-          <path d="M 56,105 C 66,118 72,130 74,142" fill="none" stroke="#1565c0" strokeWidth="11" strokeLinecap="round"/>
-          {/* Lower legs */}
-          <path d="M 14,144 C 10,150 18,154 34,150" fill="none" stroke="#c0392b" strokeWidth="10" strokeLinecap="round"/>
-          <path d="M 74,142 C 80,148 78,154 64,152" fill="none" stroke="#1565c0" strokeWidth="9" strokeLinecap="round"/>
-          {/* Shoes */}
-          <ellipse cx="23" cy="151" rx="12" ry="5" fill="#c0392b"/>
-          <ellipse cx="68" cy="153" rx="11" ry="5" fill="#c0392b"/>
-          {/* Body slumped forward */}
-          <ellipse cx="43" cy="86" rx="19" ry="22" fill="#1565c0"/>
-          <ellipse cx="43" cy="81" rx="13" ry="15" fill="#c0392b"/>
-          {/* Spider emblem */}
-          <ellipse cx="43" cy="79" rx="4" ry="5.5" fill="#0d0d0d"/>
+          <path d="M 30,105 C 22,120 16,132 14,144" fill="none" stroke="#9b1c1c" strokeWidth="11" strokeLinecap="round"/>
+          <path d="M 56,105 C 66,118 72,130 74,142" fill="none" stroke="#1e3a8a" strokeWidth="11" strokeLinecap="round"/>
+          <path d="M 14,144 C 10,150 18,154 34,150" fill="none" stroke="#9b1c1c" strokeWidth="10" strokeLinecap="round"/>
+          <path d="M 74,142 C 80,148 78,154 64,152" fill="none" stroke="#1e3a8a" strokeWidth="9"  strokeLinecap="round"/>
+          <ellipse cx="43" cy="86" rx="19" ry="22" fill="#1e3a8a"/>
+          <ellipse cx="43" cy="81" rx="13" ry="15" fill="#9b1c1c"/>
+          <ellipse cx="43" cy="79" rx="4"  ry="5.5" fill="#0d0d0d"/>
           <line x1="43" y1="73" x2="35" y2="66" stroke="#0d0d0d" strokeWidth="1.8"/>
           <line x1="43" y1="73" x2="51" y2="66" stroke="#0d0d0d" strokeWidth="1.8"/>
           <line x1="43" y1="85" x2="35" y2="92" stroke="#0d0d0d" strokeWidth="1.8"/>
           <line x1="43" y1="85" x2="51" y2="92" stroke="#0d0d0d" strokeWidth="1.8"/>
-          {/* Arms — both resting on knees, hanging forward */}
-          <path d="M 25,90 C 18,102 16,112 18,118" fill="none" stroke="#c0392b" strokeWidth="9" strokeLinecap="round"/>
-          <path d="M 61,88 C 68,100 70,110 68,116" fill="none" stroke="#1565c0" strokeWidth="9" strokeLinecap="round"/>
-          <circle cx="18" cy="119" r="7" fill="#c0392b"/>
-          <circle cx="68" cy="117" r="7" fill="#1565c0"/>
-          {/* Head — deeply bowed, chin to chest */}
-          <ellipse cx="42" cy="60" rx="18" ry="18" fill="#c0392b" transform="rotate(10 42 60)"/>
-          {/* Web lines on mask */}
-          {[175,195,215,235,255].map((deg,i)=>{
-            const r2=deg*Math.PI/180;
-            return <line key={i} x1="42" y1="60" x2={42+22*Math.cos(r2)} y2={60+22*Math.sin(r2)}
-              stroke="#8b0000" strokeWidth="0.7" opacity="0.4"/>;
+          <path d="M 25,90 C 18,102 16,112 18,118" fill="none" stroke="#9b1c1c" strokeWidth="9" strokeLinecap="round"/>
+          <path d="M 61,88 C 68,100 70,110 68,116" fill="none" stroke="#1e3a8a" strokeWidth="9" strokeLinecap="round"/>
+          <ellipse cx="42" cy="60" rx="18" ry="18" fill="#9b1c1c" transform="rotate(10 42 60)"/>
+          {[175,200,225,250].map((deg,i)=>{
+            const r=deg*Math.PI/180;
+            return <line key={i} x1="42" y1="60" x2={42+22*Math.cos(r)} y2={60+22*Math.sin(r)}
+              stroke="#7f1d1d" strokeWidth="0.7" opacity="0.5"/>;
           })}
-          <ellipse cx="42" cy="60" rx="8" ry="9"  fill="none" stroke="#8b0000" strokeWidth="0.6" opacity="0.4"/>
-          <ellipse cx="42" cy="60" rx="14" ry="15" fill="none" stroke="#8b0000" strokeWidth="0.5" opacity="0.3"/>
-          {/* Grief-lidded eyes — looking down */}
-          <path d="M 33,54 C 35,49 40,48 44,50" fill="white" opacity="0.8"/>
-          <path d="M 44,50 C 48,48 51,50 52,54" fill="white" opacity="0.8"/>
-          <ellipse cx="38" cy="53" rx="3.5" ry="2.5" fill="#b0bec5" opacity="0.45"/>
-          <ellipse cx="47" cy="53" rx="3.5" ry="2.5" fill="#b0bec5" opacity="0.45"/>
-          {/* Tear drop — subtle */}
-          <ellipse cx="36" cy="57" rx="1.2" ry="2" fill="#aac8e0" opacity="0.5"/>
+          <path d="M 33,54 C 35,49 40,48 44,50" fill="white" opacity="0.75"/>
+          <path d="M 44,50 C 48,48 51,50 52,54" fill="white" opacity="0.75"/>
+          <ellipse cx="38" cy="53" rx="3" ry="2" fill="#94a3b8" opacity="0.4"/>
+          <ellipse cx="47" cy="53" rx="3" ry="2" fill="#94a3b8" opacity="0.4"/>
         </svg>
-        {/* Paper grain */}
+
+        {/* ── Fine gold dividing rule — mid-screen subtle ── */}
+        <svg className="absolute" style={{ top:'50%', left:0, width:'100%', opacity:0.06 }}
+          viewBox="0 0 400 2" preserveAspectRatio="none">
+          <line x1="0" y1="1" x2="400" y2="1" stroke="#b8860b" strokeWidth="0.8"/>
+        </svg>
+
+        {/* ── Paper grain noise overlay ── */}
         <div className="absolute inset-0" style={{
-          backgroundImage: 'radial-gradient(circle, rgba(100,80,60,0.065) 1px, transparent 1px)',
-          backgroundSize: '18px 18px',
+          backgroundImage:'url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E")',
+          backgroundSize:'180px 180px',
+          opacity:0.5,
+          mixBlendMode:'multiply',
+        }}/>
+
+        {/* ── Soft dot-grid pattern ── */}
+        <div className="absolute inset-0" style={{
+          backgroundImage:'radial-gradient(circle, rgba(190,24,93,0.04) 1px, transparent 1px)',
+          backgroundSize:'28px 28px',
         }}/>
       </div>
     );
   }
-
   const configs: Record<string, { grad: string; blob1: string; blob2: string; blob3: string }> = {
     light: {
       grad: creator
@@ -1331,682 +1324,478 @@ type SettingsSection = 'appearance' | 'ai' | 'chat' | 'data' | 'about';
 // ─────────────────────────────────────────────────────────────────────────────
 // ─────────────────────────────────────────────────────────────────────────────
 // ─────────────────────────────────────────────────────────────────────────────
-// TESSA SPORTS — Cricbuzz-style live scores browser (2025-2026 data)
 // ─────────────────────────────────────────────────────────────────────────────
-type SportTab = 'cricket' | 'football' | 'tennis' | 'f1' | 'basketball' | 'other';
-const SPORT_TABS2: { id: SportTab; emoji: string; label: string }[] = [
-  { id: 'cricket',    emoji: '🏏', label: 'Cricket'    },
-  { id: 'football',   emoji: '⚽', label: 'Football'   },
-  { id: 'tennis',     emoji: '🎾', label: 'Tennis'     },
-  { id: 'f1',         emoji: '🏎️', label: 'F1'         },
-  { id: 'basketball', emoji: '🏀', label: 'NBA'        },
-  { id: 'other',      emoji: '🏆', label: 'More'       },
+// NOVA — Tessa's built-in web browser
+// Opens as a full-screen overlay when user clicks "Web" in the chat input bar.
+// Features: real URL navigation via iframe, tab management, back/forward,
+//           bookmarks bar, Tessa AI sidebar, and smooth animations.
+// ─────────────────────────────────────────────────────────────────────────────
+const NOVA_BOOKMARKS = [
+  { icon:'🌐', label:'Google',    url:'https://www.google.com'      },
+  { icon:'📰', label:'BBC News',  url:'https://www.bbc.com/news'    },
+  { icon:'🐙', label:'GitHub',    url:'https://github.com'          },
+  { icon:'▶️', label:'YouTube',   url:'https://www.youtube.com'     },
+  { icon:'🔬', label:'Wikipedia', url:'https://www.wikipedia.org'   },
+  { icon:'🌤️', label:'Weather',   url:'https://wttr.in/?format=3'   },
 ];
-const SPORT_SUGG: Record<SportTab, string[]> = {
-  cricket: [
-    'India vs England 2026 live score',
-    'IPL 2026 today match scorecard',
-    'ICC Champions Trophy 2025 result',
-    'India batting score now',
-    'Test match today scorecard',
-    'Pakistan vs Australia live',
-    'IPL points table 2026',
-    'T20 World Cup 2026 score',
-    'MI vs CSK live 2026',
-    'Rohit Sharma score today',
-    'Virat Kohli runs today',
-    'India vs New Zealand ODI',
-    'England vs Australia Ashes 2025',
-    'India T20 score today',
-    'ICC rankings 2026 batsmen',
-  ],
-  football: [
-    'Premier League scores today 2025',
-    'Man City vs Arsenal live',
-    'Champions League 2025 result',
-    'La Liga scores this week',
-    'Liverpool vs Chelsea score',
-    'FIFA World Cup 2026 qualifier',
-    'Bundesliga results today',
-    'Serie A live score now',
-    'Real Madrid vs Barcelona 2025',
-    'Europa League result today',
-    'Premier League standings 2025',
-    'PSG vs Man United score',
-    'Arsenal latest score today',
-    'Ligue 1 standings 2025',
-  ],
-  tennis: [
-    'Australian Open 2026 live score',
-    'Wimbledon 2025 final result',
-    'US Open 2025 score today',
-    'ATP rankings 2026',
-    'Sinner vs Djokovic score',
-    'Alcaraz match today result',
-    'French Open 2025 winner',
-    'WTA rankings 2026 today',
-    'Davis Cup 2025 score',
-    'Medvedev match result today',
-    'Nadal comeback 2026',
-    'Australian Open draw 2026',
-  ],
-  f1: [
-    'F1 2026 season race result',
-    'F1 Abu Dhabi GP 2025 result',
-    'Verstappen championship 2025',
-    'F1 drivers standings 2026',
-    'McLaren race result today',
-    'Ferrari F1 2025 result',
-    'Hamilton Mercedes 2026',
-    'F1 qualifying result today',
-    'Norris race result 2025',
-    'F1 constructors standings 2026',
-    'Monaco GP 2026 race result',
-    'British GP 2025 winner',
-  ],
-  basketball: [
-    'NBA Finals 2025 score',
-    'NBA live score tonight',
-    'Lakers vs Warriors 2025',
-    'LeBron James stats today',
-    'NBA playoffs 2025 result',
-    'Stephen Curry game score',
-    'Celtics vs Heat score 2025',
-    'NBA standings 2025-26',
-    'Giannis game result today',
-    'NBA MVP 2025 winner',
-    'Eastern Conference standings',
-    'Western Conference standings',
-  ],
-  other: [
-    'Hockey World Cup 2026 score',
-    'Pro Kabaddi League 2025 score',
-    'Olympic Paris 2024 final results',
-    'Badminton Thomas Cup 2026',
-    'ISL football score today',
-    'UFC fight result this week',
-    'Golf Masters 2025 winner',
-    'Boxing result today 2025',
-    'WWE SmackDown result',
-    'Kho Kho World Cup 2025',
-  ],
-};
 
-const SPORTS_SYSTEM = `You are Tessa Sports. Today is ${new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}.
+interface NovaTab { id:string; url:string; title:string; favicon:string; }
 
-CRITICAL: Always use web search. Return ONLY a valid JSON array, no other text.
-Output format — array of match cards:
-[
-  {
-    "sport": "cricket",
-    "status": "live|completed|upcoming",
-    "title": "IND vs ENG · 3rd ODI",
-    "venue": "Wankhede Stadium, Mumbai",
-    "date": "Mar 1, 2026",
-    "team1": { "name": "India", "flag": "🇮🇳", "score": "287/6", "overs": "48.2", "batting": true },
-    "team2": { "name": "England", "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "score": "245/8", "overs": "50.0", "batting": false },
-    "summary": "India leads by 42 runs · 10 balls left",
-    "result": "India won by 42 runs",
-    "topBat": "Rohit 87(64)",
-    "topBowl": "Bumrah 3/28",
-    "innings": [
-      { "team": "India", "score": "287/6", "overs": "50", "batsmen": [{"name":"Rohit","runs":"87","balls":"64","fours":"9","sixes":"2","sr":"135.9"},{"name":"Shubman","runs":"64","balls":"71","fours":"6","sixes":"1","sr":"90.1"}], "bowlers": [{"name":"Archer","overs":"10","runs":"52","wickets":"2","econ":"5.2"},{"name":"Wood","overs":"10","runs":"61","wickets":"1","econ":"6.1"}] },
-      { "team": "England", "score": "245/8", "overs": "50", "batsmen": [{"name":"Root","runs":"72","balls":"88","fours":"7","sixes":"0","sr":"81.8"}], "bowlers": [{"name":"Bumrah","overs":"10","runs":"28","wickets":"3","econ":"2.8"},{"name":"Shami","overs":"10","runs":"45","wickets":"2","econ":"4.5"}] }
-    ]
-  }
-]
+function NovaBrowser({
+  open, onClose, initialUrl, glow, isLight
+}: {
+  open:boolean; onClose:()=>void; initialUrl?:string;
+  glow:string; isLight:boolean;
+}) {
+  const [tabs,       setTabs]       = useState<NovaTab[]>([{ id:'t1', url: initialUrl||'https://www.google.com', title:'New Tab', favicon:'🌐' }]);
+  const [activeTab,  setActiveTab]  = useState('t1');
+  const [urlInput,   setUrlInput]   = useState(initialUrl||'https://www.google.com');
+  const [urlFocused, setUrlFocused] = useState(false);
+  const [loading,    setLoading]    = useState(false);
+  const [history,    setHistory]    = useState<string[]>([initialUrl||'https://www.google.com']);
+  const [histIdx,    setHistIdx]    = useState(0);
+  const [showBkBar,  setShowBkBar]  = useState(true);
+  const [sideOpen,   setSideOpen]   = useState(false);
+  const [sideQuery,  setSideQuery]  = useState('');
+  const [sideReply,  setSideReply]  = useState('');
+  const [sideLoad,   setSideLoad]   = useState(false);
+  const iframeRef  = useRef<HTMLIFrameElement>(null);
+  const urlRef     = useRef<HTMLInputElement>(null);
 
-RULES:
-- status must be exactly "live", "completed", or "upcoming"
-- For upcoming: omit scores, add "time": "10:00 AM IST"
-- For football/tennis/F1: use goals/sets/points instead of cricket fields — keep same JSON structure but adapt
-- Include real innings data with at least 2 batsmen and 2 bowlers per innings when available
-- Return 1-4 matches maximum
-- ONLY return the JSON array, no markdown, no explanation`;
+  const curTab = tabs.find(t=>t.id===activeTab) ?? tabs[0];
 
-function SportsBrowser({ glow, isLight, hidden, inDock }: { glow: string; isLight: boolean; hidden?: boolean; inDock?: boolean }) {
-  const [open,        setOpen]        = useState(false);
-  const [tab,         setTab]         = useState<SportTab>('cricket');
-  const [query,       setQuery]       = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [showSug,     setShowSug]     = useState(false);
-  const [results,     setResults]     = useState('');
-  const [loading,     setLoading]     = useState(false);
-  const [pos,         setPos]         = useState<{x:number;y:number}|null>(null);
-  const [expandedCard,setExpandedCard]= useState(-1);
-  const dragging    = useRef(false);
-  const dragStart   = useRef({mx:0,my:0,px:0,py:0});
-  const panelRef    = useRef<HTMLDivElement>(null);
-  const inputRef    = useRef<HTMLInputElement>(null);
-  const debRef      = useRef<ReturnType<typeof setTimeout>|null>(null);
-
-  const bg    = isLight ? '#ffffff'  : '#0d1117';
-  const hdr   = isLight ? '#f8fafc'  : '#161b22';
-  const card  = isLight ? '#f1f5f9'  : '#1c2333';
-  const text  = isLight ? '#1e293b'  : '#e6edf3';
-  const sub   = isLight ? '#64748b'  : '#8b949e';
-  const brd   = isLight ? '#e2e8f0'  : '#30363d';
-  const sugBg = isLight ? '#ffffff'  : '#1c2333';
-
-  // GPU drag
-  const onDragStart = (e: React.PointerEvent) => {
-    if ((e.target as HTMLElement).closest('button,input')) return;
-    dragging.current = true;
-    dragStart.current = {
-      mx: e.clientX, my: e.clientY,
-      px: pos?.x ?? Math.max(8, window.innerWidth / 2 - 195),
-      py: pos?.y ?? 60,
-    };
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    if (panelRef.current) panelRef.current.style.transition = 'none';
-  };
-  const onDragMove = (e: React.PointerEvent) => {
-    if (!dragging.current || !panelRef.current) return;
-    const nx = Math.max(8, Math.min(window.innerWidth - 398, dragStart.current.px + e.clientX - dragStart.current.mx));
-    const ny = Math.max(8, Math.min(window.innerHeight - 560, dragStart.current.py + e.clientY - dragStart.current.my));
-    panelRef.current.style.left   = `${nx}px`;
-    panelRef.current.style.top    = `${ny}px`;
-    panelRef.current.style.bottom = 'unset';
-    panelRef.current.style.right  = 'unset';
-  };
-  const onDragEnd = (e: React.PointerEvent) => {
-    if (!dragging.current) return;
-    dragging.current = false;
-    const nx = Math.max(8, Math.min(window.innerWidth - 398, dragStart.current.px + e.clientX - dragStart.current.mx));
-    const ny = Math.max(8, Math.min(window.innerHeight - 560, dragStart.current.py + e.clientY - dragStart.current.my));
-    setPos({ x: nx, y: ny });
-    if (panelRef.current) panelRef.current.style.transition = '';
-  };
-
-  const onQueryChange = (val: string) => {
-    setQuery(val);
-    if (debRef.current) clearTimeout(debRef.current);
-    const trimmed = val.trim();
-    if (trimmed.length < 2) { setSuggestions([]); setShowSug(false); return; }
-    const words = trimmed.toLowerCase().split(/\s+/).filter(Boolean);
-    const filtered = SPORT_SUGG[tab]
-      .filter(s => words.every(w => s.toLowerCase().includes(w)))
-      .slice(0, 8);
-    setSuggestions(filtered);
-    setShowSug(filtered.length > 0);
-    if (trimmed.length > 5) {
-      debRef.current = setTimeout(() => search(trimmed), 1000);
+  // Update URL bar when active tab changes
+  useEffect(()=>{ if (curTab) setUrlInput(curTab.url); }, [activeTab]);
+  // Reset on open
+  useEffect(()=>{
+    if (open && initialUrl) {
+      navigate(initialUrl);
     }
+  // eslint-disable-next-line
+  }, [open]);
+
+  const normalise = (raw:string) => {
+    const s = raw.trim();
+    if (!s) return 'https://www.google.com';
+    if (s.startsWith('http')) return s;
+    if (s.includes('.') && !s.includes(' ')) return 'https://'+s;
+    return `https://www.google.com/search?q=${encodeURIComponent(s)}`;
   };
 
-  const search = async (q: string) => {
-    const clean = q.trim();
-    if (!clean || loading) return;
-    setShowSug(false);
-    setLoading(true); setResults('');
+  const navigate = (raw:string) => {
+    const url = normalise(raw);
+    setUrlInput(url);
+    setLoading(true);
+    const newHist = [...history.slice(0, histIdx+1), url];
+    setHistory(newHist); setHistIdx(newHist.length-1);
+    setTabs(ts => ts.map(t => t.id===activeTab ? {...t, url, title: getDomain(url), favicon: getFavicon(url)} : t));
+  };
+
+  const getDomain = (url:string) => {
+    try { return new URL(url).hostname.replace('www.',''); } catch { return url.slice(0,30); }
+  };
+  const getFavicon = (url:string) => {
+    try {
+      const h = new URL(url).hostname;
+      if (h.includes('google'))    return '🔍';
+      if (h.includes('youtube'))   return '▶️';
+      if (h.includes('github'))    return '🐙';
+      if (h.includes('wikipedia')) return '📖';
+      if (h.includes('bbc'))       return '📰';
+      if (h.includes('reddit'))    return '🤖';
+      if (h.includes('twitter') || h.includes('x.com')) return '𝕏';
+      if (h.includes('instagram')) return '📸';
+      if (h.includes('linkedin'))  return '💼';
+      if (h.includes('amazon'))    return '📦';
+      if (h.includes('wikipedia')) return '📖';
+    } catch {}
+    return '🌐';
+  };
+
+  const goBack    = () => { if(histIdx>0){ const i=histIdx-1; setHistIdx(i); navigate(history[i]); } };
+  const goForward = () => { if(histIdx<history.length-1){ const i=histIdx+1; setHistIdx(i); navigate(history[i]); } };
+  const refresh   = () => { if(iframeRef.current) { iframeRef.current.src = iframeRef.current.src; setLoading(true); } };
+
+  const newTab = () => {
+    const id = 'tab-'+Date.now();
+    setTabs(ts=>[...ts, {id, url:'https://www.google.com', title:'New Tab', favicon:'🌐'}]);
+    setActiveTab(id); setUrlInput('https://www.google.com');
+  };
+  const closeTab = (id:string, e:React.MouseEvent) => {
+    e.stopPropagation();
+    if (tabs.length===1) { onClose(); return; }
+    const idx = tabs.findIndex(t=>t.id===id);
+    const next = tabs[idx===0?1:idx-1];
+    setTabs(ts=>ts.filter(t=>t.id!==id));
+    if (activeTab===id) setActiveTab(next.id);
+  };
+
+  const askTessa = async () => {
+    if (!sideQuery.trim()) return;
+    setSideLoad(true); setSideReply('');
     try {
       const res = await fetch('/api/chat', {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
-          messages:[{ role:'user', content:`Search for and show scores/results for: ${clean}. Include 2025 or 2026 data.` }],
-          isCreatorMode:false, maxTokens:700,
-          _systemOverride: SPORTS_SYSTEM,
-          useWebSearch:true,
+          messages:[{role:'user', content: `I'm browsing ${curTab?.url}. ${sideQuery}`}],
+          isCreatorMode:false, needsSearch:true, useWebSearch:true,
+          maxTokens:600, language:'en', currentMood:'calm',
         }),
       });
       const data = await res.json();
-      setResults(data.content || 'No data found. Try being more specific, e.g. "India vs England 2026".');
-    } catch {
-      setResults('Connection error. Check internet and try again.');
-    } finally { setLoading(false); }
+      setSideReply(data.content || 'No response.');
+    } catch { setSideReply('Connection error.'); }
+    finally { setSideLoad(false); }
   };
 
-  const pick = (s: string) => { setQuery(s); setSuggestions([]); setShowSug(false); search(s); };
-  const switchTab = (t: SportTab) => {
-    setTab(t); setResults(''); setQuery(''); setSuggestions([]); setShowSug(false); setExpandedCard(-1);
-    // Auto-load major live/recent matches for this sport
-    const autoQ: Record<SportTab,string> = {
-      cricket: 'major cricket matches live and recent today 2026',
-      football: 'major football matches live and recent today 2026',
-      tennis: 'major tennis matches live and recent today 2026',
-      f1: 'latest Formula 1 race result and standings 2026',
-      basketball: 'NBA games live and recent today 2026',
-      other: 'major live sports scores today 2026',
-    };
-    setTimeout(() => search(autoQ[t]), 50);
-  };
+  const bg   = isLight ? '#f8fafc' : '#0d1117';
+  const chr  = isLight ? '#ffffff' : '#161b22';  // chrome / toolbar bg
+  const brd  = isLight ? '#e2e8f0' : '#30363d';
+  const txt  = isLight ? '#1e293b' : '#e6edf3';
+  const sub  = isLight ? '#64748b' : '#8b949e';
+  const tabA = isLight ? '#ffffff' : '#1c2333';
+  const tabI = isLight ? '#f1f5f9' : '#161b22';
 
-  // Render structured score cards from JSON
-  const renderResults = () => {
-    if (!results) return null;
-    let matches: any[] = [];
-    try {
-      // Strip markdown fences if present
-      const clean = results.replace(/```json|```/g,'').trim();
-      const parsed = JSON.parse(clean);
-      matches = Array.isArray(parsed) ? parsed : [parsed];
-    } catch {
-      // Fallback: plain text display
-      return (
-        <div style={{ fontSize:12, color:text, lineHeight:1.7, whiteSpace:'pre-wrap', userSelect:'text', padding:'4px 0' }}>
-          {results}
-        </div>
-      );
-    }
+  if (!open) return null;
 
-    const statusColor = (s:string) => s==='live' ? '#22c55e' : s==='completed' ? '#60a5fa' : '#f59e0b';
-    const statusLabel = (s:string) => s==='live' ? '🔴 LIVE' : s==='completed' ? '✅ Final' : '🕐 Upcoming';
-    const cardBg  = isLight ? '#f8fafc' : '#161b22';
-    const rowBg   = isLight ? '#f1f5f9' : '#1c2333';
-    const divCol  = isLight ? '#e2e8f0' : '#30363d';
-    const dimText = isLight ? '#64748b' : '#8b949e';
-    const boldText= isLight ? '#1e293b' : '#e6edf3';
-
-    return (
-      <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-        {matches.map((m:any, mi:number) => {
-          const [showCard, setShowCard] = [expandedCard===mi, (v:boolean)=>setExpandedCard(v?mi:-1)];
-          return (
-            <div key={mi} style={{ background:cardBg, borderRadius:14, overflow:'hidden',
-              border:`1px solid ${divCol}`, boxShadow:`0 2px 8px rgba(0,0,0,0.08)` }}>
-
-              {/* Match header */}
-              <div style={{ background:`linear-gradient(135deg,${glow}14,${glow}06)`,
-                padding:'10px 13px 8px', borderBottom:`1px solid ${divCol}` }}>
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-                  <div>
-                    <p style={{ fontSize:13, fontWeight:800, color:boldText, margin:0, lineHeight:1.3 }}>{m.title||'Match'}</p>
-                    <p style={{ fontSize:10, color:dimText, margin:'2px 0 0' }}>
-                      {m.venue && <span>📍 {m.venue}</span>}
-                      {m.date && <span style={{marginLeft:6}}>📅 {m.date}</span>}
-                    </p>
-                  </div>
-                  <span style={{ fontSize:10, fontWeight:700, color:statusColor(m.status),
-                    background:`${statusColor(m.status)}18`, border:`1px solid ${statusColor(m.status)}40`,
-                    padding:'3px 8px', borderRadius:6, flexShrink:0, marginLeft:8 }}>
-                    {statusLabel(m.status)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Score rows */}
-              <div style={{ padding:'10px 13px' }}>
-                {/* Team 1 */}
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
-                  padding:'8px 10px', borderRadius:10, marginBottom:6,
-                  background: m.team1?.batting ? `${glow}0e` : rowBg,
-                  border: m.team1?.batting ? `1px solid ${glow}30` : `1px solid transparent` }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                    <span style={{ fontSize:18, lineHeight:1 }}>{m.team1?.flag||'🏳'}</span>
-                    <div>
-                      <p style={{ fontSize:12, fontWeight:700, color:boldText, margin:0 }}>{m.team1?.name||'Team 1'}</p>
-                      {m.team1?.batting && <p style={{ fontSize:9, color:glow, margin:0, fontWeight:600 }}>● Batting</p>}
-                    </div>
-                  </div>
-                  <div style={{ textAlign:'right' }}>
-                    <p style={{ fontSize:16, fontWeight:900, color:boldText, margin:0, fontFamily:'monospace' }}>
-                      {m.team1?.score||m.status==='upcoming'?m.team1?.score||'—':'TBD'}
-                    </p>
-                    {m.team1?.overs && <p style={{ fontSize:10, color:dimText, margin:0 }}>({m.team1.overs} ov)</p>}
-                  </div>
-                </div>
-                {/* vs divider */}
-                <div style={{ display:'flex', alignItems:'center', gap:8, margin:'4px 0' }}>
-                  <div style={{ flex:1, height:1, background:divCol }}/>
-                  <span style={{ fontSize:10, color:dimText, fontWeight:700 }}>vs</span>
-                  <div style={{ flex:1, height:1, background:divCol }}/>
-                </div>
-                {/* Team 2 */}
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
-                  padding:'8px 10px', borderRadius:10, marginTop:6,
-                  background: m.team2?.batting ? `${glow}0e` : rowBg,
-                  border: m.team2?.batting ? `1px solid ${glow}30` : `1px solid transparent` }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                    <span style={{ fontSize:18, lineHeight:1 }}>{m.team2?.flag||'🏳'}</span>
-                    <div>
-                      <p style={{ fontSize:12, fontWeight:700, color:boldText, margin:0 }}>{m.team2?.name||'Team 2'}</p>
-                      {m.team2?.batting && <p style={{ fontSize:9, color:glow, margin:0, fontWeight:600 }}>● Batting</p>}
-                    </div>
-                  </div>
-                  <div style={{ textAlign:'right' }}>
-                    <p style={{ fontSize:16, fontWeight:900, color:boldText, margin:0, fontFamily:'monospace' }}>
-                      {m.team2?.score||m.status==='upcoming'?m.team2?.score||'—':'TBD'}
-                    </p>
-                    {m.team2?.overs && <p style={{ fontSize:10, color:dimText, margin:0 }}>({m.team2.overs} ov)</p>}
-                  </div>
-                </div>
-              </div>
-
-              {/* Summary / result bar */}
-              {(m.summary||m.result||m.time) && (
-                <div style={{ padding:'7px 13px', borderTop:`1px solid ${divCol}`,
-                  background: m.status==='live'?`#22c55e0a`:m.status==='completed'?`${glow}08`:`#f59e0b0a` }}>
-                  <p style={{ fontSize:11, fontWeight:600, margin:0,
-                    color: m.status==='live'?'#22c55e':m.status==='completed'?glow:'#f59e0b' }}>
-                    {m.result||m.summary||m.time}
-                  </p>
-                </div>
-              )}
-
-              {/* Key performers */}
-              {(m.topBat||m.topBowl) && (
-                <div style={{ display:'flex', gap:8, padding:'6px 13px 8px',
-                  borderTop:`1px solid ${divCol}` }}>
-                  {m.topBat  && <span style={{ fontSize:10, color:dimText, background:rowBg, padding:'3px 8px', borderRadius:6 }}>🏏 {m.topBat}</span>}
-                  {m.topBowl && <span style={{ fontSize:10, color:dimText, background:rowBg, padding:'3px 8px', borderRadius:6 }}>⚡ {m.topBowl}</span>}
-                </div>
-              )}
-
-              {/* Scorecard expand toggle */}
-              {m.innings && m.innings.length > 0 && (
-                <>
-                  <button onClick={()=>setShowCard(!showCard)}
-                    style={{ width:'100%', padding:'7px 13px', borderTop:`1px solid ${divCol}`,
-                      background:'transparent', border:'none', cursor:'pointer', textAlign:'left',
-                      display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                    <span style={{ fontSize:10.5, fontWeight:600, color:glow }}>
-                      {showCard ? '▲ Hide scorecard' : '▼ Full scorecard'}
-                    </span>
-                    <span style={{ fontSize:9, color:dimText }}>Batting · Bowling</span>
-                  </button>
-
-                  {showCard && (
-                    <div style={{ borderTop:`1px solid ${divCol}` }}>
-                      {(m.innings||[]).map((inn:any, ii:number) => (
-                        <div key={ii} style={{ padding:'10px 13px', borderBottom:ii<(m.innings.length-1)?`1px solid ${divCol}`:'none' }}>
-                          <p style={{ fontSize:11, fontWeight:800, color:glow, margin:'0 0 6px',
-                            textTransform:'uppercase', letterSpacing:'0.05em' }}>
-                            {inn.team} · {inn.score} ({inn.overs} ov)
-                          </p>
-                          {/* Batting table */}
-                          {inn.batsmen && inn.batsmen.length > 0 && (
-                            <div style={{ marginBottom:8 }}>
-                              <p style={{ fontSize:9.5, fontWeight:700, color:dimText, margin:'0 0 4px', letterSpacing:'0.04em' }}>BATTING</p>
-                              <div style={{ borderRadius:8, overflow:'hidden', border:`1px solid ${divCol}` }}>
-                                <div style={{ display:'grid', gridTemplateColumns:'1fr 40px 40px 30px 30px 50px',
-                                  padding:'4px 8px', background:rowBg }}>
-                                  {['Batter','R','B','4s','6s','SR'].map(h=>(
-                                    <p key={h} style={{ fontSize:9, fontWeight:700, color:dimText, margin:0, textAlign:h==='Batter'?'left':'right' }}>{h}</p>
-                                  ))}
-                                </div>
-                                {inn.batsmen.map((b:any,bi:number)=>(
-                                  <div key={bi} style={{ display:'grid', gridTemplateColumns:'1fr 40px 40px 30px 30px 50px',
-                                    padding:'5px 8px', borderTop:`1px solid ${divCol}`, background:bi%2===0?'transparent':rowBg+'80' }}>
-                                    <p style={{ fontSize:11, fontWeight:600, color:boldText, margin:0 }}>{b.name}</p>
-                                    <p style={{ fontSize:11, fontWeight:800, color:boldText, margin:0, textAlign:'right' }}>{b.runs}</p>
-                                    <p style={{ fontSize:10, color:dimText, margin:0, textAlign:'right' }}>{b.balls}</p>
-                                    <p style={{ fontSize:10, color:dimText, margin:0, textAlign:'right' }}>{b.fours}</p>
-                                    <p style={{ fontSize:10, color:dimText, margin:0, textAlign:'right' }}>{b.sixes}</p>
-                                    <p style={{ fontSize:10, color:dimText, margin:0, textAlign:'right' }}>{b.sr}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          {/* Bowling table */}
-                          {inn.bowlers && inn.bowlers.length > 0 && (
-                            <div>
-                              <p style={{ fontSize:9.5, fontWeight:700, color:dimText, margin:'0 0 4px', letterSpacing:'0.04em' }}>BOWLING</p>
-                              <div style={{ borderRadius:8, overflow:'hidden', border:`1px solid ${divCol}` }}>
-                                <div style={{ display:'grid', gridTemplateColumns:'1fr 40px 40px 40px 40px',
-                                  padding:'4px 8px', background:rowBg }}>
-                                  {['Bowler','O','R','W','Econ'].map(h=>(
-                                    <p key={h} style={{ fontSize:9, fontWeight:700, color:dimText, margin:0, textAlign:h==='Bowler'?'left':'right' }}>{h}</p>
-                                  ))}
-                                </div>
-                                {inn.bowlers.map((b:any,bi:number)=>(
-                                  <div key={bi} style={{ display:'grid', gridTemplateColumns:'1fr 40px 40px 40px 40px',
-                                    padding:'5px 8px', borderTop:`1px solid ${divCol}`, background:bi%2===0?'transparent':rowBg+'80' }}>
-                                    <p style={{ fontSize:11, fontWeight:600, color:boldText, margin:0 }}>{b.name}</p>
-                                    <p style={{ fontSize:10, color:dimText, margin:0, textAlign:'right' }}>{b.overs}</p>
-                                    <p style={{ fontSize:10, color:dimText, margin:0, textAlign:'right' }}>{b.runs}</p>
-                                    <p style={{ fontSize:11, fontWeight:800, color:b.wickets>'0'?'#f87171':dimText, margin:0, textAlign:'right' }}>{b.wickets}</p>
-                                    <p style={{ fontSize:10, color:dimText, margin:0, textAlign:'right' }}>{b.econ}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
-  const panelStyle: React.CSSProperties = pos
-    ? { position:'fixed', left:pos.x, top:pos.y, zIndex:58 }
-    : { position:'fixed', top:60, left:'50%', transform:'translateX(-50%)', zIndex:58 };
-
-  if (hidden) return null;
-  return (
-    <>
-      {/* FAB */}
-      <button onClick={() => {
-        const wasOpen = open;
-        setOpen(p=>!p);
-        if (!wasOpen && !results) {
-          setTimeout(() => search('major cricket matches live and recent today 2026'), 100);
-        }
-      }}
-        className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all active:scale-90 hover:scale-105"
-        style={{
-          position: inDock ? 'relative' : 'fixed',
-          ...(inDock ? {} : { bottom:88, right:64 }),
-          background:`linear-gradient(135deg,${glow},${glow}cc)`,
-          boxShadow:`0 4px 20px ${glow}50`, border:`1.5px solid ${glow}60`,
-        }}
-        title="Tessa Sports">
-        {open ? <X size={18} className="text-white"/> : <Trophy size={18} className="text-white"/>}
-      </button>
-
-      {open && (
-        <div ref={panelRef} style={{
-          ...panelStyle,
-          width:'min(395px,calc(100vw - 16px))',
-          maxHeight:'calc(100vh - 80px)',
-          background:bg,
-          border:`1px solid ${brd}`,
-          boxShadow:`0 16px 56px rgba(0,0,0,0.45), 0 0 0 1px ${glow}12`,
-          borderRadius:16,
-          overflow:'visible',
-          display:'flex',
-          flexDirection:'column',
-          animation:'slideUpSheet 0.22s cubic-bezier(0.32,0.72,0,1)',
-          touchAction:'none',
-          userSelect:'none',
-        }}
-          onPointerDown={onDragStart} onPointerMove={onDragMove}
-          onPointerUp={onDragEnd}    onPointerCancel={onDragEnd}
-        >
-
-          {/* ── Header — browser chrome ── */}
-          <div style={{ flexShrink:0, background:`linear-gradient(135deg,${glow}20,${glow}06)`,
-            borderRadius:'16px 16px 0 0', borderBottom:`1px solid ${brd}`, cursor:'grab' }}>
-
-            {/* Title row */}
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 14px 8px' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                <div style={{ width:34, height:34, borderRadius:10,
-                  background:`linear-gradient(135deg,${glow},${glow}aa)`,
-                  display:'flex', alignItems:'center', justifyContent:'center',
-                  boxShadow:`0 3px 10px ${glow}50` }}>
-                  <Trophy size={16} className="text-white"/>
-                </div>
-                <div>
-                  <div style={{ display:'flex', alignItems:'center', gap:7 }}>
-                    <span style={{ fontSize:15, fontWeight:900, color:glow, letterSpacing:'-0.03em' }}>Tessa Sports</span>
-
-                  </div>
-                  <span style={{ fontSize:9.5, color:sub }}>Scores · Standings · 2026</span>
-                </div>
-              </div>
-              {/* macOS-style close */}
-              <div style={{ display:'flex', gap:5 }}>
-                <div style={{ width:11,height:11,borderRadius:'50%',background:'#fbbf24' }}/>
-                <div style={{ width:11,height:11,borderRadius:'50%',background:'#34d399' }}/>
-                <button onClick={()=>setOpen(false)}
-                  style={{ width:11,height:11,borderRadius:'50%',background:'#ef4444',border:'none',cursor:'pointer' }}/>
-              </div>
-            </div>
-
-            {/* Sport tabs */}
-            <div style={{ display:'flex', gap:4, padding:'0 12px 10px', overflowX:'auto', scrollbarWidth:'none' }}>
-              {SPORT_TABS2.map(s => (
-                <button key={s.id} onClick={()=>switchTab(s.id)}
-                  style={{ flexShrink:0, padding:'5px 12px', borderRadius:20,
-                    fontSize:11, fontWeight:600, cursor:'pointer', whiteSpace:'nowrap',
-                    transition:'all 0.15s',
-                    background: tab===s.id ? glow : 'transparent',
-                    border: tab===s.id ? `1px solid ${glow}` : `1px solid ${brd}`,
-                    color: tab===s.id ? 'white' : sub }}>
-                  {s.emoji} {s.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* ── Results ── */}
-          <div style={{ flex:1, overflowY:'auto', padding:'12px 14px',
-            minHeight:0, maxHeight:360,
-            scrollbarWidth:'thin', scrollbarColor:`${glow}40 transparent` }}>
-            {loading ? (
-              <div style={{ display:'flex', flexDirection:'column', alignItems:'center',
-                justifyContent:'center', minHeight:200, gap:14 }}>
-                <div style={{ position:'relative', width:48, height:48 }}>
-                  <div style={{ position:'absolute', inset:0, borderRadius:'50%',
-                    border:`3px solid ${glow}20`, borderTopColor:glow,
-                    animation:'spin 0.75s linear infinite' }}/>
-                  <div style={{ position:'absolute', inset:7, borderRadius:'50%',
-                    border:`2px solid ${glow}10`, borderTopColor:`${glow}70`,
-                    animation:'spin 1.3s linear infinite reverse' }}/>
-                  <div style={{ position:'absolute', inset:0, display:'flex',
-                    alignItems:'center', justifyContent:'center' }}>
-                    <Trophy size={16} style={{ color:glow }}/>
-                  </div>
-                </div>
-                <div style={{ textAlign:'center' }}>
-                  <p style={{ fontSize:12, color:text, margin:'0 0 4px', fontWeight:600 }}>Fetching live scores…</p>
-                  <p style={{ fontSize:10, color:sub, margin:0 }}>Searching web for 2025-2026 data</p>
-                </div>
-              </div>
-            ) : results ? renderResults() : (
-              <div style={{ display:'flex', flexDirection:'column', alignItems:'center',
-                justifyContent:'center', minHeight:200, gap:12 }}>
-                <div style={{ width:52, height:52, borderRadius:16, background:`${glow}15`,
-                  display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <Trophy size={26} style={{ color:glow }}/>
-                </div>
-                <div style={{ textAlign:'center' }}>
-                  <p style={{ fontSize:13, fontWeight:700, color:text, margin:'0 0 6px' }}>
-                    {SPORT_TABS2.find(s=>s.id===tab)?.emoji} {SPORT_TABS2.find(s=>s.id===tab)?.label} Scores
-                  </p>
-                  <p style={{ fontSize:11, color:sub, margin:'0 0 12px', lineHeight:1.5 }}>
-                    Tap a suggestion or search below
-                  </p>
-                </div>
-                <div style={{ display:'flex', flexWrap:'wrap', gap:6, justifyContent:'center', maxWidth:320 }}>
-                  {SPORT_SUGG[tab].slice(0,6).map((s,i)=>(
-                    <button key={i} onClick={()=>pick(s)}
-                      style={{ padding:'5px 11px', borderRadius:10, fontSize:10.5, fontWeight:500,
-                        border:`1px solid ${brd}`, background:card,
-                        color:sub, cursor:'pointer', transition:'all 0.15s' }}
-                      onMouseEnter={e=>{e.currentTarget.style.background=`${glow}18`;e.currentTarget.style.color=glow;}}
-                      onMouseLeave={e=>{e.currentTarget.style.background=card;e.currentTarget.style.color=sub;}}>
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* ── Search bar ── */}
-          <div style={{ flexShrink:0, borderTop:`1px solid ${brd}`, background:hdr,
-            borderRadius:'0 0 16px 16px', padding:'10px 12px', position:'relative' }}>
-
-            {/* Dropdown suggestions */}
-            {showSug && suggestions.length > 0 && (
-              <div style={{ position:'absolute', left:12, right:12, bottom:'calc(100% - 4px)',
-                background:sugBg, border:`1px solid ${brd}`, borderRadius:'10px 10px 0 0',
-                overflow:'hidden', boxShadow:`0 -10px 28px rgba(0,0,0,0.2)`, zIndex:10 }}>
-                {suggestions.map((s,i) => (
-                  <button key={i} onClick={()=>pick(s)}
-                    style={{ display:'flex', alignItems:'center', gap:8, width:'100%',
-                      textAlign:'left', padding:'8px 12px', fontSize:11.5, color:text,
-                      background:'transparent', border:'none',
-                      borderBottom:i<suggestions.length-1?`1px solid ${brd}`:'none',
-                      cursor:'pointer', transition:'background 0.1s' }}
-                    onMouseEnter={e=>e.currentTarget.style.background=`${glow}12`}
-                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                    <span style={{ fontSize:14 }}>{SPORT_TABS2.find(t=>t.id===tab)?.emoji}</span>
-                    <span>{s}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-              <input ref={inputRef} value={query}
-                onChange={e=>onQueryChange(e.target.value)}
-                onKeyDown={e=>{
-                  if(e.key==='Enter'){search(query);setShowSug(false);}
-                  if(e.key==='Escape') setShowSug(false);
-                  e.stopPropagation();
-                }}
-                onFocus={()=>query.length>1&&setShowSug(suggestions.length>0)}
-                onBlur={()=>setTimeout(()=>setShowSug(false),200)}
-                placeholder={`Search ${SPORT_TABS2.find(s=>s.id===tab)?.label} scores 2025-26…`}
-                style={{ flex:1, padding:'9px 13px', borderRadius:10, fontSize:12,
-                  border:`1.5px solid ${brd}`, background:isLight?'white':card,
-                  color:text, outline:'none', transition:'border-color 0.2s' }}
-                onFocusCapture={e=>e.currentTarget.style.borderColor=glow}
-                onBlurCapture={e=>e.currentTarget.style.borderColor=brd}
-              />
-              <button onClick={()=>{search(query);setShowSug(false);}}
-                style={{ width:38, height:38, borderRadius:10, border:'none',
-                  background:loading?`${glow}60`:glow, cursor:loading?'not-allowed':'pointer',
-                  display:'flex', alignItems:'center', justifyContent:'center',
-                  flexShrink:0, boxShadow:`0 2px 8px ${glow}40`, transition:'all 0.15s' }}>
-                {loading
-                  ? <RefreshCw size={15} className="text-white" style={{animation:'spin 0.8s linear infinite'}}/>
-                  : <Radio size={15} className="text-white"/>}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
-
-
-
-// ─────────────────────────────────────────────────────────────────────────────
-// FLOATING DOCK — unified bottom-right pill housing Health + Sports FABs
-// ─────────────────────────────────────────────────────────────────────────────
-function FloatingDock({ glow, isLight, showHealth, hidden, onHealthSync }:
-  { glow:string; isLight:boolean; showHealth:boolean; hidden?:boolean; onHealthSync?:()=>void }) {
-  if (hidden) return null;
-  const dockBg  = isLight ? 'rgba(255,255,255,0.92)' : 'rgba(13,15,30,0.92)';
-  const dockBdr = isLight ? `${glow}30` : `${glow}35`;
   return (
     <div style={{
-      position:'fixed', bottom:24, right:16, zIndex:60,
-      display:'flex', flexDirection:'column', alignItems:'center', gap:8,
+      position:'fixed', inset:0, zIndex:200,
+      background: bg,
+      display:'flex', flexDirection:'column',
+      animation:'fadeInFast 0.18s ease',
     }}>
-      {/* Tessa Sports button */}
-      <SportsBrowser glow={glow} isLight={isLight} hidden={false} inDock />
-      {/* Health Pulse button — only in creator mode */}
-      {showHealth && (
-        <HealthPulse glow={glow} isLight={isLight} hidden={false} onSync={onHealthSync} inDock />
-      )}
+      <style>{`
+        @keyframes fadeInFast { from{opacity:0;transform:scale(0.98)} to{opacity:1;transform:scale(1)} }
+        @keyframes slideInRight { from{opacity:0;transform:translateX(18px)} to{opacity:1;transform:translateX(0)} }
+        .nova-tab-scroll::-webkit-scrollbar { height:3px; }
+        .nova-tab-scroll::-webkit-scrollbar-thumb { background:${glow}40; border-radius:2px; }
+        .nova-url:focus { outline:none; }
+      `}</style>
+
+      {/* ══ CHROME BAR ═══════════════════════════════════════════════════ */}
+      <div style={{
+        background: chr, borderBottom:`1px solid ${brd}`,
+        flexShrink:0, userSelect:'none',
+      }}>
+
+        {/* ── Tab strip ── */}
+        <div style={{ display:'flex', alignItems:'center', gap:0, paddingLeft:12, paddingTop:8, overflowX:'auto' }}
+          className="nova-tab-scroll">
+          {/* NOVA wordmark pill */}
+          <div style={{
+            display:'flex', alignItems:'center', gap:6, marginRight:12, flexShrink:0,
+            padding:'4px 10px', borderRadius:8,
+            background:`linear-gradient(135deg,${glow},${glow}bb)`,
+          }}>
+            <span style={{ fontSize:11, fontWeight:700, color:'white', letterSpacing:'0.14em' }}>NOVA</span>
+            <span style={{ fontSize:8, color:'white', opacity:0.7, letterSpacing:'0.06em' }}>by Tessa</span>
+          </div>
+
+          {/* Tabs */}
+          {tabs.map(tab=>(
+            <div key={tab.id} onClick={()=>setActiveTab(tab.id)}
+              style={{
+                display:'flex', alignItems:'center', gap:6,
+                padding:'6px 12px 6px 10px', borderRadius:'8px 8px 0 0',
+                background: tab.id===activeTab ? tabA : tabI,
+                border: `1px solid ${brd}`,
+                borderBottom: tab.id===activeTab ? `1px solid ${chr}` : `1px solid ${brd}`,
+                cursor:'pointer', flexShrink:0, minWidth:120, maxWidth:180,
+                marginRight:2, position:'relative', transition:'background 0.15s',
+              }}>
+              <span style={{ fontSize:12 }}>{tab.favicon}</span>
+              <span style={{ fontSize:11, fontWeight: tab.id===activeTab?600:400, color:txt,
+                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', flex:1 }}>
+                {tab.title}
+              </span>
+              <button onClick={e=>closeTab(tab.id,e)}
+                style={{ background:'none', border:'none', cursor:'pointer', color:sub,
+                  padding:'0 2px', borderRadius:4, lineHeight:1, fontSize:14, flexShrink:0 }}>
+                ×
+              </button>
+            </div>
+          ))}
+
+          {/* New tab */}
+          <button onClick={newTab} style={{
+            flexShrink:0, marginLeft:4, width:28, height:28, borderRadius:8,
+            background:'transparent', border:`1px solid ${brd}`, color:sub,
+            cursor:'pointer', fontSize:16, display:'flex', alignItems:'center', justifyContent:'center',
+          }}>+</button>
+        </div>
+
+        {/* ── Nav + URL bar ── */}
+        <div style={{ display:'flex', alignItems:'center', gap:6, padding:'6px 10px 8px' }}>
+          {/* Back */}
+          <button onClick={goBack} disabled={histIdx===0}
+            style={{ width:32, height:32, borderRadius:8, border:'none', background:'transparent',
+              cursor:histIdx===0?'default':'pointer', color:histIdx===0?sub+'60':sub, fontSize:18,
+              display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.15s' }}>
+            ‹
+          </button>
+          {/* Forward */}
+          <button onClick={goForward} disabled={histIdx>=history.length-1}
+            style={{ width:32, height:32, borderRadius:8, border:'none', background:'transparent',
+              cursor:histIdx>=history.length-1?'default':'pointer',
+              color:histIdx>=history.length-1?sub+'60':sub, fontSize:18,
+              display:'flex', alignItems:'center', justifyContent:'center' }}>
+            ›
+          </button>
+          {/* Refresh */}
+          <button onClick={refresh}
+            style={{ width:32, height:32, borderRadius:8, border:'none', background:'transparent',
+              cursor:'pointer', color:sub, fontSize:16,
+              display:'flex', alignItems:'center', justifyContent:'center' }}>
+            {loading ? '⟳' : '↻'}
+          </button>
+
+          {/* URL bar */}
+          <div style={{ flex:1, position:'relative' }}>
+            <div style={{
+              display:'flex', alignItems:'center', gap:8,
+              background: urlFocused ? (isLight?'#fff':'#1c2333') : (isLight?'#f1f5f9':'#1c2333'),
+              border: `1.5px solid ${urlFocused?glow:brd}`,
+              borderRadius:10, padding:'0 12px', height:34,
+              transition:'border-color 0.15s',
+              boxShadow: urlFocused ? `0 0 0 3px ${glow}20` : 'none',
+            }}>
+              {/* Lock / protocol icon */}
+              <span style={{ fontSize:11, opacity:0.5, flexShrink:0 }}>
+                {curTab?.url?.startsWith('https')?'🔒':'🔓'}
+              </span>
+              <input
+                ref={urlRef}
+                className="nova-url"
+                value={urlFocused ? urlInput : (urlInput.length>60?getDomain(urlInput):urlInput)}
+                onChange={e=>setUrlInput(e.target.value)}
+                onFocus={()=>{ setUrlFocused(true); urlRef.current?.select(); }}
+                onBlur={()=>setUrlFocused(false)}
+                onKeyDown={e=>{ if(e.key==='Enter'){ navigate(urlInput); urlRef.current?.blur(); } }}
+                style={{
+                  flex:1, background:'transparent', border:'none', outline:'none',
+                  fontSize:12, color:txt, minWidth:0,
+                  fontFamily: urlFocused ? 'monospace' : 'inherit',
+                }}
+                spellCheck={false}
+                autoComplete="off"
+              />
+              {urlFocused && urlInput && (
+                <button onClick={()=>setUrlInput('')}
+                  style={{ background:'none', border:'none', color:sub, cursor:'pointer', fontSize:14, flexShrink:0 }}>
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Tessa side panel toggle */}
+          <button onClick={()=>setSideOpen(p=>!p)}
+            title="Ask Tessa about this page"
+            style={{
+              flexShrink:0, width:32, height:32, borderRadius:8, border:`1px solid ${sideOpen?glow:brd}`,
+              background: sideOpen?`${glow}18`:'transparent', cursor:'pointer',
+              display:'flex', alignItems:'center', justifyContent:'center',
+              color: sideOpen?glow:sub, fontSize:15, transition:'all 0.15s',
+            }}>
+            ✦
+          </button>
+
+          {/* Bookmark bar toggle */}
+          <button onClick={()=>setShowBkBar(p=>!p)}
+            style={{ flexShrink:0, width:32, height:32, borderRadius:8, border:`1px solid ${brd}`,
+              background:'transparent', cursor:'pointer', color:sub,
+              display:'flex', alignItems:'center', justifyContent:'center', fontSize:13 }}>
+            🔖
+          </button>
+
+          {/* Close NOVA */}
+          <button onClick={onClose}
+            style={{ flexShrink:0, width:32, height:32, borderRadius:8,
+              border:`1px solid ${brd}`, background:'transparent',
+              cursor:'pointer', color:sub, fontSize:15,
+              display:'flex', alignItems:'center', justifyContent:'center',
+              transition:'all 0.15s',
+            }}
+            onMouseEnter={e=>(e.currentTarget.style.background='#ef444415', e.currentTarget.style.color='#ef4444')}
+            onMouseLeave={e=>(e.currentTarget.style.background='transparent', e.currentTarget.style.color=sub)}>
+            ✕
+          </button>
+        </div>
+
+        {/* ── Bookmarks bar ── */}
+        {showBkBar && (
+          <div style={{ display:'flex', alignItems:'center', gap:4, padding:'0 14px 8px',
+            overflowX:'auto', borderTop:`1px solid ${brd}` }} className="nova-tab-scroll">
+            {NOVA_BOOKMARKS.map((bk,i)=>(
+              <button key={i} onClick={()=>navigate(bk.url)}
+                style={{ flexShrink:0, display:'flex', alignItems:'center', gap:5,
+                  padding:'3px 10px', borderRadius:6, background:'transparent',
+                  border:`1px solid transparent`, cursor:'pointer',
+                  fontSize:11, color:sub, transition:'all 0.12s',
+                  whiteSpace:'nowrap',
+                }}
+                onMouseEnter={e=>(e.currentTarget.style.background=`${glow}12`, e.currentTarget.style.borderColor=`${glow}25`, (e.currentTarget.style.color=txt))}
+                onMouseLeave={e=>(e.currentTarget.style.background='transparent', e.currentTarget.style.borderColor='transparent', (e.currentTarget.style.color=sub))}>
+                <span style={{ fontSize:13 }}>{bk.icon}</span>
+                <span>{bk.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ══ CONTENT AREA ═════════════════════════════════════════════════ */}
+      <div style={{ flex:1, display:'flex', overflow:'hidden', position:'relative' }}>
+
+        {/* Loading bar */}
+        {loading && (
+          <div style={{ position:'absolute', top:0, left:0, right:0, height:2, zIndex:10,
+            background:`linear-gradient(90deg,${glow},${glow}88,${glow})`,
+            animation:'novaLoad 1.2s linear infinite',
+          }}/>
+        )}
+        <style>{`@keyframes novaLoad{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}`}</style>
+
+        {/* Iframe */}
+        <iframe
+          ref={iframeRef}
+          src={curTab?.url}
+          style={{ flex:1, border:'none', background:bg }}
+          title="Nova browser"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+          onLoad={()=>{ setLoading(false); }}
+          onError={()=>setLoading(false)}
+        />
+
+        {/* ── Tessa AI sidebar ── */}
+        {sideOpen && (
+          <div style={{
+            width: 320, flexShrink:0, background:chr, borderLeft:`1px solid ${brd}`,
+            display:'flex', flexDirection:'column', animation:'slideInRight 0.18s ease',
+          }}>
+            {/* Header */}
+            <div style={{ padding:'12px 14px 10px', borderBottom:`1px solid ${brd}`,
+              background:`linear-gradient(135deg,${glow}14,${glow}05)` }}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                  <div style={{ width:26, height:26, borderRadius:8,
+                    background:`linear-gradient(135deg,${glow},${glow}bb)`,
+                    display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <span style={{ fontSize:13 }}>✦</span>
+                  </div>
+                  <div>
+                    <p style={{ fontSize:12, fontWeight:700, color:txt, margin:0 }}>Ask Tessa</p>
+                    <p style={{ fontSize:9, color:sub, margin:0 }}>About this page</p>
+                  </div>
+                </div>
+                <button onClick={()=>setSideOpen(false)}
+                  style={{ background:'none', border:'none', color:sub, cursor:'pointer', fontSize:16 }}>×</button>
+              </div>
+              {/* Current page chip */}
+              <div style={{ marginTop:8, padding:'4px 8px', borderRadius:6,
+                background:isLight?'#f1f5f9':'#1c2333', border:`1px solid ${brd}` }}>
+                <p style={{ fontSize:10, color:sub, margin:0, overflow:'hidden',
+                  textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                  📄 {getDomain(curTab?.url||'')}
+                </p>
+              </div>
+            </div>
+
+            {/* Response area */}
+            <div style={{ flex:1, overflowY:'auto', padding:'12px 14px' }}>
+              {!sideReply && !sideLoad && (
+                <div style={{ textAlign:'center', paddingTop:24 }}>
+                  <div style={{ fontSize:32, marginBottom:8 }}>✦</div>
+                  <p style={{ fontSize:12, color:sub, lineHeight:1.6 }}>
+                    Ask me anything about this page, search for related info, or get a quick summary.
+                  </p>
+                  {/* Quick actions */}
+                  <div style={{ display:'flex', flexDirection:'column', gap:6, marginTop:16 }}>
+                    {['Summarise this page','What is this site about?','Find key facts here','Search for similar topics'].map(q=>(
+                      <button key={q} onClick={()=>{ setSideQuery(q); setTimeout(()=>{ setSideQuery(q); askTessa(); },0); }}
+                        style={{ padding:'8px 12px', borderRadius:8, background:isLight?'#f1f5f9':'#1c2333',
+                          border:`1px solid ${brd}`, color:sub, fontSize:11, cursor:'pointer',
+                          textAlign:'left', transition:'all 0.12s',
+                        }}
+                        onMouseEnter={e=>(e.currentTarget.style.borderColor=`${glow}40`, (e.currentTarget.style.color=txt))}
+                        onMouseLeave={e=>(e.currentTarget.style.borderColor=brd, (e.currentTarget.style.color=sub))}>
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {sideLoad && (
+                <div style={{ display:'flex', flexDirection:'column', gap:10, paddingTop:12 }}>
+                  {[80,60,90,45].map((w,i)=>(
+                    <div key={i} style={{ height:10, borderRadius:5, width:`${w}%`,
+                      background:isLight?'#e2e8f0':'#30363d',
+                      animation:`pulse 1.4s ease ${i*0.15}s infinite` }}/>
+                  ))}
+                  <style>{`@keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}`}</style>
+                </div>
+              )}
+              {sideReply && !sideLoad && (
+                <div>
+                  <div style={{ padding:'10px 12px', borderRadius:10, marginBottom:10,
+                    background:isLight?'#f0fdf4':'#0d2818', border:`1px solid ${glow}25` }}>
+                    <p style={{ fontSize:8.5, fontWeight:700, color:glow, margin:'0 0 5px',
+                      textTransform:'uppercase', letterSpacing:'0.06em' }}>✦ Tessa</p>
+                    <p style={{ fontSize:12, color:txt, margin:0, lineHeight:1.7,
+                      whiteSpace:'pre-wrap', userSelect:'text' }}>{sideReply}</p>
+                  </div>
+                  <button onClick={()=>{ setSideReply(''); setSideQuery(''); }}
+                    style={{ fontSize:10, color:sub, background:'none', border:'none', cursor:'pointer', padding:0 }}>
+                    ← Ask another question
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Input */}
+            <div style={{ padding:'10px 14px', borderTop:`1px solid ${brd}` }}>
+              <div style={{ display:'flex', gap:8 }}>
+                <input
+                  value={sideQuery}
+                  onChange={e=>setSideQuery(e.target.value)}
+                  onKeyDown={e=>{ if(e.key==='Enter') askTessa(); }}
+                  placeholder="Ask about this page…"
+                  style={{ flex:1, padding:'8px 12px', borderRadius:9,
+                    background:isLight?'#f1f5f9':'#1c2333',
+                    border:`1px solid ${brd}`, outline:'none', fontSize:12,
+                    color:txt,
+                  }}
+                />
+                <button onClick={askTessa} disabled={sideLoad||!sideQuery.trim()}
+                  style={{ width:36, height:36, borderRadius:9, border:'none', cursor:'pointer',
+                    background:`linear-gradient(135deg,${glow},${glow}bb)`, color:'white',
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                    opacity: sideLoad||!sideQuery.trim() ? 0.4 : 1, fontSize:16 }}>
+                  ↑
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// FLOATING DOCK — bottom-right: HealthPulse only (Tessa Sports removed)
+// ─────────────────────────────────────────────────────────────────────────────
+function FloatingDock({ glow, isLight, showHealth, hidden, onHealthSync }:
+  { glow:string; isLight:boolean; showHealth:boolean; hidden?:boolean; onHealthSync?:()=>void }) {
+  if (hidden || !showHealth) return null;
+  return (
+    <div style={{ position:'fixed', bottom:24, right:16, zIndex:60 }}>
+      <HealthPulse glow={glow} isLight={isLight} hidden={false} onSync={onHealthSync} inDock />
+    </div>
+  );
+}
+
 // OFFLINE SCREEN — shows when navigator.onLine is false
 // ─────────────────────────────────────────────────────────────────────────────
 function OfflineScreen({ theme, glow }: { theme: string; glow: string }) {
@@ -2124,6 +1913,8 @@ export default function Home() {
   const [webSearchOn,     setWebSearchOn]   = useState(false);   // manual per-message toggle
   const [lastSearchData,  setLastSearchData] = useState<{snippets:string[];sources:{title:string;url:string;snippet:string}[];query:string}|null>(null);
   const [showSearchPanel, setShowSearchPanel] = useState(false); // show/hide web results drawer
+  const [showNova,        setShowNova]       = useState(false);  // NOVA browser overlay
+  const [novaInitUrl,     setNovaInitUrl]    = useState('https://www.google.com');
   const [voiceOutput,     setVoiceOutput]   = useState(false);
   const [responseLength,  setResponseLength]= useState<ResponseLength>('medium');
   const [animations,      setAnimations]    = useState(true);
@@ -2187,7 +1978,7 @@ export default function Home() {
     : theme==='dark' ? '#6366f1' : theme==='cyberpunk' ? '#ec4899'
     : theme==='ocean' ? '#0ea5e9' : theme==='sunset' ? '#f59e0b'
     : theme==='pastel' ? '#a855f7' : theme==='sakura' ? '#f43f5e'
-    : theme==='ankit' ? '#1d4ed8' : '#818cf8';
+    : theme==='ankit' ? '#fb7185' : '#818cf8';
 
   const fontSizeClass = fontSize==='sm' ? 'text-xs' : fontSize==='lg' ? 'text-base' : 'text-sm';
 
@@ -3762,7 +3553,15 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                       <img src={avatarSrc} alt="Tessa" className="w-full h-full object-cover"
                         onError={e=>{(e.currentTarget as HTMLImageElement).src=AVATARS[0].path;}}/>
                     </div>
-                    <p className="text-xl font-black tracking-[0.25em] uppercase" style={{color:t.glow}}>TESSA</p>
+                    <p style={{
+                      fontSize: 22,
+                      fontWeight: 300,
+                      letterSpacing: '0.38em',
+                      textTransform: 'uppercase',
+                      color: t.glow,
+                      lineHeight: 1,
+                      WebkitFontSmoothing: 'antialiased',
+                    }}>TESSA</p>
                     <p className={`text-[10px] mt-1 max-w-[180px] mx-auto ${t.sSub}`}>The Exceptional System, Surpassing ALL</p>
                     <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold"
                       style={{background:`${t.glow}18`,border:`1px solid ${t.glow}28`,color:t.glow}}>
@@ -3848,7 +3647,16 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
               {/* Name block */}
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <h1 className={`font-black text-[13px] leading-none tracking-[0.12em] uppercase ${t.accent}`}>
+                  <h1 style={{
+                    fontSize: isCreatorMode ? 15 : 14,
+                    fontWeight: isCreatorMode ? 600 : 700,
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    lineHeight: 1,
+                    color: t.glow,
+                    fontVariantNumeric: 'tabular-nums',
+                    WebkitFontSmoothing: 'antialiased',
+                  }}>
                     TESSA
                   </h1>
                   {isCreatorMode && (
@@ -4091,10 +3899,19 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                     </div>
 
                     {/* Greeting */}
-                    <h2 className={`text-2xl font-black mb-1 text-center`}>
-                      {isCreatorMode
-                        ? `Hey Ankit! 💝`
-                        : `Hi, I'm Tessa 👋`}
+                    <h2 className="mb-1 text-center" style={{
+                      fontSize: 26,
+                      fontWeight: isCreatorMode ? 400 : 700,
+                      letterSpacing: isCreatorMode ? '0.04em' : '-0.01em',
+                      lineHeight: 1.2,
+                      background: isCreatorMode
+                        ? `linear-gradient(135deg, ${t.glow} 0%, #fb7185 50%, #fbbf24 100%)`
+                        : undefined,
+                      WebkitBackgroundClip: isCreatorMode ? 'text' : undefined,
+                      WebkitTextFillColor: isCreatorMode ? 'transparent' : undefined,
+                      backgroundClip: isCreatorMode ? 'text' : undefined,
+                    }}>
+                      {isCreatorMode ? `Hey, Ankit 💝` : `Hi, I'm Tessa 👋`}
                     </h2>
                     <p className={`text-sm ${t.sub} text-center max-w-xs leading-relaxed mb-6`}>
                       {isCreatorMode
@@ -4353,42 +4170,55 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                 </button>
               </div>
 
-              {/* Toolbar row — web search toggle + results button + hints */}
+              {/* Toolbar row — NOVA launcher + web search toggle + hints */}
               <div className="flex items-center justify-between mt-1.5 px-0.5 gap-2">
-                {/* Left: web search controls */}
+                {/* Left: browser + search controls */}
                 <div className="flex items-center gap-1.5">
-                  {/* Web Search toggle button */}
+
+                  {/* ── NOVA browser button — opens full browser overlay ── */}
                   <button
-                    onClick={()=>setWebSearchOn(p=>!p)}
-                    title={webSearchOn ? 'Web search ON — click to disable' : 'Enable live web search for this message'}
+                    onClick={()=>{ setNovaInitUrl('https://www.google.com'); setShowNova(true); }}
+                    title="Open NOVA — Tessa's web browser"
                     className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all active:scale-95"
                     style={{
-                      background: webSearchOn ? `${t.glow}18` : 'transparent',
-                      border: `1px solid ${webSearchOn ? t.glow+'50' : t.glow+'20'}`,
-                      color: webSearchOn ? t.glow : undefined,
+                      background: `linear-gradient(135deg,${t.glow}18,${t.glow}0a)`,
+                      border: `1px solid ${t.glow}40`,
                     }}>
-                    <Globe size={11} style={{color: webSearchOn ? t.glow : undefined}}/>
-                    <span className="text-[10px] font-semibold" style={{color: webSearchOn ? t.glow : undefined}}>
-                      {webSearchOn ? 'Web: ON' : 'Web'}
-                    </span>
-                    {webSearchOn && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"/>
-                    )}
+                    <Globe size={11} style={{color:t.glow}}/>
+                    <span className="text-[10px] font-bold" style={{
+                      color:t.glow, letterSpacing:'0.06em',
+                    }}>NOVA</span>
                   </button>
 
-                  {/* Show Results button — only if we have results */}
+                  {/* Web search toggle for this message */}
+                  <button
+                    onClick={()=>setWebSearchOn(p=>!p)}
+                    title={webSearchOn ? 'Web search ON for next message — click to disable' : 'Force web search for next message'}
+                    className="flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all active:scale-95"
+                    style={{
+                      background: webSearchOn ? `${t.glow}15` : 'transparent',
+                      border: `1px solid ${webSearchOn ? t.glow+'45' : t.glow+'18'}`,
+                    }}>
+                    <span style={{ fontSize:9, color: webSearchOn ? t.glow : undefined }}
+                      className={`font-semibold ${webSearchOn ? '' : t.sub}`}>
+                      {webSearchOn ? '🔍 Search: ON' : '🔍 Search'}
+                    </span>
+                    {webSearchOn && <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"/>}
+                  </button>
+
+                  {/* Sources button — shows after a search */}
                   {lastSearchData && (
                     <button
                       onClick={()=>setShowSearchPanel(p=>!p)}
-                      title="View web search sources used"
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all active:scale-95"
+                      title="View sources used by Tessa"
+                      className="flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all active:scale-95"
                       style={{
                         background: showSearchPanel ? `${t.glow}15` : 'transparent',
-                        border: `1px solid ${t.glow}25`,
+                        border: `1px solid ${t.glow}22`,
                       }}>
-                      <ExternalLink size={10} style={{color:t.glow}}/>
-                      <span className="text-[10px] font-medium" style={{color:t.glow}}>
-                        {showSearchPanel ? 'Hide sources' : `Sources (${lastSearchData.sources.length})`}
+                      <ExternalLink size={9} style={{color:t.glow}}/>
+                      <span className="text-[9px] font-medium" style={{color:t.glow}}>
+                        {showSearchPanel ? 'Hide' : `Sources (${lastSearchData.sources.length})`}
                       </span>
                     </button>
                   )}
@@ -4489,12 +4319,21 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
         />
       )}
 
-      {/* ── UNIFIED BOTTOM DOCK — HealthPulse + Tessa Sports together ── */}
+      {/* ── UNIFIED BOTTOM DOCK — HealthPulse only (Tessa Sports removed) ── */}
       <FloatingDock
         glow={t.glow} isLight={t.isLight}
         showHealth={!!isCreatorMode}
         hidden={showSettings || showDashboard}
         onHealthSync={() => setWellnessVersion(v => v + 1)}
+      />
+
+      {/* ── NOVA BROWSER — Tessa's built-in web browser ── */}
+      <NovaBrowser
+        open={showNova}
+        onClose={()=>setShowNova(false)}
+        initialUrl={novaInitUrl}
+        glow={t.glow}
+        isLight={t.isLight}
       />
 
       {/* ── FLOATING INSIGHTS PANEL ── */}

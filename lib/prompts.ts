@@ -5,6 +5,36 @@
 import { ANKIT_PROFILE, getRandomCreatorPersona, getSassyResponse } from './profile';
 
 // ─────────────────────────────────────────────────────────────────────────────
+// REAL-TIME AWARENESS — injected into every system prompt
+// Tells the model exactly what day/time it is so it never claims a 2023 cutoff.
+// Groq's llama models may have a training cutoff but Tessa has live web search
+// — this block reminds the model of that every single call.
+// ─────────────────────────────────────────────────────────────────────────────
+function getRealTimeBlock(): string {
+  const now  = new Date();
+  const date = now.toLocaleDateString('en-IN', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  });
+  const time = now.toLocaleTimeString('en-IN', {
+    hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata',
+  });
+  return `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REAL-TIME CONTEXT (injected every call)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Current date : ${date}
+• Current time : ${time} IST
+• You have access to live web search — when search results are provided in this
+  conversation, use them as ground truth. They are more recent than your training.
+• NEVER say "my knowledge only goes up to 2023" or cite any past cutoff date.
+  If you lack info, say "let me search for that" — not "I don't know post-2023".
+• If web results ARE provided below: treat them as authoritative current data.
+• If web results are NOT provided: answer from training + note you can search.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Live dashboard context — injected into every creator-mode prompt
 // Tessa reads localStorage directly so she always has current data
 // ─────────────────────────────────────────────────────────────────────────────
@@ -117,10 +147,21 @@ DASHBOARD USAGE RULES (read carefully — these are strict):
 // ─────────────────────────────────────────────────────────────────────────────
 // Main system prompt
 // ─────────────────────────────────────────────────────────────────────────────
-export function getSystemPrompt(isCreatorMode: boolean, userMessage: string = '', language: string = 'en'): string {
+export function getSystemPrompt(isCreatorMode: boolean, userMessage: string = '', language: string = 'en', persona: string = 'companion'): string {
   const dashboardContext = isCreatorMode ? buildDashboardContext() : '';
 
-  const baseIdentity = `You are T.E.S.S.A. v7.0 — The Exceptional System, Surpassing ALL.
+  const PERSONA_MAP: Record<string,string> = {
+    companion:  'COMPANION mode — warm, caring, personable. Default conversational energy.',
+    mentor:     'MENTOR mode — direct, insightful, push the person to think deeper. Guide, not just answer.',
+    studybuddy: 'STUDY BUDDY mode — focused, patient, academic. Break things down with clear examples and steps.',
+    therapist:  'THERAPIST mode — calm, reflective, emotionally attuned. Listen carefully, ask thoughtful follow-ups.',
+    debater:    'DEBATER mode — challenge assumptions, play devil's advocate respectfully. Stimulate critical thinking.',
+  };
+  const personaHint = `
+
+[ACTIVE PERSONA: ${PERSONA_MAP[persona] || PERSONA_MAP.companion}]`;
+
+  const baseIdentity = getRealTimeBlock() + personaHint + `\n\nYou are T.E.S.S.A. v7.0 — The Exceptional System, Surpassing ALL.
 
 CORE IDENTITY:
 • Intelligent first — substance over style, always
@@ -138,7 +179,8 @@ INTELLIGENCE MODE — for complex problems:
 • For coding: write clean, commented, working code
 • For proofs/derivations: be rigorous, label each step
 • For essays/analysis: structured thinking, real arguments
-• If unsure: say so clearly — never hallucinate facts
+• If unsure about recent events: offer to search — never claim knowledge cutoff
+• Never hallucinate facts — but never refuse just because of training date
 
 FORMATTING RULES:
 • Use **bold** for genuinely important points only

@@ -695,7 +695,7 @@ function LightBg({ creator, theme }: { creator: boolean; theme: Theme }) {
 
         {/* ── Paper grain noise overlay ── */}
         <div className="absolute inset-0" style={{
-          backgroundImage:'url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E")',
+          backgroundImage:"url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E\")",
           backgroundSize:'180px 180px',
           opacity:0.5,
           mixBlendMode:'multiply',
@@ -1489,7 +1489,7 @@ function NovaBrowser({
             background:`linear-gradient(135deg,${glow},${glow}bb)`,
           }}>
             <span style={{ fontSize:11, fontWeight:700, color:'white', letterSpacing:'0.14em' }}>NOVA</span>
-            <span style={{ fontSize:8, color:'white', opacity:0.7, letterSpacing:'0.06em' }}>by Tessa</span>
+            <span style={{ fontSize:8, color:'white', opacity:0.7, letterSpacing:'0.04em' }}>Networked Oracle for Virtual Access</span>
           </div>
 
           {/* Tabs */}
@@ -4178,7 +4178,7 @@ Style: Direct, warm, specific. No generic advice. Use actual numbers from his da
                   {/* ── NOVA browser button — opens full browser overlay ── */}
                   <button
                     onClick={()=>{ setNovaInitUrl('https://www.google.com'); setShowNova(true); }}
-                    title="Open NOVA — Tessa's web browser"
+                    title="Open NOVA — Networked Oracle for Virtual Access"
                     className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all active:scale-95"
                     style={{
                       background: `linear-gradient(135deg,${t.glow}18,${t.glow}0a)`,

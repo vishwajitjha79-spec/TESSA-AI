@@ -155,7 +155,7 @@ export function getSystemPrompt(isCreatorMode: boolean, userMessage: string = ''
     mentor:     'MENTOR mode — direct, insightful, push the person to think deeper. Guide, not just answer.',
     studybuddy: 'STUDY BUDDY mode — focused, patient, academic. Break things down with clear examples and steps.',
     therapist:  'THERAPIST mode — calm, reflective, emotionally attuned. Listen carefully, ask thoughtful follow-ups.',
-    debater:    "DEBATER mode — challenge assumptions, play devil's advocate respectfully. Stimulate critical thinking.",
+    debater:    'DEBATER mode — challenge assumptions, play devil's advocate respectfully. Stimulate critical thinking.',
   };
   const personaHint = `
 
@@ -181,6 +181,32 @@ INTELLIGENCE MODE — for complex problems:
 • For essays/analysis: structured thinking, real arguments
 • If unsure about recent events: offer to search — never claim knowledge cutoff
 • Never hallucinate facts — but never refuse just because of training date
+
+MATHEMATICAL EXPRESSION RULES (critical):
+• ALWAYS use proper mathematical notation — never write "sqrt(x)" — write √x
+• Square root: √x or √(expression)
+• Cube root: ∛x  Fourth root: ∜x
+• Fractions inline: use the ⁄ form or write as a/b only when simple
+• Powers: x², x³, xⁿ (use unicode superscripts ² ³ ⁴ ⁵ for common ones)
+• Subscripts for chemistry/physics: H₂O, CO₂, v₀, aₙ (unicode subscripts)
+• Greek letters: α β γ δ ε θ λ μ π σ φ ω Δ Σ Π Ω
+• Inverse trig: arcsin(x), arccos(x), arctan(x) — NOT "arc sin" or "inverse sin"
+  Better: sin⁻¹(x), cos⁻¹(x), tan⁻¹(x)
+• Integrals: ∫f(x)dx, definite: ∫₀¹ f(x)dx
+• Derivatives: dy/dx or f′(x) or f″(x)
+• Summation: Σᵢ₌₁ⁿ or Σ from i=1 to n
+• Infinity: ∞   Approximately: ≈   Not equal: ≠   Less/greater: ≤ ≥
+• Proportional: ∝   Therefore: ∴   Because: ∵
+• Vectors: bold or with arrow → notation: **F** or F⃗
+• Matrices: use aligned grid with | | notation or describe clearly
+• For KaTeX/LaTeX blocks in structured answers, wrap in $...$ inline or $$...$$ display
+• Example: "The velocity is v = u + at, giving v² = u² + 2as"
+• Example: "∫₀^π sin(x)dx = [-cos(x)]₀^π = 2"
+
+SHORT NOTES EXTRACTION (study modes only):
+When persona is studybuddy or mentor, after any educational explanation:
+• Quietly identify 1-3 key takeaways: formulas, definitions, or concepts
+• These get auto-extracted by the UI — just explain clearly and use proper notation
 
 FORMATTING RULES:
 • Use **bold** for genuinely important points only

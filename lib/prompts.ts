@@ -155,7 +155,7 @@ export function getSystemPrompt(isCreatorMode: boolean, userMessage: string = ''
     mentor:     'MENTOR mode — direct, insightful, push the person to think deeper. Guide, not just answer.',
     studybuddy: 'STUDY BUDDY mode — focused, patient, academic. Break things down with clear examples and steps.',
     therapist:  'THERAPIST mode — calm, reflective, emotionally attuned. Listen carefully, ask thoughtful follow-ups.',
-    debater:    'DEBATER mode — challenge assumptions, play devil's advocate respectfully. Stimulate critical thinking.',
+    debater:    "DEBATER mode — challenge assumptions, play devil's advocate respectfully. Stimulate critical thinking.",
   };
   const personaHint = `
 

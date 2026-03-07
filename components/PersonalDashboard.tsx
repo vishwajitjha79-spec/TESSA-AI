@@ -57,6 +57,246 @@ const DEFAULT_HEALTH: HealthData = {
   weight: 0, height: 0, meals: [], totalCalories: 0, date: todayStr(),
 };
 
+interface WorkoutEntry { day: string; done: boolean; exercises: string[]; note?: string }
+interface CalDay { date: string; cal: number }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CalorieBarChart — full-width 7-day chart with today highlight + macro ring
+// ─────────────────────────────────────────────────────────────────────────────
+function CalorieBarChart({ data, goal, acc, isLight, todayCals, meals }: {
+  data: CalDay[]; goal: number; acc: string; isLight: boolean;
+  todayCals: number; meals: { time: string; meal: string; calories: number; confidence: string }[];
+}) {
+  const H = 100; const PAD = { l:32, r:12, t:10, b:28 };
+  const maxVal = Math.max(goal, ...data.map(d => d.cal), 100);
+  const textCol = isLight ? '#374151' : 'rgba(255,255,255,0.55)';
+  const gridCol = isLight ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.07)';
+  const today = new Date().toISOString().split('T')[0];
+  const pctToday = Math.min(1, todayCals / goal);
+  const ringColor = todayCals === 0 ? (isLight ? '#e5e7eb' : 'rgba(255,255,255,0.1)')
+    : todayCals > goal * 1.1 ? '#ef4444' : todayCals > goal * 0.8 ? '#22c55e' : '#f59e0b';
+  const r = 26; const circ = 2 * Math.PI * r;
+  const days = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+      {/* Today's ring + macro breakdown */}
+      <div style={{ display:'flex', alignItems:'center', gap:14, padding:'8px 0' }}>
+        {/* Circular progress */}
+        <div style={{ position:'relative', flexShrink:0 }}>
+          <svg width={68} height={68} viewBox="0 0 68 68">
+            <circle cx={34} cy={34} r={r} fill="none"
+              stroke={isLight?'rgba(0,0,0,0.07)':'rgba(255,255,255,0.08)'} strokeWidth={6}/>
+            <circle cx={34} cy={34} r={r} fill="none"
+              stroke={ringColor} strokeWidth={6} strokeLinecap="round"
+              strokeDasharray={circ} strokeDashoffset={circ*(1-pctToday)}
+              transform="rotate(-90 34 34)"
+              style={{transition:'stroke-dashoffset 0.6s ease'}}/>
+            <text x={34} y={31} textAnchor="middle" fill={ringColor} fontSize={11} fontWeight={900}>
+              {todayCals}
+            </text>
+            <text x={34} y={43} textAnchor="middle"
+              fill={isLight?'#9ca3af':'rgba(255,255,255,0.35)'} fontSize={7}>
+              / {goal}
+            </text>
+          </svg>
+        </div>
+        {/* Stats column */}
+        <div style={{ flex:1, display:'flex', flexDirection:'column', gap:5 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+            <span style={{ fontSize:10, fontWeight:700, color:ringColor }}>
+              {todayCals === 0 ? 'No meals logged yet' :
+               todayCals < goal * 0.5 ? `${goal - todayCals} cal remaining` :
+               todayCals > goal ? `${todayCals - goal} cal over goal` :
+               `${goal - todayCals} cal to goal`}
+            </span>
+            <span style={{ fontSize:9, color:isLight?'#9ca3af':'rgba(255,255,255,0.3)' }}>
+              {Math.round(pctToday*100)}%
+            </span>
+          </div>
+          {/* Progress bar */}
+          <div style={{ height:5, borderRadius:99, overflow:'hidden',
+            background:isLight?'rgba(0,0,0,0.07)':'rgba(255,255,255,0.08)' }}>
+            <div style={{ height:'100%', borderRadius:99, background:ringColor,
+              width:`${Math.min(100, pctToday*100)}%`, transition:'width 0.5s ease' }}/>
+          </div>
+          {/* Meal count + last meal */}
+          <div style={{ fontSize:9, color:isLight?'#6b7280':'rgba(255,255,255,0.4)' }}>
+            {meals.length === 0 ? 'Log food in Health Pulse 🥗'
+              : `${meals.length} meal${meals.length>1?'s':''} · last: ${meals[meals.length-1]?.meal?.slice(0,22)??''}`}
+          </div>
+        </div>
+      </div>
+
+      {/* 7-day bar chart — full width via viewBox */}
+      <svg viewBox={`0 0 320 ${H}`} style={{ display:'block', width:'100%', height:'auto' }}>
+        {[0.25,0.5,0.75,1].map(pct => {
+          const y = PAD.t + (H - PAD.t - PAD.b) * (1 - pct);
+          return (
+            <g key={pct}>
+              <line x1={PAD.l} y1={y} x2={320-PAD.r} y2={y} stroke={gridCol} strokeWidth={0.8}/>
+              <text x={PAD.l-3} y={y+3} textAnchor="end" fill={textCol} fontSize={6}>
+                {Math.round(maxVal*pct)}
+              </text>
+            </g>
+          );
+        })}
+        {/* Goal dashed line */}
+        {(()=>{ const gy=PAD.t+(H-PAD.t-PAD.b)*(1-goal/maxVal); return (
+          <g key="goal">
+            <line x1={PAD.l} y1={gy} x2={320-PAD.r} y2={gy} stroke={acc} strokeWidth={1} strokeDasharray="5,3" opacity={0.6}/>
+            <text x={320-PAD.r+2} y={gy+3} fill={acc} fontSize={6} fontWeight={700}>goal</text>
+          </g>
+        );})()}
+        {/* Bars */}
+        {data.map((d, i) => {
+          const inner = { w: 320-PAD.l-PAD.r, h: H-PAD.t-PAD.b };
+          const barW = inner.w / data.length;
+          const x = PAD.l + i * barW;
+          const bh = Math.max(2, (d.cal / maxVal) * inner.h);
+          const by = PAD.t + inner.h - bh;
+          const isToday = d.date === today;
+          const pct = d.cal / goal;
+          const barColor = d.cal === 0 ? (isLight?'rgba(0,0,0,0.08)':'rgba(255,255,255,0.08)')
+            : pct > 1.1 ? '#ef4444' : pct > 0.8 ? acc : `${acc}88`;
+          const di = new Date(d.date + 'T12:00').getDay();
+          const dayLabel = days[di===0?6:di-1];
+          return (
+            <g key={i}>
+              {isToday && <rect x={x+1} y={PAD.t-2} width={barW-2} height={inner.h+4}
+                fill={`${acc}08`} rx={4}/>}
+              <rect x={x+barW*0.12} y={by} width={barW*0.76} height={bh}
+                fill={barColor} rx={3} opacity={isToday?1:0.72}/>
+              {isToday && <rect x={x+barW*0.12} y={by} width={barW*0.76} height={bh}
+                fill="none" stroke={acc} strokeWidth={1.5} rx={3}/>}
+              {d.cal>0 && bh>14 && <text x={x+barW/2} y={by+9} textAnchor="middle"
+                fill="#fff" fontSize={6} fontWeight={700}>{d.cal}</text>}
+              <text x={x+barW/2} y={H-2} textAnchor="middle"
+                fill={isToday?acc:textCol} fontSize={7.5} fontWeight={isToday?900:500}>
+                {dayLabel}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TessaInsights — AI-powered super-intelligent health + study insights
+// Uses ALL available data: calories, water, sleep, workout, streaks, mood
+// ─────────────────────────────────────────────────────────────────────────────
+function TessaInsights({ health, calHistory, workoutPlan, acc, isLight, accentColor }: {
+  health: { weight:number; height:number; totalCalories:number; meals:{time:string;meal:string;calories:number;confidence:string}[]; sleepHours?:number };
+  calHistory: CalDay[];
+  workoutPlan: { day:string; done:boolean; exercises:string[] }[];
+  acc: string; isLight: boolean; accentColor: string;
+}) {
+  const [insights, setInsights] = useState<{icon:string;title:string;body:string;level:'good'|'warn'|'tip'|'great'}[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [generated, setGenerated] = useState(false);
+
+  const levelColor = (l: string) => l==='good'?'#22c55e':l==='great'?accentColor:l==='warn'?'#f59e0b':'#60a5fa';
+  const levelBg    = (l: string) => l==='good'?'#22c55e12':l==='great'?`${accentColor}12`:l==='warn'?'#f59e0b12':'#60a5fa12';
+
+  const generate = async () => {
+    setLoading(true);
+    try {
+      // Build rich context
+      const today = new Date().toISOString().split('T')[0];
+      const streak = (() => { try { const s=JSON.parse(localStorage.getItem('tessa-streaks')||'{}'); return s.streak??0; } catch{return 0;} })();
+      const water  = (() => { try { const w=JSON.parse(localStorage.getItem('tessa-wellness')||'{}'); return w.date===today?(w.water??0):0; } catch{return 0;} })();
+      const waterGoal = (() => { try { return JSON.parse(localStorage.getItem('tessa-wellness')||'{}').waterGoal??8; } catch{return 8;} })();
+      const avgCal7 = calHistory.length ? Math.round(calHistory.reduce((s,d)=>s+d.cal,0)/Math.max(1,calHistory.filter(d=>d.cal>0).length)) : 0;
+      const todayWorkout = workoutPlan.find(w=>w.day.toLowerCase()===new Date().toLocaleDateString('en-US',{weekday:'long'}).toLowerCase());
+      const workoutDoneToday = todayWorkout?.done ?? false;
+      const bmi = health.height&&health.weight ? health.weight/((health.height/100)**2) : null;
+
+      const ctx = `
+Ankit's data today (${new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'short'})}):
+- Calories today: ${health.totalCalories} / 2200 cal goal
+- Meals logged: ${health.meals.length} (${health.meals.map(m=>m.meal).join(', ')||'none'})
+- 7-day avg calories: ${avgCal7} cal
+- Water: ${water} / ${waterGoal} glasses
+- Sleep last night: ${health.sleepHours??'not logged'} hours
+- Workout today: ${todayWorkout?`${todayWorkout.exercises.slice(0,3).join(', ')} — ${workoutDoneToday?'✓ DONE':'not done yet'}`:'rest day'}
+- Chat streak: ${streak} days
+- BMI: ${bmi?bmi.toFixed(1):'not set'} (weight:${health.weight||'?'}kg, height:${health.height||'?'}cm)
+- Calorie trend (7 days): ${calHistory.map(d=>d.cal).join(', ')||'no data'}
+`;
+      const res = await fetch('/api/chat', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          messages: [{ role:'user', content: ctx }],
+          isCreatorMode: true, maxTokens: 700,
+          _systemOverride: `You are Tessa's health intelligence engine. Analyze Ankit's health data and return ONLY a JSON array of 4-5 insights (no preamble, no markdown):
+[{"icon":"🔥","title":"short title","body":"1-2 sentences specific insight","level":"good|warn|tip|great"}]
+Rules:
+- Be specific with numbers from the data (e.g. "You're 340 cal under goal")
+- level: "great" for achievements, "good" for on-track, "warn" for issues, "tip" for actionable advice
+- Reference actual meals/workout if logged
+- If no data: give motivational, actionable tips
+- Be smart, personal, not generic — like a caring AI doctor/coach`
+        })
+      });
+      const data = await res.json();
+      const text = (data.content||'').replace(/```json|```/g,'').trim();
+      const idx = text.indexOf('['); const last = text.lastIndexOf(']');
+      if (idx !== -1 && last !== -1) {
+        const parsed = JSON.parse(text.slice(idx,last+1));
+        if (Array.isArray(parsed)) { setInsights(parsed); setGenerated(true); }
+      }
+    } catch { 
+      setInsights([
+        {icon:'💧',title:'Hydration Check',body:`Log your water intake in Health Pulse to track hydration.`,level:'tip'},
+        {icon:'🍽️',title:'Meal Tracking',body:`Start logging meals to get personalized calorie insights.`,level:'tip'},
+        {icon:'💪',title:'Workout Ready',body:`Check your workout plan in the Health tab and mark it done after completing.`,level:'tip'},
+      ]);
+      setGenerated(true);
+    }
+    setLoading(false);
+  };
+
+  if (!generated) {
+    return (
+      <button onClick={generate} disabled={loading}
+        style={{ width:'100%', padding:'10px', borderRadius:10, cursor:loading?'wait':'pointer',
+          background:`${acc}12`, border:`1px dashed ${acc}40`, color:acc,
+          fontSize:11, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+        {loading ? (
+          <><span style={{animation:'spin 1s linear infinite',display:'inline-block'}}>⟳</span> Generating insights…</>
+        ) : (
+          <><span>✨</span> Generate Smart Insights</>
+        )}
+      </button>
+    );
+  }
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+      {insights.map((ins, i) => (
+        <div key={i} style={{ padding:'9px 11px', borderRadius:10,
+          background:levelBg(ins.level), border:`1px solid ${levelColor(ins.level)}25` }}>
+          <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:3 }}>
+            <span style={{ fontSize:14 }}>{ins.icon}</span>
+            <span style={{ fontSize:11, fontWeight:800, color:levelColor(ins.level) }}>{ins.title}</span>
+          </div>
+          <p style={{ fontSize:10, color:isLight?'#374151':'rgba(255,255,255,0.72)', lineHeight:1.5, margin:0 }}>
+            {ins.body}
+          </p>
+        </div>
+      ))}
+      <button onClick={generate} disabled={loading}
+        style={{ alignSelf:'flex-end', padding:'4px 10px', borderRadius:8, cursor:'pointer',
+          background:'transparent', border:`1px solid ${acc}30`, color:acc,
+          fontSize:9, fontWeight:700, marginTop:2 }}>
+        {loading?'Refreshing…':'↻ Refresh'}
+      </button>
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Paperdoll — proper anatomical proportions, BMI-responsive
 // ─────────────────────────────────────────────────────────────────────────────
@@ -193,6 +433,9 @@ export default function PersonalDashboard({ isLight = false, accentColor = '#ec4
   const [editStats,   setEditStats]   = useState(false);
   const [wDraft,      setWDraft]      = useState('');
   const [hDraft,      setHDraft]      = useState('');
+  const [calHistory,  setCalHistory]  = useState<CalDay[]>([]);
+  const [workoutPlan, setWorkoutPlan] = useState<WorkoutEntry[]>([]);
+  const [savedPlanners, setSavedPlanners] = useState<{id:string;name:string;type:string;content:string;saved:string}[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // ── Load ─────────────────────────────────────────────────────────────────
@@ -210,13 +453,42 @@ export default function PersonalDashboard({ isLight = false, accentColor = '#ec4
         setWDraft(String(hd.weight || ''));
         setHDraft(String(hd.height || ''));
       }
+      // Load calHistory
+      const ch = localStorage.getItem('tessa-cal-history');
+      if (ch) {
+        const raw = JSON.parse(ch);
+        const today = todayStr();
+        const days: CalDay[] = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(); d.setDate(d.getDate() - i);
+          const ds = d.toISOString().split('T')[0];
+          days.push({ date: ds, cal: raw[ds] ?? 0 });
+        }
+        setCalHistory(days);
+      } else {
+        // build empty 7-day array
+        const days: CalDay[] = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(); d.setDate(d.getDate() - i);
+          days.push({ date: d.toISOString().split('T')[0], cal: 0 });
+        }
+        setCalHistory(days);
+      }
+      // Load workout plan
+      const wp = localStorage.getItem('tessa-workout-plan');
+      if (wp) setWorkoutPlan(JSON.parse(wp));
+      // Load saved planners
+      const sp = localStorage.getItem('tessa-saved-planners');
+      if (sp) setSavedPlanners(JSON.parse(sp));
     } catch { }
   }, []);
 
   // ── Persist ───────────────────────────────────────────────────────────────
-  useEffect(() => { try { localStorage.setItem('tessa-exams',  JSON.stringify(exams));  } catch { } }, [exams]);
-  useEffect(() => { try { localStorage.setItem('tessa-forms',  JSON.stringify(forms));  } catch { } }, [forms]);
-  useEffect(() => { try { localStorage.setItem('tessa-health', JSON.stringify(health)); } catch { } }, [health]);
+  useEffect(() => { try { localStorage.setItem('tessa-exams',   JSON.stringify(exams));         } catch { } }, [exams]);
+  useEffect(() => { try { localStorage.setItem('tessa-forms',   JSON.stringify(forms));         } catch { } }, [forms]);
+  useEffect(() => { try { localStorage.setItem('tessa-health',  JSON.stringify(health));        } catch { } }, [health]);
+  useEffect(() => { try { localStorage.setItem('tessa-workout-plan', JSON.stringify(workoutPlan)); } catch {} }, [workoutPlan]);
+  useEffect(() => { try { localStorage.setItem('tessa-saved-planners', JSON.stringify(savedPlanners)); } catch {} }, [savedPlanners]);
 
   useEffect(() => {
     setSuggestions(foodInput.length >= 2 ? getFoodSuggestions(foodInput).slice(0, 6) : []);
@@ -366,7 +638,7 @@ export default function PersonalDashboard({ isLight = false, accentColor = '#ec4
           {([
             { lbl: 'Exams left',   val: upExams.length,          clr: '#818cf8' },
             { lbl: 'Forms due',    val: pendForms.length,        clr: '#f472b6' },
-            { lbl: 'Sleep',        val: health.sleepHours ? `${health.sleepHours}h` : '—', clr: '#a78bfa' },
+            { lbl: "Today's Cal",  val: health.totalCalories ? `${health.totalCalories}` : '—', clr: calPct > 90 ? '#ef4444' : '#22c55e' },
             { lbl: 'BMI',          val: bmiRaw?.toFixed(1) ?? '—', clr: bmiClr },
           ] as { lbl: string; val: string | number; clr: string }[]).map(s => (
             <div key={s.lbl} style={{ ...crd() }}>
@@ -640,6 +912,145 @@ export default function PersonalDashboard({ isLight = false, accentColor = '#ec4
         {/* Paperdoll */}
         <Paperdoll bmiRaw={bmiRaw} weight={health.weight} height={health.height} acc={acc} isLight={isLight} />
       </div>
+
+      {/* 7-day calorie chart — full width with today ring */}
+      <div style={{ ...crd() }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+          <span style={{ fontSize:11, fontWeight:700, color:text }}>Calories Today + 7-Day Trend</span>
+          <span style={{ fontSize:9, color:sub }}>{CAL_GOAL} cal goal</span>
+        </div>
+        <CalorieBarChart
+          data={calHistory}
+          goal={CAL_GOAL}
+          acc={acc}
+          isLight={isLight}
+          todayCals={health.totalCalories}
+          meals={health.meals}
+        />
+      </div>
+
+      {/* Smart Insights */}
+      <div style={{ ...crd() }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+          <span style={{ fontSize:11, fontWeight:700, color:text }}>✨ Smart Insights</span>
+          <span style={{ fontSize:9, color:sub }}>AI-powered</span>
+        </div>
+        <TessaInsights
+          health={health}
+          calHistory={calHistory}
+          workoutPlan={workoutPlan}
+          acc={acc}
+          isLight={isLight}
+          accentColor={accentColor}
+        />
+      </div>
+
+      {/* Workout plan — synced with PlannerHub — full week */}
+      <div style={{ ...crd() }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+          <span style={{ fontSize:11, fontWeight:700, color:text }}>Workout Plan</span>
+          {workoutPlan.length === 0
+            ? <span style={{ fontSize:9, color:sub }}>Generate in Tools → Planners</span>
+            : <span style={{ fontSize:9, color:'#22c55e' }}>
+                {workoutPlan.filter(w=>w.done).length}/{workoutPlan.length} done this week
+              </span>
+          }
+        </div>
+        {workoutPlan.length > 0 ? (() => {
+          const today = new Date().toLocaleDateString('en-US',{weekday:'long'});
+          const todayEntry = workoutPlan.find(w => w.day.toLowerCase() === today.toLowerCase())
+            ?? workoutPlan[new Date().getDay() % workoutPlan.length];
+          const doneDays = workoutPlan.filter(w=>w.done).length;
+          return (
+            <div>
+              {/* Week progress dots */}
+              <div style={{ display:'flex', gap:4, marginBottom:8, flexWrap:'wrap' }}>
+                {workoutPlan.map((w,i) => {
+                  const isT = w.day.toLowerCase()===today.toLowerCase();
+                  return (
+                    <div key={i} title={`${w.day}: ${w.exercises.slice(0,2).join(', ')}`}
+                      style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:2, minWidth:32 }}>
+                      <div style={{ width:24, height:24, borderRadius:'50%', display:'flex',
+                        alignItems:'center', justifyContent:'center', fontSize:9, fontWeight:800,
+                        border:`2px solid ${w.done?'#22c55e':isT?acc:'rgba(255,255,255,0.15)'}`,
+                        background:w.done?'#22c55e18':isT?`${acc}15`:'transparent',
+                        color:w.done?'#22c55e':isT?acc:sub }}>
+                        {w.done?'✓':isT?'▶':w.exercises.length}
+                      </div>
+                      <span style={{ fontSize:7, color:isT?acc:sub }}>{w.day.slice(0,2)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Today's exercises */}
+              {todayEntry && (
+                <div style={{ background:isLight?'rgba(0,0,0,0.03)':'rgba(255,255,255,0.03)',
+                  borderRadius:9, padding:'8px 10px', border:`1px solid ${todayEntry.done?'#22c55e25':acc+'20'}` }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:5 }}>
+                    <span style={{ fontSize:11, fontWeight:800, color:acc }}>{todayEntry.day} — Today</span>
+                    <button
+                      onClick={()=>setWorkoutPlan(p=>p.map(w=>w.day===todayEntry.day?{...w,done:!w.done}:w))}
+                      style={{ fontSize:9, padding:'3px 10px', borderRadius:8,
+                        border:`1px solid ${todayEntry.done?'#22c55e':acc}`,
+                        background:todayEntry.done?'#22c55e22':`${acc}15`,
+                        color:todayEntry.done?'#22c55e':acc, cursor:'pointer', fontWeight:700 }}>
+                      {todayEntry.done ? '✓ Done!' : 'Mark Done'}
+                    </button>
+                  </div>
+                  <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>
+                    {todayEntry.exercises.map((ex,i) => (
+                      <span key={i} style={{ fontSize:9, padding:'3px 8px', borderRadius:6,
+                        background:isLight?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.07)',
+                        border:`1px solid ${acc}20`, color:textMid }}>
+                        {ex}
+                      </span>
+                    ))}
+                  </div>
+                  {todayEntry.note && (
+                    <p style={{ fontSize:9, color:sub, marginTop:5, lineHeight:1.4 }}>💡 {todayEntry.note}</p>
+                  )}
+                  {todayEntry.done && (
+                    <p style={{ fontSize:9, color:'#22c55e', marginTop:4, fontWeight:700 }}>
+                      🔥 ~{Math.round(todayEntry.exercises.length*35+doneDays*15)} cal burned · {doneDays} day streak
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })() : (
+          <div style={{ textAlign:'center', padding:'10px 0', color:sub, fontSize:10 }}>
+            No workout plan — generate one in Tools → Planners
+          </div>
+        )}
+      </div>
+
+      {/* Saved Planners */}
+      {savedPlanners.length > 0 && (
+        <div style={{ ...crd() }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+            <span style={{ fontSize:11, fontWeight:700, color:text }}>Saved Planners</span>
+            <span style={{ fontSize:9, color:sub }}>{savedPlanners.length} saved</span>
+          </div>
+          <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
+            {savedPlanners.slice(-4).reverse().map(p => (
+              <div key={p.id} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 10px',
+                background:isLight?'rgba(0,0,0,0.035)':'rgba(255,255,255,0.04)',
+                borderRadius:8, border:`1px solid ${acc}18` }}>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontSize:11, fontWeight:600, color:text,
+                    overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</div>
+                  <div style={{ fontSize:9, color:sub, marginTop:1 }}>{p.type} · {new Date(p.saved).toLocaleDateString()}</div>
+                </div>
+                <button onClick={()=>setSavedPlanners(prev=>prev.filter(x=>x.id!==p.id))}
+                  style={{ background:'none', border:'none', color:sub, cursor:'pointer', padding:2, opacity:0.5 }}>
+                  <Trash2 size={11} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Meal log — read-only, synced from Health Pulse */}
       <div style={{ ...crd() }}>
